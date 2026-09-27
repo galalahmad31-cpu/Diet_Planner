@@ -3,7 +3,9 @@ const db = window.DietPlannerAccess?.supabaseClient;
 const state = {
   isAdmin: false,
   sections: [],
-  deletingId: null
+  deletingId: null,
+  linkEditorId: null,
+  linkSelection: null
 };
 
 const $ = (id) => document.getElementById(id);
@@ -41,6 +43,85 @@ function openDeleteModal(id) {
   state.deletingId = id;
   $("deleteModal")?.classList.remove("hidden");
   $("deleteModal")?.classList.add("flex");
+}
+
+function openLinkModal(id) {
+  if (!state.isAdmin) return;
+
+  const editor = $("editor-" + id);
+  if (!editor) return;
+
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0 || !editor.contains(selection.anchorNode)) {
+    alert("حدد النص أو الرمز الذي تريد ربطه أولاً.");
+    return;
+  }
+
+  state.linkEditorId = id;
+  state.linkSelection = selection.getRangeAt(0).cloneRange();
+
+  const modal = $("linkModal");
+  const input = $("linkUrlInput");
+  if (!modal || !input) return;
+
+  input.value = "https://";
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+  requestAnimationFrame(() => {
+    input.focus();
+    input.select();
+  });
+}
+
+function closeLinkModal() {
+  state.linkEditorId = null;
+  state.linkSelection = null;
+  $("linkModal")?.classList.add("hidden");
+  $("linkModal")?.classList.remove("flex");
+}
+
+function applyLink() {
+  const id = state.linkEditorId;
+  const editor = id ? $("editor-" + id) : null;
+  const input = $("linkUrlInput");
+  if (!editor || !input) return;
+
+  const url = input.value.trim();
+  if (!url) return;
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    input.focus();
+    input.select();
+    alert("يرجى إدخال رابط صحيح.");
+    return;
+  }
+
+  if (!["http:", "https:", "mailto:", "tel:"].includes(parsedUrl.protocol)) {
+    input.focus();
+    input.select();
+    alert("نوع الرابط غير مدعوم.");
+    return;
+  }
+
+  editor.focus();
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  if (state.linkSelection) selection?.addRange(state.linkSelection);
+
+  document.execCommand("createLink", false, url);
+
+  editor.querySelectorAll("a").forEach(link => {
+    if (link.href === url || link.getAttribute("href") === url) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
+  });
+
+  autoGrow(editor);
+  closeLinkModal();
 }
 
 function toolbarHtml(id) {
@@ -329,39 +410,37 @@ function runCommand(command, id) {
   if (!state.isAdmin) return;
   const editor = $("editor-" + id);
   if (!editor) return;
-  editor.focus();
 
   if (command === "createLink") {
-    const url = prompt("أدخل الرابط:", "https://");
-    if (!url) return;
-
-    try {
-      new URL(url);
-    } catch {
-      alert("يرجى إدخال رابط صحيح.");
-      return;
-    }
-
-    document.execCommand("createLink", false, url);
-
-    editor.querySelectorAll("a").forEach(link => {
-      if (link.href === url || link.getAttribute("href") === url) {
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-      }
-    });
-  } else {
-    document.execCommand(command, false, null);
+    openLinkModal(id);
+    return;
   }
 
+  editor.focus();
+  document.execCommand(command, false, null);
   autoGrow(editor);
 }
 
 $("addSectionBtn")?.addEventListener("click", addSection);
 $("cancelDeleteBtn")?.addEventListener("click", closeDeleteModal);
 $("confirmDeleteBtn")?.addEventListener("click", confirmDelete);
+$("cancelLinkBtn")?.addEventListener("click", closeLinkModal);
+$("applyLinkBtn")?.addEventListener("click", applyLink);
+$("linkUrlInput")?.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    applyLink();
+  }
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeLinkModal();
+  }
+});
 $("deleteModal")?.addEventListener("click", event => {
   if (event.target === $("deleteModal")) closeDeleteModal();
+});
+$("linkModal")?.addEventListener("click", event => {
+  if (event.target === $("linkModal")) closeLinkModal();
 });
 
 $("sectionsContainer")?.addEventListener("click", event => {
