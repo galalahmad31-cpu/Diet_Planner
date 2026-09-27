@@ -198,8 +198,8 @@ async function addNewDay(){
  showToast(`تمت إضافة اليوم ${n} — اضغط حفظ لتخزينه`);
 }
 function toggleDayCollapse(id){const d=daysData.find(x=>x.id===id);if(d){d.isCollapsed=!d.isCollapsed;renderDays();}}
-function updateDayTitle(id,v){const d=daysData.find(x=>x.id===id);if(d&&isDayEditing(id))d.title=v;}
-function updateDayNotes(id,v){const d=daysData.find(x=>x.id===id);if(d&&isDayEditing(id))d.notes=v;}
+function updateDayTitle(id,v){const d=daysData.find(x=>String(x.id)===String(id));if(d&&isDayEditing(id))d.title=v;}
+function updateDayNotes(id,v){const d=daysData.find(x=>String(x.id)===String(id));if(d&&isDayEditing(id))d.notes=v;}
 function updateMealName(did,mid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(!m||!isDayEditing(did))return;if(!String(v).trim()){showToast('اسم الوجبة لا يمكن أن يكون فارغًا','error');renderDays();return}m.name=String(v).trim();}
 function moveMeal(did,mid,dir){const d=daysData.find(x=>x.id===did);if(!d||!isDayEditing(did))return;const i=d.meals.findIndex(x=>x.id===mid),n=i+Number(dir);if(i<0||n<0||n>=d.meals.length)return;const [m]=d.meals.splice(i,1);d.meals.splice(n,0,m);renderDays();}
 function deleteDay(id){openConfirmModal('حذف اليوم','هل أنت متأكد من حذف هذا اليوم بالكامل؟',async()=>{const old=cloneDays(savedDaysData);savedDaysData=savedDaysData.filter(d=>String(d.id)!==String(id));daysData=cloneDays(savedDaysData);const ok=await savePlan();if(!ok){savedDaysData=old;daysData=cloneDays(old);showToast('تعذر حذف اليوم من قاعدة البيانات','error')}else{delete dayEditModes[String(id)];showToast('تم حذف اليوم بنجاح')}renderDays();});}
@@ -368,13 +368,36 @@ async function syncFixedMeals(){
   sb.from('diet_templates').select('*').eq('visibility','public').order('created_at',{ascending:false}),
   sb.from('diet_templates').select('*').eq('created_by',user.id).order('created_at',{ascending:false})
  ]);
- if(pub.error||own.error){fixedMealsDatabase=[];return}
+ if(pub.error||own.error){console.error('Fixed diets load failed:',pub.error||own.error);fixedMealsDatabase=[];return}
  const map=new Map();[...(pub.data||[]),...(own.data||[])].forEach(d=>map.set(d.id,d));const diets=[...map.values()];
  const ids=diets.map(d=>d.id);if(!ids.length){fixedMealsDatabase=[];return}
- const dr=await sb.from('diet_template_days').select('*').in('diet_id',ids).order('day_number',{ascending:true});if(dr.error)return;
- const days=dr.data||[],dayIds=days.map(x=>x.id);let meals=[];
- if(dayIds.length){const r=await sb.from('diet_template_meals').select('*').in('day_id',dayIds).order('meal_order',{ascending:true});meals=r.data||[]}
- const mids=meals.map(x=>x.id);let items=[];if(mids.length){const r=await sb.from('diet_template_items').select('*').in('meal_id',mids).order('item_order',{ascending:true});items=r.data||[]}
+
+ const days=[];
+ for(let i=0;i<ids.length;i+=100){
+  const chunk=ids.slice(i,i+100);
+  const r=await sb.from('diet_template_days').select('*').in('diet_id',chunk).order('day_number',{ascending:true});
+  if(r.error){console.error('Fixed diet days load failed:',r.error);fixedMealsDatabase=[];return}
+  days.push(...(r.data||[]));
+ }
+
+ const dayIds=days.map(x=>x.id);
+ const meals=[];
+ for(let i=0;i<dayIds.length;i+=100){
+  const chunk=dayIds.slice(i,i+100);
+  const r=await sb.from('diet_template_meals').select('*').in('day_id',chunk).order('meal_order',{ascending:true});
+  if(r.error){console.error('Fixed diet meals load failed:',r.error);fixedMealsDatabase=[];return}
+  meals.push(...(r.data||[]));
+ }
+
+ const mids=meals.map(x=>x.id);
+ const items=[];
+ for(let i=0;i<mids.length;i+=100){
+  const chunk=mids.slice(i,i+100);
+  const r=await sb.from('diet_template_items').select('*').in('meal_id',chunk).order('item_order',{ascending:true});
+  if(r.error){console.error('Fixed diet items load failed:',r.error);fixedMealsDatabase=[];return}
+  items.push(...(r.data||[]));
+ }
+
  fixedMealsDatabase=diets.map(d=>{const day=days.find(x=>x.diet_id===d.id);return{id:d.id,name:d.name||'دايت ثابت',description:d.description||'',created_by:d.created_by,target_calories:d.target_calories,target_protein:d.target_protein,target_carb:d.target_carb,target_fat:d.target_fat,meals:day?meals.filter(m=>m.day_id===day.id).map(m=>({name:m.meal_name||'وجبة',frequency:m.frequency||'',items:items.filter(i=>i.meal_id===m.id).map(i=>({foodId:String(i.food_id),grams:Number(i.quantity_g)||0,repeat:i.frequency??'',notes:i.notes??'',household_measure:i.household_measure||''}))})):[]}}).filter(d=>d.meals.length);
  fixedMealsDatabase.sort((a,b)=>(a.created_by===user.id?0:1)-(b.created_by===user.id?0:1));
 }
@@ -541,10 +564,10 @@ async function savePlan(){
 }
 
 function openPrintSettingsModal(){
-  const modal=document.getElementById('printSettingsModal');
-  const pb=document.getElementById('executePrintBtn');
-  if(pb)pb.dataset.printMode='diet';
-  if(modal)modal.classList.remove('hidden');
+ const modal=document.getElementById('printSettingsModal');
+ const pb=document.getElementById('executePrintBtn');
+ if(pb)pb.dataset.printMode='diet';
+ if(modal)modal.classList.remove('hidden');
 }
 function closePrintSettingsModal(){document.getElementById('printSettingsModal').classList.add('hidden')}
 function buildPrintPlan(){
