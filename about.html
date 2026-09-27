@@ -89,6 +89,24 @@
     </div>
   </main>
 
+  <!-- Link dialog -->
+  <div id="linkModal" class="hidden fixed inset-0 z-[210] items-center justify-center bg-slate-900/45 px-4">
+    <div class="glass w-full max-w-md rounded-3xl p-6 shadow-2xl">
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+        <i class="fa-solid fa-link"></i>
+      </div>
+      <h3 class="mt-4 text-center text-lg font-black text-slate-800">إضافة رابط</h3>
+      <p class="mt-2 text-center text-sm leading-7 text-slate-500">أدخل الرابط الذي سيفتح عند الضغط على النص أو الرمز المحدد.</p>
+      <input id="linkUrlInput" type="url" dir="ltr" inputmode="url" autocomplete="url"
+             placeholder="https://example.com"
+             class="mt-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <button id="cancelLinkBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-extrabold text-slate-600 hover:bg-slate-50">إلغاء</button>
+        <button id="applyLinkBtn" type="button" class="rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-brand-700">إضافة الرابط</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Delete confirmation -->
   <div id="deleteModal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-slate-900/45 px-4">
     <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl">
