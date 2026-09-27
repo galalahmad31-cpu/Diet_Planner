@@ -51,6 +51,63 @@
         }).join('');
     }
 
+    function confirmRoleChange(profile, newRole) {
+        return new Promise((resolve) => {
+            const bg = $('confirmBg');
+            const title = $('confirmTitle');
+            const text = $('confirmText');
+            const yes = $('confirmYes');
+            const no = $('confirmNo');
+            const close = $('confirmClose');
+
+            if (!bg || !title || !text || !yes || !no || !close) {
+                resolve(window.confirm(
+                    newRole === 'admin'
+                        ? `هل تريد تحويل ${profile.full_name || profile.email || 'هذا المستخدم'} إلى Admin؟`
+                        : `هل تريد تحويل ${profile.full_name || profile.email || 'هذا المستخدم'} إلى User؟`
+                ));
+                return;
+            }
+
+            title.textContent = newRole === 'admin' ? 'تغيير صلاحية المستخدم' : 'إزالة صلاحية الأدمن';
+            text.innerHTML = newRole === 'admin'
+                ? `هل تريد تحويل <b>${esc(profile.full_name || profile.email || 'هذا المستخدم')}</b> إلى <b>Admin</b>؟<br><span style="color:#718683">سيحصل المستخدم على صلاحيات الإدارة.</span>`
+                : `هل تريد تحويل <b>${esc(profile.full_name || profile.email || 'هذا المستخدم')}</b> إلى <b>User</b>؟<br><span style="color:#718683">سيتم إزالة صلاحيات الإدارة منه.</span>`;
+            bg.style.display = 'flex';
+
+            let settled = false;
+            const finish = (value) => {
+                if (settled) return;
+                settled = true;
+                bg.style.display = 'none';
+                yes.removeEventListener('click', onYes);
+                no.removeEventListener('click', onNo);
+                close.removeEventListener('click', onNo);
+                bg.removeEventListener('click', onBackground);
+                resolve(value);
+            };
+
+            const onYes = (event) => {
+                event.stopImmediatePropagation();
+                finish(true);
+            };
+
+            const onNo = (event) => {
+                event.stopImmediatePropagation();
+                finish(false);
+            };
+
+            const onBackground = (event) => {
+                if (event.target === event.currentTarget) finish(false);
+            };
+
+            yes.addEventListener('click', onYes);
+            no.addEventListener('click', onNo);
+            close.addEventListener('click', onNo);
+            bg.addEventListener('click', onBackground);
+        });
+    }
+
     async function changeRole(userId, newRole, select) {
         const profile = state.profiles.find((item) => item.id === userId);
         if (!profile || userId === state.currentUserId) {
@@ -61,11 +118,7 @@
         const previousRole = profile.role;
         if (newRole === previousRole) return;
 
-        const confirmed = window.confirm(
-            newRole === 'admin'
-                ? `هل تريد تحويل ${profile.full_name || profile.email || 'هذا المستخدم'} إلى Admin؟`
-                : `هل تريد تحويل ${profile.full_name || profile.email || 'هذا المستخدم'} إلى User؟`
-        );
+        const confirmed = await confirmRoleChange(profile, newRole);
 
         if (!confirmed) {
             select.value = previousRole;
