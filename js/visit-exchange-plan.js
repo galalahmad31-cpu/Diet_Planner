@@ -28,7 +28,7 @@ function total(){return G.reduce((a,g)=>{const r=S.r[g.k],v=vals(g),c=n(r.count)
 function setButtons(){const has=!!S.plan;document.getElementById('exchangeSaveBtn').disabled=!S.editing;document.getElementById('exchangeEditBtn').disabled=!has||S.editing;document.getElementById('exchangeDeleteBtn').disabled=!has||S.editing}
 function updateDisplay(){calc();const t=total();document.getElementById('exchangeTotalCal').textContent=rnd(t.kcal,0);document.getElementById('exchangeTotalPro').textContent=rnd(t.pro,1);document.getElementById('exchangeTotalCarb').textContent=rnd(t.carb,1);document.getElementById('exchangeTotalFat').textContent=rnd(t.fat,1);G.forEach(g=>{const row=document.querySelector('[data-ex-row="'+g.k+'"]');if(!row)return;const r=S.r[g.k],v=vals(g),c=n(r.count),els=row.querySelectorAll('[data-val]');[c*v.kcal,c*v.carb,c*v.pro,c*v.fat].forEach((v,i)=>{if(els[i])els[i].textContent=rnd(v,1)});const inp=row.querySelector('[data-count]');if(inp&&document.activeElement!==inp)inp.value=r.count})}
 function render(){calc();document.getElementById('exchangeTargetCal').textContent=S.t.cal?rnd(S.t.cal,0)+' kcal':'—';document.getElementById('exchangeTargetPro').textContent=S.t.pro?rnd(S.t.pro,1)+' g':'—';document.getElementById('exchangeTargetCarb').textContent=S.t.carb?rnd(S.t.carb,1)+' g':'—';document.getElementById('exchangeTargetFat').textContent=S.t.fat?rnd(S.t.fat,1)+' g':'—';const b=document.getElementById('exchangeValuesBody');b.innerHTML=G.map(g=>{const r=S.r[g.k],v=vals(g),c=n(r.count);let sub='—';if(g.subs)sub='<select data-sub="'+g.k+'" '+(S.editing?'':'disabled')+' class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-bold">'+g.subs.map(s=>'<option value="'+esc(s)+'" '+(r.sub===s?'selected':'')+'>'+esc(s)+'</option>').join('')+'</select>';const cnt=g.m?'<input data-count="'+g.k+'" '+(S.editing?'':'disabled')+' type="number" min="0" step="0.5" inputmode="decimal" value="'+r.count+'" class="w-20 mx-auto block text-center bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-extrabold text-violet-700">':'<span class="font-black text-violet-700">'+rnd(r.count,2)+'</span>';return '<tr data-ex-row="'+g.k+'" class="border-b border-slate-100 last:border-0"><td class="py-2.5 px-3 font-black">'+esc(g.n)+'</td><td class="py-2.5 px-3">'+sub+'</td><td class="py-2.5 px-3 text-center">'+cnt+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.kcal,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.carb,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.pro,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.fat,1)+'</td></tr>'}).join('');updateDisplay();setButtons()}
-async function findPlans(){const c=ctx();if(!c.patient_id)return[];let q=dbx.from('nutrition_plans').select('id,patient_id,visit_id,target_calories,target_protein,target_carb,target_fat,goal,created_at,updated_at').eq('patient_id',c.patient_id);if(c.id)q=q.eq('visit_id',c.id);const {data,error}=await q.order('updated_at',{ascending:false}).order('created_at',{ascending:false});return error?[]:(data||[])}
+async function findPlans(){const c=ctx();if(!c.patient_id)return[];let q=dbx.from('nutrition_plans').select('id,patient_id,visit_id,plan_name,target_calories,target_protein,target_carb,target_fat,goal,created_at,updated_at').eq('patient_id',c.patient_id);if(c.id)q=q.eq('visit_id',c.id);const {data,error}=await q.order('updated_at',{ascending:false}).order('created_at',{ascending:false});return error?[]:(data||[])}
 async function loadExchangeValues(){if(!S.plan)return;const r=await dbx.from('exchange_values').select('group_name,subgroup_name,exchange_count').eq('plan_id',S.plan);if(!r.error)(r.data||[]).forEach(x=>{const g=G.find(y=>y.n===x.group_name);if(g){S.r[g.k].count=n(x.exchange_count);if(x.subgroup_name)S.r[g.k].sub=x.subgroup_name}});S.saved=(r.data||[]).length>0}
 async function ensureExchangePlan(skipAuth=false){
   if(!skipAuth && !(await canWriteExchangePlan())){status('إنشاء خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return null;}
@@ -42,7 +42,19 @@ async function ensureExchangePlan(skipAuth=false){
  }
 
  const plans=await findPlans();
- const base=plans.find(p=>p.plan_name==='الخطة الغذائية');
+ const exchange=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام البدائل');
+ const base=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام الجرامات');
+
+ if(exchange){
+  S.t={
+   cal:n(exchange.target_calories),
+   pro:n(exchange.target_protein),
+   carb:n(exchange.target_carb),
+   fat:n(exchange.target_fat)
+  };
+  S.plan=exchange.id;
+  return S.plan;
+ }
 
  if(base){
   S.t={
@@ -364,19 +376,26 @@ async function init(){
 
  const plans=await findPlans();
  const ex=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام البدائل');
- const base=plans.find(p=>p.plan_name==='الخطة الغذائية');
+ const gram=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام الجرامات');
 
  /*
-  * The exchange plan is independent of calculator approval.
-  * Existing targets are loaded when available, but they are not
-  * required to create a day or edit the exchange plan.
+  * The exchange plan uses the targets saved by calculator approval.
+  * Prefer its own saved targets, then fall back to the gram plan for
+  * older records where the exchange row exists without targets.
   */
- if(base){
+ if(ex){
   S.t={
-   cal:n(base.target_calories),
-   pro:n(base.target_protein),
-   carb:n(base.target_carb),
-   fat:n(base.target_fat)
+   cal:n(ex.target_calories),
+   pro:n(ex.target_protein),
+   carb:n(ex.target_carb),
+   fat:n(ex.target_fat)
+  };
+ }else if(gram){
+  S.t={
+   cal:n(gram.target_calories),
+   pro:n(gram.target_protein),
+   carb:n(gram.target_carb),
+   fat:n(gram.target_fat)
   };
  }else{
   S.t={cal:0,pro:0,carb:0,fat:0};
