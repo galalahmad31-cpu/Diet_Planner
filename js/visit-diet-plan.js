@@ -17,7 +17,7 @@ let patientId=initialUrlPatientId;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
-let fixedMealsLoadPromise=null;
+let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
 const FIXED_DIET_CACHE_V1='fixed-diet-cache-v1';
 const FIXED_DIET_CACHE_TTL=5*60*1000;
 
@@ -103,47 +103,70 @@ async function loadPatient(){
  return true;
 }
 
-async function loadFoods(){
- /*
-  * Ask Supabase for the exact current row count, then request that full
-  * range. No fixed client-side limit such as 1000 is used.
-  */
- const {data,error,count}=await sb.from('foods')
-  .select('*',{count:'exact'})
-  .order('name_ar',{ascending:true});
+async function loadFoods(options={}){
+ const ids=Array.isArray(options.ids)?[...new Set(options.ids.map(String).filter(Boolean))]:null;
+ const isFullLoad=!ids;
 
- if(error){
-  console.error('Foods load failed:',error);
-  showToast('تعذر تحميل مكتبة الأغذية','error');
-  return false;
- }
+ if(isFullLoad && foodsFullyLoaded)return true;
+ if(foodsLoadPromise)return foodsLoadPromise;
 
- const rows=data||[];
- foodDatabase=rows.map(f=>({
-  id:String(f.id),
-  name:String(f.name_ar??'').trim(),
-  household:f.household||'',
-  calories:Number(f.kcal||0),
-  protein:Number(f.protein||0),
-  carbs:Number(f.carb||0),
-  fat:Number(f.fat||0),
-  sodium:Number(f.sodium||0),
-  potassium:Number(f.potassium||0),
-  phosphorus:Number(f.phosphorus||0)
- }));
+ foodsLoadPromise=(async()=>{
+  let query=sb.from('foods').select('*',{count:'exact'}).order('name_ar',{ascending:true});
+  if(ids?.length)query=query.in('id',ids);
+  else if(ids){
+   foodDatabase=[];
+   return true;
+  }
 
- console.info(`Foods loaded: ${foodDatabase.length}`);
- return true;
+  const {data,error}=await query;
+  if(error){
+   console.error('Foods load failed:',error);
+   showToast('تعذر تحميل مكتبة الأغذية','error');
+   return false;
+  }
+
+  const rows=data||[];
+  const mapped=rows.map(f=>({
+   id:String(f.id),
+   name:String(f.name_ar??'').trim(),
+   household:f.household||'',
+   calories:Number(f.kcal||0),
+   protein:Number(f.protein||0),
+   carbs:Number(f.carb||0),
+   fat:Number(f.fat||0),
+   sodium:Number(f.sodium||0),
+   potassium:Number(f.potassium||0),
+   phosphorus:Number(f.phosphorus||0)
+  }));
+
+  if(isFullLoad){
+   foodDatabase=mapped;
+   foodsFullyLoaded=true;
+  }else{
+   const existing=new Map(foodDatabase.map(f=>[String(f.id),f]));
+   mapped.forEach(f=>existing.set(String(f.id),f));
+   foodDatabase=[...existing.values()];
+  }
+
+  console.info(`Foods loaded: ${mapped.length}${isFullLoad?' (full library)':' (plan references)'}`);
+  return true;
+ })().finally(()=>{foodsLoadPromise=null;});
+
+ return foodsLoadPromise;
 }
 
-async function loadPlan(){
+async function ensureAllFoods(){
+ return loadFoods();
+}
+
+async function loadPlan(shouldRender=true){
  let query=sb.from('nutrition_plans').select('id,patient_id,visit_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
  if(visitId) query=query.eq('visit_id',visitId);
  query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
  const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
  if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
  const plan=plans?.[0];
- if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;updateTargets();renderDays();return;}
+ if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;updateTargets();if(shouldRender)renderDays();return;}
  activeCloudPlanId=plan.id;
  patientInfo.targetCal=plan.target_calories??''; patientInfo.targetPro=plan.target_protein??''; patientInfo.targetCarb=plan.target_carb??''; patientInfo.targetFat=plan.target_fat??''; patientInfo.goal=plan.goal||'loss';
  const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name').eq('plan_id',plan.id).order('day_number',{ascending:true});
@@ -151,8 +174,17 @@ async function loadPlan(){
  let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
  const mids=meals.map(x=>x.id); let items=[]; if(mids.length){const r=await sb.from('plan_items').select('id,meal_id,food_id,quantity_g,frequency,notes').in('meal_id',mids);items=r.data||[];}
  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:'',isCollapsed:false,meals:meals.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:items.filter(i=>i.meal_id===m.id).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
- savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); renderDays();
+ savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
 }
+
+function getPlanFoodIds(){
+ const ids=new Set();
+ daysData.forEach(day=>(day.meals||[]).forEach(meal=>(meal.items||[]).forEach(item=>{
+  if(item.foodId)ids.add(String(item.foodId));
+ })));
+ return [...ids];
+}
+
 function updateTargets(){
  document.getElementById('targetCal').textContent=patientInfo.targetCal?`${patientInfo.targetCal} kcal`:'—';
  document.getElementById('targetPro').textContent=patientInfo.targetPro?`${patientInfo.targetPro} g`:'—';
@@ -213,7 +245,8 @@ function closeAddMealModal(){document.getElementById('addMealModal').classList.a
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
-function openFoodModal(did,mid){
+async function openFoodModal(did,mid){
+ await ensureAllFoods();
  currentModalContext={dayId:did,mealId:mid};const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);
  document.getElementById('modalMealTitle').textContent=m?`إضافة صنف لـ (${m.name})`:'إضافة صنف للوجبة';
  document.getElementById('foodSearchInput').value='';document.getElementById('selectedFoodId').value='';document.getElementById('foodGramsInput').value='100';document.getElementById('foodModalHouseholdBox').classList.add('hidden');
@@ -284,82 +317,31 @@ function initFoodSearchInteraction(){
   event.stopPropagation();
   selectFoodForMeal(result.dataset.foodId);
  });
-
  input.dataset.bound='1';
 }
 
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+
 function confirmAddFoodItem(){
- const id=document.getElementById('selectedFoodId').value,g=parseFloat(document.getElementById('foodGramsInput').value);
- if(!id){showToast('يرجى اختيار صنف من القائمة أولاً','error');return}if(!g||g<=0){showToast('يرجى تحديد كمية صحيحة بالجرام','error');return}
- const {dayId,mealId}=currentModalContext,d=daysData.find(x=>x.id===dayId),m=d?.meals.find(x=>x.id===mealId);
- if(m&&isDayEditing(dayId)){m.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:id,grams:g,includeInCalculation:true});renderDays();closeFoodModal();showToast('تم إضافة الصنف إلى الوجبة بنجاح');}
+ const foodId=document.getElementById('selectedFoodId').value,grams=parseFloat(document.getElementById('foodGramsInput').value);
+ const repeat=document.getElementById('foodRepeatInput')?.value?.trim()||'';
+ const notes=document.getElementById('foodNotesInput')?.value?.trim()||'';
+ if(!foodId||!Number.isFinite(grams)||grams<=0){showToast('اختر صنفًا وأدخل كمية صحيحة','error');return;}
+ const d=daysData.find(x=>x.id===currentModalContext.dayId),m=d?.meals.find(x=>x.id===currentModalContext.mealId);
+ if(!d||!m||!isDayEditing(d.id))return;
+ m.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(foodId),grams:Number(grams),includeInCalculation:true,repeat,notes});
+ renderDays();closeFoodModal();showToast('تمت إضافة الصنف بنجاح');
 }
-function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Math.max(0,Number(v)||0);renderDays();}}
-function updateMealItemRepeat(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.repeat=String(v??'').trim();renderDays();}}
-function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>String(x.id)===String(mid)),it=m?.items.find(x=>String(x.itemId)===String(iid));if(it&&isDayEditing(did)){it.notes=String(v??'');}}
-function deleteFoodItemFromMeal(did,mid,iid){openConfirmModal('حذف الصنف','هل أنت متأكد من حذف هذا الصنف من الوجبة؟',()=>{const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){m.items=m.items.filter(x=>x.itemId!==iid);renderDays();showToast('تم إزالة الصنف من الوجبة')}});}
+function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Number(v)||0;renderDays();}}
+function updateMealItemRepeat(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))it.repeat=v;}
+function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))it.notes=v;}
+function deleteFoodItemFromMeal(did,mid,iid){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){m.items=m.items.filter(x=>x.itemId!==iid);renderDays();}}
 function updateMealItemCalculation(did,mid,iid,checked){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.includeInCalculation=!!checked;renderDays();}}
 
-function renderDays(){
- const c=document.getElementById('daysContainer'),empty=document.getElementById('emptyState');
- if(!daysData.length){c.innerHTML='';empty.classList.remove('hidden');return}empty.classList.add('hidden');
- const tc=num(patientInfo.targetCal),tp=num(patientInfo.targetPro),tcarb=num(patientInfo.targetCarb),tf=num(patientInfo.targetFat);
- c.innerHTML=daysData.map((d,di)=>{
-  let cal=0,pro=0,carb=0,fat=0,sod=0,pot=0,pho=0;
-  (d.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{if(it.includeInCalculation===false)return;const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
-  const pct=(v,t)=>t?Math.min(Math.round(v/t*100),100):0,cc=pct(cal,tc),pp=pct(pro,tp),cp=pct(carb,tcarb),fp=pct(fat,tf),col=d.isCollapsed;
-  return `<div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden page-break day-card day-locked" data-day-id="${escapeHtml(d.id)}">
-   <div class="p-4 bg-slate-900 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3 meal-header">
-    <div class="flex items-center gap-3 w-full md:w-auto justify-between">
-     <div class="flex items-center gap-2">
-      <button class="day-action-always w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center" onclick="window.dietPlan.toggleDayCollapse('${escapeHtml(d.id)}')"><i class="fa-solid fa-chevron-down ${col?'':'rotate-180'}"></i></button>
-      <span class="w-7 h-7 rounded-lg bg-slate-800 text-emerald-400 border border-slate-700 flex items-center justify-center font-black text-xs">${di+1}</span>
-      <input type="text" value="${escapeHtml(d.title)}" onchange="window.dietPlan.updateDayTitle('${escapeHtml(d.id)}',this.value)" class="font-black text-base sm:text-lg text-white bg-transparent border-b border-transparent focus:border-emerald-500 focus:outline-none w-36 sm:w-auto">
-     </div>
-    </div>
-    <div class="flex items-center gap-1.5 no-print flex-wrap justify-end">
-     <button type="button" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')" class="day-action-always day-edit-btn text-white bg-sky-600 hover:bg-sky-500 px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5"><i class="fa-solid fa-pen"></i><span>تعديل</span></button>
-     <button type="button" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')" class="day-action-always day-save-btn text-white bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5"><i class="fa-solid fa-floppy-disk"></i><span>حفظ</span></button>
-     <button type="button" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')" class="day-action-always text-white bg-rose-600 hover:bg-rose-500 px-2.5 py-1.5 rounded-lg text-[10px] font-bold"><i class="fa-solid fa-trash"></i><span class="mr-1">حذف</span></button>
-    </div>
-   </div>
-   <div class="p-4 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200 collapsible-body ${col?'hidden':''}">
-    <div class="flex items-center justify-between mb-3"><h3 class="font-black text-slate-800 text-sm"><i class="fa-solid fa-chart-pie text-emerald-600 ml-1"></i>ملخص إجمالي اليوم</h3>${tc?`<span class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">${cc}% من المستهدف</span>`:''}</div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-     ${metricCard('🔥 السعرات',cal.toFixed(0),'kcal',tc,cc,'amber')}
-     ${metricCard('🥩 البروتين',pro.toFixed(1),'جرام',tp,pp,'slate')}
-     ${metricCard('🍞 الكارب',carb.toFixed(1),'جرام',tcarb,cp,'sky')}
-     ${metricCard('🥑 الدهون',fat.toFixed(1),'جرام',tf,fp,'emerald')}
-    </div>
-    <div class="mt-3 bg-white border border-slate-200 rounded-xl p-2.5 flex flex-wrap justify-between gap-2 text-[11px] font-bold">
-     <span>🧂 الصوديوم: <b>${sod.toFixed(0)}</b> mg</span><span>🍌 البوتاسيوم: <b>${pot.toFixed(0)}</b> mg</span><span>🦴 الفسفور: <b>${pho.toFixed(0)}</b> mg</span>
-    </div>
-   </div>
-   <div class="p-4 space-y-4 collapsible-body ${col?'hidden':''}">
-    <div class="text-xs"><label class="block font-bold text-slate-600 mb-1">ملاحظات اليوم:</label><input type="text" value="${escapeHtml(d.notes||'')}" onchange="window.dietPlan.updateDayNotes('${escapeHtml(d.id)}',this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2"></div>
-    ${(d.meals||[]).map(m=>`<div class="border border-slate-200 rounded-xl p-3 bg-white space-y-2">
-     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-100 pb-2">
-      <input type="text" value="${escapeHtml(m.name||'')}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" class="w-full max-w-md bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 font-black text-sm">
-      <div class="flex items-center gap-1 no-print">
-       <button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600"><i class="fa-solid fa-chevron-up text-xs"></i></button>
-       <button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-       <button onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-     </div>
-     <div class="overflow-x-auto custom-scrollbar"><table class="w-full min-w-[900px] table-fixed text-right text-[11px] sm:text-xs">
-      <thead><tr class="text-slate-500 font-bold border-b border-slate-100"><th class="py-1.5 px-2 w-[30%]">اسم الصنف</th><th class="py-1.5 px-2 text-center w-[14%]">الكمية بالجم</th><th class="py-1.5 px-2 text-center w-[23%]">المقياس المنزلي</th><th class="py-1.5 px-2 text-center w-[15%]">التكرار</th><th class="py-1.5 px-2 text-center w-[22%]">ملاحظة</th><th class="py-1.5 px-2 text-center no-print w-[12%]">إجراء</th></tr></thead>
-      <tbody>${m.items?.length?m.items.map(it=>{const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return'';return `<tr class="border-b border-slate-50 last:border-0"><td class="py-1.5 px-2 font-bold text-slate-800">${escapeHtml(f.name)}</td><td class="py-1.5 px-2 text-center"><input type="number" min="0" step="1" value="${num(it.grams)}" onchange="window.dietPlan.updateMealItemGrams('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" class="w-24 bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-1 text-center font-extrabold text-emerald-700"><span class="text-[9px] text-slate-400 mr-1">جم</span></td><td class="py-1.5 px-2 text-center text-emerald-700 font-bold">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td class="py-1.5 px-2 text-center"><input type="text" value="${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="7/7" class="w-20 bg-sky-50 border border-sky-200 rounded-lg px-2 py-1 text-center font-extrabold text-sky-700"></td><td class="py-1.5 px-2"><input type="text" value="${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="ملاحظة" class="w-full min-w-[120px] bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 text-right font-semibold text-amber-800" title="ملاحظة خاصة بهذا الصنف"></td><td class="py-1.5 px-2 text-center no-print"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)" class="w-4 h-4 cursor-pointer"><button onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" class="text-rose-400 mr-2"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="6" class="py-3 text-center text-slate-400 font-semibold">لا توجد أصناف مضافة لهذه الوجبة بعد</td></tr>'}</tbody>
-     </table></div>
-     <div class="mt-2 no-print"><button onclick="window.dietPlan.openFoodModal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1.5 rounded-lg">+ إضافة صنف للوجبة</button></div>
-    </div>`).join('')}
-    <div class="no-print mt-3 p-3 rounded-xl border border-sky-200 bg-sky-50/60 flex flex-wrap gap-2">
-     <button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="text-xs bg-sky-600 text-white px-3 py-2 rounded-lg font-extrabold"><i class="fa-solid fa-utensils ml-1"></i>الوجبات الثابتة لهذا اليوم</button>
-     <button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-bold"><i class="fa-solid fa-plus ml-1"></i>إضافة وجبة جديدة</button>
-    </div>
-   </div>
-  </div>`;
- }).join('');
- daysData.forEach(d=>setDayEditMode(d.id,!!dayEditModes[String(d.id)]));
+function calculateDay(day){
+ let cal=0,pro=0,carb=0,fat=0,sod=0,pot=0,pho=0;
+ (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{if(it.includeInCalculation===false)return;const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
+ return {cal,pro,carb,fat,sod,pot,pho};
 }
 function metricCard(label,value,unit,target,pctv,kind){
  const bg={amber:'bg-amber-50 border-amber-200 text-amber-900',slate:'bg-slate-50 border-slate-200 text-slate-800',sky:'bg-sky-50 border-sky-200 text-sky-900',emerald:'bg-emerald-50 border-emerald-200 text-emerald-900'}[kind];
@@ -456,7 +438,7 @@ async function syncFixedMeals(){
       notes:i.notes??'',
       household_measure:i.household_measure||''
      }))
-    })):[]
+    })) :[]
    };
   }).filter(d=>d.meals.length);
 
@@ -513,6 +495,7 @@ function initFixedMealsSearch(){
 }
 
 async function openFixedMeals(dayId){
+ await ensureAllFoods();
  fixedMealsTargetDayId=dayId;
  const search=document.getElementById('fixedMealsSearch');
  if(search)search.value='';
@@ -618,7 +601,6 @@ async function savePlan(){
     });
 
     if(error) throw new Error('فشل حفظ الخطة: '+error.message);
-
     activeCloudPlanId=savedPlanId;
     return true;
   }catch(e){
@@ -627,6 +609,38 @@ async function savePlan(){
     showToast(window.__lastNutritionPlanSaveError,'error');
     return false;
   }
+}
+
+function renderDays(){
+ const container=document.getElementById('daysContainer');if(!container)return;
+ container.innerHTML=daysData.length?daysData.map((d,di)=>{
+   const calc=calculateDay(d),calPct=patientInfo.targetCal?Math.min(100,calc.cal/Number(patientInfo.targetCal)*100):0,proPct=patientInfo.targetPro?Math.min(100,calc.pro/Number(patientInfo.targetPro)*100):0,carbPct=patientInfo.targetCarb?Math.min(100,calc.carb/Number(patientInfo.targetCarb)*100):0,fatPct=patientInfo.targetFat?Math.min(100,calc.fat/Number(patientInfo.targetFat)*100):0;
+   return `<section class="day-card bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden" data-day-id="${escapeHtml(d.id)}">
+    <div class="flex items-center justify-between gap-3 p-4 border-b border-slate-100 bg-slate-50/60">
+     <div class="flex items-center gap-2 min-w-0"><button class="day-action-always text-slate-500" onclick="window.dietPlan.toggleDayCollapse('${escapeHtml(d.id)}')"><i class="fa-solid ${d.isCollapsed?'fa-chevron-down':'fa-chevron-up'}"></i></button><input value="${escapeHtml(d.title||`اليوم ${di+1}`)}" onchange="window.dietPlan.updateDayTitle('${escapeHtml(d.id)}',this.value)" class="font-black bg-transparent outline-none min-w-0"><span class="text-xs text-slate-400">${d.meals?.length||0} وجبات</span></div>
+     <div class="flex items-center gap-2"><button class="day-edit-btn bg-slate-900 text-white text-xs font-extrabold px-3 py-2 rounded-xl" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')">تعديل</button><button class="day-save-btn bg-emerald-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')">حفظ</button><button class="day-action-always text-rose-500 px-2" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')"><i class="fa-solid fa-trash"></i></button></div>
+    </div>
+    ${d.isCollapsed?'':`<div class="p-4 space-y-4">
+     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+      ${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
+      ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
+      ${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
+      ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
+     </div>
+     <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2"><button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة وجبة</button><button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">تطبيق دايت ثابت</button></div>
+      <input value="${escapeHtml(d.notes||'')}" onchange="window.dietPlan.updateDayNotes('${escapeHtml(d.id)}',this.value)" placeholder="ملاحظات اليوم" class="flex-1 min-w-[220px] bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs font-semibold">
+     </div>
+     ${(d.meals||[]).map((m,mi)=>`<div class="meal-card border border-slate-200 rounded-2xl overflow-hidden">
+      <div class="flex items-center justify-between gap-3 p-3 bg-slate-50"><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" class="font-black bg-transparent outline-none flex-1"><div class="flex items-center gap-2"><button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" class="text-slate-400"><i class="fa-solid fa-arrow-up"></i></button><button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" class="text-slate-400"><i class="fa-solid fa-arrow-down"></i></button><button onclick="window.dietPlan.openFoodModal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="bg-emerald-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة صنف</button><button onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div>
+      <div class="overflow-x-auto"><table class="w-full text-[11px]"><thead><tr class="text-slate-400 border-b border-slate-100"><th class="py-2 px-2 text-right">الصنف</th><th class="py-2 px-2 text-center">الكمية</th><th class="py-2 px-2 text-center">المقياس</th><th class="py-2 px-2 text-center">التكرار</th><th class="py-2 px-2">ملاحظة</th><th class="py-2 px-2 text-center no-print">حساب</th></tr></thead>
+      <tbody>${m.items?.length?m.items.map(it=>{const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return'';return `<tr class="border-b border-slate-50 last:border-0"><td class="py-1.5 px-2 font-bold text-slate-800">${escapeHtml(f.name)}</td><td class="py-1.5 px-2 text-center"><input type="number" min="0" step="1" value="${num(it.grams)}" onchange="window.dietPlan.updateMealItemGrams('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" class="w-24 bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-1 text-center font-extrabold text-emerald-700"><span class="text-[9px] text-slate-400 mr-1">جم</span></td><td class="py-1.5 px-2 text-center text-emerald-700 font-bold">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td class="py-1.5 px-2 text-center"><input type="text" value="${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="7/7" class="w-20 bg-sky-50 border border-sky-200 rounded-lg px-2 py-1 text-center font-extrabold text-sky-700"></td><td class="py-1.5 px-2"><input type="text" value="${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="ملاحظة" class="w-full min-w-[120px] bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 text-right font-semibold text-amber-800" title="ملاحظة خاصة بهذا الصنف"></td><td class="py-1.5 px-2 text-center no-print"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)" class="w-4 h-4 cursor-pointer"><button onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" class="text-rose-400 mr-2"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="6" class="py-3 text-center text-slate-400 font-semibold">لا توجد أصناف مضافة لهذه الوجبة بعد</td></tr>'}</tbody>
+      </table></div>
+     </div>`).join('')}
+    </div>`}
+   </section>`;
+ }).join(''):'<div class="text-center py-12 text-slate-400 font-bold">لا توجد أيام غذائية بعد. أضف يومًا جديدًا للبدء.</div>';
+ daysData.forEach(d=>setDayEditMode(d.id,!!dayEditModes[String(d.id)]));
 }
 
 function openPrintSettingsModal(){
@@ -682,10 +696,16 @@ function init(){
   const ok=await loadPatient();
   if(!ok){dietInitPromise=null;return false;}
 
-  const foodsLoaded=await loadFoods();
+  await loadPlan(false);
+
+  const planFoodIds=getPlanFoodIds();
+  const foodsLoaded=planFoodIds.length
+    ? await loadFoods({ids:planFoodIds})
+    : true;
+
   if(!foodsLoaded){dietInitPromise=null;return false;}
 
-  await loadPlan();
+  renderDays();
   return true;
  })().catch(error=>{
   console.error('Diet plan initialization failed:',error);
@@ -697,5 +717,5 @@ function init(){
  return dietInitPromise;
 }
 
-window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, toggleDayCollapse, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, metricCard, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, savePlan, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
+window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, toggleDayCollapse, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, metricCard, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, savePlan, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
 })();
