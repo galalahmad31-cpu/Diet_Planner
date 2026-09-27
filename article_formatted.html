@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html
+    lang="ar"
+    dir="rtl"
+    >
+    <head>
+        <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>المقالات | Diet Planner
+        </title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/tailwind.css?v=20260923-2"><link rel="stylesheet" href="css/article.css"><link rel="stylesheet" href="css/theme.css?v=20260921-3">
+        <script src="js/theme.js?v=20260921-3">
+
+        </script>
+        <style>
+#toolbar .tool,#toolbar select,#toolbar label{transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease}
+#toolbar .tool:hover,#toolbar select:hover,#toolbar label:hover{background:#f0fdfa;border-color:#99f6e4}
+#toolbar .tool:focus-visible,#toolbar select:focus-visible,#toolbar input:focus-visible{outline:2px solid #14b8a6;outline-offset:1px}
+#toolbar .toolbar-group{display:flex;align-items:center;gap:.25rem;padding-inline-end:.4rem;margin-inline-end:.4rem;border-inline-end:1px solid #e2e8f0}
+#toolbar .toolbar-group:last-child{border-inline-end:0;margin-inline-end:0;padding-inline-end:0}
+#editor:empty:before{content:attr(data-placeholder);color:#94a3b8;pointer-events:none}
+@media(max-width:640px){#toolbar{gap:.35rem}#toolbar .toolbar-group{border-inline-end:0;margin:0;padding:0;flex-wrap:wrap}.editor{min-height:320px}}
+
+        </style>
+    </head>
+    <body class="min-h-screen">
+        <div
+            id="loading"
+            class="loading"
+            >
+            <div class="flex flex-col items-center gap-3">
+                <div class="spinner">
+
+                </div>
+                <div class="text-sm font-semibold text-slate-500">جاري تحميل المقالات...
+                </div>
+            </div>
+        </div>
+        <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl">
+                <header class="glass rounded-3xl px-5 py-5 sm:px-7 sm:py-6 shadow-sm">
+                    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg">
+                                <i class="fa-solid fa-newspaper text-2xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-extrabold text-slate-800 sm:text-3xl">المقالات
+                                </h1>
+                                <p class="mt-1 text-sm font-medium text-slate-500">إدارة ونشر المحتوى التثقيفي
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="app.html" class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600"><i class="fa-solid fa-arrow-right"></i>الرئيسية</a><button id="addBtn" class="flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white"><i class="fa-solid fa-plus"></i>إضافة مقال</button>
+                        </div>
+                    </div>
+                </header>
+                <section class="mt-6 glass rounded-3xl p-4">
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="search" class="h-12 w-full rounded-2xl border border-slate-200 bg-white pr-11 pl-4 text-sm outline-none focus:border-brand-400" placeholder="ابحث باسم المقال أو المؤلف...">
+                        </div><select id="filter" class="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold"><option value="all">كل المقالات</option><option value="public">المقالات العامة</option><option value="private">مقالاتي الخاصة</option></select>
+                    </div>
+                </section>
+                <section class="mt-6">
+                    <div
+                        id="grid"
+                        class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+                        >
+
+                    </div>
+                    <div
+                        id="empty"
+                        class="hidden glass rounded-3xl p-12 text-center"
+                        >
+                        <i class="fa-solid fa-newspaper text-3xl text-brand-500"></i>
+                        <h3 class="mt-4 font-extrabold">لا توجد مقالات
+                        </h3>
+                        <p class="mt-2 text-sm text-slate-500">ابدأ بإضافة أول مقال.
+                        </p>
+                    </div>
+                </section>
+                <footer class="py-8 text-center text-xs text-slate-400">Diet Planner • Clinical Nutrition
+                </footer>
+            </div>
+        </main>
+        <div
+            id="editModal"
+            class="modal fixed inset-0 z-50 hidden overflow-y-auto p-2 sm:p-5"
+            >
+            <div class="mx-auto flex min-h-full w-full max-w-6xl items-center">
+                <div class="w-full rounded-3xl bg-white shadow-2xl overflow-hidden">
+                    <div class="flex items-center justify-between border-b px-5 py-4">
+                        <div>
+                            <h2
+                                id="modalTitle"
+                                class="font-extrabold text-lg"
+                                >إضافة مقال
+                            </h2>
+                            <p class="text-xs text-slate-500">اكتب المحتوى ونسّقه ثم احفظ.
+                            </p>
+                        </div><button id="closeEdit" class="h-10 w-10 rounded-xl bg-slate-100"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="max-h-[calc(100vh-30px)] overflow-y-auto p-4 sm:p-6">
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <label><span class="mb-2 block text-sm font-bold">اسم المقال</span><input id="title" class="h-12 w-full rounded-xl border px-4 outline-none" placeholder="عنوان المقال"></label><label><span class="mb-2 block text-sm font-bold">اسم المؤلف</span><input id="author" class="h-12 w-full rounded-xl border px-4 outline-none" placeholder="اسم المؤلف"></label>
+                        </div>
+                        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                            <div class="rounded-xl bg-slate-50 p-3">
+                                <div class="text-[11px] text-slate-400">تاريخ النشر
+                                </div>
+                                <div
+                                    id="pubDate"
+                                    class="text-sm font-bold"
+                                    >سيُحدد عند النشر
+                                </div>
+                            </div>
+                            <div class="rounded-xl bg-slate-50 p-3">
+                                <div class="text-[11px] text-slate-400">آخر تعديل
+                                </div>
+                                <div
+                                    id="updDate"
+                                    class="text-sm font-bold"
+                                    >عند الحفظ
+                                </div>
+                            </div>
+                            <div class="rounded-xl bg-slate-50 p-3">
+                                <div class="text-[11px] text-slate-400">الحالة
+                                </div>
+                                <div
+                                    id="state"
+                                    class="text-sm font-bold"
+                                    >خاص
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 overflow-hidden rounded-2xl border">
+                            <div
+                                id="toolbar"
+                                class="flex flex-wrap items-center gap-2 border-b bg-slate-50 p-2"
+                                >
+                                <div class="toolbar-group">
+                                    <button data-cmd="bold" title="عريض" aria-label="عريض" class="tool h-9 w-9 rounded-lg bg-white"><b>B</b></button><button data-cmd="italic" title="مائل" aria-label="مائل" class="tool h-9 w-9 rounded-lg bg-white"><i>I</i></button><button data-cmd="underline" title="تحته خط" aria-label="تحته خط" class="tool h-9 w-9 rounded-lg bg-white"><u>U</u></button>
+                                </div>
+                                <div class="toolbar-group">
+                                    <select id="format" title="نوع النص" class="h-9 rounded-lg border bg-white px-2 text-xs"><option value="p">نص عادي</option><option value="h1">عنوان رئيسي</option><option value="h2">عنوان فرعي</option><option value="h3">عنوان فرعي صغير</option><option value="blockquote">اقتباس</option></select><select id="size" title="حجم النص" class="h-9 rounded-lg border bg-white px-2 text-xs"><option value="2">صغير</option><option value="3" selected>متوسط</option><option value="4">كبير</option><option value="5">كبير جدًا</option><option value="6">ضخم</option></select>
+                                </div>
+                                <div class="toolbar-group">
+                                    <button data-cmd="justifyRight" title="محاذاة لليمين" aria-label="محاذاة لليمين" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-align-right"></i></button><button data-cmd="justifyCenter" title="توسيط" aria-label="توسيط" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-align-center"></i></button><button data-cmd="justifyLeft" title="محاذاة لليسار" aria-label="محاذاة لليسار" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-align-left"></i></button><button data-cmd="insertUnorderedList" title="قائمة نقطية" aria-label="قائمة نقطية" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-list-ul"></i></button><button data-cmd="insertOrderedList" title="قائمة مرقمة" aria-label="قائمة مرقمة" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-list-ol"></i></button>
+                                </div>
+                                <div class="toolbar-group">
+                                    <button id="link" title="إدراج رابط" aria-label="إدراج رابط" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-link"></i></button><button data-cmd="removeFormat" title="إزالة التنسيق" aria-label="إزالة التنسيق" class="tool h-9 w-9 rounded-lg bg-white"><i class="fa-solid fa-eraser"></i></button>
+                                </div>
+                                <div class="toolbar-group">
+                                    <label title="لون النص" class="flex h-9 items-center gap-1 rounded-lg border bg-white px-2"><i class="fa-solid fa-font text-xs"></i><input id="color" type="color" value="#17252a" aria-label="لون النص"></label><label title="تمييز النص" class="flex h-9 items-center gap-1 rounded-lg border bg-white px-2"><i class="fa-solid fa-fill-drip text-xs"></i><input id="highlight" type="color" value="#fff3a3" aria-label="تمييز النص"></label>
+                                </div>
+                                <div class="toolbar-group">
+                                    <button id="insertTable" type="button" class="tool h-9 rounded-lg bg-white px-3 text-xs font-bold" title="إضافة جدول"><i class="fa-solid fa-table ml-1"></i>جدول</button><button id="addRow" type="button" class="tool h-9 rounded-lg bg-white px-3 text-xs font-bold" title="إضافة صف"><i class="fa-solid fa-plus ml-1"></i>صف</button><button id="deleteRow" type="button" class="tool h-9 rounded-lg bg-white px-3 text-xs font-bold" title="حذف الصف"><i class="fa-solid fa-minus ml-1"></i>صف</button><button id="addCol" type="button" class="tool h-9 rounded-lg bg-white px-3 text-xs font-bold" title="إضافة عمود"><i class="fa-solid fa-plus ml-1"></i>عمود</button><button id="deleteCol" type="button" class="tool h-9 rounded-lg bg-white px-3 text-xs font-bold" title="حذف العمود"><i class="fa-solid fa-minus ml-1"></i>عمود</button><label class="flex h-9 items-center gap-1 rounded-lg border bg-white px-2" title="لون الخلية"><i class="fa-solid fa-fill-drip text-xs"></i><input id="cellBgColor" type="color" value="#eef7f6" aria-label="لون الخلية"></label><button id="deleteTable" type="button" class="tool h-9 rounded-lg bg-white px-3 text-xs font-bold text-red-600" title="حذف الجدول"><i class="fa-solid fa-trash-can ml-1"></i>حذف الجدول</button>
+                                </div>
+                            </div>
+                            <div
+                                id="editor"
+                                class="editor bg-white p-5 text-base"
+                                contenteditable="true"
+                                data-placeholder="اكتب محتوى المقال هنا..."
+                                >
+
+                            </div>
+                        </div>
+                        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                            <div class="flex flex-col gap-3 rounded-2xl border bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <div class="font-extrabold text-sm">إتاحة المقال
+                                    </div>
+                                    <div class="text-xs text-slate-500">عام: يظهر للمستخدمين. خاص: يظهر لك فقط.
+                                    </div>
+                                </div><label class="flex cursor-pointer items-center gap-3"><input id="public" type="checkbox"><span id="toggleText" class="text-sm font-bold">خاص</span></label>
+                            </div><label id="articleAccessWrap" class="hidden rounded-2xl border bg-slate-50 p-4"><span class="font-extrabold text-sm">نوع المحتوى المنشور</span><select id="articleAccess" class="mt-3 h-11 w-full rounded-xl border bg-white px-3 text-sm font-bold"><option value="">أساسي — متاح للباقة Basic</option><option value="article">متقدم — يحتاج Professional</option></select></label>
+                        </div>
+                        <div class="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <button id="cancel" class="h-11 rounded-xl border px-5 font-bold">إلغاء</button><button id="save" class="h-11 rounded-xl bg-brand-600 px-6 font-bold text-white">حفظ المقال</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div
+            id="viewModal"
+            class="modal fixed inset-0 z-50 hidden overflow-y-auto p-2 sm:p-5"
+            >
+            <div class="mx-auto flex min-h-full w-full max-w-4xl items-center">
+                <article class="w-full rounded-3xl bg-white shadow-2xl overflow-hidden">
+                    <div class="flex items-start justify-between border-b p-5 sm:p-7">
+                        <div>
+                            <div
+                                id="viewState"
+                                class="mb-2 text-xs font-bold text-brand-600"
+                                >
+
+                            </div>
+                            <h2
+                                id="viewTitle"
+                                class="text-2xl font-extrabold"
+                                >
+
+                            </h2>
+                            <div class="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
+                                <span id="viewAuthor"></span><span id="viewPub"></span><span id="viewUpd"></span>
+                            </div>
+                        </div><button id="closeView" class="h-10 w-10 rounded-xl bg-slate-100"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div
+                        id="viewContent"
+                        class="content p-5 sm:p-8"
+                        >
+
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div
+            id="confirmModal"
+            class="modal fixed inset-0 z-[110] hidden overflow-y-auto p-4"
+            >
+            <div class="mx-auto flex min-h-full w-full max-w-md items-center justify-center">
+                <div class="w-full rounded-3xl bg-white shadow-2xl overflow-hidden">
+                    <div class="p-6 text-center">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+                            <i class="fa-solid fa-trash text-xl"></i>
+                        </div>
+                        <h3 class="mt-4 text-lg font-extrabold text-slate-800">حذف المقال
+                        </h3>
+                        <p class="mt-2 text-sm leading-7 text-slate-500">هل أنت متأكد من حذف هذا المقال؟ لا يمكن التراجع عن الحذف.
+                        </p>
+                        <div class="mt-6 flex gap-3">
+                            <button id="confirmCancel" class="h-11 flex-1 rounded-xl border border-slate-200 bg-white font-bold text-slate-600">إلغاء</button><button id="confirmDelete" class="h-11 flex-1 rounded-xl bg-red-600 font-bold text-white shadow-sm hover:bg-red-700">حذف المقال</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div
+            id="toast"
+            class="hidden fixed bottom-5 left-1/2 z-[100] -translate-x-1/2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-xl"
+            >
+
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+        </script>
+        <script src="js/auth-access.js?v=20260923-1">
+
+        </script>
+        <script src="js/article.js">
+
+        </script>
+    </body>
+</html>
