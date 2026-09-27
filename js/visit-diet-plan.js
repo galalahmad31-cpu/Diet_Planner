@@ -136,10 +136,11 @@ async function loadFoods(){
 async function loadPlan(){
  let query=sb.from('nutrition_plans').select('id,patient_id,visit_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
  if(visitId) query=query.eq('visit_id',visitId);
+ query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
  const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
  if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
  const plan=plans?.[0];
- if(!plan){daysData=[];savedDaysData=[];updateTargets();renderDays();return;}
+ if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;updateTargets();renderDays();return;}
  activeCloudPlanId=plan.id;
  patientInfo.targetCal=plan.target_calories??''; patientInfo.targetPro=plan.target_protein??''; patientInfo.targetCarb=plan.target_carb??''; patientInfo.targetFat=plan.target_fat??''; patientInfo.goal=plan.goal||'loss';
  const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name').eq('plan_id',plan.id).order('day_number',{ascending:true});
@@ -292,7 +293,7 @@ function confirmAddFoodItem(){
 }
 function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Math.max(0,Number(v)||0);renderDays();}}
 function updateMealItemRepeat(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.repeat=String(v??'').trim();renderDays();}}
-function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.notes=String(v??'');}}
+function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>String(x.id)===String(mid)),it=m?.items.find(x=>String(x.itemId)===String(iid));if(it&&isDayEditing(did)){it.notes=String(v??'');}}
 function deleteFoodItemFromMeal(did,mid,iid){openConfirmModal('حذف الصنف','هل أنت متأكد من حذف هذا الصنف من الوجبة؟',()=>{const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){m.items=m.items.filter(x=>x.itemId!==iid);renderDays();showToast('تم إزالة الصنف من الوجبة')}});}
 function updateMealItemCalculation(did,mid,iid,checked){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.includeInCalculation=!!checked;renderDays();}}
 
@@ -516,7 +517,7 @@ async function savePlan(){
       id:planId,
       patient_id:window.currentPatientId||patientId,
       visit_id:visitId||null,
-      plan_name:'الخطة الغذائية',
+      plan_name:'الخطة الغذائية باستخدام الجرامات',
       start_date:new Date().toISOString().slice(0,10),
       target_calories:Number(patientInfo.targetCal)||null,
       target_protein:Number(patientInfo.targetPro)||null,
