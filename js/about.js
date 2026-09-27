@@ -53,6 +53,7 @@ function toolbarHtml(id) {
     ["justifyRight", "fa-align-right", "محاذاة يمين"],
     ["justifyCenter", "fa-align-center", "توسيط"],
     ["justifyLeft", "fa-align-left", "محاذاة يسار"],
+    ["createLink", "fa-link", "إضافة رابط"],
     ["removeFormat", "fa-eraser", "إزالة التنسيق"]
   ];
   return `<div class="toolbar flex flex-wrap items-center gap-1.5 border-b border-slate-100 pb-3 mb-3">
@@ -329,7 +330,30 @@ function runCommand(command, id) {
   const editor = $("editor-" + id);
   if (!editor) return;
   editor.focus();
-  document.execCommand(command, false, null);
+
+  if (command === "createLink") {
+    const url = prompt("أدخل الرابط:", "https://");
+    if (!url) return;
+
+    try {
+      new URL(url);
+    } catch {
+      alert("يرجى إدخال رابط صحيح.");
+      return;
+    }
+
+    document.execCommand("createLink", false, url);
+
+    editor.querySelectorAll("a").forEach(link => {
+      if (link.href === url || link.getAttribute("href") === url) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+    });
+  } else {
+    document.execCommand(command, false, null);
+  }
+
   autoGrow(editor);
 }
 
