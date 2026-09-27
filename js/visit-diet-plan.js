@@ -18,7 +18,7 @@ let patientId=initialUrlPatientId;
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
 let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
-const FIXED_DIET_CACHE_V1='fixed-diet-cache-v1';
+const FIXED_DIET_CACHE_V2='fixed-diet-cache-v2';
 const FIXED_DIET_CACHE_TTL=5*60*1000;
 
 function num(v){return Number.isFinite(Number(v))?Number(v):0;}
@@ -352,8 +352,7 @@ async function syncFixedMeals(){
  const user=await currentUser();
  if(!user)return;
 
- // FIXED_DIET_CACHE_V1: user-scoped session cache, expires after 5 minutes.
- const cacheKey=`${FIXED_DIET_CACHE_V1}:${user.id}`;
+ const cacheKey=`${FIXED_DIET_CACHE_V2}:${user.id}`;
  const readCache=()=>{
   try{
    const raw=sessionStorage.getItem(cacheKey);
@@ -376,8 +375,8 @@ async function syncFixedMeals(){
  if(fixedMealsLoadPromise)return fixedMealsLoadPromise;
  fixedMealsLoadPromise=(async()=>{
   const [pub,own]=await Promise.all([
-   sb.from('diet_templates').select('*').eq('visibility','public').order('created_at',{ascending:false}),
-   sb.from('diet_templates').select('*').eq('created_by',user.id).order('created_at',{ascending:false})
+   sb.from('diet_templates').select('id,name,description,created_by,target_calories,target_protein,target_carb,target_fat,visibility,created_at').eq('visibility','public').order('created_at',{ascending:false}),
+   sb.from('diet_templates').select('id,name,description,created_by,target_calories,target_protein,target_carb,target_fat,visibility,created_at').eq('created_by',user.id).order('created_at',{ascending:false})
   ]);
   if(pub.error||own.error){
    console.error('Fixed diets load failed:',pub.error||own.error);
@@ -387,39 +386,9 @@ async function syncFixedMeals(){
 
   const map=new Map();
   [...(pub.data||[]),...(own.data||[])].forEach(d=>map.set(d.id,d));
-  const diets=[...map.values()];
-  const ids=diets.map(d=>d.id);
-  if(!ids.length){fixedMealsDatabase=[];writeCache([]);return;}
-
-  const days=[];
-  for(let i=0;i<ids.length;i+=100){
-   const chunk=ids.slice(i,i+100);
-   const r=await sb.from('diet_template_days').select('*').in('diet_id',chunk).order('day_number',{ascending:true});
-   if(r.error){console.error('Fixed diet days load failed:',r.error);fixedMealsDatabase=[];return;}
-   days.push(...(r.data||[]));
-  }
-
-  const dayIds=days.map(x=>x.id);
-  const meals=[];
-  for(let i=0;i<dayIds.length;i+=100){
-   const chunk=dayIds.slice(i,i+100);
-   const r=await sb.from('diet_template_meals').select('*').in('day_id',chunk).order('meal_order',{ascending:true});
-   if(r.error){console.error('Fixed diet meals load failed:',r.error);fixedMealsDatabase=[];return;}
-   meals.push(...(r.data||[]));
-  }
-
-  const mids=meals.map(x=>x.id);
-  const items=[];
-  for(let i=0;i<mids.length;i+=100){
-   const chunk=mids.slice(i,i+100);
-   const r=await sb.from('diet_template_items').select('*').in('meal_id',chunk).order('item_order',{ascending:true});
-   if(r.error){console.error('Fixed diet items load failed:',r.error);fixedMealsDatabase=[];return;}
-   items.push(...(r.data||[]));
-  }
-
-  fixedMealsDatabase=diets.map(d=>{
-   const day=days.find(x=>x.diet_id===d.id);
-   return {
+  fixedMealsDatabase=[...map.values()]
+   .sort((a,b)=>(a.created_by===user.id?0:1)-(b.created_by===user.id?0:1))
+   .map(d=>({
     id:d.id,
     name:d.name||'دايت ثابت',
     description:d.description||'',
@@ -427,28 +396,59 @@ async function syncFixedMeals(){
     target_calories:d.target_calories,
     target_protein:d.target_protein,
     target_carb:d.target_carb,
-    target_fat:d.target_fat,
-    meals:day?meals.filter(m=>m.day_id===day.id).map(m=>({
-     name:m.meal_name||'وجبة',
-     frequency:m.frequency||'',
-     items:items.filter(i=>i.meal_id===m.id).map(i=>({
-      foodId:String(i.food_id),
-      grams:Number(i.quantity_g)||0,
-      repeat:i.frequency??'',
-      notes:i.notes??'',
-      household_measure:i.household_measure||''
-     }))
-    })) :[]
-   };
-  }).filter(d=>d.meals.length);
-
-  fixedMealsDatabase.sort((a,b)=>(a.created_by===user.id?0:1)-(b.created_by===user.id?0:1));
+    target_fat:d.target_fat
+   }));
   writeCache(fixedMealsDatabase);
  })();
 
  try{await fixedMealsLoadPromise;}
  finally{fixedMealsLoadPromise=null;}
 }
+
+async function loadFixedDietDetails(dietId){
+ const dayResult=await sb.from('diet_template_days')
+  .select('id,day_number,day_name')
+  .eq('diet_id',dietId)
+  .order('day_number',{ascending:true})
+  .limit(1);
+ if(dayResult.error)throw dayResult.error;
+ const day=dayResult.data?.[0];
+ if(!day)return null;
+
+ const mealResult=await sb.from('diet_template_meals')
+  .select('id,meal_name,meal_order,frequency')
+  .eq('day_id',day.id)
+  .order('meal_order',{ascending:true});
+ if(mealResult.error)throw mealResult.error;
+ const meals=mealResult.data||[];
+ const mealIds=meals.map(m=>m.id);
+
+ let items=[];
+ if(mealIds.length){
+  const itemResult=await sb.from('diet_template_items')
+   .select('id,meal_id,food_id,quantity_g,frequency,notes,household_measure')
+   .in('meal_id',mealIds)
+   .order('item_order',{ascending:true});
+  if(itemResult.error)throw itemResult.error;
+  items=itemResult.data||[];
+ }
+
+ return {
+  id:dietId,
+  meals:meals.map(m=>({
+   name:m.meal_name||'وجبة',
+   frequency:m.frequency||'',
+   items:items.filter(i=>i.meal_id===m.id).map(i=>({
+    foodId:String(i.food_id),
+    grams:Number(i.quantity_g)||0,
+    repeat:i.frequency??'',
+    notes:i.notes??'',
+    household_measure:i.household_measure||''
+   }))
+  }))
+ };
+}
+
 function renderFixedMealsList(){
  const list=document.getElementById('fixedMealsList');
  if(!list)return;
@@ -471,19 +471,6 @@ function renderFixedMealsList(){
     </div>
     <button onclick="window.dietPlan.applyFixedDiet(${i})" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl whitespace-nowrap">تطبيق اليوم</button>
    </div>
-   <div class="mt-3 space-y-2">
-    ${d.meals.map((m,mi)=>`<div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
-     <h5 class="font-black text-slate-700 text-xs">${mi+1}. ${escapeHtml(m.name)}</h5>
-     <div class="mt-2 overflow-x-auto"><table class="w-full text-[11px]"><tbody>
-      ${m.items.map(it=>{const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));return`<tr class="border-b border-slate-100">
-       <td class="py-1.5 font-bold">${f?escapeHtml(f.name):escapeHtml(it.foodId)}</td>
-       <td class="py-1.5 text-center">${num(it.grams)} جم</td>
-       <td class="py-1.5 text-center">${f?.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td>
-       <td class="py-1.5 text-center">${escapeHtml(it.repeat||'')}</td>
-      </tr>`}).join('')}
-     </tbody></table></div>
-    </div>`).join('')}
-   </div>
   </div>`;
  }).join('');
 }
@@ -495,7 +482,6 @@ function initFixedMealsSearch(){
 }
 
 async function openFixedMeals(dayId){
- await ensureAllFoods();
  fixedMealsTargetDayId=dayId;
  const search=document.getElementById('fixedMealsSearch');
  if(search)search.value='';
@@ -511,19 +497,60 @@ async function openFixedMeals(dayId){
  renderFixedMealsList();
 }
 function closeFixedMeals(){document.getElementById('fixedMealsModal').classList.add('hidden');fixedMealsTargetDayId=null;}
-function applyFixedDiet(i){
- const diet=fixedMealsDatabase[i],day=daysData.find(d=>d.id===fixedMealsTargetDayId);if(!diet||!day||!isDayEditing(day.id)){showToast('افتح اليوم بوضع التعديل أولاً','error');return}
- const install=()=>{day.meals=diet.meals.map((m,mi)=>({id:'m_'+Date.now()+'_'+mi+'_'+Math.random().toString(36).slice(2),name:m.name||`وجبة ${mi+1}`,description:'',items:m.items.map((it,ii)=>({itemId:'it_'+Date.now()+'_'+mi+'_'+ii+'_'+Math.random().toString(36).slice(2),foodId:String(it.foodId),grams:num(it.grams),includeInCalculation:true,repeat:it.repeat||'',notes:it.notes||''}))}));day.appliedFixedDietKey=diet.id;day.appliedFixedDietName=diet.name;renderDays();closeFixedMeals();showToast(`تم تطبيق «${diet.name}» على اليوم بالكامل`)}
- const has=day.meals.some(m=>m.items?.length);has?openConfirmModal('استبدال محتوى اليوم',`هذا اليوم يحتوي بالفعل على أصناف. تطبيق «${diet.name}» سيستبدل وجبات اليوم الحالية بالكامل. هل تريد المتابعة؟`,install):install();
+async function applyFixedDiet(i){
+ const diet=fixedMealsDatabase[i],day=daysData.find(d=>d.id===fixedMealsTargetDayId);
+ if(!diet||!day||!isDayEditing(day.id)){showToast('افتح اليوم بوضع التعديل أولاً','error');return;}
+
+ const install=details=>{
+  if(!details?.meals?.length){showToast('هذا الدايت لا يحتوي على وجبات','error');return;}
+  day.meals=details.meals.map((m,mi)=>({
+   id:'m_'+Date.now()+'_'+mi+'_'+Math.random().toString(36).slice(2),
+   name:m.name||`وجبة ${mi+1}`,
+   description:'',
+   items:m.items.map((it,ii)=>({
+    itemId:'it_'+Date.now()+'_'+mi+'_'+ii+'_'+Math.random().toString(36).slice(2),
+    foodId:String(it.foodId),
+    grams:num(it.grams),
+    includeInCalculation:true,
+    repeat:it.repeat||'',
+    notes:it.notes||''
+   }))
+  }));
+  day.appliedFixedDietKey=diet.id;
+  day.appliedFixedDietName=diet.name;
+  renderDays();
+  closeFixedMeals();
+  showToast(`تم تطبيق «${diet.name}» على اليوم بالكامل`);
+ };
+
+ const loadAndInstall=async()=>{
+  try{
+   const details=await loadFixedDietDetails(diet.id);
+   if(!details){showToast('تعذر العثور على تفاصيل هذا الدايت','error');return;}
+   const foodIds=[...new Set(details.meals.flatMap(m=>m.items.map(it=>String(it.foodId)).filter(Boolean)))];
+   if(foodIds.length && !(await loadFoods({ids:foodIds}))){return;}
+   install(details);
+  }catch(error){
+   console.error('Fixed diet details load failed:',error);
+   showToast('تعذر تحميل تفاصيل الدايت','error');
+  }
+ };
+
+ const has=day.meals.some(m=>m.items?.length);
+ if(has){
+  openConfirmModal('استبدال محتوى اليوم',`هذا اليوم يحتوي بالفعل على أصناف. تطبيق «${diet.name}» سيستبدل وجبات اليوم الحالية بالكامل. هل تريد المتابعة؟`,loadAndInstall);
+ }else{
+  await loadAndInstall();
+ }
 }
 
 function newCloudUuid(){
- return (window.crypto && typeof window.crypto.randomUUID === 'function')
-   ? window.crypto.randomUUID()
-   : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
-       const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);
-       return v.toString(16);
-     });
+  return (window.crypto && typeof window.crypto.randomUUID === 'function')
+    ? window.crypto.randomUUID()
+    : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+        const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);
+        return v.toString(16);
+      });
 }
 
 async function savePlan(){
@@ -687,31 +714,31 @@ function init(){
  if(dietInitPromise)return dietInitPromise;
 
  dietInitPromise=(async()=>{
-  const ctx=window.visitContext||{};
-  visitId=ctx.id || params.get('visit_id') || params.get('id') || null;
-  patientId=ctx.patient_id || params.get('patient_id') || null;
+   const ctx=window.visitContext||{};
+   visitId=ctx.id || params.get('visit_id') || params.get('id') || null;
+   patientId=ctx.patient_id || params.get('patient_id') || null;
 
-  initFoodSearchInteraction();
+   initFoodSearchInteraction();
 
-  const ok=await loadPatient();
-  if(!ok){dietInitPromise=null;return false;}
+   const ok=await loadPatient();
+   if(!ok){dietInitPromise=null;return false;}
 
-  await loadPlan(false);
+   await loadPlan(false);
 
-  const planFoodIds=getPlanFoodIds();
-  const foodsLoaded=planFoodIds.length
-    ? await loadFoods({ids:planFoodIds})
-    : true;
+   const planFoodIds=getPlanFoodIds();
+   const foodsLoaded=planFoodIds.length
+     ? await loadFoods({ids:planFoodIds})
+     : true;
 
-  if(!foodsLoaded){dietInitPromise=null;return false;}
+   if(!foodsLoaded){dietInitPromise=null;return false;}
 
-  renderDays();
-  return true;
+   renderDays();
+   return true;
  })().catch(error=>{
-  console.error('Diet plan initialization failed:',error);
-  dietInitPromise=null;
-  showToast('تعذر تهيئة الخطة الغذائية','error');
-  return false;
+   console.error('Diet plan initialization failed:',error);
+   dietInitPromise=null;
+   showToast('تعذر تهيئة الخطة الغذائية','error');
+   return false;
  });
 
  return dietInitPromise;
