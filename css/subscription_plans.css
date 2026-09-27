@@ -9,7 +9,8 @@
 .card{background:#fff;border:1px solid #e1e9e8;border-radius:20px;padding:24px;box-shadow:0 8px 25px rgba(20,60,56,.05);display:flex;flex-direction:column;min-height:310px}
 .card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.card h3{margin:0;font-size:20px;font-weight:800}.badge{background:#e8f6f4;color:#11786f;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:700}
 .price{margin:20px 0 4px;color:#11786f;font-size:30px;font-weight:800}.duration{color:#738783;font-size:13px}.method{margin-top:18px;padding:12px;background:#f6faf9;border-radius:12px;font-size:13px}.method strong{display:block;margin-bottom:4px}
-.description{color:#687d79;font-size:13px;line-height:1.8;margin:14px 0}.card-actions{margin-top:auto;display:flex;gap:8px}.card-actions .btn{flex:1}
+.description{color:#687d79;font-size:13px;line-height:1.8;margin:14px 0;white-space:pre-line}
+.card-actions{margin-top:auto;display:flex;gap:8px}.card-actions .btn{flex:1}
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(14,40,37,.48);z-index:100;align-items:center;justify-content:center;padding:18px}
 .modal{width:100%;max-width:480px;background:#fff;border-radius:20px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.18)}.modal h2{margin:0 0 20px;font-size:20px}
 .form-group{margin-bottom:14px}.form-group label{display:block;margin-bottom:6px;font-size:13px;font-weight:700}.form-group input,.form-group textarea{width:100%;border:1px solid #d6e2e0;border-radius:10px;padding:11px 12px;font-family:inherit;outline:none}.form-group input:focus,.form-group textarea:focus{border-color:#178f84}.form-group textarea{min-height:85px;resize:vertical}
