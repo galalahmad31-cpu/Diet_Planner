@@ -17,7 +17,6 @@ let patientId=initialUrlPatientId;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
-let fixedMealsLoadPromise=null, fixedMealsLoaded=false;
 
 function num(v){return Number.isFinite(Number(v))?Number(v):0;}
 function cloneDays(v){try{return JSON.parse(JSON.stringify(v||[]));}catch{return[];}}
@@ -361,10 +360,7 @@ function renderDays(){
 }
 function metricCard(label,value,unit,target,pctv,kind){
  const bg={amber:'bg-amber-50 border-amber-200 text-amber-900',slate:'bg-slate-50 border-slate-200 text-slate-800',sky:'bg-sky-50 border-sky-200 text-sky-900',emerald:'bg-emerald-50 border-emerald-200 text-emerald-900'}[kind];
- return `<div class="${bg} border rounded-xl p-3"><div class="flex justify-between items-center mb-1"><span class="text-[11px] font-black">${label}</span>${target?`<span class="text-[10px] font-bold opacity-70">الهدف: ${target}g</span>`:''}</div><div class="flex items-baseline gap-1"><span class="text-xl font-black">${value}</span><span class="text-[10px] font-extrabold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div
-  if (fixedMealsLoaded) return true;
-  if (fixedMealsLoadPromise) return fixedMealsLoadPromise;
-  fixedMealsLoadPromise = (async () => {></div>`:''}</div>`;
+ return `<div class="${bg} border rounded-xl p-3"><div class="flex justify-between items-center mb-1"><span class="text-[11px] font-black">${label}</span>${target?`<span class="text-[10px] font-bold opacity-70">الهدف: ${target}g</span>`:''}</div><div class="flex items-baseline gap-1"><span class="text-xl font-black">${value}</span><span class="text-[10px] font-extrabold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div></div>`:''}</div>`;
 }
 
 async function syncFixedMeals(){
@@ -404,16 +400,7 @@ async function syncFixedMeals(){
  }
 
  fixedMealsDatabase=diets.map(d=>{const day=days.find(x=>x.diet_id===d.id);return{id:d.id,name:d.name||'دايت ثابت',description:d.description||'',created_by:d.created_by,target_calories:d.target_calories,target_protein:d.target_protein,target_carb:d.target_carb,target_fat:d.target_fat,meals:day?meals.filter(m=>m.day_id===day.id).map(m=>({name:m.meal_name||'وجبة',frequency:m.frequency||'',items:items.filter(i=>i.meal_id===m.id).map(i=>({foodId:String(i.food_id),grams:Number(i.quantity_g)||0,repeat:i.frequency??'',notes:i.notes??'',household_measure:i.household_measure||''}))})):[]}}).filter(d=>d.meals.length);
- fixedMealsDatabase.sort((a,b)=>(a.c
-  })();
-  try {
-    const result = await fixedMealsLoadPromise;
-    fixedMealsLoaded = result !== false;
-    return result;
-  } finally {
-    fixedMealsLoadPromise = null;
-  }
-}eated_by===user.id?0:1)-(b.created_by===user.id?0:1));
+ fixedMealsDatabase.sort((a,b)=>(a.created_by===user.id?0:1)-(b.created_by===user.id?0:1));
 }
 function renderFixedMealsList(){
  const list=document.getElementById('fixedMealsList');
