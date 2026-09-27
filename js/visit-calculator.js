@@ -151,7 +151,7 @@ function calcShowToast(msg, type = 'success') {
             } else if (age < 18) {
                 if (gender === 'male') {
                     bmr = 17.686 * weight + 658.2;
-                    group = '10–18 سنة — ذكر';
+                    group = '10–18 سنوات — ذكر';
                 } else {
                     bmr = 13.384 * weight + 692.6;
                     group = '10–18 سنة — أنثى';
@@ -379,58 +379,71 @@ async function applyCustomTargetToPatient() {
         calcShowToast('يجب تسجيل الدخول أولاً', 'error');
         return;
     }
-    const authData = { user: authUser };
 
     let existingQuery = calcDb
         .from('nutrition_plans')
-        .select('id')
+        .select('id,plan_name')
         .eq('patient_id', calcResolvedPatientId);
 
     if (calcVisitId) existingQuery = existingQuery.eq('visit_id', calcVisitId);
 
     const { data: existing, error: findError } = await existingQuery
         .order('updated_at', { ascending:false })
-        .order('created_at', { ascending:false })
-        .limit(1);
+        .order('created_at', { ascending:false });
 
     if (findError) {
-        calcShowToast('تعذر الوصول إلى خطة المريض', 'error');
+        calcShowToast('تعذر الوصول إلى خطط المريض', 'error');
         return;
     }
 
-    const planId = existing?.[0]?.id || crypto.randomUUID();
-
-    const { error } = await calcDb
-        .from('nutrition_plans')
-        .upsert({
-            id: planId,
-            patient_id: calcResolvedPatientId,
-            visit_id: calcVisitId || null,
-            plan_name: 'الخطة الغذائية',
-            start_date: new Date().toISOString().slice(0,10),
-            target_calories: targetCal,
-            target_protein: proGrams,
-            target_carb: carbGrams,
-            target_fat: fatGrams
-        }, { onConflict:'id' });
-
-    if (error) {
-        calcShowToast('تعذر حفظ الهدف في قاعدة البيانات', 'error');
-        return;
-    }
-
-    window.__dietPlannerCalculatorApproved = true;
-    window.__dietPlannerApprovedPlan = {
-        id: planId,
+    const existingGramPlan = existing?.find(p => p.plan_name === 'الخطة الغذائية باستخدام الجرامات');
+    const existingExchangePlan = existing?.find(p => p.plan_name === 'الخطة الغذائية باستخدام البدائل');
+    const startDate = new Date().toISOString().slice(0,10);
+    const sharedTargets = {
         patient_id: calcResolvedPatientId,
         visit_id: calcVisitId || null,
+        start_date: startDate,
         target_calories: targetCal,
         target_protein: proGrams,
         target_carb: carbGrams,
         target_fat: fatGrams
     };
 
-    calcShowToast(`تم اعتماد الهدف (${targetCal} سعر) والماكروز بنجاح`);
+    const rows = [
+        {
+            id: existingGramPlan?.id || crypto.randomUUID(),
+            ...sharedTargets,
+            plan_name: 'الخطة الغذائية باستخدام الجرامات'
+        },
+        {
+            id: existingExchangePlan?.id || crypto.randomUUID(),
+            ...sharedTargets,
+            plan_name: 'الخطة الغذائية باستخدام البدائل'
+        }
+    ];
+
+    const { error } = await calcDb
+        .from('nutrition_plans')
+        .upsert(rows, { onConflict:'id' });
+
+    if (error) {
+        calcShowToast('تعذر حفظ خطتي الجرامات والبدائل في قاعدة البيانات', 'error');
+        return;
+    }
+
+    window.__dietPlannerCalculatorApproved = true;
+    window.__dietPlannerApprovedPlan = {
+        patient_id: calcResolvedPatientId,
+        visit_id: calcVisitId || null,
+        target_calories: targetCal,
+        target_protein: proGrams,
+        target_carb: carbGrams,
+        target_fat: fatGrams,
+        gram_plan_id: rows[0].id,
+        exchange_plan_id: rows[1].id
+    };
+
+    calcShowToast(`تم اعتماد الهدف (${targetCal} سعر) والماكروز وحفظ خطتي الجرامات والبدائل بنجاح`);
 }
 
 async function initCalculator(){
