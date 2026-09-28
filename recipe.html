@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الوصفات الصحية | Diet Planner</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
+    <link rel="stylesheet" href="css/recipe.css">
+    <link rel="stylesheet" href="css/theme.css?v=20260921-3">
+    <script src="js/theme.js?v=20260921-3"></script>
+</head>
+
+<body class="min-h-screen">
+
+    <div id="loading" class="loading">
+        <div class="flex flex-col items-center gap-3">
+            <div class="spinner"></div>
+            <div class="text-sm font-semibold text-slate-500">جاري تحميل الوصفات الصحية...</div>
+        </div>
+    </div>
+
+    <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
+
+            <header class="glass rounded-3xl px-5 py-5 shadow-sm sm:px-7 sm:py-6">
+                <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg shadow-brand-500/20">
+                            <i class="fa-solid fa-bowl-food text-2xl"></i>
+                        </div>
+
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-800 sm:text-3xl">الوصفات الصحية</h1>
+                            <p class="mt-1 text-sm font-medium text-slate-500">مكتبة وصفات غذائية للمتخصصين في التغذية العلاجية</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <a href="app.html" class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600">
+                            <i class="fa-solid fa-arrow-right"></i>
+                            الرئيسية
+                        </a>
+
+                        <button id="addBtn" type="button" class="flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white shadow-sm hover:bg-brand-700">
+                            <i class="fa-solid fa-plus"></i>
+                            إضافة وصفة
+                        </button>
+                    </div>
+
+                </div>
+            </header>
+
+            <section class="glass mt-6 rounded-3xl p-4">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input id="search" type="search" class="h-12 w-full rounded-2xl border border-slate-200 bg-white pr-11 pl-4 text-sm outline-none focus:border-brand-400" placeholder="ابحث باسم الوصفة أو المكونات...">
+                </div>
+            </section>
+
+            <section class="mt-6">
+                <div id="grid" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"></div>
+
+                <div id="empty" class="hidden glass rounded-3xl p-12 text-center">
+                    <i class="fa-solid fa-bowl-food text-4xl text-brand-500"></i>
+                    <h3 class="mt-4 font-extrabold">لا توجد وصفات</h3>
+                    <p class="mt-2 text-sm text-slate-500">ابدأ بإضافة أول وصفة صحية.</p>
+                </div>
+            </section>
+
+            <footer class="py-8 text-center text-xs text-slate-400">Diet Planner • Clinical Nutrition</footer>
+        </div>
+    </main>
+
+    <div id="recipeModal" class="recipe-modal fixed inset-0 z-50 hidden overflow-y-auto p-2 sm:p-5">
+        <div class="mx-auto flex min-h-full w-full max-w-5xl items-center">
+            <div class="w-full overflow-hidden rounded-3xl bg-white shadow-2xl">
+
+                <div class="flex items-center justify-between border-b px-5 py-4 sm:px-6">
+                    <div>
+                        <h2 id="modalTitle" class="text-lg font-extrabold text-slate-800">إضافة وصفة</h2>
+                        <p class="mt-1 text-xs text-slate-500">أدخل بيانات الوصفة والقيم الغذائية.</p>
+                    </div>
+                    <button id="closeModal" type="button" class="h-10 w-10 rounded-xl bg-slate-100 text-slate-600">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form id="recipeForm" class="max-h-[calc(100vh-30px)] overflow-y-auto p-4 sm:p-6">
+                    <input id="editId" type="hidden">
+
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <label>
+                            <span class="field-label">اسم الوصفة *</span>
+                            <input id="name" required class="field-input" placeholder="مثال: دجاج بالخضار">
+                        </label>
+
+                        <label>
+                            <span class="field-label">عدد الحصص (Servings) *</span>
+                            <input id="servings" required type="number" min="1" step="1" value="1" class="field-input" placeholder="1">
+                        </label>
+                    </div>
+
+                    <div class="mt-4 grid gap-4 lg:grid-cols-2">
+                        <label>
+                            <span class="field-label">المكونات</span>
+                            <textarea id="ingredients" class="text-area" placeholder="اكتب المكونات، كل مكون في سطر..."></textarea>
+                        </label>
+
+                        <label>
+                            <span class="field-label">طريقة التحضير</span>
+                            <textarea id="instructions" class="text-area" placeholder="اكتب خطوات التحضير بالترتيب..."></textarea>
+                        </label>
+                    </div>
+
+                    <div class="mt-5">
+                        <div class="mb-3 font-extrabold text-slate-800">القيم الغذائية</div>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <label><span class="field-label">السعرات kcal</span><input id="calories" type="number" min="0" step="any" value="0" class="field-input"></label>
+                            <label><span class="field-label">الكربوهيدرات g</span><input id="carbohydrates" type="number" min="0" step="any" value="0" class="field-input"></label>
+                            <label><span class="field-label">البروتين g</span><input id="protein" type="number" min="0" step="any" value="0" class="field-input"></label>
+                            <label><span class="field-label">الدهون g</span><input id="fat" type="number" min="0" step="any" value="0" class="field-input"></label>
+                            <label><span class="field-label">البوتاسيوم mg</span><input id="potassium" type="number" min="0" step="any" value="0" class="field-input"></label>
+                            <label><span class="field-label">الفسفور mg</span><input id="phosphorus" type="number" min="0" step="any" value="0" class="field-input"></label>
+                            <label><span class="field-label">الصوديوم mg</span><input id="sodium" type="number" min="0" step="any" value="0" class="field-input"></label>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end gap-2">
+                        <button id="cancelBtn" type="button" class="rounded-xl bg-slate-100 px-5 py-3 text-sm font-bold text-slate-600">إلغاء</button>
+                        <button id="saveBtn" type="submit" class="rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white">حفظ الوصفة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewModal" class="recipe-modal fixed inset-0 z-[60] hidden overflow-y-auto p-2 sm:p-5">
+        <div class="mx-auto flex min-h-full w-full max-w-4xl items-center">
+            <div class="w-full overflow-hidden rounded-3xl bg-white shadow-2xl">
+                <div class="flex items-center justify-between border-b px-5 py-4 sm:px-6">
+                    <div>
+                        <h2 id="viewTitle" class="text-xl font-extrabold text-slate-800"></h2>
+                        <p id="viewAuthor" class="mt-1 text-xs text-slate-500"></p>
+                    </div>
+                    <button id="closeView" type="button" class="h-10 w-10 rounded-xl bg-slate-100 text-slate-600">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="max-h-[calc(100vh-30px)] overflow-y-auto p-5 sm:p-7">
+                    <div id="viewNutrition" class="grid grid-cols-2 gap-3 sm:grid-cols-4"></div>
+
+                    <div class="mt-6 grid gap-5 lg:grid-cols-2">
+                        <section class="rounded-2xl bg-slate-50 p-5">
+                            <h3 class="font-extrabold text-slate-800"><i class="fa-solid fa-basket-shopping ml-2 text-brand-600"></i>المكونات</h3>
+                            <div id="viewIngredients" class="recipe-text mt-3"></div>
+                        </section>
+
+                        <section class="rounded-2xl bg-slate-50 p-5">
+                            <h3 class="font-extrabold text-slate-800"><i class="fa-solid fa-utensils ml-2 text-brand-600"></i>طريقة التحضير</h3>
+                            <div id="viewInstructions" class="recipe-text mt-3"></div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="recipe-modal fixed inset-0 z-[70] hidden items-center justify-center p-4">
+        <div class="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-50 text-red-600"><i class="fa-solid fa-trash"></i></div>
+                <div>
+                    <h3 class="font-extrabold text-slate-800">تأكيد حذف الوصفة</h3>
+                    <p id="deleteText" class="mt-1 text-xs text-slate-500">هل تريد حذف هذه الوصفة؟</p>
+                </div>
+            </div>
+            <div class="mt-5 flex gap-2">
+                <button id="confirmDelete" type="button" class="flex-1 rounded-xl bg-red-600 px-4 py-3 text-xs font-extrabold text-white">حذف الوصفة</button>
+                <button id="cancelDelete" type="button" class="rounded-xl bg-slate-100 px-4 py-3 text-xs font-bold text-slate-600">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 left-5 z-[120] hidden rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/auth-access.js?v=20260923-1"></script>
+    <script src="js/recipe.js"></script>
+</body>
+</html>
