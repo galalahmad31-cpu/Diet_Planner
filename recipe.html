@@ -30,7 +30,6 @@
 
             <header class="glass rounded-3xl px-5 py-5 shadow-sm sm:px-7 sm:py-6">
                 <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-
                     <div class="flex items-center gap-4">
                         <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg shadow-brand-500/20">
                             <i class="fa-solid fa-bowl-food text-2xl"></i>
@@ -53,7 +52,6 @@
                             إضافة وصفة
                         </button>
                     </div>
-
                 </div>
             </header>
 
@@ -108,20 +106,71 @@
                     </div>
 
                     <div class="mt-4 grid gap-4 lg:grid-cols-2">
-                        <label>
+                        <div>
                             <span class="field-label">المكونات</span>
-                            <textarea id="ingredients" class="text-area" placeholder="اكتب المكونات، كل مكون في سطر..."></textarea>
-                        </label>
+                            <div class="editor-shell">
+                                <div class="editor-toolbar" data-editor="ingredientsEditor">
+                                    <button type="button" data-command="bold" title="عريض"><i class="fa-solid fa-bold"></i></button>
+                                    <button type="button" data-command="underline" title="تحته خط"><i class="fa-solid fa-underline"></i></button>
+                                    <button type="button" data-command="increaseFont" title="تكبير الخط"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                    <button type="button" data-command="decreaseFont" title="تصغير الخط"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                                    <button type="button" data-command="justifyRight" title="محاذاة لليمين"><i class="fa-solid fa-align-right"></i></button>
+                                    <button type="button" data-command="justifyCenter" title="توسيط"><i class="fa-solid fa-align-center"></i></button>
+                                    <button type="button" data-command="justifyLeft" title="محاذاة لليسار"><i class="fa-solid fa-align-left"></i></button>
+                                    <label class="editor-color" title="لون النص">
+                                        <i class="fa-solid fa-palette"></i>
+                                        <input type="color" data-command="foreColor" value="#334155" aria-label="لون النص">
+                                    </label>
+                                    <button type="button" data-command="createLink" title="إضافة رابط"><i class="fa-solid fa-link"></i></button>
+                                    <button type="button" data-command="unlink" title="إزالة الرابط"><i class="fa-solid fa-link-slash"></i></button>
+                                </div>
+                                <div id="ingredientsEditor" class="rich-editor" contenteditable="true" data-placeholder="اكتب المكونات، ويمكنك تنسيقها..." spellcheck="true"></div>
+                            </div>
+                        </div>
 
-                        <label>
+                        <div>
                             <span class="field-label">طريقة التحضير</span>
-                            <textarea id="instructions" class="text-area" placeholder="اكتب خطوات التحضير بالترتيب..."></textarea>
-                        </label>
+                            <div class="editor-shell">
+                                <div class="editor-toolbar" data-editor="instructionsEditor">
+                                    <button type="button" data-command="bold" title="عريض"><i class="fa-solid fa-bold"></i></button>
+                                    <button type="button" data-command="underline" title="تحته خط"><i class="fa-solid fa-underline"></i></button>
+                                    <button type="button" data-command="increaseFont" title="تكبير الخط"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                    <button type="button" data-command="decreaseFont" title="تصغير الخط"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                                    <button type="button" data-command="justifyRight" title="محاذاة لليمين"><i class="fa-solid fa-align-right"></i></button>
+                                    <button type="button" data-command="justifyCenter" title="توسيط"><i class="fa-solid fa-align-center"></i></button>
+                                    <button type="button" data-command="justifyLeft" title="محاذاة لليسار"><i class="fa-solid fa-align-left"></i></button>
+                                    <label class="editor-color" title="لون النص">
+                                        <i class="fa-solid fa-palette"></i>
+                                        <input type="color" data-command="foreColor" value="#334155" aria-label="لون النص">
+                                    </label>
+                                    <button type="button" data-command="createLink" title="إضافة رابط"><i class="fa-solid fa-link"></i></button>
+                                    <button type="button" data-command="unlink" title="إزالة الرابط"><i class="fa-solid fa-link-slash"></i></button>
+                                </div>
+                                <div id="instructionsEditor" class="rich-editor" contenteditable="true" data-placeholder="اكتب خطوات التحضير بالترتيب ويمكنك تنسيقها..." spellcheck="true"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-5">
                         <div class="mb-3 font-extrabold text-slate-800">القيم الغذائية</div>
-                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+
+                        <div class="nutrition-basis grid gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-[1fr_180px]">
+                            <div>
+                                <div class="field-label mb-1">القيم التالية محسوبة لكل</div>
+                                <p class="text-xs text-slate-400">حدد الأساس الذي تنطبق عليه جميع القيم الغذائية.</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <input id="nutritionBasisValue" type="number" min="0.1" step="any" value="100" class="field-input" aria-label="قيمة الأساس">
+                                <select id="nutritionBasisUnit" class="field-input" aria-label="وحدة الأساس">
+                                    <option value="g">جرام</option>
+                                    <option value="serving">حصة</option>
+                                    <option value="ml">مل</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                             <label><span class="field-label">السعرات kcal</span><input id="calories" type="number" min="0" step="any" value="0" class="field-input"></label>
                             <label><span class="field-label">الكربوهيدرات g</span><input id="carbohydrates" type="number" min="0" step="any" value="0" class="field-input"></label>
                             <label><span class="field-label">البروتين g</span><input id="protein" type="number" min="0" step="any" value="0" class="field-input"></label>
@@ -141,6 +190,28 @@
         </div>
     </div>
 
+    <div id="linkModal" class="recipe-modal fixed inset-0 z-[90] hidden items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-extrabold text-slate-800">إضافة رابط</h3>
+                    <p class="mt-1 text-xs text-slate-500">حدد الرابط الذي سيفتح عند الضغط على النص المحدد.</p>
+                </div>
+                <button id="closeLinkModal" type="button" class="h-10 w-10 rounded-xl bg-slate-100 text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <label class="mt-5 block">
+                <span class="field-label">الرابط</span>
+                <input id="linkUrl" type="url" dir="ltr" class="field-input text-left" placeholder="https://example.com">
+            </label>
+
+            <div class="mt-5 flex justify-end gap-2">
+                <button id="cancelLink" type="button" class="rounded-xl bg-slate-100 px-5 py-3 text-sm font-bold text-slate-600">إلغاء</button>
+                <button id="applyLink" type="button" class="rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white">إضافة الرابط</button>
+            </div>
+        </div>
+    </div>
+
     <div id="viewModal" class="recipe-modal fixed inset-0 z-[60] hidden overflow-y-auto p-2 sm:p-5">
         <div class="mx-auto flex min-h-full w-full max-w-4xl items-center">
             <div class="w-full overflow-hidden rounded-3xl bg-white shadow-2xl">
@@ -149,9 +220,7 @@
                         <h2 id="viewTitle" class="text-xl font-extrabold text-slate-800"></h2>
                         <p id="viewAuthor" class="mt-1 text-xs text-slate-500"></p>
                     </div>
-                    <button id="closeView" type="button" class="h-10 w-10 rounded-xl bg-slate-100 text-slate-600">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button id="closeView" type="button" class="h-10 w-10 rounded-xl bg-slate-100 text-slate-600"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
                 <div class="max-h-[calc(100vh-30px)] overflow-y-auto p-5 sm:p-7">
