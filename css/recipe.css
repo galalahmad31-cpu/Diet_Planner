@@ -53,6 +53,86 @@ body {
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
 }
 
+.editor-shell {
+    overflow: hidden;
+    border: 1px solid var(--dp-input-border, #d9e7e5);
+    border-radius: 0.85rem;
+    background: var(--dp-input, #fff);
+}
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--dp-border, #e2e8f0);
+    background: var(--dp-surface-soft, #f8fafc);
+    padding: 0.45rem;
+}
+
+.editor-toolbar button,
+.editor-color {
+    display: inline-flex;
+    height: 2.2rem;
+    min-width: 2.2rem;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 0.65rem;
+    background: transparent;
+    color: var(--dp-text-2, #475569);
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.editor-toolbar button:hover,
+.editor-color:hover {
+    background: var(--dp-brand-soft, #ecfdf5);
+    color: var(--dp-brand, #0f766e);
+}
+
+.editor-color {
+    position: relative;
+    cursor: pointer;
+}
+
+.editor-color input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.rich-editor {
+    min-height: 230px;
+    padding: 0.9rem 1rem;
+    color: var(--dp-text, #17252a);
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.9;
+    outline: none;
+    text-align: right;
+}
+
+.rich-editor:empty::before {
+    color: var(--dp-text-muted, #94a3b8);
+    content: attr(data-placeholder);
+    pointer-events: none;
+}
+
+.rich-editor a,
+.recipe-text a {
+    color: var(--dp-brand, #0f766e);
+    text-decoration: underline;
+}
+
+.nutrition-basis {
+    border: 1px solid var(--dp-border, #e2e8f0);
+}
+
 .recipe-card {
     transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
@@ -62,10 +142,29 @@ body {
 }
 
 .recipe-text {
-    white-space: pre-wrap;
     line-height: 1.95;
     color: var(--dp-text-2, #475569);
     font-size: 0.875rem;
+}
+
+.recipe-text p,
+.recipe-text div,
+.recipe-text ul,
+.recipe-text ol {
+    margin-bottom: 0.55rem;
+}
+
+.recipe-text ul,
+.recipe-text ol {
+    padding-right: 1.35rem;
+}
+
+.recipe-text ul {
+    list-style: disc;
+}
+
+.recipe-text ol {
+    list-style: decimal;
 }
 
 .nutrition-item {
@@ -81,7 +180,17 @@ html[data-theme="dark"] .recipe-modal {
 }
 
 @media (max-width: 640px) {
-    .text-area {
+    .rich-editor {
         min-height: 190px;
+    }
+
+    .editor-toolbar {
+        gap: 0.15rem;
+    }
+
+    .editor-toolbar button,
+    .editor-color {
+        min-width: 2rem;
+        height: 2rem;
     }
 }
