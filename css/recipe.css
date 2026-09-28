@@ -1,5 +1,13 @@
+/* =========================================================
+   Diet Planner — Recipes
+   Page-specific presentation only.
+   Global theme variables remain in theme.css.
+   ========================================================= */
+
 body {
-    background: #f7fafb;
+    font-family: "Cairo", sans-serif;
+    background: var(--dp-bg, #f7fafb);
+    color: var(--dp-text, #17252a);
 }
 
 .recipe-modal {
@@ -10,18 +18,20 @@ body {
 .field-label {
     display: block;
     margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 800;
-    color: #334155;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--dp-text, #334155);
 }
 
 .field-input,
 .text-area {
     width: 100%;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--dp-input-border, #d9e7e5);
     border-radius: 0.85rem;
-    background: #fff;
+    background: var(--dp-input, #fff);
+    color: var(--dp-text, #17252a);
     padding: 0.75rem 1rem;
+    font-family: inherit;
     font-size: 0.875rem;
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -54,15 +64,20 @@ body {
 .recipe-text {
     white-space: pre-wrap;
     line-height: 1.95;
-    color: #475569;
-    font-size: 0.9rem;
+    color: var(--dp-text-2, #475569);
+    font-size: 0.875rem;
 }
 
 .nutrition-item {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--dp-border, #e2e8f0);
     border-radius: 1rem;
-    background: #fff;
+    background: var(--dp-surface, #fff);
+    color: var(--dp-text, #17252a);
     padding: 0.85rem;
+}
+
+html[data-theme="dark"] .recipe-modal {
+    background: rgba(0, 0, 0, 0.68);
 }
 
 @media (max-width: 640px) {
