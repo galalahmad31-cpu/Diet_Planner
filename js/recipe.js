@@ -8,9 +8,10 @@
     let hasActiveSubscription = false;
     let recipes = [];
     let deleteTarget = null;
+    let savedLinkRange = null;
+    let activeEditor = null;
 
     const $ = (id) => document.getElementById(id);
-
     const numberValue = (id) => Number($(id).value || 0);
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -29,14 +30,171 @@
         setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
+    function sanitizeEditorHtml(html) {
+        const source = document.createElement('div');
+        source.innerHTML = html || '';
+
+        source.querySelectorAll('script,style,iframe,object,embed,form').forEach((node) => node.remove());
+        source.querySelectorAll('*').forEach((node) => {
+            [...node.attributes].forEach((attribute) => {
+                const name = attribute.name.toLowerCase();
+                const value = attribute.value.trim();
+
+                if (name.startsWith('on')) node.removeAttribute(attribute.name);
+
+                if (name === 'href') {
+                    if (!/^(https?:|mailto:)/i.test(value)) node.removeAttribute(attribute.name);
+                    else node.setAttribute('rel', 'noopener noreferrer');
+                }
+
+                if (name === 'src') node.removeAttribute(attribute.name);
+            });
+        });
+
+        return source.innerHTML.trim();
+    }
+
+    function editorText(html) {
+        const box = document.createElement('div');
+        box.innerHTML = html || '';
+        return box.textContent?.trim() || '';
+    }
+
+    function saveSelection(editor) {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        if (editor.contains(range.commonAncestorContainer)) {
+            savedLinkRange = range.cloneRange();
+            activeEditor = editor;
+        }
+    }
+
+    function executeEditorCommand(editor, command, value = null) {
+        editor.focus();
+        document.execCommand(command, false, value);
+        saveSelection(editor);
+    }
+
+    function changeFontSize(editor, direction) {
+        editor.focus();
+        const current = Number(document.queryCommandValue('fontSize')) || 3;
+        const next = Math.min(7, Math.max(1, current + direction));
+        document.execCommand('fontSize', false, next);
+        saveSelection(editor);
+    }
+
+    function openLinkModal(editor) {
+        saveSelection(editor);
+
+        if (!savedLinkRange || savedLinkRange.collapsed) {
+            showToast('حدد كلمة أو نصًا أولًا لإضافة الرابط.', false);
+            return;
+        }
+
+        $('linkUrl').value = '';
+        $('linkModal').classList.remove('hidden');
+        $('linkModal').classList.add('flex');
+        setTimeout(() => $('linkUrl').focus(), 50);
+    }
+
+    function closeLinkModal() {
+        $('linkModal').classList.add('hidden');
+        $('linkModal').classList.remove('flex');
+        savedLinkRange = null;
+        activeEditor = null;
+    }
+
+    function applyLink() {
+        const url = $('linkUrl').value.trim();
+
+        if (!/^https?:\/\//i.test(url)) {
+            showToast('اكتب رابطًا يبدأ بـ https:// أو http://', false);
+            return;
+        }
+
+        if (!savedLinkRange || !activeEditor) {
+            showToast('تعذر تحديد النص المراد ربطه.', false);
+            closeLinkModal();
+            return;
+        }
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedLinkRange);
+        activeEditor.focus();
+        document.execCommand('createLink', false, url);
+        closeLinkModal();
+    }
+
+    function initEditor(editorId) {
+        const editor = $(editorId);
+        const toolbar = document.querySelector(`.editor-toolbar[data-editor="${editorId}"]`);
+        if (!editor || !toolbar) return;
+
+        editor.addEventListener('focus', () => {
+            activeEditor = editor;
+        });
+
+        editor.addEventListener('mouseup', () => saveSelection(editor));
+        editor.addEventListener('keyup', () => saveSelection(editor));
+
+        toolbar.addEventListener('mousedown', (event) => {
+            const control = event.target.closest('[data-command]');
+            if (control && control.tagName !== 'INPUT') event.preventDefault();
+        });
+
+        toolbar.addEventListener('click', (event) => {
+            const control = event.target.closest('[data-command]');
+            if (!control) return;
+
+            const command = control.dataset.command;
+
+            if (command === 'createLink') {
+                openLinkModal(editor);
+                return;
+            }
+
+            if (command === 'increaseFont') {
+                changeFontSize(editor, 1);
+                return;
+            }
+
+            if (command === 'decreaseFont') {
+                changeFontSize(editor, -1);
+                return;
+            }
+
+            if (command === 'foreColor') return;
+            executeEditorCommand(editor, command);
+        });
+
+        toolbar.addEventListener('input', (event) => {
+            const control = event.target.closest('[data-command="foreColor"]');
+            if (!control) return;
+            executeEditorCommand(editor, 'foreColor', control.value);
+        });
+    }
+
+    function clearEditors() {
+        $('ingredientsEditor').innerHTML = '';
+        $('instructionsEditor').innerHTML = '';
+    }
+
     function openModal(recipe = null) {
         $('recipeModal').classList.remove('hidden');
         $('modalTitle').textContent = recipe ? 'تعديل وصفة' : 'إضافة وصفة';
         $('editId').value = recipe?.id || '';
         $('name').value = recipe?.name || '';
         $('servings').value = recipe?.servings || 1;
-        $('ingredients').value = recipe?.ingredients || '';
-        $('instructions').value = recipe?.instructions || '';
+
+        $('ingredientsEditor').innerHTML = recipe?.ingredients || '';
+        $('instructionsEditor').innerHTML = recipe?.instructions || '';
+
+        $('nutritionBasisValue').value = recipe?.nutrition_basis_value ?? 100;
+        $('nutritionBasisUnit').value = recipe?.nutrition_basis_unit || 'g';
+
         $('calories').value = recipe?.calories ?? 0;
         $('carbohydrates').value = recipe?.carbohydrates ?? 0;
         $('protein').value = recipe?.protein ?? 0;
@@ -51,11 +209,20 @@
         $('recipeForm').reset();
         $('editId').value = '';
         $('servings').value = 1;
+        $('nutritionBasisValue').value = 100;
+        $('nutritionBasisUnit').value = 'g';
+        clearEditors();
     }
 
     function openView(recipe) {
         $('viewTitle').textContent = recipe.name;
         $('viewAuthor').textContent = `بواسطة ${recipe.authorName || 'متخصص تغذية'}`;
+
+        const basisUnit = recipe.nutrition_basis_unit === 'serving'
+            ? 'حصة'
+            : recipe.nutrition_basis_unit === 'ml'
+                ? 'مل'
+                : 'جم';
 
         const nutrition = [
             ['السعرات', `${recipe.calories} kcal`],
@@ -65,7 +232,7 @@
             ['البوتاسيوم', `${recipe.potassium} mg`],
             ['الفسفور', `${recipe.phosphorus} mg`],
             ['الصوديوم', `${recipe.sodium} mg`],
-            ['عدد الحصص', recipe.servings]
+            ['القيم لكل', `${recipe.nutrition_basis_value} ${basisUnit}`]
         ];
 
         $('viewNutrition').innerHTML = nutrition.map(([label, value]) => `
@@ -75,8 +242,8 @@
             </div>
         `).join('');
 
-        $('viewIngredients').textContent = recipe.ingredients || 'لم تُسجل مكونات.';
-        $('viewInstructions').textContent = recipe.instructions || 'لم تُسجل طريقة التحضير.';
+        $('viewIngredients').innerHTML = sanitizeEditorHtml(recipe.ingredients) || '<span class="text-slate-400">لم تُسجل مكونات.</span>';
+        $('viewInstructions').innerHTML = sanitizeEditorHtml(recipe.instructions) || '<span class="text-slate-400">لم تُسجل طريقة التحضير.</span>';
         $('viewModal').classList.remove('hidden');
     }
 
@@ -100,7 +267,7 @@
     function render() {
         const query = $('search').value.trim().toLowerCase();
         const filtered = recipes.filter((recipe) => {
-            const text = `${recipe.name} ${recipe.ingredients}`.toLowerCase();
+            const text = `${recipe.name} ${editorText(recipe.ingredients)}`.toLowerCase();
             return !query || text.includes(query);
         });
 
@@ -108,6 +275,7 @@
             const owner = recipe.created_by === currentUser.id;
             const canDelete = isAdmin || (owner && hasActiveSubscription);
             const canEdit = isAdmin || owner;
+            const ingredientPreview = editorText(recipe.ingredients) || 'بدون مكونات مسجلة';
 
             return `
                 <article class="recipe-card glass rounded-3xl p-5 shadow-sm">
@@ -132,9 +300,7 @@
 
                     <h2 class="mt-5 text-lg font-extrabold text-slate-800">${escapeHtml(recipe.name)}</h2>
 
-                    <p class="mt-2 line-clamp-3 text-sm leading-7 text-slate-500">
-                        ${escapeHtml(recipe.ingredients || 'بدون مكونات مسجلة')}
-                    </p>
+                    <p class="mt-2 line-clamp-3 text-sm leading-7 text-slate-500">${escapeHtml(ingredientPreview)}</p>
 
                     <div class="mt-4 flex flex-wrap gap-2">
                         <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">${recipe.calories} kcal</span>
@@ -144,9 +310,7 @@
 
                     <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
                         <span class="text-xs text-slate-400">${escapeHtml(recipe.authorName || 'متخصص تغذية')}</span>
-                        <button data-view="${escapeHtml(recipe.id)}" type="button" class="rounded-xl bg-brand-600 px-4 py-2 text-xs font-extrabold text-white hover:bg-brand-700">
-                            عرض الوصفة
-                        </button>
+                        <button data-view="${escapeHtml(recipe.id)}" type="button" class="rounded-xl bg-brand-600 px-4 py-2 text-xs font-extrabold text-white hover:bg-brand-700">عرض الوصفة</button>
                     </div>
                 </article>
             `;
@@ -176,7 +340,7 @@
     async function loadRecipes() {
         const { data, error } = await supabase
             .from('recipes')
-            .select('id,created_by,name,ingredients,instructions,servings,calories,carbohydrates,protein,fat,potassium,phosphorus,sodium,created_at,updated_at')
+            .select('id,created_by,name,ingredients,instructions,servings,nutrition_basis_value,nutrition_basis_unit,calories,carbohydrates,protein,fat,potassium,phosphorus,sodium,created_at,updated_at')
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -209,6 +373,8 @@
             phosphorus: Number(recipe.phosphorus || 0),
             sodium: Number(recipe.sodium || 0),
             servings: Number(recipe.servings || 1),
+            nutrition_basis_value: Number(recipe.nutrition_basis_value || 100),
+            nutrition_basis_unit: recipe.nutrition_basis_unit || 'g',
             authorName: authorMap.get(recipe.created_by)
         }));
 
@@ -223,9 +389,11 @@
 
         const payload = {
             name: $('name').value.trim(),
-            ingredients: $('ingredients').value.trim(),
-            instructions: $('instructions').value.trim(),
+            ingredients: sanitizeEditorHtml($('ingredientsEditor').innerHTML),
+            instructions: sanitizeEditorHtml($('instructionsEditor').innerHTML),
             servings: Math.max(1, Math.trunc(numberValue('servings'))),
+            nutrition_basis_value: Math.max(0.1, numberValue('nutritionBasisValue')),
+            nutrition_basis_unit: $('nutritionBasisUnit').value,
             calories: numberValue('calories'),
             carbohydrates: numberValue('carbohydrates'),
             protein: numberValue('protein'),
@@ -262,10 +430,7 @@
         button.disabled = true;
         button.textContent = 'جاري الحذف...';
 
-        const { error } = await supabase
-            .from('recipes')
-            .delete()
-            .eq('id', deleteTarget.id);
+        const { error } = await supabase.from('recipes').delete().eq('id', deleteTarget.id);
 
         button.disabled = false;
         button.textContent = 'حذف الوصفة';
@@ -287,8 +452,19 @@
     $('closeView').addEventListener('click', closeView);
     $('cancelDelete').addEventListener('click', closeDelete);
     $('confirmDelete').addEventListener('click', deleteRecipe);
+    $('closeLinkModal').addEventListener('click', closeLinkModal);
+    $('cancelLink').addEventListener('click', closeLinkModal);
+    $('applyLink').addEventListener('click', applyLink);
     $('search').addEventListener('input', render);
     $('recipeForm').addEventListener('submit', saveRecipe);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (!$('linkModal').classList.contains('hidden')) closeLinkModal();
+        else if (!$('viewModal').classList.contains('hidden')) closeView();
+        else if (!$('deleteModal').classList.contains('hidden')) closeDelete();
+        else if (!$('recipeModal').classList.contains('hidden')) closeModal();
+    });
 
     $('grid').addEventListener('click', (event) => {
         const viewButton = event.target.closest('[data-view]');
@@ -317,6 +493,9 @@
             return;
         }
 
+        initEditor('ingredientsEditor');
+        initEditor('instructionsEditor');
+
         const accessStatus = await window.DietPlannerAccess?.getAccessStatus?.();
 
         if (!accessStatus?.authenticated || !accessStatus.user) {
@@ -327,11 +506,7 @@
         currentUser = accessStatus.user;
         isAdmin = Boolean(accessStatus.isAdmin || accessStatus.profile?.role === 'admin');
 
-        await Promise.all([
-            loadSubscriptionStatus(),
-            loadRecipes()
-        ]);
-
+        await Promise.all([loadSubscriptionStatus(), loadRecipes()]);
         $('loading').style.display = 'none';
     }
 
