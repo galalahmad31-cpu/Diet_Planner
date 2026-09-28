@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diet Planner | مكتبة الأغذية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
+<link rel="stylesheet" href="css/food.css">
+  <link rel="stylesheet" href="css/theme.css?v=20260921-3">
+  <script src="js/theme.js?v=20260921-3"></script>
+</head>
+<body>
+<div id="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#f7fafb]">
+  <div class="flex flex-col items-center gap-3"><div class="spinner"></div><span class="text-sm font-semibold text-slate-500">جاري تحميل مكتبة الأغذية...</span></div>
+</div>
+
+<main class="min-h-screen p-4 sm:p-6">
+<div class="mx-auto max-w-[1500px]">
+
+<header class="glass rounded-3xl p-5 sm:p-6">
+  <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex items-center gap-4">
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg shadow-brand-500/20"><i class="fa-solid fa-apple-whole text-2xl"></i></div>
+      <div>
+        <div class="flex flex-wrap items-center gap-2">
+          <h1 class="text-2xl font-extrabold text-slate-800">مكتبة الأغذية</h1>
+          <span id="countBadge" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">0 صنف</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <a href="app.html" class="rounded-xl bg-slate-800 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-700"><i class="fa-solid fa-house ml-1"></i> الرئيسية </a>
+    </div>
+  </div>
+</header>
+
+<section class="glass mt-5 rounded-2xl p-1.5">
+  <div class="grid grid-cols-2 gap-1.5">
+    <button id="foodsTab" type="button" class="tab-btn active rounded-xl px-2 py-3 text-xs sm:px-4 sm:text-sm font-extrabold">
+      <i class="fa-solid fa-weight-scale ml-1"></i> قائمة الأغذية بالجرامات
+    </button>
+    <button id="exchangesTab" type="button" class="tab-btn rounded-xl px-2 py-3 text-xs sm:px-4 sm:text-sm font-extrabold text-slate-600">
+      <i class="fa-solid fa-list-check ml-1"></i> قائمة البدائل الغذائية
+    </button>
+  </div>
+</section>
+
+<section id="foodTools" class="mt-5">
+  <div class="mb-3 flex justify-end">
+    <button id="addBtn" class="rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-brand-700">
+      <i class="fa-solid fa-plus ml-1"></i> إضافة صنف مخصص
+    </button>
+  </div>
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+  <div class="glass rounded-2xl p-4"><div class="text-xs font-semibold text-slate-500">إجمالي الأصناف</div><div id="totalStat" class="mt-1 text-2xl font-extrabold text-slate-800">0</div></div>
+  <div class="glass rounded-2xl p-4"><div class="text-xs font-semibold text-slate-500">المكتبة الأساسية</div><div id="baseStat" class="mt-1 text-2xl font-extrabold text-slate-800">0</div></div>
+  <div class="glass rounded-2xl p-4"><div class="text-xs font-semibold text-slate-500">أصناف مخصصة</div><div id="customStat" class="mt-1 text-2xl font-extrabold text-brand-600">0</div></div>
+    </div>
+</section>
+
+<section id="foodFilters" class="glass mt-5 rounded-3xl p-4 sm:p-5">
+  <div class="flex items-center gap-3 overflow-x-auto">
+    <div class="relative min-w-[260px] flex-1">
+      <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+      <input id="search" class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-11 pl-4 text-sm" placeholder="ابحث باسم الصنف بالعربي أو الإنجليزي...">
+    </div>
+    <select id="typeFilter" class="w-[170px] shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+      <option value="all">كل الأصناف</option>
+      <option value="base">المكتبة الأساسية</option>
+      <option value="custom">الأصناف المخصصة</option>
+    </select>
+    <button id="refreshBtn" class="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50"><i class="fa-solid fa-rotate ml-1"></i> تحديث</button>
+  </div>
+</section>
+
+<section id="foodSection" class="glass mt-5 overflow-hidden rounded-3xl">
+  <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+    <div><h2 class="font-extrabold text-slate-800">بيانات الأغذية</h2><p class="mt-1 text-xs text-slate-400">القيم الغذائية لكل 100 جم كما هي محفوظة في قاعدة البيانات</p></div>
+    <span id="shownCount" class="text-xs font-bold text-slate-400">0 معروض</span>
+  </div>
+  <div class="table-wrap overflow-x-auto">
+    <table class="min-w-[1250px] w-full text-right text-xs">
+      <thead class="bg-slate-50 text-slate-500">
+        <tr>
+          <th class="px-3 py-3 font-extrabold">الصنف</th>
+          <th class="px-3 py-3 font-extrabold">المقياس المنزلي</th>
+          <th class="px-3 py-3 text-center font-extrabold">سعرات  كالوري</th>
+          <th class="px-3 py-3 text-center font-extrabold">كربوهيدرات جم</th>
+          <th class="px-3 py-3 text-center font-extrabold">بروتين  جم</th>
+          <th class="px-3 py-3 text-center font-extrabold">دهون جم</th>
+          <th class="px-3 py-3 text-center font-extrabold">صوديوم مجم</th>
+          <th class="px-3 py-3 text-center font-extrabold">بوتاسيوم  مجم</th>
+          <th class="px-3 py-3 text-center font-extrabold"> فسفور  مجم</th>
+          <th class="px-3 py-3 text-center font-extrabold">ماء  جم</th>
+          <th class="px-3 py-3 text-center font-extrabold">النوع</th>
+          <th class="px-3 py-3 text-center font-extrabold">إجراء</th>
+        </tr>
+      </thead>
+      <tbody id="foodRows"></tbody>
+    </table>
+  </div>
+  <div class="flex justify-center border-t border-slate-100 px-5 py-4">
+    <button id="loadMoreFoods" type="button" class="hidden rounded-xl bg-brand-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-sm hover:bg-brand-700">
+      عرض المزيد
+    </button>
+  </div>
+  <div id="empty" class="hidden p-12 text-center"><i class="fa-solid fa-bowl-food text-4xl text-slate-200"></i><p class="mt-3 font-bold text-slate-500">لا توجد نتائج</p></div>
+</section>
+
+
+<section id="exchangeSection" class="hidden glass mt-5 overflow-hidden rounded-3xl">
+  <div class="border-b border-slate-100 px-5 py-4">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 class="font-extrabold text-slate-800">قائمة البدائل الغذائية</h2>
+        <p class="mt-1 text-xs text-slate-400">كل صف يمثل مجموعة فرعية، والقيم الغذائية للحصة الواحدة.</p>
+      </div>
+    </div>
+    <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input id="exchangeSearch" class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-11 pl-4 text-sm" placeholder="ابحث في المجموعة أو المجموعة الفرعية أو البدائل...">
+      </div>
+      <select id="exchangeGroupFilter" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+        <option value="all">كل المجموعات</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-wrap overflow-x-auto">
+    <table class="exchange-table min-w-[760px] w-full text-right text-xs sm:text-sm">
+      <thead class="bg-slate-50 text-slate-600">
+        <tr>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 font-extrabold text-brand-700">المجموعة</th>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 font-extrabold text-brand-700">المجموعة الفرعية</th>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 text-center font-extrabold text-brand-700">البدائل</th>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 text-center font-extrabold text-brand-700">السعرات</th>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 text-center font-extrabold text-brand-700">الكربوهيدرات</th>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 text-center font-extrabold text-brand-700">البروتين</th>
+          <th class="px-2 py-2 sm:px-4 sm:py-4 text-center font-extrabold text-brand-700">الدهون</th>
+        </tr>
+      </thead>
+      <tbody id="exchangeRows"></tbody>
+    </table>
+  </div>
+
+  <div id="exchangeEmpty" class="hidden p-12 text-center">
+    <i class="fa-solid fa-list-check text-4xl text-slate-200"></i>
+    <p class="mt-3 font-bold text-slate-500">لا توجد نتائج</p>
+  </div>
+</section>
+
+<footer class="py-7 text-center text-xs text-slate-400">Developed by <span class="font-bold text-brand-600">Dr. Ahmed Galal</span></footer>
+</div>
+</main>
+
+<!-- Food modal -->
+<div id="modal" class="modal-bg fixed inset-0 z-[80] hidden items-center justify-center p-4">
+<div class="max-h-[94vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+  <div class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4">
+    <div><h3 id="modalTitle" class="font-extrabold text-slate-800">إضافة صنف مخصص</h3><p class="mt-1 text-xs text-slate-400">سيتم حفظ الصنف المخصص في حسابك فقط</p></div>
+    <button id="closeModal" class="h-9 w-9 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <form id="foodForm" class="p-5">
+    <input type="hidden" id="editId">
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="sm:col-span-2"><span class="label">اسم الصنف بالعربي *</span><input id="nameAr" required class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">English Name</span><input id="nameEn" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" dir="ltr"></label>
+      <label><span class="label">المقياس المنزلي</span><input id="household" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">السعرات kcal</span><input id="kcal" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">البروتين g</span><input id="protein" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">الكارب g</span><input id="carb" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">الدهون g</span><input id="fat" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">الصوديوم mg</span><input id="sodium" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">البوتاسيوم mg</span><input id="potassium" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">الفسفور mg</span><input id="phosphorus" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+      <label><span class="label">الماء g</span><input id="water" type="number" step="any" min="0" class="num mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+    </div>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" id="cancelBtn" class="rounded-xl bg-slate-100 px-5 py-3 text-sm font-bold text-slate-600">إلغاء</button>
+      <button type="submit" id="saveBtn" class="rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white">حفظ الصنف</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<!-- Delete confirmation -->
+<div id="deleteConfirmModal" class="modal-bg fixed inset-0 z-[140] hidden items-center justify-center p-4">
+  <div class="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+      <div>
+        <h3 class="font-extrabold text-slate-800">تأكيد حذف الصنف</h3>
+        <p id="deleteConfirmText" class="mt-1 text-xs text-slate-500">هل أنت متأكد من حذف هذا الصنف؟ لا يمكن التراجع عن الحذف.</p>
+      </div>
+    </div>
+    <div class="mt-5 flex gap-2">
+      <button id="confirmDeleteBtn" class="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-red-700">
+        <i class="fa-solid fa-trash ml-1"></i> حذف الصنف
+      </button>
+      <button id="cancelDeleteBtn" class="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-200">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-5 left-5 z-[120] hidden max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth-access.js?v=20260923-1"></script>
+<script src="js/food.js?v=20260922-3"></script>
+  
+</body>
+</html>
