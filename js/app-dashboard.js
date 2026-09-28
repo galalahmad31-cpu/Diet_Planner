@@ -78,13 +78,13 @@
   }
 
   function renderRecipeCard() {
-    const aboutCard = document.querySelector('a.nav-card[href="about.html"]');
+    const dietCard = document.querySelector('a.nav-card[href="diet.html"]');
 
-    if (!aboutCard || document.querySelector('a.nav-card[href="recipe.html"]')) {
+    if (!dietCard || document.querySelector('a.nav-card[href="recipe.html"]')) {
       return;
     }
 
-    aboutCard.insertAdjacentHTML("afterend", `
+    dietCard.insertAdjacentHTML("afterend", `
       <a href="recipe.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
         <div class="flex items-start justify-between">
           <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
