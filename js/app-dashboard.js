@@ -77,6 +77,34 @@
     );
   }
 
+  function renderRecipeCard() {
+    const aboutCard = document.querySelector('a.nav-card[href="about.html"]');
+
+    if (!aboutCard || document.querySelector('a.nav-card[href="recipe.html"]')) {
+      return;
+    }
+
+    aboutCard.insertAdjacentHTML("afterend", `
+      <a href="recipe.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
+            <i class="fa-solid fa-bowl-food text-xl"></i>
+          </div>
+
+          <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+        </div>
+
+        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+          الوصفات الصحية
+        </h4>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          إنشاء واستعراض وصفات صحية مع مكوناتها وطريقة تحضيرها وقيمها الغذائية.
+        </p>
+      </a>
+    `);
+  }
+
   // ---------------------------------------------------------
   // Locked cards
   // ---------------------------------------------------------
@@ -322,6 +350,7 @@
 
       await renderAccountName(status.user);
       renderAdminCard(status.isAdmin);
+      renderRecipeCard();
 
       await renderFeatureCards(
         status.user.id,
