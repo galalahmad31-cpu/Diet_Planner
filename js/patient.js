@@ -1,15 +1,19 @@
 (() => {
   'use strict';
 
+  const access = window.DietPlannerAccess;
   const auth = window.DietPlannerAuth;
-  const pageAccess = window.DietPlannerPageAccess;
   const supabase = window.DietPlannerSupabase?.client;
+
+  if (!access || !auth?.getCurrentUser || !supabase) {
+    console.error('supabase.js, auth.js, and access.js must load before patient.js.');
+    return;
+  }
 
   const state = {
     patients: [],
     pendingDeleteId: null,
-    statusTimer: null,
-    user: null
+    statusTimer: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -54,19 +58,14 @@
       </div>`;
   }
 
-  async function getCurrentUser() {
-    state.user = await auth?.getCurrentUser?.() || null;
-    return state.user;
-  }
-
-  async function canAddPatient() {
-    return await pageAccess?.can?.('patient', 'add') === true;
+  async function canPatient(action) {
+    return access.can('patient', action);
   }
 
   async function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
-    const allowed = await canAddPatient();
+    const allowed = await canPatient('add');
 
     if (addButton) {
       addButton.disabled = !allowed;
@@ -92,8 +91,10 @@
     if (!box) return;
 
     try {
-      if (!supabase) {
-        throw new Error('Supabase client is not available.');
+      const allowed = await canPatient('read');
+      if (!allowed) {
+        showLoadError();
+        return;
       }
 
       const { data, error } = await supabase
@@ -170,7 +171,7 @@
   }
 
   async function openAddPatientModal() {
-    if (!(await canAddPatient())) {
+    if (!(await canPatient('add'))) {
       showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
       await updateWriteControls();
       return;
@@ -181,7 +182,6 @@
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-
     setTimeout(() => $('newPatientName')?.focus(), 50);
   }
 
@@ -197,7 +197,7 @@
   }
 
   async function createPatient() {
-    if (!(await canAddPatient())) {
+    if (!(await canPatient('add'))) {
       showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
       await updateWriteControls();
       return;
@@ -213,7 +213,7 @@
     }
 
     try {
-      const user = await getCurrentUser();
+      const user = await auth.getCurrentUser();
       if (!user) {
         showStatus('يجب تسجيل الدخول أولاً.');
         return;
@@ -249,7 +249,12 @@
     }
   }
 
-  function askDelete(id) {
+  async function askDelete(id) {
+    if (!(await canPatient('delete'))) {
+      showStatus('لا تملك صلاحية حذف المرضى.');
+      return;
+    }
+
     const patient = state.patients.find((item) => item.id === id);
     if (!patient) return;
 
@@ -278,14 +283,14 @@
   }
 
   async function deletePatient() {
-    const id = state.pendingDeleteId;
-    if (!id) return;
-
-    const user = await getCurrentUser();
-    if (!user) {
-      showStatus('يجب تسجيل الدخول أولاً.');
+    if (!(await canPatient('delete'))) {
+      showStatus('لا تملك صلاحية حذف المرضى.');
+      closeDeleteModal();
       return;
     }
+
+    const id = state.pendingDeleteId;
+    if (!id) return;
 
     try {
       const { error } = await supabase
@@ -342,7 +347,7 @@
 
   async function init() {
     bindEvents();
-    await getCurrentUser();
+    await access.requireAuthentication();
     await updateWriteControls();
     await loadPatients();
   }
