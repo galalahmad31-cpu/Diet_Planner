@@ -1,4 +1,4 @@
-(function () {
+(() => {
   'use strict';
 
   const auth = window.DietPlannerAuth;
@@ -9,8 +9,7 @@
     patients: [],
     pendingDeleteId: null,
     statusTimer: null,
-    user: null,
-    addPatientAllowed: false
+    user: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -41,7 +40,7 @@
       </div>`;
 
     state.statusTimer = setTimeout(() => {
-      if (box) box.innerHTML = '';
+      box.innerHTML = '';
     }, 3500);
   }
 
@@ -55,40 +54,34 @@
       </div>`;
   }
 
-  async function refreshAccess() {
-    try {
-      state.user = await auth?.getCurrentUser?.() || null;
-      state.addPatientAllowed = state.user
-        ? await pageAccess?.can?.('patient', 'add') === true
-        : false;
-
-      updateWriteControls();
-    } catch (error) {
-      console.error('Patient access check failed:', error);
-      state.user = null;
-      state.addPatientAllowed = false;
-      updateWriteControls();
-    }
+  async function getCurrentUser() {
+    state.user = await auth?.getCurrentUser?.() || null;
+    return state.user;
   }
 
-  function updateWriteControls() {
+  async function canAddPatient() {
+    return await pageAccess?.can?.('patient', 'add') === true;
+  }
+
+  async function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
+    const allowed = await canAddPatient();
 
     if (addButton) {
-      addButton.disabled = !state.addPatientAllowed;
-      addButton.classList.toggle('opacity-50', !state.addPatientAllowed);
-      addButton.classList.toggle('cursor-not-allowed', !state.addPatientAllowed);
-      addButton.title = state.addPatientAllowed
+      addButton.disabled = !allowed;
+      addButton.classList.toggle('opacity-50', !allowed);
+      addButton.classList.toggle('cursor-not-allowed', !allowed);
+      addButton.title = allowed
         ? 'إضافة مريض جديد'
         : 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة';
     }
 
     if (accessBox) {
-      accessBox.textContent = state.addPatientAllowed
+      accessBox.textContent = allowed
         ? 'يمكنك إضافة مرضى جدد وفق الكوتة المتاحة.'
         : 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.';
-      accessBox.className = state.addPatientAllowed
+      accessBox.className = allowed
         ? 'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
         : 'mt-3 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
     }
@@ -176,9 +169,10 @@
     window.location.href = `patient-profile.html?id=${encodeURIComponent(id)}`;
   }
 
-  function openAddPatientModal() {
-    if (!state.addPatientAllowed) {
+  async function openAddPatientModal() {
+    if (!(await canAddPatient())) {
       showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
+      await updateWriteControls();
       return;
     }
 
@@ -203,8 +197,9 @@
   }
 
   async function createPatient() {
-    if (!state.addPatientAllowed) {
+    if (!(await canAddPatient())) {
       showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
+      await updateWriteControls();
       return;
     }
 
@@ -218,8 +213,11 @@
     }
 
     try {
-      const user = state.user;
-      if (!user) throw new Error('No authenticated user.');
+      const user = await getCurrentUser();
+      if (!user) {
+        showStatus('يجب تسجيل الدخول أولاً.');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('patients')
@@ -283,7 +281,8 @@
     const id = state.pendingDeleteId;
     if (!id) return;
 
-    if (!state.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       showStatus('يجب تسجيل الدخول أولاً.');
       return;
     }
@@ -343,7 +342,8 @@
 
   async function init() {
     bindEvents();
-    await refreshAccess();
+    await getCurrentUser();
+    await updateWriteControls();
     await loadPatients();
   }
 
