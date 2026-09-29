@@ -14,10 +14,13 @@
 (() => {
   "use strict";
 
+  const auth = window.DietPlannerAuth;
   const access = window.DietPlannerAccess;
 
-  if (!access) {
-    console.error("access.js must load before access_pages.js.");
+  if (!auth || !access) {
+    console.error(
+      "auth.js and access.js must load before access_pages.js."
+    );
     return;
   }
 
@@ -43,6 +46,26 @@
       update: "active_subscription"
     }
   };
+
+  async function requireAuthentication() {
+    const user = await auth.getCurrentUser();
+
+    if (!user) {
+      const path = window.location.pathname;
+      const isIndex =
+        path.endsWith("/index.html") ||
+        path === "/" ||
+        path === "";
+
+      if (!isIndex) {
+        window.location.replace("index.html");
+      }
+
+      return false;
+    }
+
+    return true;
+  }
 
   async function can(pageKey, action) {
     const rule = PAGE_RULES?.[pageKey]?.[action];
@@ -263,16 +286,23 @@
   window.DietPlannerPageAccess = {
     can,
     getRules,
+    requireAuthentication,
     requireFeature,
     applyCardAccess
   };
 
   if (!document.body) return;
 
-  access.requireAuthentication().then((authenticated) => {
+  requireAuthentication().then((authenticated) => {
     if (!authenticated) return;
 
-    if (!window.location.pathname.endsWith("/index.html")) {
+    const path = window.location.pathname;
+    const isIndex =
+      path.endsWith("/index.html") ||
+      path === "/" ||
+      path === "";
+
+    if (!isIndex) {
       applyCardAccess();
     }
   });
