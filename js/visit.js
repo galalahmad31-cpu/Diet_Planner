@@ -5,7 +5,9 @@
  *
  * Dependencies:
  *   1) Supabase CDN
- *   2) js/auth-access.js
+ *   2) js/auth.js
+ *   3) js/access.js
+ *   4) js/access_pages.js
  * ========================================================= */
 
 
@@ -23,13 +25,11 @@ const db = window.DietPlannerAccess?.supabaseClient;
     document.getElementById('errorText').textContent = message;
   }
 
-  async function refreshVisitWriteAccess() {
-    const accessStatus = await window.DietPlannerAccess?.getAccessStatus?.();
-    if (!accessStatus?.authenticated) return false;
-    if (accessStatus.isAdmin === true) return true;
-    return (await window.DietPlannerAccess?.hasActiveSubscription?.(
-      accessStatus.user.id
-    )) === true;
+  const pageAccess = window.DietPlannerPageAccess;
+
+  async function canVisitContent(action) {
+    if (!pageAccess?.can) return false;
+    return pageAccess.can('visitContent', action);
   }
 
   function formatVisitDate(date) {
@@ -238,7 +238,10 @@ function setAssessmentEditMode(editing){
   function deleteAssessment(){if(!assessmentId)return;const m=document.getElementById('deleteAssessmentModal');if(m){m.classList.remove('hidden');m.classList.add('flex');document.body.classList.add('overflow-hidden');}}
   function closeDeleteAssessmentModal(){const m=document.getElementById('deleteAssessmentModal');if(m){m.classList.add('hidden');m.classList.remove('flex');document.body.classList.remove('overflow-hidden');}}
   async function confirmDeleteAssessment(){
-    if (!(await refreshVisitWriteAccess())) { alert('حذف التقييم متاح أثناء الاشتراك المدفوع فقط.'); return; }
+    if (!(await canVisitContent('delete'))) {
+      alert('لا تملك صلاحية حذف محتوى الزيارة.');
+      return;
+    }
     if(!assessmentId)return;
     const btn=document.getElementById('confirmDeleteAssessmentBtn');if(btn){btn.disabled=true;btn.textContent='جاري الحذف...';}
     const {error}=await db.from('assessment').delete().eq('id',assessmentId);
@@ -416,10 +419,12 @@ function setAssessmentEditMode(editing){
   }
 
   async function saveAssessment() {
-    if (!(await refreshVisitWriteAccess())) {
-      alert('تعديل التقييم متاح أثناء الاشتراك المدفوع فقط.');
+    const action = assessmentId ? 'update' : 'add';
+    if (!(await canVisitContent(action))) {
+      alert('إضافة وتعديل محتوى الزيارة متاحان أثناء الاشتراك الفعال والساري فقط.');
       return;
     }
+
     const accessStatus = await window.DietPlannerAccess?.getAccessStatus?.();
     const user = accessStatus?.user || null;
     if (!user || !visit) return;

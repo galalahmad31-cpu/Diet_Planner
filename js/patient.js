@@ -2,6 +2,7 @@
   'use strict';
 
   const access = window.DietPlannerAccess;
+  const pageAccess = window.DietPlannerPageAccess;
   const supabase = access?.supabaseClient;
 
   const state = {
@@ -9,9 +10,7 @@
     pendingDeleteId: null,
     statusTimer: null,
     user: null,
-    isAdmin: false,
-    hasActiveSubscription: false,
-    canAddPatient: false
+    addPatientAllowed: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -60,27 +59,15 @@
     try {
       const accessStatus = await access?.getAccessStatus?.();
       state.user = accessStatus?.user || null;
-
-      if (!state.user) {
-        state.isAdmin = false;
-        state.hasActiveSubscription = false;
-        state.canAddPatient = false;
-        updateWriteControls();
-        return;
-      }
-
-      state.isAdmin = accessStatus?.isAdmin === true;
-      state.hasActiveSubscription =
-        (await access?.hasActiveSubscription?.(state.user.id)) === true;
-      state.canAddPatient =
-        (await access?.canAddPatient?.(state.user.id)) === true;
+      state.addPatientAllowed = state.user
+        ? await pageAccess?.can?.('patient', 'add') === true
+        : false;
 
       updateWriteControls();
     } catch (error) {
       console.error('Patient access check failed:', error);
-      state.isAdmin = false;
-      state.hasActiveSubscription = false;
-      state.canAddPatient = false;
+      state.user = null;
+      state.addPatientAllowed = false;
       updateWriteControls();
     }
   }
@@ -90,31 +77,21 @@
     const accessBox = $('accessStatus');
 
     if (addButton) {
-      addButton.disabled = !state.canAddPatient;
-      addButton.classList.toggle('opacity-50', !state.canAddPatient);
-      addButton.classList.toggle('cursor-not-allowed', !state.canAddPatient);
-      addButton.title = state.canAddPatient
+      addButton.disabled = !state.addPatientAllowed;
+      addButton.classList.toggle('opacity-50', !state.addPatientAllowed);
+      addButton.classList.toggle('cursor-not-allowed', !state.addPatientAllowed);
+      addButton.title = state.addPatientAllowed
         ? 'إضافة مريض جديد'
-        : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط';
+        : 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة';
     }
 
     if (accessBox) {
-      if (state.isAdmin) {
-        accessBox.textContent = 'وضع المدير: جميع الصلاحيات متاحة';
-        accessBox.className =
-          'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else if (state.hasActiveSubscription) {
-        accessBox.textContent = state.canAddPatient
-          ? 'الاشتراك فعال — يمكنك إضافة مرضى جدد.'
-          : 'الاشتراك فعال، لكن تم بلوغ حد المرضى المسموح به في الاشتراك الحالي.';
-        accessBox.className =
-          'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else {
-        accessBox.textContent =
-          'الاشتراك غير فعال — يمكنك عرض وحذف ملفاتك الحالية، لكن لا يمكنك إضافة مرضى جدد.';
-        accessBox.className =
-          'mt-3 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
-      }
+      accessBox.textContent = state.addPatientAllowed
+        ? 'يمكنك إضافة مرضى جدد وفق الكوتة المتاحة.'
+        : 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.';
+      accessBox.className = state.addPatientAllowed
+        ? 'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
+        : 'mt-3 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
     }
   }
 
@@ -201,12 +178,8 @@
   }
 
   function openAddPatientModal() {
-    if (!state.canAddPatient) {
-      showStatus(
-        state.hasActiveSubscription
-          ? 'لا يمكن إضافة مريض جديد لأن الحد المسموح به في الاشتراك الحالي قد تم بلوغه.'
-          : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط.'
-      );
+    if (!state.addPatientAllowed) {
+      showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
       return;
     }
 
@@ -231,12 +204,8 @@
   }
 
   async function createPatient() {
-    if (!state.canAddPatient) {
-      showStatus(
-        state.hasActiveSubscription
-          ? 'لا يمكن إضافة مريض جديد لأن الحد المسموح به في الاشتراك الحالي قد تم بلوغه.'
-          : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط.'
-      );
+    if (!state.addPatientAllowed) {
+      showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
       return;
     }
 

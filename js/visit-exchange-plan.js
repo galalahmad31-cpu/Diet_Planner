@@ -12,11 +12,8 @@ const dbx=window.DietPlannerAccess?.supabaseClient;
   if (!dbx) console.error("Diet Planner access layer is unavailable to the exchange-plan module.");
 const n=v=>Number.isFinite(Number(v))?Number(v):0,rnd=(v,d=2)=>Number(n(v).toFixed(d)),esc=escapeHtml;
 const isUuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v??''));
-async function currentExchangeUser(){return await window.DietPlannerAccess?.getCurrentUser?.()||null;}
-async function canWriteExchangePlan(){
-  const user=await currentExchangeUser();
-  if(!user)return false;
-  return (await window.DietPlannerAccess?.canWrite?.(user.id))===true;
+async function canVisitContent(action){
+  return (await window.DietPlannerPageAccess?.can?.('visitContent',action))===true;
 }
 
 function ctx(){return window.visitContext||{}}
@@ -31,7 +28,7 @@ function render(){calc();document.getElementById('exchangeTargetCal').textConten
 async function findPlans(){const c=ctx();if(!c.patient_id)return[];let q=dbx.from('nutrition_plans').select('id,patient_id,visit_id,plan_name,target_calories,target_protein,target_carb,target_fat,goal,created_at,updated_at').eq('patient_id',c.patient_id);if(c.id)q=q.eq('visit_id',c.id);const {data,error}=await q.order('updated_at',{ascending:false}).order('created_at',{ascending:false});return error?[]:(data||[])}
 async function loadExchangeValues(){if(!S.plan)return;const r=await dbx.from('exchange_values').select('group_name,subgroup_name,exchange_count').eq('plan_id',S.plan);if(!r.error)(r.data||[]).forEach(x=>{const g=G.find(y=>y.n===x.group_name);if(g){S.r[g.k].count=n(x.exchange_count);if(x.subgroup_name)S.r[g.k].sub=x.subgroup_name}});S.saved=(r.data||[]).length>0}
 async function ensureExchangePlan(skipAuth=false){
-  if(!skipAuth && !(await canWriteExchangePlan())){status('إنشاء خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return null;}
+  if(!skipAuth && !(await canVisitContent('add'))){status('إضافة خطة البدائل متاحة أثناء الاشتراك الفعال فقط',true);return null;}
 
  if(S.plan && isUuid(S.plan))return S.plan;
 
@@ -142,15 +139,15 @@ function renderDays(){
 async function addDay(){
  if(!S.plan){const idp=await ensureExchangePlan();if(!idp){status('تعذر إنشاء خطة البدائل لهذا المريض',true);return}}
  const id='local-day-'+Date.now();S.days.push({id,title:`اليوم ${S.days.length+1}`,meals:[{id:'local-meal-'+Date.now()+'-1',name:'وجبة الإفطار',items:[]},{id:'local-meal-'+Date.now()+'-2',name:'وجبة الغداء',items:[]},{id:'local-meal-'+Date.now()+'-3',name:'وجبة العشاء',items:[]}]});S.dayEditing[id]=true;renderDays();status('تمت إضافة اليوم — اضغط حفظ لتخزينه')}
-function editDay(id){S.dayEditing[String(id)]=true;renderDays()}
+async function editDay(id){if(!(await canVisitContent('update'))){status('تعديل محتوى الزيارة متاح أثناء الاشتراك الفعال فقط',true);return;}S.dayEditing[String(id)]=true;renderDays()}
 function setDayTitle(id,v){const d=S.days.find(x=>String(x.id)===String(id));if(d&&dayEditing(id))d.title=String(v).trim()||d.title}
 function setMealName(did,mid,v){const d=S.days.find(x=>String(x.id)===String(did)),m=d?.meals.find(x=>String(x.id)===String(mid));if(m&&dayEditing(did))m.name=String(v).trim()||m.name}
 function moveMeal(did,mid,dir){const d=S.days.find(x=>String(x.id)===String(did));if(!d||!dayEditing(did))return;const i=d.meals.findIndex(m=>String(m.id)===String(mid)),n=i+Number(dir);if(i<0||n<0||n>=d.meals.length)return;const [m]=d.meals.splice(i,1);d.meals.splice(n,0,m);renderDays()}
-function addMeal(did){const d=S.days.find(x=>String(x.id)===String(did));if(d&&dayEditing(did)){d.meals.push({id:'local-meal-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:`وجبة ${d.meals.length+1}`,items:[]});renderDays()}}
+async function addMeal(did){if(!(await canVisitContent('add'))){status('إضافة وجبة متاحة أثناء الاشتراك الفعال فقط',true);return;}const d=S.days.find(x=>String(x.id)===String(did));if(d&&dayEditing(did)){d.meals.push({id:'local-meal-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:`وجبة ${d.meals.length+1}`,items:[]});renderDays()}}
 function deleteMeal(did,mid){openConfirm('حذف الوجبة','هل أنت متأكد من حذف الوجبة بكل أصنافها؟',()=>{const d=S.days.find(x=>String(x.id)===String(did));if(d&&dayEditing(did)){d.meals=d.meals.filter(m=>String(m.id)!==String(mid));renderDays()}})}
 function openConfirm(title,text,cb){document.getElementById('confirmTitle').textContent=title;document.getElementById('confirmText').textContent=text;S.confirm=cb;document.getElementById('confirmModal').classList.remove('hidden')}
 function closeConfirm(){document.getElementById('confirmModal').classList.add('hidden');S.confirm=null}
-async function saveDay(id){if(!dayEditing(id))return;const ok=await saveDaysToDb();if(ok){S.savedDays=clone(S.days);S.dayEditing[String(id)]=false;renderDays();status('تم حفظ اليوم بنجاح')}}
+async function saveDay(id){if(!dayEditing(id))return;if(!(await canVisitContent('update'))){status('تعديل محتوى الزيارة متاح أثناء الاشتراك الفعال فقط',true);return;}const ok=await saveDaysToDb();if(ok){S.savedDays=clone(S.days);S.dayEditing[String(id)]=false;renderDays();status('تم حفظ اليوم بنجاح')}}
 async function deleteRemovedDays(removed){
  if(!removed.length)return;
  const mr=await dbx.from('plan_meals').select('id').in('day_id',removed);
@@ -322,8 +319,8 @@ async function saveAndPrintFromSettings(){
   if(pb)pb.disabled=false;
  }
 }
-function edit(){if(!S.plan)return;S.editing=true;render();status('وضع التعديل')}
-async function deletePlan(){if(!(await canWriteExchangePlan())){status('حذف خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return;}if(!S.plan)return;openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',S.plan);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete().eq('plan_id',S.plan);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',S.plan);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.days=[];S.savedDays=[];S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();renderDays();setButtons();status('تم حذف خطة البدائل بنجاح')}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
+async function edit(){if(!S.plan)return;if(!(await canVisitContent('update'))){status('تعديل خطة البدائل متاح أثناء الاشتراك الفعال فقط',true);return;}S.editing=true;render();status('وضع التعديل')}
+async function deletePlan(){if(!S.plan)return;if(!(await canVisitContent('delete'))){status('تعذر حذف خطة البدائل',true);return;}openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',S.plan);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete().eq('plan_id',S.plan);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',S.plan);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.days=[];S.savedDays=[];S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();renderDays();setButtons();status('تم حذف خطة البدائل بنجاح')}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
 function setupExchangePlanEvents(){
  const container=document.getElementById('exchangeDaysContainer');
  if(!container||container.dataset.eventsReady==='1')return;
