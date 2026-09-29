@@ -3,7 +3,7 @@
    Page Access Rules
 
    Responsibilities:
-   - Define read/add/update/delete rules for pages.
+   - Define page/action access rules.
    - Ask access.js for backend authorization results.
    - Protect feature-gated pages.
 
@@ -17,7 +17,7 @@
   const auth = window.DietPlannerAuth;
   const access = window.DietPlannerAccess;
 
-  if (!auth || !access) {
+  if (!auth?.getCurrentUser || !access) {
     console.error("auth.js and access.js must load before access_pages.js.");
     return;
   }
@@ -46,40 +46,44 @@
   async function requireAuthentication() {
     const user = await auth.getCurrentUser();
 
-    if (!user) {
-      const path = window.location.pathname;
-      const isIndex = path.endsWith("/index.html") || path === "/" || path === "";
+    if (user) return true;
 
-      if (!isIndex) window.location.replace("index.html");
-      return false;
-    }
+    const path = window.location.pathname;
+    const isIndex = path.endsWith("/index.html") || path === "/" || path === "";
 
-    return true;
-  }
-
-  async function can(pageKey, action) {
-    const rule = PAGE_RULES?.[pageKey]?.[action];
-    if (!rule) return false;
-
-    const status = await access.getAccessStatus();
-    if (!status.authenticated) return false;
-    if (status.isAdmin) return true;
-    if (rule === "always") return true;
-
-    if (rule === "active_subscription") {
-      return status.hasActiveSubscription === true;
-    }
-
-    if (rule === "active_subscription_and_quota") {
-      if (status.hasActiveSubscription !== true) return false;
-      return access.canAddPatient() === true;
+    if (!isIndex) {
+      window.location.replace("index.html");
     }
 
     return false;
   }
 
+  async function can(pageKey, action) {
+    const rule = PAGE_RULES[pageKey]?.[action];
+    if (!rule) return false;
+
+    const status = await access.getAccessStatus();
+    if (!status.authenticated) return false;
+
+    if (status.isAdmin || rule === "always") return true;
+
+    switch (rule) {
+      case "active_subscription":
+        return status.hasActiveSubscription === true;
+
+      case "active_subscription_and_quota":
+        return (
+          status.hasActiveSubscription === true &&
+          await access.canAddPatient()
+        );
+
+      default:
+        return false;
+    }
+  }
+
   function getRules(pageKey) {
-    return PAGE_RULES?.[pageKey] || null;
+    return PAGE_RULES[pageKey] || null;
   }
 
   async function requireFeature(featureKey) {
@@ -90,8 +94,7 @@
       return false;
     }
 
-    if (status.isAdmin) return true;
-    return access.hasFeature(featureKey);
+    return status.isAdmin || access.hasFeature(featureKey);
   }
 
   window.DietPlannerPageAccess = {
@@ -101,6 +104,5 @@
     requireFeature
   };
 
-  if (!document.body) return;
   requireAuthentication();
 })();
