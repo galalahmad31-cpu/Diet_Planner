@@ -13,9 +13,6 @@
    Authentication belongs to auth.js.
    Supabase client belongs to supabase.js.
    Database RLS remains the final security layer.
-
-   Compatibility exports below are temporary bridges for legacy
-   page modules and contain no permission logic.
    ========================================================= */
 
 (() => {
@@ -187,23 +184,12 @@
     };
   }
 
-  const accessApi = {
+  window.DietPlannerAccess = {
     getUserRole,
     hasActiveSubscription,
     canAddPatient,
     hasFeature,
     getAccessStatus,
-    clearAccessCache,
-
-    // Compatibility only: these do not contain authorization logic.
-    getCurrentUser: () => auth.getCurrentUser()
+    clearAccessCache
   };
-
-  Object.defineProperty(accessApi, "supabaseClient", {
-    enumerable: false,
-    configurable: false,
-    get: () => supabaseClient
-  });
-
-  window.DietPlannerAccess = accessApi;
 })();
