@@ -5,7 +5,6 @@
    Responsibilities:
    - Call backend RPCs that make authorization decisions.
    - Return authorization results to access_pages.js.
-   - Provide a small, stable API for page code.
 
    Does NOT:
    - Calculate subscription validity.
@@ -32,11 +31,6 @@
       "supabase.js and auth.js must load before access.js."
     );
     return;
-  }
-
-  function clearAccessCache() {
-    // Kept as a no-op for API compatibility.
-    // Authorization results are intentionally not cached here.
   }
 
   async function getAccessStatus() {
@@ -76,11 +70,6 @@
       hasActiveSubscription:
         data.has_active_subscription === true
     };
-  }
-
-  async function getUserRole() {
-    const status = await getAccessStatus();
-    return status.role;
   }
 
   async function hasActiveSubscription() {
@@ -144,10 +133,8 @@
 
   window.DietPlannerAccess = {
     getAccessStatus,
-    getUserRole,
     hasActiveSubscription,
     canAddPatient,
-    hasFeature,
-    clearAccessCache
+    hasFeature
   };
 })();
