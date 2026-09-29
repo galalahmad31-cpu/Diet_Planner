@@ -10,7 +10,7 @@
    - Shared access status.
 
    Page-specific rules belong to access_pages.js.
-   Authentication itself belongs to auth.js.
+   Authentication belongs to auth.js.
    Database RLS remains the final security layer.
    ========================================================= */
 
@@ -38,16 +38,6 @@
 
   function getToday() {
     return new Date().toISOString().slice(0, 10);
-  }
-
-  function isIndexPage() {
-    const path = window.location.pathname;
-
-    return (
-      path.endsWith("/index.html") ||
-      path === "/" ||
-      path === ""
-    );
   }
 
   async function getUserRole(userId) {
@@ -192,20 +182,6 @@
     };
   }
 
-  async function requireAuthentication() {
-    const user = await auth.getCurrentUser();
-
-    if (!user) {
-      if (!isIndexPage()) {
-        window.location.replace("index.html");
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
   window.DietPlannerAccess = {
     supabaseClient,
     getCurrentUser: auth.getCurrentUser,
@@ -214,12 +190,6 @@
     canAddPatient,
     hasFeature,
     getAccessStatus,
-    requireAuthentication,
-    clearAccessCache,
-    logout: auth.logout
+    clearAccessCache
   };
-
-  if (!document.body) return;
-
-  requireAuthentication();
 })();
