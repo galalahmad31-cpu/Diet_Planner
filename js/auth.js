@@ -7,8 +7,9 @@
    - Login / Register / Google / Logout.
    - Session access.
    - Authentication UI on index.html.
+   - Post-login routing.
 
-   Authorization and feature access belong to access.js.
+   Authorization and page access belong to access.js / access_pages.js.
    ========================================================= */
 
 (() => {
@@ -93,6 +94,13 @@
     return data?.session || null;
   }
 
+  async function handlePostAuth(session) {
+    if (!session?.user) return false;
+
+    window.location.replace("app.html");
+    return true;
+  }
+
   async function loginUser() {
     const email =
       document.getElementById("loginEmail")?.value.trim();
@@ -129,9 +137,7 @@
       return;
     }
 
-    window.DietPlannerAccess?.handlePostAuth(
-      data?.session
-    );
+    handlePostAuth(data?.session);
   }
 
   async function registerUser() {
@@ -178,9 +184,7 @@
     }
 
     if (data?.session) {
-      window.DietPlannerAccess?.handlePostAuth(
-        data.session
-      );
+      handlePostAuth(data.session);
       return;
     }
 
@@ -285,9 +289,7 @@
       handled = true;
 
       try {
-        await window.DietPlannerAccess?.handlePostAuth(
-          session
-        );
+        await handlePostAuth(session);
       } finally {
         authStateSubscription?.unsubscribe?.();
       }
@@ -342,7 +344,8 @@
     supabaseClient,
     getCurrentUser,
     getSession,
-    logout: logoutUser
+    logout: logoutUser,
+    handlePostAuth
   };
 
   if (document.readyState === "loading") {
