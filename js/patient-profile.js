@@ -6,17 +6,12 @@
   const supabase = window.DietPlannerSupabase?.client;
   const patientId = new URLSearchParams(window.location.search).get('id');
 
-  const state = {
-    patient: null
-  };
-
+  const state = { patient: null };
   const $ = (id) => document.getElementById(id);
 
   function setLink(id, page) {
     const element = $(id);
-    if (element && patientId) {
-      element.href = `${page}?id=${encodeURIComponent(patientId)}`;
-    }
+    if (element && patientId) element.href = `${page}?id=${encodeURIComponent(patientId)}`;
   }
 
   function showError(message) {
@@ -42,18 +37,14 @@
         editButton.disabled = !canUpdatePatient;
         editButton.classList.toggle('opacity-50', !canUpdatePatient);
         editButton.classList.toggle('cursor-not-allowed', !canUpdatePatient);
-        editButton.title = canUpdatePatient
-          ? 'تعديل بيانات المريض'
-          : 'التعديل يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
+        editButton.title = canUpdatePatient ? 'تعديل بيانات المريض' : 'التعديل يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
       }
 
       if (addVisitButton) {
         addVisitButton.disabled = !canAddVisit;
         addVisitButton.classList.toggle('opacity-50', !canAddVisit);
         addVisitButton.classList.toggle('cursor-not-allowed', !canAddVisit);
-        addVisitButton.title = canAddVisit
-          ? 'إضافة زيارة'
-          : 'إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
+        addVisitButton.title = canAddVisit ? 'إضافة زيارة' : 'إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
       }
 
       const accessBox = $('writeAccessStatus');
@@ -72,37 +63,22 @@
   }
 
   async function loadPatient() {
-    if (!supabase) {
-      showError('تعذر الاتصال بقاعدة البيانات.');
-      return;
-    }
+    if (!supabase) return showError('تعذر الاتصال بقاعدة البيانات.');
+    if (!patientId) return showError('لم يتم تحديد المريض.');
 
-    if (!patientId) {
-      showError('لم يتم تحديد المريض.');
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('patients')
+    const { data, error } = await supabase.from('patients')
       .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
-      .eq('id', patientId)
-      .maybeSingle();
+      .eq('id', patientId).maybeSingle();
 
     if (error) {
       console.error('Load patient failed:', error);
-      showError('تعذر تحميل ملف المريض.');
-      return;
+      return showError('تعذر تحميل ملف المريض.');
     }
-
-    if (!data) {
-      showError('ملف المريض غير موجود.');
-      return;
-    }
+    if (!data) return showError('ملف المريض غير موجود.');
 
     state.patient = data;
     fillPatientData();
     setLink('weightLink', 'weight.html');
-
     $('loadingState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
     $('modulesSection')?.classList.remove('hidden');
@@ -115,15 +91,13 @@
     const loading = $('visitsLoading');
     const empty = $('visitsEmpty');
     const list = $('visitsList');
-
     if (!loading || !empty || !list) return;
 
     loading.classList.remove('hidden');
     empty.classList.add('hidden');
     list.innerHTML = '';
 
-    const { data, error } = await supabase
-      .from('patient_visits')
+    const { data, error } = await supabase.from('patient_visits')
       .select('id,visit_number,visit_date')
       .eq('patient_id', patientId)
       .order('visit_number', { ascending: false });
@@ -135,7 +109,6 @@
       list.innerHTML = '<div class="text-center py-5 text-xs font-bold text-red-500">تعذر تحميل الزيارات.</div>';
       return;
     }
-
     if (!data?.length) {
       empty.classList.remove('hidden');
       return;
@@ -148,12 +121,7 @@
       const visitLink = document.createElement('a');
       visitLink.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
       visitLink.className = 'flex items-center gap-3 min-w-0 flex-1';
-      visitLink.innerHTML = `
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">${escapeHtml(visit.visit_number)}</div>
-        <div class="min-w-0">
-          <div class="font-extrabold text-sm text-slate-800">زيارة رقم ${escapeHtml(visit.visit_number)}</div>
-          <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(formatVisitDate(visit.visit_date))}</div>
-        </div>`;
+      visitLink.innerHTML = `<div class="w-10 h-10 shrink-0 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">${escapeHtml(visit.visit_number)}</div><div class="min-w-0"><div class="font-extrabold text-sm text-slate-800">زيارة رقم ${escapeHtml(visit.visit_number)}</div><div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(formatVisitDate(visit.visit_date))}</div></div>`;
 
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
@@ -173,32 +141,15 @@
   }
 
   function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[char]));
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   }
 
   function formatVisitDate(date) {
     if (!date) return 'بدون تاريخ';
-    const value = new Date(`${date}T00:00:00`);
-    return new Intl.DateTimeFormat('ar-EG', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(value);
+    return new Intl.DateTimeFormat('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(`${date}T00:00:00`));
   }
 
   async function deleteVisit(visit) {
-    const allowed = await access.can('patientProfileVisits', 'delete');
-    if (!allowed) {
-      alert('حذف الزيارة غير متاح.');
-      return;
-    }
-
     const result = await Swal.fire({
       title: 'حذف الزيارة',
       text: `هل أنت متأكد من حذف الزيارة رقم ${visit.visit_number}؟`,
@@ -210,33 +161,18 @@
       reverseButtons: true,
       width: '290px',
       padding: '.85rem 1rem .7rem',
-      customClass: {
-        popup: 'visit-delete-popup',
-        title: 'visit-delete-title',
-        htmlContainer: 'visit-delete-text',
-        confirmButton: 'visit-delete-confirm',
-        cancelButton: 'visit-delete-cancel'
-      },
+      customClass: { popup: 'visit-delete-popup', title: 'visit-delete-title', htmlContainer: 'visit-delete-text', confirmButton: 'visit-delete-confirm', cancelButton: 'visit-delete-cancel' },
       buttonsStyling: true
     });
 
     if (!result.isConfirmed) return;
 
-    const { error } = await supabase
-      .from('patient_visits')
-      .delete()
-      .eq('id', visit.id)
-      .eq('patient_id', patientId);
+    const { error } = await supabase.from('patient_visits').delete()
+      .eq('id', visit.id).eq('patient_id', patientId);
 
     if (error) {
       console.error('Delete visit failed:', error);
-      await Swal.fire({
-        title: 'تعذر الحذف',
-        text: 'حدث خطأ أثناء حذف الزيارة.',
-        icon: 'error',
-        confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#178f84'
-      });
+      await Swal.fire({ title: 'تعذر الحذف', text: 'حدث خطأ أثناء حذف الزيارة.', icon: 'error', confirmButtonText: 'حسنًا', confirmButtonColor: '#178f84' });
       return;
     }
 
@@ -244,49 +180,34 @@
   }
 
   async function addVisit() {
-    const allowed = await access.can('patientProfileVisits', 'add');
-    if (!allowed) {
+    if (!(await access.can('patientProfileVisits', 'add'))) {
       alert('إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
       return;
     }
 
     const user = await auth?.getCurrentUser?.();
-    if (!user) {
-      alert('تعذر تحديد المستخدم الحالي.');
-      return;
-    }
+    if (!user) return alert('تعذر تحديد المستخدم الحالي.');
 
-    const { data: lastVisit, error: lastError } = await supabase
-      .from('patient_visits')
-      .select('visit_number')
-      .eq('patient_id', patientId)
-      .order('visit_number', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const { data: lastVisit, error: lastError } = await supabase.from('patient_visits')
+      .select('visit_number').eq('patient_id', patientId)
+      .order('visit_number', { ascending: false }).limit(1).maybeSingle();
 
     if (lastError) {
       console.error('Get last visit failed:', lastError);
-      alert('تعذر معرفة رقم الزيارة التالية.');
-      return;
+      return alert('تعذر معرفة رقم الزيارة التالية.');
     }
 
     const nextNumber = (lastVisit?.visit_number || 0) + 1;
-
-    const { data: visit, error } = await supabase
-      .from('patient_visits')
-      .insert({
-        patient_id: patientId,
-        user_id: user.id,
-        visit_number: nextNumber,
-        visit_date: new Date().toISOString().slice(0, 10)
-      })
-      .select('id')
-      .single();
+    const { data: visit, error } = await supabase.from('patient_visits').insert({
+      patient_id: patientId,
+      user_id: user.id,
+      visit_number: nextNumber,
+      visit_date: new Date().toISOString().slice(0, 10)
+    }).select('id').single();
 
     if (error) {
       console.error('Create visit failed:', error);
-      alert('تعذر إنشاء الزيارة.');
-      return;
+      return alert('تعذر إنشاء الزيارة.');
     }
 
     window.location.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
@@ -307,34 +228,19 @@
     $('notesInput').value = patient.clinical_notes || '';
   }
 
-  const patientFieldIds = [
-    'nameInput',
-    'genderInput',
-    'birthDateInput',
-    'ageInput',
-    'heightInput',
-    'diagnosisInput',
-    'complaintsInput',
-    'notesInput'
-  ];
+  const patientFieldIds = ['nameInput', 'genderInput', 'birthDateInput', 'ageInput', 'heightInput', 'diagnosisInput', 'complaintsInput', 'notesInput'];
 
   function setEditing(enabled) {
-    patientFieldIds.forEach((id) => {
-      const field = $(id);
-      if (field) field.disabled = !enabled;
-    });
-
+    patientFieldIds.forEach((id) => { const field = $(id); if (field) field.disabled = !enabled; });
     $('saveArea')?.classList.toggle('hidden', !enabled);
     $('editButton')?.classList.toggle('hidden', enabled);
   }
 
   async function enableEditing() {
-    const allowed = await access.can('patient', 'update');
-    if (!allowed) {
+    if (!(await access.can('patient', 'update'))) {
       alert('تعديل بيانات المريض يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
       return;
     }
-
     setEditing(true);
   }
 
@@ -344,8 +250,7 @@
   }
 
   async function savePatient() {
-    const allowed = await access.can('patient', 'update');
-    if (!allowed) {
+    if (!(await access.can('patient', 'update'))) {
       alert('تعديل بيانات المريض يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
       setEditing(false);
       return;
@@ -362,12 +267,8 @@
       clinical_notes: $('notesInput').value.trim() || null
     };
 
-    const { data, error } = await supabase
-      .from('patients')
-      .update(payload)
-      .eq('id', patientId)
-      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
-      .single();
+    const { data, error } = await supabase.from('patients').update(payload).eq('id', patientId)
+      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at').single();
 
     if (error) {
       console.error('Save patient failed:', error);
