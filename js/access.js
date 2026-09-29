@@ -7,16 +7,10 @@
    - Define page/action access rules.
    - Expose one public access API to application pages.
 
-   Does NOT:
-   - Calculate subscription validity locally.
-   - Calculate quotas locally.
-   - Read subscription tables as a fallback.
-   - Contain page business logic.
-   - Contain UI locking/presentation logic.
+   Security authority:
+   - Backend RPC + RLS.
 
-   Authentication belongs to auth.js.
-   Supabase client belongs to supabase.js.
-   Backend/RPC + RLS remain the security authority.
+   This file does not calculate subscription validity or quotas.
    ========================================================= */
 
 (() => {
@@ -126,7 +120,7 @@
   }
 
   /* =========================================================
-     Page Authorization
+     Page / Action Rules
      ========================================================= */
 
   const PAGE_RULES = {
@@ -171,7 +165,10 @@
     const status = await getAccessStatus();
     if (!status.authenticated) return false;
 
-    if (status.isAdmin || rule === "always") return true;
+    // Admins are exempt from page-level restrictions.
+    if (status.isAdmin) return true;
+
+    if (rule === "always") return true;
 
     switch (rule) {
       case "active_subscription":
@@ -200,7 +197,7 @@
       return false;
     }
 
-    return status.isAdmin || hasFeature(featureKey);
+    return status.isAdmin || await hasFeature(featureKey);
   }
 
   /* =========================================================
