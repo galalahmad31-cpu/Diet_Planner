@@ -2,15 +2,12 @@
   'use strict';
 
   const access = window.DietPlannerAccess;
+  const auth = window.DietPlannerAuth;
   const supabase = window.DietPlannerSupabase?.client;
   const patientId = new URLSearchParams(window.location.search).get('id');
 
   const state = {
-    patient: null,
-    user: null,
-    canUpdatePatient: false,
-    canAddVisit: false,
-    canDeleteVisit: false
+    patient: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -31,65 +28,46 @@
     if (errorText) errorText.textContent = message;
   }
 
-  async function refreshPageAccess() {
+  async function updateWriteControls() {
     try {
-      const status = await access.getAccessStatus();
-      state.user = status.user || null;
+      const [canUpdatePatient, canAddVisit] = await Promise.all([
+        access.can('patient', 'update'),
+        access.can('patientProfileVisits', 'add')
+      ]);
 
-      if (!status.authenticated) {
-        state.canUpdatePatient = false;
-        state.canAddVisit = false;
-        state.canDeleteVisit = false;
-      } else {
-        state.canUpdatePatient = await access.can('patient', 'update');
-        state.canAddVisit = await access.can('patientProfileVisits', 'add');
-        state.canDeleteVisit = await access.can('patientProfileVisits', 'delete');
+      const editButton = $('editButton');
+      const addVisitButton = $('addVisitButton');
+
+      if (editButton) {
+        editButton.disabled = !canUpdatePatient;
+        editButton.classList.toggle('opacity-50', !canUpdatePatient);
+        editButton.classList.toggle('cursor-not-allowed', !canUpdatePatient);
+        editButton.title = canUpdatePatient
+          ? 'تعديل بيانات المريض'
+          : 'التعديل يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
       }
 
-      updateWriteControls();
+      if (addVisitButton) {
+        addVisitButton.disabled = !canAddVisit;
+        addVisitButton.classList.toggle('opacity-50', !canAddVisit);
+        addVisitButton.classList.toggle('cursor-not-allowed', !canAddVisit);
+        addVisitButton.title = canAddVisit
+          ? 'إضافة زيارة'
+          : 'إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
+      }
+
+      const accessBox = $('writeAccessStatus');
+      if (accessBox) {
+        const writeAllowed = canUpdatePatient && canAddVisit;
+        accessBox.textContent = writeAllowed
+          ? 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الزيارات.'
+          : 'يمكنك عرض بيانات المريض والزيارات. التعديل وإضافة الزيارات يتطلبان اشتراكًا فعالًا وساريًا وضمن الكوتة.';
+        accessBox.className = writeAllowed
+          ? 'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
+          : 'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
+      }
     } catch (error) {
       console.error('Patient profile access check failed:', error);
-      state.canUpdatePatient = false;
-      state.canAddVisit = false;
-      state.canDeleteVisit = false;
-      updateWriteControls();
-    }
-  }
-
-  function updateWriteControls() {
-    const editButton = $('editButton');
-    const addVisitButton = $('addVisitButton');
-
-    if (editButton) {
-      editButton.disabled = !state.canUpdatePatient;
-      editButton.classList.toggle('opacity-50', !state.canUpdatePatient);
-      editButton.classList.toggle('cursor-not-allowed', !state.canUpdatePatient);
-      editButton.title = state.canUpdatePatient
-        ? 'تعديل بيانات المريض'
-        : 'تعديل بيانات المريض متاح أثناء الاشتراك الفعال.';
-    }
-
-    if (addVisitButton) {
-      addVisitButton.disabled = !state.canAddVisit;
-      addVisitButton.classList.toggle('opacity-50', !state.canAddVisit);
-      addVisitButton.classList.toggle('cursor-not-allowed', !state.canAddVisit);
-      addVisitButton.title = state.canAddVisit
-        ? 'إضافة زيارة'
-        : 'إضافة الزيارة متاحة أثناء الاشتراك الفعال وضمن الكوتة.';
-    }
-
-    const accessBox = $('writeAccessStatus');
-    if (accessBox) {
-      if (state.canUpdatePatient && state.canAddVisit) {
-        accessBox.textContent = 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الزيارات.';
-        accessBox.className =
-          'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else {
-        accessBox.textContent =
-          'يمكنك عرض بيانات المريض والزيارات. التعديل وإضافة الزيارات تتطلب اشتراكًا فعالًا وضمن الكوتة.';
-        accessBox.className =
-          'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
-      }
     }
   }
 
@@ -123,13 +101,13 @@
 
     state.patient = data;
     fillPatientData();
-    await refreshPageAccess();
     setLink('weightLink', 'weight.html');
 
     $('loadingState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
     $('modulesSection')?.classList.remove('hidden');
 
+    await updateWriteControls();
     await loadVisits();
   }
 
@@ -180,10 +158,8 @@
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
       deleteButton.className = 'shrink-0 w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center';
-      deleteButton.title = state.canDeleteVisit ? 'حذف الزيارة' : 'حذف الزيارة غير متاح';
+      deleteButton.title = 'حذف الزيارة';
       deleteButton.setAttribute('aria-label', 'حذف الزيارة');
-      deleteButton.disabled = !state.canDeleteVisit;
-      deleteButton.classList.toggle('opacity-50', !state.canDeleteVisit);
       deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
       deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -270,11 +246,11 @@
   async function addVisit() {
     const allowed = await access.can('patientProfileVisits', 'add');
     if (!allowed) {
-      alert('إضافة الزيارة تتطلب اشتراكًا فعالًا وضمن الكوتة.');
+      alert('إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
       return;
     }
 
-    const user = state.user || (await access.getAccessStatus()).user;
+    const user = await auth?.getCurrentUser?.();
     if (!user) {
       alert('تعذر تحديد المستخدم الحالي.');
       return;
@@ -352,9 +328,10 @@
     $('editButton')?.classList.toggle('hidden', enabled);
   }
 
-  function enableEditing() {
-    if (!state.canUpdatePatient) {
-      alert('تعديل بيانات المريض متاح أثناء الاشتراك الفعال.');
+  async function enableEditing() {
+    const allowed = await access.can('patient', 'update');
+    if (!allowed) {
+      alert('تعديل بيانات المريض يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
       return;
     }
 
@@ -369,7 +346,7 @@
   async function savePatient() {
     const allowed = await access.can('patient', 'update');
     if (!allowed) {
-      alert('تعديل بيانات المريض متاح أثناء الاشتراك الفعال.');
+      alert('تعديل بيانات المريض يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
       setEditing(false);
       return;
     }
