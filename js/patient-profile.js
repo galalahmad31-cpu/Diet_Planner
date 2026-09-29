@@ -2,15 +2,15 @@
   'use strict';
 
   const access = window.DietPlannerAccess;
-  const pageAccess = window.DietPlannerPageAccess;
-  const supabase = access?.supabaseClient;
+  const supabase = window.DietPlannerSupabase?.client;
   const patientId = new URLSearchParams(window.location.search).get('id');
 
   const state = {
     patient: null,
     user: null,
     canUpdatePatient: false,
-    canAddVisit: false
+    canAddVisit: false,
+    canDeleteVisit: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -33,26 +33,25 @@
 
   async function refreshPageAccess() {
     try {
-      const accessStatus = await access?.getAccessStatus?.();
-      state.user = accessStatus?.user || null;
+      const status = await access.getAccessStatus();
+      state.user = status.user || null;
 
-      if (!state.user) {
+      if (!status.authenticated) {
         state.canUpdatePatient = false;
         state.canAddVisit = false;
-        updateWriteControls();
-        return;
+        state.canDeleteVisit = false;
+      } else {
+        state.canUpdatePatient = await access.can('patient', 'update');
+        state.canAddVisit = await access.can('patientProfileVisits', 'add');
+        state.canDeleteVisit = await access.can('patientProfileVisits', 'delete');
       }
-
-      state.canUpdatePatient =
-        await pageAccess?.can?.('patientProfileVisits', 'update') === true;
-      state.canAddVisit =
-        await pageAccess?.can?.('patientProfileVisits', 'add') === true;
 
       updateWriteControls();
     } catch (error) {
       console.error('Patient profile access check failed:', error);
       state.canUpdatePatient = false;
       state.canAddVisit = false;
+      state.canDeleteVisit = false;
       updateWriteControls();
     }
   }
@@ -67,7 +66,7 @@
       editButton.classList.toggle('cursor-not-allowed', !state.canUpdatePatient);
       editButton.title = state.canUpdatePatient
         ? 'تعديل بيانات المريض'
-        : 'تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط';
+        : 'تعديل بيانات المريض متاح أثناء الاشتراك الفعال.';
     }
 
     if (addVisitButton) {
@@ -76,7 +75,7 @@
       addVisitButton.classList.toggle('cursor-not-allowed', !state.canAddVisit);
       addVisitButton.title = state.canAddVisit
         ? 'إضافة زيارة'
-        : 'إضافة الزيارة متاحة أثناء الاشتراك المدفوع فقط';
+        : 'إضافة الزيارة متاحة أثناء الاشتراك الفعال وضمن الكوتة.';
     }
 
     const accessBox = $('writeAccessStatus');
@@ -87,7 +86,7 @@
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
       } else {
         accessBox.textContent =
-          'الاشتراك غير فعال — يمكنك عرض بيانات المريض والزيارات فقط. التعديل وإضافة الزيارات غير متاحين.';
+          'يمكنك عرض بيانات المريض والزيارات. التعديل وإضافة الزيارات تتطلب اشتراكًا فعالًا وضمن الكوتة.';
         accessBox.className =
           'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
       }
@@ -181,8 +180,10 @@
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
       deleteButton.className = 'shrink-0 w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center';
-      deleteButton.title = 'حذف الزيارة';
+      deleteButton.title = state.canDeleteVisit ? 'حذف الزيارة' : 'حذف الزيارة غير متاح';
       deleteButton.setAttribute('aria-label', 'حذف الزيارة');
+      deleteButton.disabled = !state.canDeleteVisit;
+      deleteButton.classList.toggle('opacity-50', !state.canDeleteVisit);
       deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
       deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -216,18 +217,9 @@
   }
 
   async function deleteVisit(visit) {
-    if (!state.user) {
-      state.user = await access?.getCurrentUser?.();
-    }
-
-    if (!state.user) {
-      await Swal.fire({
-        title: 'تسجيل الدخول مطلوب',
-        text: 'يجب تسجيل الدخول أولاً.',
-        icon: 'warning',
-        confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#178f84'
-      });
+    const allowed = await access.can('patientProfileVisits', 'delete');
+    if (!allowed) {
+      alert('حذف الزيارة غير متاح.');
       return;
     }
 
@@ -276,12 +268,13 @@
   }
 
   async function addVisit() {
-    if (!state.canAddVisit) {
-      alert('إضافة الزيارة متاحة أثناء الاشتراك المدفوع فقط.');
+    const allowed = await access.can('patientProfileVisits', 'add');
+    if (!allowed) {
+      alert('إضافة الزيارة تتطلب اشتراكًا فعالًا وضمن الكوتة.');
       return;
     }
 
-    const user = state.user || await access?.getCurrentUser?.();
+    const user = state.user || (await access.getAccessStatus()).user;
     if (!user) {
       alert('تعذر تحديد المستخدم الحالي.');
       return;
@@ -361,7 +354,7 @@
 
   function enableEditing() {
     if (!state.canUpdatePatient) {
-      alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.');
+      alert('تعديل بيانات المريض متاح أثناء الاشتراك الفعال.');
       return;
     }
 
@@ -374,8 +367,9 @@
   }
 
   async function savePatient() {
-    if (!state.canUpdatePatient) {
-      alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.');
+    const allowed = await access.can('patient', 'update');
+    if (!allowed) {
+      alert('تعديل بيانات المريض متاح أثناء الاشتراك الفعال.');
       setEditing(false);
       return;
     }
@@ -415,35 +409,9 @@
     $('addVisitButton')?.addEventListener('click', addVisit);
   }
 
-  async function init() {
-    try {
-      bindEvents();
-
-      if (!access || !supabase || !pageAccess) {
-        throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات أو نظام الصلاحيات.');
-      }
-
-      const accessStatus = await access.getAccessStatus?.();
-      state.user = accessStatus?.user || null;
-      if (!state.user) {
-        showError('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
-        return;
-      }
-
-      await loadPatient();
-    } catch (error) {
-      console.error('Patient profile initialization failed:', error);
-      showError(error?.message || 'تعذر تحميل ملف المريض.');
-    }
-  }
-
-  function boot() {
-    init();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    bindEvents();
+    setEditing(false);
+    loadPatient();
+  });
 })();
