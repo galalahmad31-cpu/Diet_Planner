@@ -1,9 +1,9 @@
 (function () {
   'use strict';
 
-  const access = window.DietPlannerAccess;
+  const auth = window.DietPlannerAuth;
   const pageAccess = window.DietPlannerPageAccess;
-  const supabase = access?.supabaseClient;
+  const supabase = window.DietPlannerSupabase?.client;
 
   const state = {
     patients: [],
@@ -57,8 +57,7 @@
 
   async function refreshAccess() {
     try {
-      const accessStatus = await access?.getAccessStatus?.();
-      state.user = accessStatus?.user || null;
+      state.user = await auth?.getCurrentUser?.() || null;
       state.addPatientAllowed = state.user
         ? await pageAccess?.can?.('patient', 'add') === true
         : false;
