@@ -16,6 +16,11 @@
     statusTimer: null
   };
 
+  const MESSAGES = {
+    writeDenied: 'إضافة وتعديل المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.',
+    deleteDenied: 'لا تملك صلاحية حذف المرضى.'
+  };
+
   const $ = (id) => document.getElementById(id);
 
   function escapeHtml(value) {
@@ -58,14 +63,10 @@
       </div>`;
   }
 
-  async function canPatient(action) {
-    return access.can('patient', action);
-  }
-
   async function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
-    const allowed = await canPatient('add');
+    const allowed = await access.can('patient', 'add');
 
     if (addButton) {
       addButton.disabled = !allowed;
@@ -73,13 +74,13 @@
       addButton.classList.toggle('cursor-not-allowed', !allowed);
       addButton.title = allowed
         ? 'إضافة مريض جديد'
-        : 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة';
+        : MESSAGES.writeDenied;
     }
 
     if (accessBox) {
       accessBox.textContent = allowed
         ? 'يمكنك إضافة مرضى جدد وفق الكوتة المتاحة.'
-        : 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.';
+        : MESSAGES.writeDenied;
       accessBox.className = allowed
         ? 'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
         : 'mt-3 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
@@ -91,8 +92,7 @@
     if (!box) return;
 
     try {
-      const allowed = await canPatient('read');
-      if (!allowed) {
+      if (!(await access.can('patient', 'read'))) {
         showLoadError();
         return;
       }
@@ -118,7 +118,6 @@
     if (!box || !input) return;
 
     const query = input.value.trim().toLocaleLowerCase('ar-EG');
-
     const filtered = state.patients.filter((patient) =>
       !query || String(patient.name || '').toLocaleLowerCase('ar-EG').includes(query)
     );
@@ -171,8 +170,8 @@
   }
 
   async function openAddPatientModal() {
-    if (!(await canPatient('add'))) {
-      showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
+    if (!(await access.can('patient', 'add'))) {
+      showStatus(MESSAGES.writeDenied);
       await updateWriteControls();
       return;
     }
@@ -197,8 +196,8 @@
   }
 
   async function createPatient() {
-    if (!(await canPatient('add'))) {
-      showStatus('إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.');
+    if (!(await access.can('patient', 'add'))) {
+      showStatus(MESSAGES.writeDenied);
       await updateWriteControls();
       return;
     }
@@ -250,8 +249,8 @@
   }
 
   async function askDelete(id) {
-    if (!(await canPatient('delete'))) {
-      showStatus('لا تملك صلاحية حذف المرضى.');
+    if (!(await access.can('patient', 'delete'))) {
+      showStatus(MESSAGES.deleteDenied);
       return;
     }
 
@@ -283,8 +282,8 @@
   }
 
   async function deletePatient() {
-    if (!(await canPatient('delete'))) {
-      showStatus('لا تملك صلاحية حذف المرضى.');
+    if (!(await access.can('patient', 'delete'))) {
+      showStatus(MESSAGES.deleteDenied);
       closeDeleteModal();
       return;
     }
