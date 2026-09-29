@@ -2,14 +2,15 @@
   'use strict';
 
   const access = window.DietPlannerAccess;
+  const pageAccess = window.DietPlannerPageAccess;
   const supabase = access?.supabaseClient;
   const patientId = new URLSearchParams(window.location.search).get('id');
 
   const state = {
     patient: null,
     user: null,
-    isAdmin: false,
-    hasActiveSubscription: false
+    canUpdatePatient: false,
+    canAddVisit: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -30,66 +31,57 @@
     if (errorText) errorText.textContent = message;
   }
 
-  function getUserForWrite() {
-    return state.user;
-  }
-
-  async function refreshWriteAccess() {
+  async function refreshPageAccess() {
     try {
       const accessStatus = await access?.getAccessStatus?.();
       state.user = accessStatus?.user || null;
 
       if (!state.user) {
-        state.isAdmin = false;
-        state.hasActiveSubscription = false;
+        state.canUpdatePatient = false;
+        state.canAddVisit = false;
         updateWriteControls();
         return;
       }
 
-      state.isAdmin = accessStatus?.isAdmin === true;
-      state.hasActiveSubscription =
-        (await access?.hasActiveSubscription?.(state.user.id)) === true;
+      state.canUpdatePatient =
+        await pageAccess?.can?.('patientProfileVisits', 'update') === true;
+      state.canAddVisit =
+        await pageAccess?.can?.('patientProfileVisits', 'add') === true;
 
       updateWriteControls();
     } catch (error) {
       console.error('Patient profile access check failed:', error);
-      state.isAdmin = false;
-      state.hasActiveSubscription = false;
+      state.canUpdatePatient = false;
+      state.canAddVisit = false;
       updateWriteControls();
     }
   }
 
   function updateWriteControls() {
-    const canWrite = state.isAdmin || state.hasActiveSubscription;
-
     const editButton = $('editButton');
     const addVisitButton = $('addVisitButton');
 
     if (editButton) {
-      editButton.disabled = !canWrite;
-      editButton.classList.toggle('opacity-50', !canWrite);
-      editButton.classList.toggle('cursor-not-allowed', !canWrite);
-      editButton.title = canWrite
+      editButton.disabled = !state.canUpdatePatient;
+      editButton.classList.toggle('opacity-50', !state.canUpdatePatient);
+      editButton.classList.toggle('cursor-not-allowed', !state.canUpdatePatient);
+      editButton.title = state.canUpdatePatient
         ? 'تعديل بيانات المريض'
         : 'تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط';
     }
 
     if (addVisitButton) {
-      addVisitButton.disabled = !canWrite;
-      addVisitButton.classList.toggle('opacity-50', !canWrite);
-      addVisitButton.classList.toggle('cursor-not-allowed', !canWrite);
-      addVisitButton.title = canWrite
+      addVisitButton.disabled = !state.canAddVisit;
+      addVisitButton.classList.toggle('opacity-50', !state.canAddVisit);
+      addVisitButton.classList.toggle('cursor-not-allowed', !state.canAddVisit);
+      addVisitButton.title = state.canAddVisit
         ? 'إضافة زيارة'
         : 'إضافة الزيارة متاحة أثناء الاشتراك المدفوع فقط';
     }
 
     const accessBox = $('writeAccessStatus');
     if (accessBox) {
-      if (state.isAdmin) {
-        accessBox.textContent = 'وضع المدير: جميع صلاحيات التعديل متاحة.';
-        accessBox.className =
-          'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else if (state.hasActiveSubscription) {
+      if (state.canUpdatePatient && state.canAddVisit) {
         accessBox.textContent = 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الزيارات.';
         accessBox.className =
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
@@ -100,10 +92,6 @@
           'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
       }
     }
-  }
-
-  function canWrite() {
-    return state.isAdmin || state.hasActiveSubscription;
   }
 
   async function loadPatient() {
@@ -136,7 +124,7 @@
 
     state.patient = data;
     fillPatientData();
-    await refreshWriteAccess();
+    await refreshPageAccess();
     setLink('weightLink', 'weight.html');
 
     $('loadingState')?.classList.add('hidden');
@@ -288,12 +276,12 @@
   }
 
   async function addVisit() {
-    if (!canWrite()) {
+    if (!state.canAddVisit) {
       alert('إضافة الزيارة متاحة أثناء الاشتراك المدفوع فقط.');
       return;
     }
 
-    const user = await getUserForWrite();
+    const user = state.user || await access?.getCurrentUser?.();
     if (!user) {
       alert('تعذر تحديد المستخدم الحالي.');
       return;
@@ -372,7 +360,7 @@
   }
 
   function enableEditing() {
-    if (!canWrite()) {
+    if (!state.canUpdatePatient) {
       alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.');
       return;
     }
@@ -386,7 +374,7 @@
   }
 
   async function savePatient() {
-    if (!canWrite()) {
+    if (!state.canUpdatePatient) {
       alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.');
       setEditing(false);
       return;
@@ -431,8 +419,8 @@
     try {
       bindEvents();
 
-      if (!access || !supabase) {
-        throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات.');
+      if (!access || !supabase || !pageAccess) {
+        throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات أو نظام الصلاحيات.');
       }
 
       const accessStatus = await access.getAccessStatus?.();
