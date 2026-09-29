@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <script>
+        /* Dashboard UI is public; database access is protected by RLS. */
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title>Diet Planner | Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/tailwind.css?v=20260923-1">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/theme.css?v=20260921-3">
+
+    <script src="js/theme.js?v=20260921-3"></script>
+
+</head>
+
+<body class="min-h-screen">
+
+    <div id="loadingScreen" class="loading">
+        <div class="flex flex-col items-center gap-3">
+            <div class="spinner"></div>
+
+            <div class="text-sm font-semibold text-slate-500">
+                جاري تحميل التطبيق...
+            </div>
+        </div>
+    </div>
+
+    <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
+
+        <div class="mx-auto max-w-6xl">
+
+            <header class="glass rounded-3xl px-5 py-5 sm:px-7 sm:py-6 shadow-sm">
+
+                <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg shadow-brand-500/20">
+                            <i class="fa-solid fa-leaf text-2xl"></i>
+                        </div>
+
+                        <div>
+                            <h1 class="text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl">
+                                Diet Planner
+                            </h1>
+
+                            <p class="mt-1 text-sm font-medium text-slate-500">
+                                منصة متكاملة لإدارة التغذية العلاجية
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3 sm:justify-end">
+
+                        <div class="text-right">
+                            <div id="doctorName" class="font-bold text-slate-800">
+                                حساب المستخدم
+                            </div>
+
+                            <div class="text-xs text-slate-500">
+                                Clinical Nutrition
+                            </div>
+                        </div>
+
+                        <button
+                            id="logoutBtn"
+                            type="button"
+                            class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                            title="تسجيل الخروج"
+                        >
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <section class="mt-7">
+
+                <div class="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-500 px-6 py-7 text-white shadow-xl shadow-brand-700/10 sm:px-9 sm:py-9">
+
+                    <div class="max-w-3xl">
+
+                        <div class="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold">
+                            <i class="fa-solid fa-sparkles"></i>
+                            لوحة التحكم الرئيسية
+                        </div>
+
+                        <h2 class="text-2xl font-extrabold leading-tight sm:text-3xl">
+                            أهلاً بك في Diet Planner
+                        </h2>
+
+                        <p class="mt-3 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
+                            كل أدواتك الأساسية لإدارة المرضى، الأغذية، خطط الدايت والملف الشخصي في مكان واحد.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="mt-7">
+
+                <div class="mb-4">
+
+                    <h3 class="text-lg font-extrabold text-slate-800">
+                        الأقسام الرئيسية
+                    </h3>
+
+                    <p class="mt-1 text-xs text-slate-500">
+                        اختر القسم الذي تريد العمل عليه
+                    </p>
+
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+                    <a href="patient.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                                <i class="fa-solid fa-user-group text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            قائمة المرضى
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إدارة المرضى، الملفات الغذائية، الخطط والمتابعة.
+                        </p>
+                    </a>
+
+                    <a href="food.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                                <i class="fa-solid fa-apple-whole text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            مكتبة الأغذية
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            استعراض وإدارة قاعدة بيانات الأغذية والقيم الغذائية.
+                        </p>
+                    </a>
+
+                    <a href="products.html" data-feature="product" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
+                                <i class="fa-solid fa-prescription-bottle-medical text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            المنتجات الغذائية
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            مكتبة التركيبات الغذائية العلاجية وتصنيفها وقيمها الغذائية.
+                        </p>
+                    </a>
+
+                    <a href="diet.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                                <i class="fa-solid fa-layer-group text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            مكتبة الدايت
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إنشاء وحفظ وإدارة خطط الدايت والقوالب الأسبوعية.
+                        </p>
+                    </a>
+
+                    <a href="recipe.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
+                                <i class="fa-solid fa-bowl-food text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            الوصفات الصحية
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إنشاء واستعراض وصفات صحية مع مكوناتها وطريقة تحضيرها وقيمها الغذائية.
+                        </p>
+                    </a>
+
+                    <a href="nutritionsupport.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-600">
+                                <i class="fa-solid fa-heart-pulse text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            الدعم الغذائي
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إدارة ومتابعة الدعم الغذائي للمرضى.
+                        </p>
+                    </a>
+
+                    <a href="quickcalc.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
+                                <i class="fa-solid fa-calculator text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            الحاسبة السريعة
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            حساب السعرات والاحتياجات الغذائية بسرعة.
+                        </p>
+                    </a>
+
+                    <a href="finance.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+                                <i class="fa-solid fa-wallet text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            ماليات المرضى
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إدارة الاشتراكات، مواعيد الانتهاء وحالة السداد.
+                        </p>
+                    </a>
+
+                    <a href="notifications.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
+                                <i class="fa-solid fa-bell text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            الإشعارات
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            تنبيهات الاشتراكات ومواعيد المتابعة القادمة.
+                        </p>
+                    </a>
+
+                    <a href="article.html" data-feature="article" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+                                <i class="fa-solid fa-newspaper text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            المقالات
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إنشاء وإدارة المقالات والمحتوى التثقيفي ونشره للعامة.
+                        </p>
+                    </a>
+
+                    <a href="profile.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                                <i class="fa-solid fa-user-doctor text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            الصفحة الشخصية
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            بيانات الحساب، التخصص وحالة الاشتراك.
+                        </p>
+                    </a>
+
+                    <a href="feedback.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-50 text-yellow-600">
+                                <i class="fa-solid fa-star text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            شاركنا رأيك
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            قيّم تجربتك مع Diet Planner واكتب رأيك وملاحظاتك.
+                        </p>
+                    </a>
+
+                    <a href="about.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-brand-600">
+                                <i class="fa-solid fa-circle-info text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            عن التطبيق
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            تعرف على Diet Planner ومحتوى التطبيق ومزاياه.
+                        </p>
+                    </a>
+
+                    <a
+                        id="adminCard"
+                        href="admin.html"
+                        class="nav-card glass group rounded-3xl p-5 shadow-sm hidden"
+                    >
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+                                <i class="fa-solid fa-shield-halved text-xl"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                            الإدارة
+                        </h4>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            إدارة طلبات الاشتراك ومراجعة إثباتات الدفع.
+                        </p>
+                    </a>
+
+                </div>
+
+            </section>
+
+            <footer class="py-8 text-center">
+
+                <div class="text-sm font-semibold text-slate-500">
+                    Developed by <span class="text-brand-600">Dr. Ahmed Galal</span>
+                </div>
+
+                <div class="mt-1 text-xs text-slate-400">
+                    Diet Planner • Clinical Nutrition
+                </div>
+
+            </footer>
+
+        </div>
+
+    </main>
+
+    <script src="js/auth-access.js?v=20260923-1"></script>
+    <script src="js/app-dashboard.js"></script>
+
+</body>
+
+</html>
