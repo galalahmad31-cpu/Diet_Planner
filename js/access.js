@@ -1,18 +1,24 @@
 /* =========================================================
    Diet Planner — access.js
-   Core Authorization Engine
+   Backend-Authoritative Access API
 
    Responsibilities:
-   - Role checks.
-   - Subscription checks.
-   - Feature checks.
-   - Patient quota checks.
-   - Shared access status.
+   - Call backend RPCs that make authorization decisions.
+   - Return authorization results to access_pages.js.
+   - Provide a small, stable API for page code.
 
-   Page-specific rules belong to access_pages.js.
+   Does NOT:
+   - Calculate subscription validity.
+   - Calculate quotas.
+   - Calculate feature access.
+   - Decide admin privileges locally.
+   - Read subscription tables as a fallback.
+   - Contain page-specific rules.
+
    Authentication belongs to auth.js.
    Supabase client belongs to supabase.js.
-   Database RLS remains the final security layer.
+   Page rules belong to access_pages.js.
+   Backend/RPC + RLS are the security authority.
    ========================================================= */
 
 (() => {
@@ -28,132 +34,9 @@
     return;
   }
 
-  const accessCache = {
-    userId: null,
-    role: null
-  };
-
   function clearAccessCache() {
-    accessCache.userId = null;
-    accessCache.role = null;
-  }
-
-  function getToday() {
-    return new Date().toISOString().slice(0, 10);
-  }
-
-  async function getUserRole(userId) {
-    if (!userId) return null;
-
-    if (
-      accessCache.userId === userId &&
-      accessCache.role !== null
-    ) {
-      return accessCache.role;
-    }
-
-    const { data, error } = await supabaseClient
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Role check failed:", error);
-      return null;
-    }
-
-    const role = data?.role || "user";
-
-    accessCache.userId = userId;
-    accessCache.role = role;
-
-    return role;
-  }
-
-  async function hasActiveSubscription(userId) {
-    if (!userId) return null;
-
-    const role = await getUserRole(userId);
-
-    if (role === "admin") return true;
-
-    const { data, error } = await supabaseClient.rpc(
-      "has_active_subscription",
-      { p_user_id: userId }
-    );
-
-    if (!error) {
-      return data === true;
-    }
-
-    console.error(
-      "Subscription RPC failed; using read-only fallback:",
-      error
-    );
-
-    const today = getToday();
-
-    const {
-      data: subscription,
-      error: fallbackError
-    } = await supabaseClient
-      .from("subscriptions")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("status", "paid")
-      .lte("start_date", today)
-      .gte("expiry_date", today)
-      .limit(1)
-      .maybeSingle();
-
-    if (fallbackError) {
-      console.error(
-        "Subscription fallback check failed:",
-        fallbackError
-      );
-      return null;
-    }
-
-    return !!subscription;
-  }
-
-  async function canAddPatient(userId) {
-    if (!userId) return false;
-
-    const { data, error } = await supabaseClient.rpc(
-      "can_add_patient",
-      { p_user_id: userId }
-    );
-
-    if (error) {
-      console.error("Patient quota check failed:", error);
-      return false;
-    }
-
-    return data === true;
-  }
-
-  async function hasFeature(userId, featureKey) {
-    if (!userId || !featureKey) return false;
-
-    const { data, error } = await supabaseClient.rpc(
-      "has_feature",
-      {
-        p_user_id: userId,
-        p_feature: featureKey
-      }
-    );
-
-    if (error) {
-      console.error(
-        `Feature check failed (${featureKey}):`,
-        error
-      );
-      return false;
-    }
-
-    return data === true;
+    // Kept as a no-op for API compatibility.
+    // Authorization results are intentionally not cached here.
   }
 
   async function getAccessStatus() {
@@ -169,27 +52,102 @@
       };
     }
 
-    const role = await getUserRole(user.id);
-    const active =
-      role === "admin"
-        ? true
-        : await hasActiveSubscription(user.id);
+    const { data, error } = await supabaseClient.rpc(
+      "get_access_status"
+    );
+
+    if (error || !data) {
+      console.error("Access status RPC failed:", error);
+
+      return {
+        authenticated: true,
+        user,
+        role: null,
+        isAdmin: false,
+        hasActiveSubscription: false
+      };
+    }
 
     return {
-      authenticated: true,
+      authenticated: data.authenticated === true,
       user,
-      role,
-      isAdmin: role === "admin",
-      hasActiveSubscription: active === true
+      role: data.role ?? null,
+      isAdmin: data.is_admin === true,
+      hasActiveSubscription:
+        data.has_active_subscription === true
     };
   }
 
+  async function getUserRole() {
+    const status = await getAccessStatus();
+    return status.role;
+  }
+
+  async function hasActiveSubscription() {
+    const user = await auth.getCurrentUser();
+    if (!user) return false;
+
+    const { data, error } = await supabaseClient.rpc(
+      "has_active_subscription",
+      { p_user_id: user.id }
+    );
+
+    if (error) {
+      console.error("Subscription RPC failed:", error);
+      return false;
+    }
+
+    return data === true;
+  }
+
+  async function canAddPatient() {
+    const user = await auth.getCurrentUser();
+    if (!user) return false;
+
+    const { data, error } = await supabaseClient.rpc(
+      "can_add_patient",
+      { p_user_id: user.id }
+    );
+
+    if (error) {
+      console.error("Patient quota RPC failed:", error);
+      return false;
+    }
+
+    return data === true;
+  }
+
+  async function hasFeature(featureKey) {
+    if (!featureKey) return false;
+
+    const user = await auth.getCurrentUser();
+    if (!user) return false;
+
+    const { data, error } = await supabaseClient.rpc(
+      "has_feature",
+      {
+        p_user_id: user.id,
+        p_feature: featureKey
+      }
+    );
+
+    if (error) {
+      console.error(
+        `Feature RPC failed (${featureKey}):`,
+        error
+      );
+      return false;
+    }
+
+    return data === true;
+  }
+
   window.DietPlannerAccess = {
+    getAccessStatus,
     getUserRole,
     hasActiveSubscription,
     canAddPatient,
     hasFeature,
-    getAccessStatus,
     clearAccessCache
   };
 })();
