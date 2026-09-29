@@ -27,7 +27,7 @@
     patient: {
       read: "always",
       delete: "always",
-      add: "active_subscription",
+      add: "active_subscription_and_quota",
       update: "active_subscription"
     },
 
@@ -67,6 +67,14 @@
 
     if (rule === "active_subscription") {
       return status.hasActiveSubscription === true;
+    }
+
+    if (rule === "active_subscription_and_quota") {
+      if (status.hasActiveSubscription !== true) {
+        return false;
+      }
+
+      return access.canAddPatient(status.user?.id) === true;
     }
 
     return false;
