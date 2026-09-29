@@ -3,33 +3,25 @@
    Central Authentication
 
    Responsibilities:
-   - One Supabase client for the whole application.
    - Login / Register / Google / Logout.
    - Session access.
    - Authentication UI on index.html.
    - Post-login routing.
 
+   Database client belongs to supabase.js.
    Authorization and page access belong to access.js / access_pages.js.
    ========================================================= */
 
 (() => {
   "use strict";
 
-  const SUPABASE_URL =
-    "https://zwxnmnfoknfbzvptnpmv.supabase.co";
+  const supabaseClient =
+    window.DietPlannerSupabase?.client;
 
-  const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_A6u5kWAdL60bYpz1wRyv6w_J2p896iY";
-
-  if (!window.supabase) {
-    console.error("Supabase JS library is not loaded.");
+  if (!supabaseClient) {
+    console.error("supabase.js must load before auth.js.");
     return;
   }
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
 
   function isIndexPage() {
     const path = window.location.pathname;
@@ -341,7 +333,6 @@
   }
 
   window.DietPlannerAuth = {
-    supabaseClient,
     getCurrentUser,
     getSession,
     logout: logoutUser,
