@@ -2,14 +2,7 @@
    Diet Planner — access.js
    Central Access & Authorization API
 
-   Responsibilities:
-   - Call backend RPCs for authorization decisions.
-   - Define page/action access rules.
-   - Expose one public access API to application pages.
-
-   Security authority:
-   - Backend RPC + RLS.
-
+   Backend RPC + RLS are the security authority.
    This file does not calculate subscription validity or quotas.
    ========================================================= */
 
@@ -23,10 +16,6 @@
     console.error("supabase.js and auth.js must load before access.js.");
     return;
   }
-
-  /* =========================================================
-     Backend Access API
-     ========================================================= */
 
   async function getAccessStatus() {
     const user = await auth.getCurrentUser();
@@ -119,10 +108,6 @@
     return data === true;
   }
 
-  /* =========================================================
-     Page / Action Rules
-     ========================================================= */
-
   const PAGE_RULES = {
     patient: {
       read: "always",
@@ -133,14 +118,14 @@
     patientProfileVisits: {
       read: "always",
       delete: "always",
-      add: "active_subscription",
-      update: "active_subscription"
+      add: "active_subscription_and_quota",
+      update: "active_subscription_and_quota"
     },
     visitContent: {
       read: "always",
       delete: "always",
-      add: "active_subscription",
-      update: "active_subscription"
+      add: "active_subscription_and_quota",
+      update: "active_subscription_and_quota"
     }
   };
 
@@ -151,10 +136,7 @@
     const path = window.location.pathname;
     const isIndex = path.endsWith("/index.html") || path === "/" || path === "";
 
-    if (!isIndex) {
-      window.location.replace("index.html");
-    }
-
+    if (!isIndex) window.location.replace("index.html");
     return false;
   }
 
@@ -165,10 +147,7 @@
     const status = await getAccessStatus();
     if (!status.authenticated) return false;
 
-    // Admins are exempt from page-level restrictions.
-    if (status.isAdmin) return true;
-
-    if (rule === "always") return true;
+    if (status.isAdmin || rule === "always") return true;
 
     switch (rule) {
       case "active_subscription":
@@ -199,10 +178,6 @@
 
     return status.isAdmin || await hasFeature(featureKey);
   }
-
-  /* =========================================================
-     Public API
-     ========================================================= */
 
   window.DietPlannerAccess = {
     getAccessStatus,
