@@ -11,6 +11,7 @@
 
    Page-specific rules belong to access_pages.js.
    Authentication belongs to auth.js.
+   Supabase client belongs to supabase.js.
    Database RLS remains the final security layer.
    ========================================================= */
 
@@ -18,13 +19,14 @@
   "use strict";
 
   const auth = window.DietPlannerAuth;
+  const supabaseClient = window.DietPlannerSupabase?.client;
 
-  if (!auth?.supabaseClient) {
-    console.error("auth.js must load before access.js.");
+  if (!auth?.getCurrentUser || !supabaseClient) {
+    console.error(
+      "supabase.js and auth.js must load before access.js."
+    );
     return;
   }
-
-  const supabaseClient = auth.supabaseClient;
 
   const accessCache = {
     userId: null,
@@ -183,8 +185,6 @@
   }
 
   window.DietPlannerAccess = {
-    supabaseClient,
-    getCurrentUser: auth.getCurrentUser,
     getUserRole,
     hasActiveSubscription,
     canAddPatient,
