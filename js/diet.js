@@ -1,7 +1,7 @@
 /* Diet Planner — Diet Library
  * Page logic only.
  * Supabase client: js/supabase.js
- * UI permissions: js/access.js → DietPlannerAccess.getPageAccess("diet")
+ * Authorization: js/access.js → DietPlannerAccess.getPageAccess("diet")
  * Backend remains the final security boundary (RLS/RPC).
  */
 (() => {
@@ -10,7 +10,7 @@
   const supabase = window.DietPlannerSupabase?.client;
   const access = window.DietPlannerAccess;
 
-  if (!supabase || !access) {
+  if (!access || !supabase) {
     console.error("diet.js requires js/supabase.js and js/access.js.");
     return;
   }
@@ -57,8 +57,8 @@
       `fixed bottom-5 left-5 z-[150] max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl ${
         success ? "bg-brand-600" : "bg-red-600"
       }`;
-    element.classList.remove("hidden");
 
+    element.classList.remove("hidden");
     clearTimeout(window.__dietToastTimer);
     window.__dietToastTimer = setTimeout(
       () => element.classList.add("hidden"),
@@ -126,10 +126,7 @@
       if (!raw) return null;
 
       const cached = JSON.parse(raw);
-      if (
-        !cached?.timestamp ||
-        Date.now() - cached.timestamp > CACHE_TTL
-      ) {
+      if (!cached?.timestamp || Date.now() - cached.timestamp > CACHE_TTL) {
         return null;
       }
 
@@ -171,10 +168,7 @@
 
     try {
       const { data, error } = await withTimeout(
-        supabase
-          .from("foods")
-          .select(FOOD_SELECT)
-          .order("name_ar", { ascending: true }),
+        supabase.from("foods").select(FOOD_SELECT).order("name_ar", { ascending: true }),
         15000,
         "انتهت مهلة تحميل مكتبة الأغذية."
       );
@@ -218,10 +212,7 @@
 
     try {
       const { data, error } = await withTimeout(
-        supabase
-          .from("diet_templates")
-          .select(DIET_SELECT)
-          .order("updated_at", { ascending: false }),
+        supabase.from("diet_templates").select(DIET_SELECT).order("updated_at", { ascending: false }),
         15000,
         "انتهت مهلة تحميل مكتبة الدايت."
       );
@@ -234,10 +225,7 @@
       const ids = [
         ...new Set(
           [
-            ...state.diets
-              .filter((diet) => diet.visibility === "public")
-              .map((diet) => diet.created_by)
-              .filter(Boolean),
+            ...state.diets.filter((diet) => diet.visibility === "public").map((diet) => diet.created_by).filter(Boolean),
             state.user.id
           ].filter(Boolean)
         )
@@ -262,22 +250,14 @@
       }
 
       if (!state.authors[state.user.id]) {
-        state.authors[state.user.id] =
-          state.user.user_metadata?.full_name ||
-          state.user.user_metadata?.name ||
-          "";
+        state.authors[state.user.id] = state.user.user_metadata?.full_name || state.user.user_metadata?.name || "";
       }
 
       state.diets.forEach((diet) => {
-        if (diet.publisher_name) {
-          state.authors[diet.created_by] = diet.publisher_name;
-        }
+        if (diet.publisher_name) state.authors[diet.created_by] = diet.publisher_name;
       });
 
-      writeCache("diets", {
-        diets: state.diets,
-        authors: state.authors
-      });
+      writeCache("diets", { diets: state.diets, authors: state.authors });
 
       if (status) {
         status.textContent = "متصل";
@@ -305,10 +285,7 @@
 
     const filtered = state.diets.filter((diet) => {
       const matchesSearch =
-        !query ||
-        `${diet.name} ${diet.description || ""} ${diet.notes || ""}`
-          .toLowerCase()
-          .includes(query);
+        !query || `${diet.name} ${diet.description || ""} ${diet.notes || ""}`.toLowerCase().includes(query);
 
       const matchesVisibility =
         visibility === "all" ||
@@ -325,19 +302,13 @@
     grid.innerHTML = visible.map((diet) => dietCard(diet)).join("");
     $("empty")?.classList.toggle("hidden", visible.length > 0);
 
-    if ($("countBadge")) {
-      $("countBadge").textContent = `${state.diets.length} دايت`;
-    }
+    if ($("countBadge")) $("countBadge").textContent = `${state.diets.length} دايت`;
     if ($("totalStat")) $("totalStat").textContent = state.diets.length;
     if ($("mineStat")) {
-      $("mineStat").textContent = state.diets.filter(
-        (diet) => diet.created_by === state.user.id
-      ).length;
+      $("mineStat").textContent = state.diets.filter((diet) => diet.created_by === state.user.id).length;
     }
     if ($("publicStat")) {
-      $("publicStat").textContent = state.diets.filter(
-        (diet) => diet.visibility === "public"
-      ).length;
+      $("publicStat").textContent = state.diets.filter((diet) => diet.visibility === "public").length;
     }
 
     $("loadMoreDiets")?.remove();
@@ -346,10 +317,8 @@
       const button = document.createElement("button");
       button.id = "loadMoreDiets";
       button.type = "button";
-      button.className =
-        "mx-auto mt-5 block rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50";
-      button.innerHTML =
-        '<i class="fa-solid fa-chevron-down ml-1"></i> عرض المزيد';
+      button.className = "mx-auto mt-5 block rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50";
+      button.innerHTML = '<i class="fa-solid fa-chevron-down ml-1"></i> عرض المزيد';
       button.onclick = () => {
         state.renderLimit += 40;
         renderDiets();
@@ -387,27 +356,15 @@
           <div class="flex items-start justify-between gap-3">
             <div>
               <div class="flex flex-wrap gap-2">
-                <span class="rounded-full ${published ? "bg-indigo-50 text-indigo-600" : "bg-brand-50 text-brand-700"} px-2.5 py-1 text-[10px] font-extrabold">
-                  ${published ? "منشور" : "خاص"}
-                </span>
+                <span class="rounded-full ${published ? "bg-indigo-50 text-indigo-600" : "bg-brand-50 text-brand-700"} px-2.5 py-1 text-[10px] font-extrabold">${published ? "منشور" : "خاص"}</span>
                 ${mine ? '<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500">ملكي</span>' : ""}
               </div>
-
               <h3 class="mt-3 text-lg font-extrabold text-slate-800">${esc(diet.name)}</h3>
               <p class="mt-1 text-xs text-slate-400 line-clamp-2">${esc(diet.description || "بدون وصف")}</p>
-
-              ${published ? `
-                <div class="mt-3 flex items-center gap-2 text-[10px] text-slate-400">
-                  <span class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-                    <i class="fa-solid fa-user-doctor"></i>
-                  </span>
-                  <span>${authorText}</span>
-                </div>
-              ` : ""}
+              ${published ? `<div class="mt-3 flex items-center gap-2 text-[10px] text-slate-400"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600"><i class="fa-solid fa-user-doctor"></i></span><span>${authorText}</span></div>` : ""}
             </div>
             <i class="fa-solid fa-utensils text-2xl text-brand-100"></i>
           </div>
-
           <div class="mt-5 grid grid-cols-4 gap-2">
             ${summaryMetric("سعرات", diet.target_calories, "kcal", "amber")}
             ${summaryMetric("بروتين", diet.target_protein, "g", "slate")}
@@ -415,22 +372,13 @@
             ${summaryMetric("دهون", diet.target_fat, "g", "emerald")}
           </div>
         </div>
-
         <div class="flex items-center justify-between gap-2 bg-slate-50/70 p-4">
           <div class="flex flex-wrap gap-2">
-            <button data-open="${esc(diet.id)}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200">
-              <i class="fa-solid fa-eye ml-1"></i> فتح الدايت
-            </button>
-            <button data-duplicate="${esc(diet.id)}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200">
-              <i class="fa-solid fa-copy ml-1"></i> نسخ
-            </button>
+            <button data-open="${esc(diet.id)}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200"><i class="fa-solid fa-eye ml-1"></i> فتح الدايت</button>
+            <button data-duplicate="${esc(diet.id)}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200"><i class="fa-solid fa-copy ml-1"></i> نسخ</button>
             ${mine ? `
-              <button data-edit="${esc(diet.id)}" class="rounded-xl bg-brand-600 px-3 py-2 text-[11px] font-bold text-white">
-                <i class="fa-solid fa-pen ml-1"></i> تعديل
-              </button>
-              <button data-del="${esc(diet.id)}" class="rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-600 ring-1 ring-red-100">
-                <i class="fa-solid fa-trash ml-1"></i> حذف
-              </button>
+              <button data-edit="${esc(diet.id)}" class="rounded-xl bg-brand-600 px-3 py-2 text-[11px] font-bold text-white"><i class="fa-solid fa-pen ml-1"></i> تعديل</button>
+              <button data-del="${esc(diet.id)}" class="rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-600 ring-1 ring-red-100"><i class="fa-solid fa-trash ml-1"></i> حذف</button>
             ` : ""}
           </div>
         </div>
@@ -456,27 +404,20 @@
     state.editingId = null;
     state.activeMealIndex = null;
     state.selectedFood = null;
-    state.day = {
-      day_number: 1,
-      day_name: "اليوم",
-      meals: []
-    };
+    state.day = { day_number: 1, day_name: "اليوم", meals: [] };
 
-    $("editorTitle") && ($("editorTitle").textContent = "إنشاء دايت جديد");
-    $("dietName") && ($("dietName").value = "");
-    $("description") && ($("description").value = "");
-    $("notes") && ($("notes").value = "");
-    $("visibility") && ($("visibility").value = "private");
-    $("dietAccess") && ($("dietAccess").value = "");
+    if ($("editorTitle")) $("editorTitle").textContent = "إنشاء دايت جديد";
+    if ($("dietName")) $("dietName").value = "";
+    if ($("description")) $("description").value = "";
+    if ($("notes")) $("notes").value = "";
+    if ($("visibility")) $("visibility").value = "private";
+    if ($("dietAccess")) $("dietAccess").value = "";
     renderDay();
   }
 
   async function openEditor(id = null) {
     const action = id ? "update" : "add";
-    const message = id
-      ? "ليس لديك صلاحية تعديل الدايت."
-      : "ليس لديك صلاحية إنشاء دايت.";
-
+    const message = id ? "ليس لديك صلاحية تعديل الدايت." : "ليس لديك صلاحية إنشاء دايت.";
     if (!(await requireAccess(action, message))) return;
 
     resetEditor();
@@ -486,13 +427,12 @@
       if (!diet) return;
 
       state.editingId = id;
-      $("editorTitle") && ($("editorTitle").textContent = "تعديل الدايت");
-      $("dietName") && ($("dietName").value = diet.name || "");
-      $("description") && ($("description").value = diet.description || "");
-      $("notes") && ($("notes").value = diet.notes || "");
-      $("visibility") && ($("visibility").value = diet.visibility || "private");
-      $("dietAccess") && ($("dietAccess").value = diet.required_feature || "");
-
+      if ($("editorTitle")) $("editorTitle").textContent = "تعديل الدايت";
+      if ($("dietName")) $("dietName").value = diet.name || "";
+      if ($("description")) $("description").value = diet.description || "";
+      if ($("notes")) $("notes").value = diet.notes || "";
+      if ($("visibility")) $("visibility").value = diet.visibility || "private";
+      if ($("dietAccess")) $("dietAccess").value = diet.required_feature || "";
       await loadDietStructure(id);
     }
 
@@ -502,30 +442,20 @@
   async function loadDietStructure(id) {
     try {
       const { data: days, error } = await withTimeout(
-        supabase
-          .from("diet_template_days")
-          .select("id,day_number,day_name")
-          .eq("template_id", id)
-          .order("day_number", { ascending: true }),
+        supabase.from("diet_template_days").select("id,day_number,day_name").eq("template_id", id).order("day_number", { ascending: true }),
         10000,
         "انتهت مهلة تحميل أيام الدايت."
       );
-
       if (error) throw error;
 
       const day = days?.[0];
       if (!day) return;
 
       const { data: meals, error: mealsError } = await withTimeout(
-        supabase
-          .from("diet_template_meals")
-          .select("id,meal_name,meal_order")
-          .eq("day_id", day.id)
-          .order("meal_order", { ascending: true }),
+        supabase.from("diet_template_meals").select("id,meal_name,meal_order").eq("day_id", day.id).order("meal_order", { ascending: true }),
         10000,
         "انتهت مهلة تحميل وجبات الدايت."
       );
-
       if (mealsError) throw mealsError;
 
       const mealIds = (meals || []).map((meal) => meal.id);
@@ -533,15 +463,10 @@
 
       if (mealIds.length) {
         const { data, error: itemsError } = await withTimeout(
-          supabase
-            .from("diet_template_items")
-            .select("id,meal_id,food_id,quantity,unit,repeat_count,notes")
-            .in("meal_id", mealIds)
-            .order("id", { ascending: true }),
+          supabase.from("diet_template_items").select("id,meal_id,food_id,quantity,unit,repeat_count,notes").in("meal_id", mealIds).order("id", { ascending: true }),
           10000,
           "انتهت مهلة تحميل أصناف الدايت."
         );
-
         if (itemsError) throw itemsError;
         items = data || [];
       }
@@ -552,16 +477,14 @@
         meals: (meals || []).map((meal) => ({
           id: meal.id,
           name: meal.meal_name || "وجبة",
-          items: items
-            .filter((item) => item.meal_id === meal.id)
-            .map((item) => ({
-              id: item.id,
-              food_id: item.food_id,
-              quantity: num(item.quantity),
-              unit: item.unit || "g",
-              repeat_count: num(item.repeat_count) || 1,
-              notes: item.notes || ""
-            }))
+          items: items.filter((item) => item.meal_id === meal.id).map((item) => ({
+            id: item.id,
+            food_id: item.food_id,
+            quantity: num(item.quantity),
+            unit: item.unit || "g",
+            repeat_count: num(item.repeat_count) || 1,
+            notes: item.notes || ""
+          }))
         }))
       };
 
@@ -576,40 +499,31 @@
     const container = $("mealsEditor");
     if (!container) return;
 
-    container.innerHTML = state.day.meals
-      .map((meal, mealIndex) => `
-        <div class="rounded-2xl border border-slate-200 bg-white p-4">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <input value="${esc(meal.name)}" data-meal-name="${mealIndex}" class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold">
-            <div class="flex flex-wrap gap-2">
-              <button type="button" data-add-food="${mealIndex}" class="rounded-xl bg-brand-50 px-3 py-2 text-xs font-bold text-brand-700">إضافة صنف</button>
-              <button type="button" data-move-meal="${mealIndex}:up" class="rounded-xl bg-slate-100 px-3 py-2 text-xs">↑</button>
-              <button type="button" data-move-meal="${mealIndex}:down" class="rounded-xl bg-slate-100 px-3 py-2 text-xs">↓</button>
-              <button type="button" data-remove-meal="${mealIndex}" class="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">حذف</button>
-            </div>
-          </div>
-          <div class="mt-3 space-y-2">
-            ${meal.items.map((item, itemIndex) => renderItem(item, mealIndex, itemIndex)).join("")}
+    container.innerHTML = state.day.meals.map((meal, mealIndex) => `
+      <div class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <input value="${esc(meal.name)}" data-meal-name="${mealIndex}" class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold">
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-add-food="${mealIndex}" class="rounded-xl bg-brand-50 px-3 py-2 text-xs font-bold text-brand-700">إضافة صنف</button>
+            <button type="button" data-move-meal="${mealIndex}:up" class="rounded-xl bg-slate-100 px-3 py-2 text-xs">↑</button>
+            <button type="button" data-move-meal="${mealIndex}:down" class="rounded-xl bg-slate-100 px-3 py-2 text-xs">↓</button>
+            <button type="button" data-remove-meal="${mealIndex}" class="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">حذف</button>
           </div>
         </div>
-      `)
-      .join("");
+        <div class="mt-3 space-y-2">${meal.items.map((item, itemIndex) => renderItem(item, mealIndex, itemIndex)).join("")}</div>
+      </div>
+    `).join("");
 
     updateSummary();
   }
 
   function renderItem(item, mealIndex, itemIndex) {
     const food = state.foods.find((entry) => String(entry.id) === String(item.food_id));
-    if (!food) {
-      return `<div class="rounded-xl bg-red-50 p-3 text-xs text-red-600">الصنف غير موجود في مكتبة الأغذية.</div>`;
-    }
+    if (!food) return `<div class="rounded-xl bg-red-50 p-3 text-xs text-red-600">الصنف غير موجود في مكتبة الأغذية.</div>`;
 
     return `
       <div class="grid gap-2 rounded-xl bg-slate-50 p-3 sm:grid-cols-[1fr_110px_110px_auto] sm:items-center">
-        <div>
-          <div class="text-sm font-bold text-slate-700">${esc(food.name_ar || food.name_en || "صنف")}</div>
-          <div class="mt-1 text-[10px] text-slate-400">${num(food.kcal)} kcal / 100g</div>
-        </div>
+        <div><div class="text-sm font-bold text-slate-700">${esc(food.name_ar || food.name_en || "صنف")}</div><div class="mt-1 text-[10px] text-slate-400">${num(food.kcal)} kcal / 100g</div></div>
         <input type="number" min="0" step="0.1" value="${num(item.quantity)}" data-item-quantity="${mealIndex}:${itemIndex}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
         <input type="number" min="1" step="1" value="${num(item.repeat_count) || 1}" data-item-repeat="${mealIndex}:${itemIndex}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
         <button type="button" data-remove-item="${mealIndex}:${itemIndex}" class="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">حذف</button>
@@ -618,15 +532,7 @@
   }
 
   function updateSummary() {
-    const totals = {
-      kcal: 0,
-      protein: 0,
-      carb: 0,
-      fat: 0,
-      sodium: 0,
-      potassium: 0,
-      phosphorus: 0
-    };
+    const totals = { kcal: 0, protein: 0, carb: 0, fat: 0, sodium: 0, potassium: 0, phosphorus: 0 };
 
     state.day.meals.forEach((meal) => {
       meal.items.forEach((item) => {
@@ -665,8 +571,8 @@
       return;
     }
 
-    $("confirmTitle") && ($("confirmTitle").textContent = title);
-    $("confirmMessage") && ($("confirmMessage").textContent = message);
+    if ($("confirmTitle")) $("confirmTitle").textContent = title;
+    if ($("confirmMessage")) $("confirmMessage").textContent = message;
     openModal("confirmModal", "flex");
 
     const confirmButton = $("confirmAction");
@@ -680,10 +586,7 @@
 
   async function saveDiet() {
     const action = state.editingId ? "update" : "add";
-    const message = state.editingId
-      ? "ليس لديك صلاحية تعديل الدايت."
-      : "ليس لديك صلاحية إنشاء دايت.";
-
+    const message = state.editingId ? "ليس لديك صلاحية تعديل الدايت." : "ليس لديك صلاحية إنشاء دايت.";
     if (!(await requireAccess(action, message))) return;
 
     const name = $("dietName")?.value.trim();
@@ -710,13 +613,10 @@
 
     try {
       const { error } = await withTimeout(
-        supabase.rpc("save_diet_template", {
-          p_payload: payload
-        }),
+        supabase.rpc("save_diet_template", { p_payload: payload }),
         20000,
         "انتهت مهلة حفظ الدايت."
       );
-
       if (error) throw error;
 
       clearCache("diets");
@@ -741,12 +641,12 @@
     if (!source) return;
 
     state.editingId = null;
-    $("editorTitle") && ($("editorTitle").textContent = "نسخ الدايت");
-    $("dietName") && ($("dietName").value = `${source.name} - نسخة`);
-    $("description") && ($("description").value = source.description || "");
-    $("notes") && ($("notes").value = source.notes || "");
-    $("visibility") && ($("visibility").value = "private");
-    $("dietAccess") && ($("dietAccess").value = "");
+    if ($("editorTitle")) $("editorTitle").textContent = "نسخ الدايت";
+    if ($("dietName")) $("dietName").value = `${source.name} - نسخة`;
+    if ($("description")) $("description").value = source.description || "";
+    if ($("notes")) $("notes").value = source.notes || "";
+    if ($("visibility")) $("visibility").value = "private";
+    if ($("dietAccess")) $("dietAccess").value = "";
 
     await loadDietStructure(id);
     openModal("editor", "flex");
@@ -755,28 +655,23 @@
   async function deleteDiet(id) {
     if (!(await requireAccess("delete", "ليس لديك صلاحية حذف الدايت."))) return;
 
-    openConfirm(
-      "حذف الدايت",
-      "هل أنت متأكد من حذف هذا القالب بكل بياناته؟",
-      async () => {
-        try {
-          const { error } = await withTimeout(
-            supabase.from("diet_templates").delete().eq("id", id),
-            15000,
-            "انتهت مهلة حذف الدايت."
-          );
+    openConfirm("حذف الدايت", "هل أنت متأكد من حذف هذا القالب بكل بياناته؟", async () => {
+      try {
+        const { error } = await withTimeout(
+          supabase.from("diet_templates").delete().eq("id", id),
+          15000,
+          "انتهت مهلة حذف الدايت."
+        );
+        if (error) throw error;
 
-          if (error) throw error;
-
-          clearCache("diets");
-          toast("تم حذف الدايت.");
-          await loadDiets(true);
-        } catch (error) {
-          console.error("Diet delete failed:", error);
-          toast(`تعذر حذف الدايت: ${error.message}`, false);
-        }
+        clearCache("diets");
+        toast("تم حذف الدايت.");
+        await loadDiets(true);
+      } catch (error) {
+        console.error("Diet delete failed:", error);
+        toast(`تعذر حذف الدايت: ${error.message}`, false);
       }
-    );
+    });
   }
 
   function bindEvents() {
@@ -784,10 +679,7 @@
     $("cancelEditor")?.addEventListener("click", () => closeModal("editor", "flex"));
     $("saveDiet")?.addEventListener("click", saveDiet);
     $("addMeal")?.addEventListener("click", () => {
-      state.day.meals.push({
-        name: `وجبة ${state.day.meals.length + 1}`,
-        items: []
-      });
+      state.day.meals.push({ name: `وجبة ${state.day.meals.length + 1}`, items: [] });
       renderDay();
     });
     $("refreshBtn")?.addEventListener("click", () => loadDiets(true));
@@ -809,20 +701,15 @@
         await openEditor(button.dataset.open);
         return;
       }
-
       if (button.dataset.duplicate) {
         await duplicateDiet(button.dataset.duplicate);
         return;
       }
-
       if (button.dataset.edit) {
         await openEditor(button.dataset.edit);
         return;
       }
-
-      if (button.dataset.del) {
-        await deleteDiet(button.dataset.del);
-      }
+      if (button.dataset.del) await deleteDiet(button.dataset.del);
     });
 
     $("mealsEditor")?.addEventListener("input", (event) => {
@@ -830,16 +717,12 @@
       const quantity = event.target.dataset.itemQuantity;
       const repeat = event.target.dataset.itemRepeat;
 
-      if (mealIndex !== undefined) {
-        state.day.meals[Number(mealIndex)].name = event.target.value;
-      }
-
+      if (mealIndex !== undefined) state.day.meals[Number(mealIndex)].name = event.target.value;
       if (quantity) {
         const [meal, item] = quantity.split(":").map(Number);
         state.day.meals[meal].items[item].quantity = num(event.target.value);
         updateSummary();
       }
-
       if (repeat) {
         const [meal, item] = repeat.split(":").map(Number);
         state.day.meals[meal].items[item].repeat_count = num(event.target.value) || 1;
@@ -850,8 +733,7 @@
     $("mealsEditor")?.addEventListener("click", async (event) => {
       let button = event.target.closest("[data-add-food]");
       if (button) {
-        const mealIndex = Number(button.dataset.addFood);
-        state.activeMealIndex = mealIndex;
+        state.activeMealIndex = Number(button.dataset.addFood);
         await openFoodPicker();
         return;
       }
@@ -859,28 +741,20 @@
       button = event.target.closest("[data-remove-item]");
       if (button) {
         const [mealIndex, itemIndex] = button.dataset.removeItem.split(":").map(Number);
-        openConfirm(
-          "حذف الصنف",
-          "هل أنت متأكد من حذف هذا الصنف من الوجبة؟",
-          () => {
-            state.day.meals[mealIndex].items.splice(itemIndex, 1);
-            renderDay();
-          }
-        );
+        openConfirm("حذف الصنف", "هل أنت متأكد من حذف هذا الصنف من الوجبة؟", () => {
+          state.day.meals[mealIndex].items.splice(itemIndex, 1);
+          renderDay();
+        });
         return;
       }
 
       button = event.target.closest("[data-remove-meal]");
       if (button) {
         const mealIndex = Number(button.dataset.removeMeal);
-        openConfirm(
-          "حذف الوجبة",
-          "هل أنت متأكد من حذف الوجبة بكل أصنافها؟",
-          () => {
-            state.day.meals.splice(mealIndex, 1);
-            renderDay();
-          }
-        );
+        openConfirm("حذف الوجبة", "هل أنت متأكد من حذف الوجبة بكل أصنافها؟", () => {
+          state.day.meals.splice(mealIndex, 1);
+          renderDay();
+        });
         return;
       }
 
@@ -890,21 +764,14 @@
         const from = Number(mealIndex);
         const to = direction === "up" ? from - 1 : from + 1;
         if (to < 0 || to >= state.day.meals.length) return;
-
-        [state.day.meals[from], state.day.meals[to]] = [
-          state.day.meals[to],
-          state.day.meals[from]
-        ];
+        [state.day.meals[from], state.day.meals[to]] = [state.day.meals[to], state.day.meals[from]];
         renderDay();
       }
     });
   }
 
   async function openFoodPicker() {
-    if (!state.foods.length) {
-      const loaded = await loadFoods();
-      if (!loaded) return;
-    }
+    if (!state.foods.length && !(await loadFoods())) return;
 
     const list = $("foodList");
     if (list) {
