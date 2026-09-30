@@ -119,13 +119,14 @@
   }
 
   async function can(action) {
-    if (!access?.can) {
-      console.error('DietPlannerAccess.can is unavailable.');
+    if (!access?.getPageAccess) {
+      console.error('DietPlannerAccess.getPageAccess is unavailable.');
       return false;
     }
 
     try {
-      return (await access.can('admin', action)) === true;
+      const permissions = await access.getPageAccess('admin');
+      return permissions?.[action] === true;
     } catch (error) {
       console.error(`Admin access check failed for "${action}".`, error);
       return false;
@@ -275,10 +276,6 @@
       .join('');
 
     setState('request', '', true);
-  }
-
-  function featureLabel(key) {
-    return PLAN_FEATURES.find((feature) => feature.key === key)?.label || key;
   }
 
   function featuresText(features) {
