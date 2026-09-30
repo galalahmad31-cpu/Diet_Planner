@@ -1,9 +1,12 @@
 /* =========================================================
    Diet Planner — access.js
-   Central Access & Authorization API
+   Central Access API
 
-   Backend RPC + RLS are the security authority.
-   This file does not calculate subscription validity or quotas.
+   Access decisions are made by the backend RPC.
+   RLS remains the final security boundary.
+
+   This file intentionally contains no subscription, quota,
+   role, or page-rule calculations.
    ========================================================= */
 
 (() => {
@@ -17,6 +20,10 @@
     return;
   }
 
+  /**
+   * Read the current access status for UI/status screens.
+   * This is informational; can() is the authorization API.
+   */
   async function getAccessStatus() {
     const user = await auth.getCurrentUser();
 
@@ -52,143 +59,71 @@
     };
   }
 
-  async function hasActiveSubscription() {
-    const user = await auth.getCurrentUser();
-    if (!user) return false;
+  /**
+   * Ask the backend whether a specific page operation is allowed.
+   *
+   * No authorization rules are duplicated in the frontend.
+   * The backend decides using the authenticated user, role,
+   * subscription, quota, and feature state as appropriate.
+   */
+  async function can(page, action) {
+    if (!page || !action) return false;
 
-    const { data, error } = await supabaseClient.rpc(
-      "has_active_subscription",
-      { p_user_id: user.id }
-    );
+    const { data, error } = await supabaseClient.rpc("can_access", {
+      p_page: page,
+      p_action: action
+    });
 
     if (error) {
-      console.error("Subscription RPC failed:", error);
+      console.error(`Access check failed (${page}.${action}):`, error);
       return false;
     }
 
     return data === true;
   }
 
-  async function canAddPatient() {
-    const user = await auth.getCurrentUser();
-    if (!user) return false;
-
-    const { data, error } = await supabaseClient.rpc(
-      "can_add_patient",
-      { p_user_id: user.id }
-    );
-
-    if (error) {
-      console.error("Patient quota RPC failed:", error);
-      return false;
-    }
-
-    return data === true;
-  }
-
+  /**
+   * Feature access uses the same backend authorization API.
+   */
   async function hasFeature(featureKey) {
     if (!featureKey) return false;
-
-    const user = await auth.getCurrentUser();
-    if (!user) return false;
-
-    const { data, error } = await supabaseClient.rpc(
-      "has_feature",
-      {
-        p_user_id: user.id,
-        p_feature: featureKey
-      }
-    );
-
-    if (error) {
-      console.error(`Feature RPC failed (${featureKey}):`, error);
-      return false;
-    }
-
-    return data === true;
+    return can("feature", featureKey);
   }
 
-  const PAGE_RULES = {
-    patient: {
-      read: "always",
-      delete: "always",
-      add: "active_subscription_and_quota",
-      update: "active_subscription_and_quota"
-    },
-
-    patientProfileVisits: {
-      read: "always",
-      delete: "always",
-      add: "active_subscription",
-      update: "active_subscription"
-    },
-
-    visitContent: {
-      read: "always",
-      delete: "always",
-      add: "active_subscription",
-      update: "active_subscription"
-    }
-  };
-
+  /**
+   * Authentication guard retained for existing page entry points.
+   * Authentication itself remains owned by auth.js.
+   */
   async function requireAuthentication() {
     const user = await auth.getCurrentUser();
     if (user) return true;
 
     const path = window.location.pathname;
-    const isIndex = path.endsWith("/index.html") || path === "/" || path === "";
+    const isIndex =
+      path.endsWith("/index.html") ||
+      path === "/" ||
+      path === "";
 
     if (!isIndex) window.location.replace("index.html");
     return false;
   }
 
-  async function can(pageKey, action) {
-    const rule = PAGE_RULES[pageKey]?.[action];
-    if (!rule) return false;
-
-    const status = await getAccessStatus();
-    if (!status.authenticated) return false;
-
-    if (status.isAdmin || rule === "always") return true;
-
-    switch (rule) {
-      case "active_subscription":
-        return status.hasActiveSubscription === true;
-
-      case "active_subscription_and_quota":
-        return (
-          status.hasActiveSubscription === true &&
-          await canAddPatient()
-        );
-
-      default:
-        return false;
-    }
-  }
-
-  function getRules(pageKey) {
-    return PAGE_RULES[pageKey] || null;
-  }
-
   async function requireFeature(featureKey) {
-    const status = await getAccessStatus();
+    const allowed = await hasFeature(featureKey);
 
-    if (!status.authenticated) {
-      window.location.replace("index.html");
-      return false;
+    if (!allowed) {
+      const user = await auth.getCurrentUser();
+      if (!user) window.location.replace("index.html");
     }
 
-    return status.isAdmin || await hasFeature(featureKey);
+    return allowed;
   }
 
   window.DietPlannerAccess = {
     getAccessStatus,
-    hasActiveSubscription,
-    canAddPatient,
+    can,
     hasFeature,
     requireAuthentication,
-    can,
-    getRules,
     requireFeature
   };
 
