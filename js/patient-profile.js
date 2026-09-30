@@ -6,12 +6,26 @@
   const supabase = window.DietPlannerSupabase?.client;
   const patientId = new URLSearchParams(window.location.search).get('id');
 
-  const state = { patient: null };
+  if (!access?.getPageAccess || !supabase) {
+    console.error('supabase.js and access.js must load before patient-profile.js.');
+    return;
+  }
+
+  const state = {
+    patient: null,
+    access: {
+      patient: null,
+      visits: null
+    }
+  };
+
   const $ = (id) => document.getElementById(id);
 
   function setLink(id, page) {
     const element = $(id);
-    if (element && patientId) element.href = `${page}?id=${encodeURIComponent(patientId)}`;
+    if (element && patientId) {
+      element.href = `${page}?id=${encodeURIComponent(patientId)}`;
+    }
   }
 
   function showError(message) {
@@ -19,47 +33,60 @@
     $('patientContent')?.classList.add('hidden');
     $('modulesSection')?.classList.add('hidden');
     $('errorState')?.classList.remove('hidden');
+
     const errorText = $('errorText');
     if (errorText) errorText.textContent = message;
   }
 
-  async function updateWriteControls() {
-    try {
-      const [canUpdatePatient, canAddVisit] = await Promise.all([
-        access.can('patient', 'update'),
-        access.can('patientProfileVisits', 'add')
-      ]);
+  function applyAccessState() {
+    const patientAccess = state.access.patient || {};
+    const visitsAccess = state.access.visits || {};
 
-      const editButton = $('editButton');
-      const addVisitButton = $('addVisitButton');
+    const canUpdatePatient = patientAccess.update === true;
+    const canAddVisit = visitsAccess.add === true;
 
-      if (editButton) {
-        editButton.disabled = !canUpdatePatient;
-        editButton.classList.toggle('opacity-50', !canUpdatePatient);
-        editButton.classList.toggle('cursor-not-allowed', !canUpdatePatient);
-        editButton.title = canUpdatePatient ? 'تعديل بيانات المريض' : 'التعديل يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
-      }
+    const editButton = $('editButton');
+    const addVisitButton = $('addVisitButton');
 
-      if (addVisitButton) {
-        addVisitButton.disabled = !canAddVisit;
-        addVisitButton.classList.toggle('opacity-50', !canAddVisit);
-        addVisitButton.classList.toggle('cursor-not-allowed', !canAddVisit);
-        addVisitButton.title = canAddVisit ? 'إضافة زيارة' : 'إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.';
-      }
-
-      const accessBox = $('writeAccessStatus');
-      if (accessBox) {
-        const writeAllowed = canUpdatePatient && canAddVisit;
-        accessBox.textContent = writeAllowed
-          ? 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الزيارات.'
-          : 'يمكنك عرض بيانات المريض والزيارات. التعديل وإضافة الزيارات يتطلبان اشتراكًا فعالًا وساريًا وضمن الكوتة.';
-        accessBox.className = writeAllowed
-          ? 'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
-          : 'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
-      }
-    } catch (error) {
-      console.error('Patient profile access check failed:', error);
+    if (editButton) {
+      editButton.disabled = !canUpdatePatient;
+      editButton.classList.toggle('opacity-50', !canUpdatePatient);
+      editButton.classList.toggle('cursor-not-allowed', !canUpdatePatient);
+      editButton.title = canUpdatePatient
+        ? 'تعديل بيانات المريض'
+        : 'تعديل بيانات المريض غير متاح حاليًا.';
     }
+
+    if (addVisitButton) {
+      addVisitButton.disabled = !canAddVisit;
+      addVisitButton.classList.toggle('opacity-50', !canAddVisit);
+      addVisitButton.classList.toggle('cursor-not-allowed', !canAddVisit);
+      addVisitButton.title = canAddVisit
+        ? 'إضافة زيارة'
+        : 'إضافة الزيارة غير متاحة حاليًا.';
+    }
+
+    const accessBox = $('writeAccessStatus');
+    if (accessBox) {
+      const writeAllowed = canUpdatePatient && canAddVisit;
+      accessBox.textContent = writeAllowed
+        ? 'يمكنك تعديل الملف وإضافة الزيارات.'
+        : 'بعض عمليات التعديل والإضافة غير متاحة حاليًا.';
+      accessBox.className = writeAllowed
+        ? 'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
+        : 'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
+    }
+  }
+
+  async function loadAccess() {
+    const [patientAccess, visitsAccess] = await Promise.all([
+      access.getPageAccess('patient'),
+      access.getPageAccess('patientProfileVisits')
+    ]);
+
+    state.access.patient = patientAccess;
+    state.access.visits = visitsAccess;
+    applyAccessState();
   }
 
   async function loadPatient() {
@@ -68,22 +95,24 @@
 
     const { data, error } = await supabase.from('patients')
       .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
-      .eq('id', patientId).maybeSingle();
+      .eq('id', patientId)
+      .maybeSingle();
 
     if (error) {
       console.error('Load patient failed:', error);
       return showError('تعذر تحميل ملف المريض.');
     }
+
     if (!data) return showError('ملف المريض غير موجود.');
 
     state.patient = data;
     fillPatientData();
     setLink('weightLink', 'weight.html');
+
     $('loadingState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
     $('modulesSection')?.classList.remove('hidden');
 
-    await updateWriteControls();
     await loadVisits();
   }
 
@@ -109,6 +138,7 @@
       list.innerHTML = '<div class="text-center py-5 text-xs font-bold text-red-500">تعذر تحميل الزيارات.</div>';
       return;
     }
+
     if (!data?.length) {
       empty.classList.remove('hidden');
       return;
@@ -141,12 +171,22 @@
   }
 
   function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[char]));
   }
 
   function formatVisitDate(date) {
     if (!date) return 'بدون تاريخ';
-    return new Intl.DateTimeFormat('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(`${date}T00:00:00`));
+    return new Intl.DateTimeFormat('ar-EG', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(new Date(`${date}T00:00:00`));
   }
 
   async function deleteVisit(visit) {
@@ -161,18 +201,32 @@
       reverseButtons: true,
       width: '290px',
       padding: '.85rem 1rem .7rem',
-      customClass: { popup: 'visit-delete-popup', title: 'visit-delete-title', htmlContainer: 'visit-delete-text', confirmButton: 'visit-delete-confirm', cancelButton: 'visit-delete-cancel' },
+      customClass: {
+        popup: 'visit-delete-popup',
+        title: 'visit-delete-title',
+        htmlContainer: 'visit-delete-text',
+        confirmButton: 'visit-delete-confirm',
+        cancelButton: 'visit-delete-cancel'
+      },
       buttonsStyling: true
     });
 
     if (!result.isConfirmed) return;
 
-    const { error } = await supabase.from('patient_visits').delete()
-      .eq('id', visit.id).eq('patient_id', patientId);
+    const { error } = await supabase.from('patient_visits')
+      .delete()
+      .eq('id', visit.id)
+      .eq('patient_id', patientId);
 
     if (error) {
       console.error('Delete visit failed:', error);
-      await Swal.fire({ title: 'تعذر الحذف', text: 'حدث خطأ أثناء حذف الزيارة.', icon: 'error', confirmButtonText: 'حسنًا', confirmButtonColor: '#178f84' });
+      await Swal.fire({
+        title: 'تعذر الحذف',
+        text: 'حدث خطأ أثناء حذف الزيارة.',
+        icon: 'error',
+        confirmButtonText: 'حسنًا',
+        confirmButtonColor: '#178f84'
+      });
       return;
     }
 
@@ -180,21 +234,23 @@
   }
 
   async function addVisit() {
-    if (!(await access.can('patientProfileVisits', 'add'))) {
-      alert('إضافة الزيارة تتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
+    const user = await auth?.getCurrentUser?.();
+    if (!user) {
+      alert('تعذر تحديد المستخدم الحالي.');
       return;
     }
 
-    const user = await auth?.getCurrentUser?.();
-    if (!user) return alert('تعذر تحديد المستخدم الحالي.');
-
     const { data: lastVisit, error: lastError } = await supabase.from('patient_visits')
-      .select('visit_number').eq('patient_id', patientId)
-      .order('visit_number', { ascending: false }).limit(1).maybeSingle();
+      .select('visit_number')
+      .eq('patient_id', patientId)
+      .order('visit_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (lastError) {
       console.error('Get last visit failed:', lastError);
-      return alert('تعذر معرفة رقم الزيارة التالية.');
+      alert('تعذر معرفة رقم الزيارة التالية.');
+      return;
     }
 
     const nextNumber = (lastVisit?.visit_number || 0) + 1;
@@ -207,7 +263,8 @@
 
     if (error) {
       console.error('Create visit failed:', error);
-      return alert('تعذر إنشاء الزيارة.');
+      alert('تعذر إنشاء الزيارة.');
+      return;
     }
 
     window.location.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
@@ -228,19 +285,29 @@
     $('notesInput').value = patient.clinical_notes || '';
   }
 
-  const patientFieldIds = ['nameInput', 'genderInput', 'birthDateInput', 'ageInput', 'heightInput', 'diagnosisInput', 'complaintsInput', 'notesInput'];
+  const patientFieldIds = [
+    'nameInput',
+    'genderInput',
+    'birthDateInput',
+    'ageInput',
+    'heightInput',
+    'diagnosisInput',
+    'complaintsInput',
+    'notesInput'
+  ];
 
   function setEditing(enabled) {
-    patientFieldIds.forEach((id) => { const field = $(id); if (field) field.disabled = !enabled; });
+    patientFieldIds.forEach((id) => {
+      const field = $(id);
+      if (field) field.disabled = !enabled;
+    });
+
     $('saveArea')?.classList.toggle('hidden', !enabled);
     $('editButton')?.classList.toggle('hidden', enabled);
   }
 
-  async function enableEditing() {
-    if (!(await access.can('patient', 'update'))) {
-      alert('تعديل بيانات المريض يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
-      return;
-    }
+  function enableEditing() {
+    if (state.access.patient?.update !== true) return;
     setEditing(true);
   }
 
@@ -250,12 +317,6 @@
   }
 
   async function savePatient() {
-    if (!(await access.can('patient', 'update'))) {
-      alert('تعديل بيانات المريض يتطلب اشتراكًا فعالًا وساريًا وضمن الكوتة.');
-      setEditing(false);
-      return;
-    }
-
     const payload = {
       name: $('nameInput').value.trim() || 'مريض',
       gender: $('genderInput').value || null,
@@ -267,8 +328,11 @@
       clinical_notes: $('notesInput').value.trim() || null
     };
 
-    const { data, error } = await supabase.from('patients').update(payload).eq('id', patientId)
-      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at').single();
+    const { data, error } = await supabase.from('patients')
+      .update(payload)
+      .eq('id', patientId)
+      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
+      .single();
 
     if (error) {
       console.error('Save patient failed:', error);
@@ -287,9 +351,27 @@
     $('addVisitButton')?.addEventListener('click', addVisit);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  async function init() {
     bindEvents();
     setEditing(false);
-    loadPatient();
-  });
+
+    if (!patientId) {
+      showError('لم يتم تحديد المريض.');
+      return;
+    }
+
+    try {
+      await loadAccess();
+    } catch (error) {
+      console.error('Load page access failed:', error);
+    }
+
+    await loadPatient();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
 })();
