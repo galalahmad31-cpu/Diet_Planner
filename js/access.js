@@ -115,17 +115,19 @@
       add: "active_subscription_and_quota",
       update: "active_subscription_and_quota"
     },
+
     patientProfileVisits: {
       read: "always",
       delete: "always",
-      add: "active_subscription_and_quota",
-      update: "active_subscription_and_quota"
+      add: "active_subscription",
+      update: "active_subscription"
     },
+
     visitContent: {
       read: "always",
       delete: "always",
-      add: "active_subscription_and_quota",
-      update: "active_subscription_and_quota"
+      add: "active_subscription",
+      update: "active_subscription"
     }
   };
 
