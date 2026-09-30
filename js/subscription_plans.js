@@ -1,8 +1,8 @@
 (function () {
   'use strict';
 
-  const access = window.DietPlannerAccess;
-  const supabase = access?.supabaseClient;
+  const supabase = window.DietPlannerSupabase?.client;
+  const auth = window.DietPlannerAuth;
 
   const $ = (id) => document.getElementById(id);
 
@@ -74,7 +74,6 @@
   }
 
   function getPendingSubscription() {
-    if (!state.user) return null;
     return state.subscriptions.find((subscription) => subscription.status === 'pending') || null;
   }
 
@@ -288,19 +287,16 @@
         if (uploadError) throw uploadError;
       }
 
-      const { data: createdSubscription, error: insertError } = await supabase.rpc(
-        'create_subscription',
-        {
-          p_plan_id: plan.id,
-          p_full_name:
-            state.user.user_metadata?.full_name ||
-            state.user.user_metadata?.name ||
-            state.user.email ||
-            null,
-          p_notes: isTrial ? null : (note || null),
-          p_payment_proof_path: filePath
-        }
-      );
+      const { error: insertError } = await supabase.rpc('create_subscription', {
+        p_plan_id: plan.id,
+        p_full_name:
+          state.user.user_metadata?.full_name ||
+          state.user.user_metadata?.name ||
+          state.user.email ||
+          null,
+        p_notes: isTrial ? null : (note || null),
+        p_payment_proof_path: filePath
+      });
 
       if (insertError) throw insertError;
 
@@ -453,14 +449,13 @@
     const container = $('plans');
 
     try {
-      if (!access || !supabase || typeof access.getAccessStatus !== 'function') {
-        throw new Error('نظام المصادقة المركزي غير متاح. تأكد من تحميل auth-access.js قبل subscription_plans.js.');
+      if (!supabase || !auth?.getCurrentUser) {
+        throw new Error('خدمات التطبيق الأساسية غير متاحة. تأكد من تحميل supabase.js وauth.js قبل subscription_plans.js.');
       }
 
       bindEvents();
 
-      const accessStatus = await access.getAccessStatus();
-      state.user = accessStatus?.user || null;
+      state.user = await auth.getCurrentUser();
       if (!state.user) {
         window.location.replace('index.html');
         return;
