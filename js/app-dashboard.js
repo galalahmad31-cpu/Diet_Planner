@@ -87,7 +87,7 @@
     elements.logout.disabled = true;
 
     try {
-      await auth?.logoutUser();
+      await auth?.logout();
     } catch (error) {
       console.error("Logout failed:", error);
       window.location.replace("index.html");
