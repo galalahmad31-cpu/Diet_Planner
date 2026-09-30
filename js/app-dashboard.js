@@ -3,97 +3,82 @@
    Dashboard UI only
 
    Depends on:
-   js/auth.js
-   js/access.js
+   - js/supabase.js
+   - js/auth.js
+   - js/access.js
    ========================================================= */
 
 (() => {
   "use strict";
 
+  const supabase = window.DietPlannerSupabase?.client;
+  const auth = window.DietPlannerAuth;
+  const access = window.DietPlannerAccess;
+
   const elements = {
-    loading:
-      document.getElementById("loadingScreen"),
-
-    accountName:
-      document.getElementById("doctorName"),
-
-    logout:
-      document.getElementById("logoutBtn")
+    loading: document.getElementById("loadingScreen"),
+    accountName: document.getElementById("doctorName"),
+    logout: document.getElementById("logoutBtn"),
+    adminCard: document.getElementById("adminCard")
   };
 
-  // ---------------------------------------------------------
-  // UI
-  // ---------------------------------------------------------
   function hideLoading() {
     if (elements.loading) {
       elements.loading.style.display = "none";
     }
 
-    document.documentElement.style.visibility =
-      "visible";
+    document.documentElement.style.visibility = "visible";
   }
 
   async function renderAccountName(user) {
-    if (!elements.accountName || !user?.id) {
+    if (!elements.accountName || !user?.id || !supabase) {
       return;
     }
 
     try {
-      const supabase =
-        window.DietPlannerAccess?.supabaseClient;
-
-      if (!supabase) {
-        console.error(
-          "Supabase client is unavailable."
-        );
-
-        elements.accountName.textContent =
-          "حساب المستخدم";
-
-        return;
-      }
-
-      const {
-        data: profile,
-        error
-      } = await supabase
+      const { data: profile, error } = await supabase
         .from("profiles")
         .select("full_name")
         .eq("id", user.id)
         .maybeSingle();
 
       if (error) {
-        console.error(
-          "Profile name lookup failed:",
-          error
-        );
-
-        elements.accountName.textContent =
-          "حساب المستخدم";
-
-        return;
+        console.error("Profile name lookup failed:", error);
       }
 
       elements.accountName.textContent =
         profile?.full_name?.trim() ||
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
-        user?.email ||
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email ||
         "حساب المستخدم";
     } catch (error) {
-      console.error(
-        "Profile name lookup failed:",
-        error
-      );
+      console.error("Profile name lookup failed:", error);
 
       elements.accountName.textContent =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email ||
         "حساب المستخدم";
     }
   }
 
-  // ---------------------------------------------------------
-  // Logout
-  // ---------------------------------------------------------
+  async function renderAdminCard() {
+    if (!elements.adminCard || !access?.getPageAccess) {
+      return;
+    }
+
+    try {
+      const permissions = await access.getPageAccess("admin");
+      const isAdmin = permissions?.read === true;
+
+      elements.adminCard.classList.toggle("hidden", !isAdmin);
+    } catch (error) {
+      console.error("Admin UI access lookup failed:", error);
+      elements.adminCard.classList.add("hidden");
+    }
+  }
+
   async function logoutUser() {
     if (!elements.logout) {
       return;
@@ -102,87 +87,56 @@
     elements.logout.disabled = true;
 
     try {
-      await window.DietPlannerAccess?.logout();
+      await auth?.logoutUser();
     } catch (error) {
-      console.error(
-        "Logout failed:",
-        error
-      );
-
-      window.location.replace(
-        "index.html"
-      );
+      console.error("Logout failed:", error);
+      window.location.replace("index.html");
     }
   }
 
-  // ---------------------------------------------------------
-  // Initialization
-  // ---------------------------------------------------------
   async function initializeDashboard() {
     hideLoading();
 
-    const access =
-      window.DietPlannerAccess;
+    if (!auth?.getCurrentUser) {
+      console.error("auth.js must load before app-dashboard.js.");
+      return;
+    }
 
-    if (!access?.getAccessStatus) {
-      console.error(
-        "access.js must load before app-dashboard.js."
-      );
-
+    if (!supabase) {
+      console.error("supabase.js must load before app-dashboard.js.");
       return;
     }
 
     try {
-      const status =
-        await access.getAccessStatus();
+      const user = await auth.getCurrentUser();
 
-      if (
-        !status.authenticated ||
-        !status.user
-      ) {
+      if (!user) {
+        window.location.replace("index.html");
         return;
       }
 
-      await renderAccountName(
-        status.user
-      );
+      await Promise.all([
+        renderAccountName(user),
+        renderAdminCard()
+      ]);
     } catch (error) {
-      console.error(
-        "Dashboard initialization failed:",
-        error
-      );
+      console.error("Dashboard initialization failed:", error);
     }
   }
 
-  // ---------------------------------------------------------
-  // Start
-  // ---------------------------------------------------------
   function start() {
-    elements.logout?.addEventListener(
-      "click",
-      logoutUser
-    );
-
+    elements.logout?.addEventListener("click", logoutUser);
     initializeDashboard();
   }
 
-  if (
-    document.readyState === "loading"
-  ) {
-    document.addEventListener(
-      "DOMContentLoaded",
-      start,
-      { once: true }
-    );
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
   } else {
     start();
   }
 
-  window.DietPlannerDashboard = {
-    init:
-      initializeDashboard,
-
-    logout:
-      logoutUser
-  };
+  window.DietPlannerDashboard = Object.freeze({
+    init: initializeDashboard,
+    logout: logoutUser
+  });
 })();
