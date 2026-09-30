@@ -1,9 +1,14 @@
 (function () {
   'use strict';
 
-  const access = window.DietPlannerAccess;
-  const supabase = access?.supabaseClient;
+  const supabase = window.DietPlannerSupabase?.client;
+  const auth = window.DietPlannerAuth;
   const $ = (id) => document.getElementById(id);
+
+  if (!supabase || !auth) {
+    console.error('supabase.js and auth.js must load before profile.js.');
+    return;
+  }
 
   const state = {
     user: null,
@@ -27,7 +32,9 @@
     const date = new Date(`${value}T00:00:00`);
     if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleDateString('ar-EG', {
-      year: 'numeric', month: 'long', day: 'numeric'
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   }
 
@@ -46,7 +53,9 @@
   }
 
   function sortByCreatedDesc(items) {
-    return [...items].sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+    return [...items].sort((a, b) =>
+      String(b.created_at || '').localeCompare(String(a.created_at || ''))
+    );
   }
 
   function chooseSubscription(subscriptions) {
@@ -127,21 +136,18 @@
   }
 
   async function loadProfile() {
-    const user = state.user;
-    $('doctorEmail').textContent = user?.email || '—';
-
     const { data, error } = await supabase
       .from('profiles')
       .select('full_name,profession,phone')
-      .eq('id', user.id)
+      .eq('id', state.user.id)
       .maybeSingle();
 
     if (error) throw new Error(`تعذر قراءة بيانات الطبيب: ${error.message}`);
 
     state.profile = {
-      full_name: data?.full_name || user.user_metadata?.name || user.user_metadata?.full_name || '',
-      profession: data?.profession || user.user_metadata?.specialty || '',
-      phone: data?.phone || user.user_metadata?.phone || ''
+      full_name: data?.full_name || state.user.user_metadata?.name || state.user.user_metadata?.full_name || '',
+      profession: data?.profession || state.user.user_metadata?.specialty || '',
+      phone: data?.phone || state.user.user_metadata?.phone || ''
     };
 
     renderProfile();
@@ -160,7 +166,9 @@
     state.subscription = chooseSubscription(subscriptions);
 
     const plan = state.subscription?.subscription_plans;
-    state.planName = Array.isArray(plan) ? (plan[0]?.name || '') : (plan?.name || '');
+    state.planName = Array.isArray(plan)
+      ? (plan[0]?.name || '')
+      : (plan?.name || '');
 
     renderSubscription();
   }
@@ -179,43 +187,37 @@
     $('editProfileModal').classList.remove('flex');
   }
 
-  async function canWriteProfile() {
-    const accessStatus = await access?.getAccessStatus?.();
-    if (!accessStatus?.authenticated) return false;
-    if (accessStatus.isAdmin === true) return true;
-
-    return (await access?.hasActiveSubscription?.(
-      accessStatus.user.id
-    )) === true;
-  }
-
   async function saveProfile() {
-    if (!(await canWriteProfile())) {
-        showToast('تعديل الملف الشخصي متاح أثناء الاشتراك المدفوع فقط.');
-        return;
-    }
-
     const name = $('editDoctorName').value.trim();
     const specialty = $('editDoctorSpecialty').value.trim();
     const phone = $('editDoctorPhone').value.trim();
+
     if (!name) {
       showToast('من فضلك اكتب اسم الطبيب');
       return;
     }
 
     const button = $('saveProfileBtn');
-    button.disabled = true;
-    button.textContent = 'جاري الحفظ...';
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'جاري الحفظ...';
+    }
 
     try {
-      const user = state.user;
-      if (!user) throw new Error('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
+      if (!state.user) {
+        throw new Error('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
+      }
 
-      const payload = { full_name: name, profession: specialty, phone };
+      const payload = {
+        full_name: name,
+        profession: specialty,
+        phone
+      };
+
       const { data, error } = await supabase
         .from('profiles')
         .update(payload)
-        .eq('id', user.id)
+        .eq('id', state.user.id)
         .select('id,full_name,profession,phone')
         .maybeSingle();
 
@@ -225,7 +227,7 @@
       const { error: syncError } = await supabase
         .from('diet_templates')
         .update({ publisher_name: data.full_name })
-        .eq('created_by', user.id)
+        .eq('created_by', state.user.id)
         .eq('visibility', 'public');
 
       if (syncError) console.warn('تعذر مزامنة اسم الناشر:', syncError);
@@ -235,6 +237,7 @@
         profession: data.profession || '',
         phone: data.phone || ''
       };
+
       renderProfile();
       closeProfileEditor();
       showToast('تم حفظ بيانات الطبيب بنجاح');
@@ -242,13 +245,15 @@
       console.error('Profile save failed:', error);
       showToast(error.message || 'حدث خطأ أثناء حفظ البيانات');
     } finally {
-      button.disabled = false;
-      button.innerHTML = '<i class="fa-solid fa-check ml-1"></i> حفظ التعديلات';
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = '<i class="fa-solid fa-check ml-1"></i> حفظ التعديلات';
+      }
     }
   }
 
   async function logout() {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await auth.logout();
     if (error) console.error('Logout failed:', error);
     window.location.replace('index.html');
   }
@@ -265,12 +270,8 @@
 
   async function init() {
     try {
-      if (!supabase || typeof access.getAccessStatus !== 'function') {
-        throw new Error('تعذر تهيئة نظام الحساب.');
-      }
+      state.user = await auth.getCurrentUser();
 
-      const accessStatus = await access.getAccessStatus();
-      state.user = accessStatus?.user || null;
       if (!state.user) {
         setSubscriptionStatus(
           'غير متاح',
