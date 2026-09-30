@@ -1,12 +1,17 @@
 /* =========================================================
    Diet Planner — access.js
-   Central Access API
+   UI Access API
 
-   The backend RPC is the authorization authority.
-   RLS remains the final security boundary.
+   Purpose:
+   - Fetch page-level UI permissions from the backend.
+   - Keep authorization rules out of the frontend.
 
-   This file contains no role, subscription, quota,
-   feature, authentication, or page-rule logic.
+   Security:
+   - This API is for UI/UX only.
+   - Backend/RPC and RLS remain the final security boundary.
+
+   Public API:
+     DietPlannerAccess.getPageAccess(page)
    ========================================================= */
 
 (() => {
@@ -20,32 +25,43 @@
   }
 
   /**
-   * Ask the backend whether an operation is allowed.
+   * Fetch all UI permissions for a page in one backend request.
    *
-   * page  = protected resource/page identifier
-   * action = operation being requested
+   * Example result:
+   * {
+   *   read: true,
+   *   add: true,
+   *   update: false,
+   *   delete: true
+   * }
    *
-   * The frontend does not know why access is allowed or denied.
-   * The backend decides using the authenticated user and all
-   * relevant authorization rules.
+   * The frontend does not calculate or interpret authorization rules.
+   * It only uses the returned values to control the UI.
    */
-  async function can(page, action) {
-    if (!page || !action) return false;
+  async function getPageAccess(page) {
+    if (!page) {
+      console.error("getPageAccess requires a page identifier.");
+      return null;
+    }
 
-    const { data, error } = await supabaseClient.rpc("can_access", {
-      p_page: page,
-      p_action: action
+    const { data, error } = await supabaseClient.rpc("get_page_access", {
+      p_page: page
     });
 
     if (error) {
-      console.error(`Access check failed (${page}.${action}):`, error);
-      return false;
+      console.error(`Page access request failed (${page}):`, error);
+      return null;
     }
 
-    return data === true;
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      console.error(`Invalid page access response (${page}).`);
+      return null;
+    }
+
+    return data;
   }
 
-  window.DietPlannerAccess = {
-    can
-  };
+  window.DietPlannerAccess = Object.freeze({
+    getPageAccess
+  });
 })();
