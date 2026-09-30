@@ -5,7 +5,7 @@
   const auth = window.DietPlannerAuth;
   const supabase = window.DietPlannerSupabase?.client;
 
-  if (!access || !auth?.getCurrentUser || !supabase) {
+  if (!access?.getPageAccess || !auth?.getCurrentUser || !supabase) {
     console.error('supabase.js, auth.js, and access.js must load before patient.js.');
     return;
   }
@@ -13,15 +13,19 @@
   const state = {
     patients: [],
     pendingDeleteId: null,
+    pageAccess: null,
     statusTimer: null
   };
 
-  const WRITE_DENIED_MESSAGE = 'إضافة المرضى تتطلب اشتراكًا فعالًا وساريًا ووجود مساحة ضمن الكوتة.';
   const $ = (id) => document.getElementById(id);
 
   function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
     }[char]));
   }
 
@@ -30,45 +34,70 @@
     if (!box) return;
 
     clearTimeout(state.statusTimer);
+
     const styles = type === 'success'
       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
       : 'bg-red-50 border-red-200 text-red-700';
 
     box.innerHTML = `<div class="border ${styles} rounded-xl px-4 py-3 text-xs font-bold">${escapeHtml(message)}</div>`;
-    state.statusTimer = setTimeout(() => { box.innerHTML = ''; }, 3500);
+    state.statusTimer = setTimeout(() => {
+      box.innerHTML = '';
+    }, 3500);
   }
 
   function showLoadError() {
     const box = $('patientsList');
     if (!box) return;
+
     box.innerHTML = '<div class="text-center py-10 text-red-600 text-sm font-bold">تعذر تحميل ملفات المرضى.</div>';
   }
 
-  async function updateWriteControls() {
+  function applyAccessToUI() {
+    const permissions = state.pageAccess || {};
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
-    const allowed = await access.can('patient', 'add');
 
     if (addButton) {
+      const allowed = permissions.add === true;
       addButton.disabled = !allowed;
       addButton.classList.toggle('opacity-50', !allowed);
       addButton.classList.toggle('cursor-not-allowed', !allowed);
-      addButton.title = allowed ? 'إضافة مريض جديد' : WRITE_DENIED_MESSAGE;
+      addButton.title = allowed
+        ? 'إضافة مريض جديد'
+        : 'إضافة المرضى غير متاحة حاليًا.';
     }
 
     if (accessBox) {
+      const allowed = permissions.add === true;
       accessBox.textContent = allowed
-        ? 'يمكنك إضافة مرضى جدد وفق الكوتة المتاحة.'
-        : WRITE_DENIED_MESSAGE;
+        ? 'يمكنك إضافة مرضى جدد وفق الصلاحيات المتاحة.'
+        : 'إضافة المرضى غير متاحة حاليًا.';
       accessBox.className = allowed
         ? 'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2'
         : 'mt-3 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
     }
   }
 
+  async function loadPageAccess() {
+    state.pageAccess = await access.getPageAccess('patient');
+
+    if (!state.pageAccess) {
+      showStatus('تعذر التحقق من صلاحيات الصفحة.');
+      return false;
+    }
+
+    applyAccessToUI();
+    return true;
+  }
+
   async function loadPatients() {
     const box = $('patientsList');
     if (!box) return;
+
+    if (state.pageAccess?.read !== true) {
+      box.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm font-bold">لا توجد صلاحية لعرض ملفات المرضى.</div>';
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -77,6 +106,7 @@
         .order('name', { ascending: true });
 
       if (error) throw error;
+
       state.patients = data || [];
       renderPatients();
     } catch (error) {
@@ -121,15 +151,15 @@
     if (id) window.location.href = `patient-profile.html?id=${encodeURIComponent(id)}`;
   }
 
-  async function openAddPatientModal() {
-    if (!(await access.can('patient', 'add'))) {
-      showStatus(WRITE_DENIED_MESSAGE);
-      await updateWriteControls();
+  function openAddPatientModal() {
+    if (state.pageAccess?.add !== true) {
+      showStatus('إضافة المرضى غير متاحة حاليًا.');
       return;
     }
 
     const modal = $('addPatientModal');
     if (!modal) return;
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     setTimeout(() => $('newPatientName')?.focus(), 50);
@@ -138,21 +168,23 @@
   function closeAddPatientModal() {
     const modal = $('addPatientModal');
     if (!modal) return;
+
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+
     const input = $('newPatientName');
     if (input) input.value = '';
   }
 
   async function createPatient() {
-    if (!(await access.can('patient', 'add'))) {
-      showStatus(WRITE_DENIED_MESSAGE);
-      await updateWriteControls();
+    if (state.pageAccess?.add !== true) {
+      showStatus('إضافة المرضى غير متاحة حاليًا.');
       return;
     }
 
     const input = $('newPatientName');
     const name = input?.value.trim();
+
     if (!name) {
       showStatus('أدخل اسم المريض أولاً.');
       input?.focus();
@@ -166,23 +198,30 @@
         return;
       }
 
-      const { data, error } = await supabase.from('patients').insert({
-        user_id: user.id,
-        name,
-        gender: null,
-        birth_date: null,
-        age: null,
-        height: null,
-        diagnosis: null,
-        complaints: null,
-        clinical_notes: null
-      }).select('id').single();
+      const { data, error } = await supabase
+        .from('patients')
+        .insert({
+          user_id: user.id,
+          name,
+          gender: null,
+          birth_date: null,
+          age: null,
+          height: null,
+          diagnosis: null,
+          complaints: null,
+          clinical_notes: null
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
       closeAddPatientModal();
       showStatus('تم حفظ المريض.', 'success');
-      if (data?.id) window.location.href = `patient-profile.html?id=${encodeURIComponent(data.id)}`;
+
+      if (data?.id) {
+        window.location.href = `patient-profile.html?id=${encodeURIComponent(data.id)}`;
+      }
     } catch (error) {
       console.error('Create patient failed:', error);
       showStatus('تعذر حفظ المريض في قاعدة البيانات.');
@@ -194,19 +233,25 @@
     if (!patient) return;
 
     state.pendingDeleteId = id;
+
     const text = $('deleteText');
-    if (text) text.textContent = `هل أنت متأكد من حذف ملف «${patient.name || 'بدون اسم'}»؟`;
+    if (text) {
+      text.textContent = `هل أنت متأكد من حذف ملف «${patient.name || 'بدون اسم'}»؟`;
+    }
 
     const modal = $('deleteModal');
     if (!modal) return;
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
 
   function closeDeleteModal() {
     state.pendingDeleteId = null;
+
     const modal = $('deleteModal');
     if (!modal) return;
+
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
@@ -216,7 +261,11 @@
     if (!id) return;
 
     try {
-      const { error } = await supabase.from('patients').delete().eq('id', id);
+      const { error } = await supabase
+        .from('patients')
+        .delete()
+        .eq('id', id);
+
       if (error) throw error;
 
       state.patients = state.patients.filter((patient) => patient.id !== id);
@@ -235,6 +284,7 @@
     if (!target) return;
 
     const action = target.dataset.action;
+
     if (action === 'open-add-patient') openAddPatientModal();
     if (action === 'close-add-patient') closeAddPatientModal();
     if (action === 'create-patient') createPatient();
@@ -265,8 +315,10 @@
 
   async function init() {
     bindEvents();
-    await access.requireAuthentication();
-    await updateWriteControls();
+
+    const accessLoaded = await loadPageAccess();
+    if (!accessLoaded) return;
+
     await loadPatients();
   }
 
