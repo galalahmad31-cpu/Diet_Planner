@@ -9,9 +9,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/auth-access.js?v=20260923-1"></script>
 <link rel="stylesheet" href="css/subscription_plans.css">
-<script src="js/subscription_plans.js" defer></script>
-  <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <script src="js/theme.js?v=20260921-3"></script>
+<script src="js/subscription_plans.js?v=20261001-2" defer></script>
+<link rel="stylesheet" href="css/theme.css?v=20260921-3">
+<script src="js/theme.js?v=20260921-3"></script>
 </head>
 <body>
 <header class="header">
@@ -26,37 +26,30 @@
 <div id="subscriptionStatus" class="subscription-status" aria-live="polite"></div>
 <div id="plans" class="plans"><div class="loading"><i class="fa-solid fa-spinner fa-spin"></i><div class="loading-text">جاري تحميل الخطط...</div></div></div>
 </main>
-
 <div id="subscribeModal" class="modal-backdrop">
 <div class="modal">
 <h2>الاشتراك في الخطة</h2>
-
 <div id="selectedPlanInfo" class="selected-plan-info"></div>
-
 <div class="form-group">
 <label>صورة التحويل</label>
 <input id="paymentProof" type="file" accept="image/jpeg,image/png,image/webp">
 <div class="field-help">يفضل أن تكون الصورة واضحة. الحد الأقصى 5 ميجابايت.</div>
 </div>
-
 <div class="form-group">
 <label>ملاحظات (اختياري)</label>
 <textarea id="paymentNote" placeholder="أي ملاحظات خاصة بالتحويل"></textarea>
 </div>
-
 <div id="pendingActions" class="pending-actions">
 <button id="replaceProofBtn" class="btn btn-outline" data-action="replace-proof"><i class="fa-solid fa-image"></i> تعديل إثبات الدفع</button>
 <button id="cancelSubscriptionBtn" class="btn btn-danger" data-action="cancel-pending"><i class="fa-solid fa-ban"></i> إلغاء الطلب</button>
 </div>
-
 <div class="modal-actions">
 <button class="btn btn-outline" data-action="close-modal">إغلاق</button>
 <button id="submitSubscriptionBtn" class="btn btn-primary" data-action="submit-subscription">إرسال طلب الاشتراك</button>
 </div>
 </div>
 </div>
-
 <div id="toast" class="toast"></div>
 <div id="confirmOverlay" class="confirm-backdrop"><div class="confirm-modal" role="dialog" aria-modal="true"><div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><h3 id="confirmTitle">تأكيد العملية</h3><p id="confirmMessage" class="confirm-message"></p><div class="confirm-actions"><button class="btn btn-outline" data-action="confirm-no">إلغاء</button><button class="btn btn-confirm-danger" data-action="confirm-yes">تأكيد</button></div></div></div>
-
-
+</body>
+</html>
