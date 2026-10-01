@@ -1,348 +1,296 @@
-(function () {
+(() => {
   'use strict';
 
-  // This page uses the central Supabase client only.
-  // It does NOT use can_access() or get_page_access().
-  const access = window.DietPlannerAccess;
-  const supabase = access?.supabaseClient;
+  const sb = window.DietPlannerAccess?.supabaseClient;
   const $ = (id) => document.getElementById(id);
+  const state = { user: null, plans: [], subscriptions: [], selectedPlanId: null, currentSubscription: null, confirm: null, toastTimer: null };
 
-  const state = {
-    user: null,
-    plans: [],
-    subscriptions: [],
-    selectedPlanId: null,
-    currentSubscription: null,
-    confirmResolver: null,
-    toastTimer: null
-  };
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[c]));
 
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    }[char]));
-  }
-
-  function showToast(message) {
-    const toast = $('toast');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.classList.add('show');
+  function toast(message) {
+    const el = $('toast');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add('show');
     clearTimeout(state.toastTimer);
-    state.toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    state.toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
   }
 
-  function showDetailedError(title, error) {
-    console.error(title, error);
-    const message = getSubscriptionErrorMessage(error, title.includes('التجربة'));
-    showToast(message);
+  function errorMessage(error, trial = false) {
+    const m = String(error?.message || error || '').toLowerCase();
+    if (m.includes('authentication required')) return 'انتهت جلسة الدخول. سجل الدخول مرة أخرى.';
+    if (m.includes('permission denied') || error?.code === '42501') return 'لا توجد صلاحية لتنفيذ العملية حاليًا.';
+    if (m.includes('plan is not available') || m.includes('subscription plan is not available')) return 'خطة الاشتراك غير متاحة حاليًا.';
+    if (m.includes('invalid plan duration') || m.includes('invalid subscription duration')) return 'مدة خطة الاشتراك غير صحيحة.';
+    if (m.includes('free trial has already been used')) return 'لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.';
+    if (m.includes('already have an active subscription')) return 'لديك اشتراك فعال بالفعل.';
+    if (m.includes('could not choose the best candidate function')) return 'حدث تعارض في دالة الاشتراك. تم تسجيل الخطأ.';
+    return trial ? 'تعذر بدء التجربة المجانية حاليًا. تم تسجيل المحاولة.' : 'تعذر إنشاء طلب الاشتراك حاليًا.';
   }
 
-  function goDashboard() { window.location.href = 'app.html'; }
-  function goProfile() { window.location.href = 'profile.html'; }
-
-  function showConfirmPopup(message, title = 'تأكيد العملية') {
-    return new Promise((resolve) => {
-      state.confirmResolver = resolve;
-      $('confirmTitle').textContent = title;
-      $('confirmMessage').textContent = message;
-      $('confirmOverlay').style.display = 'flex';
-    });
+  function showError(context, error, trial = false) {
+    console.error(context, error);
+    toast(errorMessage(error, trial));
   }
 
-  function resolveConfirm(value) {
-    $('confirmOverlay').style.display = 'none';
-    if (!state.confirmResolver) return;
-    const resolver = state.confirmResolver;
-    state.confirmResolver = null;
-    resolver(value);
+  async function loadUser() {
+    if (!sb) throw new Error('Supabase client is unavailable');
+    const { data, error } = await sb.auth.getUser();
+    if (error) throw error;
+    if (!data?.user) {
+      window.location.replace('index.html');
+      return false;
+    }
+    state.user = data.user;
+    return true;
   }
 
-  function getActiveSubscription() {
-    if (!state.user) return null;
+  async function loadData() {
+    const { data: plans, error: planError } = await sb
+      .from('subscription_plans').select('*').eq('is_active', true).order('price', { ascending: true });
+    if (planError) throw planError;
+
+    const { data: subscriptions, error: subError } = await sb
+      .from('subscriptions')
+      .select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path')
+      .eq('user_id', state.user.id)
+      .order('created_at', { ascending: false });
+    if (subError) throw subError;
+
+    state.plans = plans || [];
+    state.subscriptions = subscriptions || [];
+    render();
+  }
+
+  function activeSubscription() {
     const today = new Date().toISOString().slice(0, 10);
-    return state.subscriptions.find((subscription) =>
-      subscription.status === 'paid' &&
-      subscription.start_date &&
-      subscription.expiry_date &&
-      subscription.start_date <= today &&
-      subscription.expiry_date >= today
-    ) || null;
+    return state.subscriptions.find(s => s.status === 'paid' && s.start_date && s.expiry_date && s.start_date <= today && s.expiry_date >= today) || null;
   }
 
-  function getPendingSubscription() {
-    if (!state.user) return null;
-    return state.subscriptions.find((subscription) => subscription.status === 'pending') || null;
+  function pendingSubscription() {
+    return state.subscriptions.find(s => s.status === 'pending') || null;
   }
 
-  function hasUsedFreeTrial() {
-    return state.subscriptions.some((subscription) => {
-      const plan = state.plans.find((item) => item.id === subscription.plan_id);
-      return plan?.is_free_trial === true;
-    });
+  function trialUsed() {
+    return state.subscriptions.some(s => state.plans.some(p => p.id === s.plan_id && p.is_free_trial === true));
   }
 
-  function setTrialModalMode(isTrial) {
-    const proofGroup = $('paymentProof')?.closest('.form-group');
-    const noteGroup = $('paymentNote')?.closest('.form-group');
-    const submitButton = $('submitSubscriptionBtn');
-    if (proofGroup) proofGroup.style.display = isTrial ? 'none' : '';
-    if (noteGroup) noteGroup.style.display = isTrial ? 'none' : '';
-    if (submitButton) submitButton.textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
+  function render() {
+    const c = $('plans');
+    if (!c) return;
+    const active = activeSubscription();
+    const pending = pendingSubscription();
+    if (!state.plans.length) {
+      c.innerHTML = '<div class="empty">لا توجد خطط اشتراك متاحة حاليًا.</div>';
+      return;
+    }
+    c.innerHTML = state.plans.map(plan => {
+      const isActive = active?.plan_id === plan.id;
+      const isPending = pending?.plan_id === plan.id;
+      const used = plan.is_free_trial === true && trialUsed();
+      let button;
+      if (isActive) button = '<button class="btn btn-outline" disabled>الخطة مفعّلة</button>';
+      else if (isPending) button = `<button class="btn btn-outline" data-action="open-pending" data-id="${esc(pending.id)}">الطلب قيد المراجعة</button>`;
+      else if (used) button = '<button class="btn btn-outline" disabled>تم استخدام التجربة</button>';
+      else button = `<button class="btn btn-primary" data-action="subscribe" data-id="${esc(plan.id)}">${plan.is_free_trial ? 'ابدأ التجربة' : 'اشتراك'}</button>`;
+      return `<div class="card"><div class="card-top"><h3>${esc(plan.name)}</h3><span class="badge">اشتراك</span></div><div class="price">${Number(plan.price).toLocaleString('ar-EG')} <span style="font-size:13px;font-weight:700">جنيه</span></div><div class="duration"><i class="fa-regular fa-calendar"></i> ${Number(plan.duration_days)} يوم</div><div class="method"><strong>طريقة التحويل</strong>${esc(plan.payment_method)}</div>${plan.description ? `<div class="description">${esc(plan.description)}</div>` : ''}<div class="card-actions">${button}</div></div>`;
+    }).join('');
   }
 
-  function resetSubscriptionModal() {
-    $('submitSubscriptionBtn').style.display = 'inline-block';
-    $('pendingActions').style.display = 'none';
-    $('paymentProof').value = '';
-    $('paymentNote').value = '';
-    setTrialModalMode(false);
+  function setTrialMode(isTrial) {
+    const proof = $('paymentProof')?.closest('.form-group');
+    const note = $('paymentNote')?.closest('.form-group');
+    if (proof) proof.style.display = isTrial ? 'none' : '';
+    if (note) note.style.display = isTrial ? 'none' : '';
+    if ($('submitSubscriptionBtn')) $('submitSubscriptionBtn').textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
   }
 
-  function closeSubscribeModal() {
-    $('subscribeModal').style.display = 'none';
+  function resetModal() {
+    if ($('submitSubscriptionBtn')) { $('submitSubscriptionBtn').style.display = 'inline-block'; $('submitSubscriptionBtn').disabled = false; }
+    if ($('pendingActions')) $('pendingActions').style.display = 'none';
+    if ($('paymentProof')) $('paymentProof').value = '';
+    if ($('paymentNote')) $('paymentNote').value = '';
+    setTrialMode(false);
+  }
+
+  function closeModal() {
+    if ($('subscribeModal')) $('subscribeModal').style.display = 'none';
     state.selectedPlanId = null;
     state.currentSubscription = null;
-    resetSubscriptionModal();
+    resetModal();
   }
 
-  function openPendingSubscription(subscriptionId) {
-    const subscription = state.subscriptions.find((item) => item.id === subscriptionId);
-    if (!subscription) return;
-    const plan = state.plans.find((item) => item.id === subscription.plan_id);
-    state.currentSubscription = subscription;
-    state.selectedPlanId = subscription.plan_id;
-    $('selectedPlanInfo').innerHTML = `<strong>${escapeHtml(plan?.name || 'الخطة')}</strong><br>الحالة: <strong>قيد المراجعة</strong><br>${plan ? `المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>` : ''}${subscription.notes ? `الملاحظات: ${escapeHtml(subscription.notes)}` : ''}`;
+  function openSubscribe(planId) {
+    const plan = state.plans.find(p => p.id === planId);
+    if (!state.user) return toast('من فضلك سجل الدخول أولًا.');
+    if (!plan) return;
+    if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) return toast('مدة خطة الاشتراك غير صحيحة.');
+    if (plan.is_free_trial === true && trialUsed()) return toast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.');
+
+    resetModal();
+    state.selectedPlanId = plan.id;
+    $('selectedPlanInfo').innerHTML = `<strong>${esc(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${esc(plan.payment_method)}`;
+    setTrialMode(plan.is_free_trial === true);
+    $('subscribeModal').style.display = 'flex';
+  }
+
+  function openPending(id) {
+    const sub = state.subscriptions.find(s => s.id === id);
+    if (!sub) return;
+    const plan = state.plans.find(p => p.id === sub.plan_id);
+    state.currentSubscription = sub;
+    state.selectedPlanId = sub.plan_id;
+    $('selectedPlanInfo').innerHTML = `<strong>${esc(plan?.name || 'الخطة')}</strong><br>الحالة: <strong>قيد المراجعة</strong><br>${plan ? `المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>` : ''}${sub.notes ? `الملاحظات: ${esc(sub.notes)}` : ''}`;
     $('paymentProof').value = '';
-    $('paymentNote').value = subscription.notes || '';
+    $('paymentNote').value = sub.notes || '';
     $('submitSubscriptionBtn').style.display = 'none';
     $('pendingActions').style.display = 'flex';
     $('subscribeModal').style.display = 'flex';
   }
 
-  async function loadPlans() {
-    const container = $('plans');
-    if (!supabase) throw new Error('Supabase client is unavailable.');
-    const { data: plans, error: plansError } = await supabase.from('subscription_plans').select('*').eq('is_active', true).order('price', { ascending: true });
-    if (plansError) {
-      console.error('subscription_plans load error:', plansError);
-      container.innerHTML = '<div class="empty"><i class="fa-solid fa-circle-exclamation"></i><div style="margin-top:8px">تعذر تحميل خطط الاشتراك</div></div>';
-      return;
-    }
-    state.plans = plans || [];
-    state.subscriptions = [];
-    if (state.user) {
-      const { data: subscriptions, error: subscriptionsError } = await supabase.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path').eq('user_id', state.user.id).order('created_at', { ascending: false });
-      if (subscriptionsError) console.error('subscriptions load error:', subscriptionsError);
-      else state.subscriptions = subscriptions || [];
-    }
-    renderPlans();
-  }
-
-  function renderPlans() {
-    const container = $('plans');
-    const activeSubscription = getActiveSubscription();
-    const pendingSubscription = getPendingSubscription();
-    if (!state.plans.length) {
-      container.innerHTML = '<div class="empty">لا توجد خطط اشتراك متاحة حاليًا.</div>';
-      return;
-    }
-    container.innerHTML = state.plans.map((plan) => {
-      const isActive = activeSubscription?.plan_id === plan.id;
-      const hasPending = pendingSubscription?.plan_id === plan.id;
-      const trialUsed = plan.is_free_trial === true && hasUsedFreeTrial();
-      let action;
-      if (isActive) action = '<button class="btn btn-outline" disabled style="cursor:default;opacity:.9"><i class="fa-solid fa-circle-check"></i> الخطة مفعّلة</button>';
-      else if (hasPending) action = `<button class="btn btn-outline" data-action="open-pending" data-id="${escapeHtml(pendingSubscription.id)}"><i class="fa-solid fa-clock"></i> الطلب قيد المراجعة</button>`;
-      else if (trialUsed) action = '<button class="btn btn-outline" disabled style="cursor:default;opacity:.75"><i class="fa-solid fa-circle-check"></i> تم استخدام التجربة</button>';
-      else action = `<button class="btn btn-primary" data-action="subscribe" data-id="${escapeHtml(plan.id)}">${plan.is_free_trial ? 'ابدأ التجربة' : 'اشتراك'}</button>`;
-      return `<div class="card"><div class="card-top"><h3>${escapeHtml(plan.name)}</h3><span class="badge">اشتراك</span></div><div class="price">${Number(plan.price).toLocaleString('ar-EG')} <span style="font-size:13px;font-weight:700">جنيه</span></div><div class="duration"><i class="fa-regular fa-calendar"></i> ${Number(plan.duration_days)} يوم</div><div class="method"><strong>طريقة التحويل</strong>${escapeHtml(plan.payment_method)}</div>${plan.description ? `<div class="description">${escapeHtml(plan.description)}</div>` : ''}<div class="card-actions">${action}</div></div>`;
-    }).join('');
-  }
-
-  function openSubscribeModal(planId) {
-    resetSubscriptionModal();
-    if (!state.user) { showToast('من فضلك سجل الدخول أولًا لإرسال الطلب'); return; }
-    const plan = state.plans.find((item) => item.id === planId);
-    if (!plan) return;
-    if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) {
-      showToast('هذه الخطة غير صالحة حاليًا: مدة الاشتراك غير صحيحة');
-      console.error('Invalid subscription plan duration:', plan);
-      return;
-    }
-    if (plan.is_free_trial && hasUsedFreeTrial()) { showToast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل'); return; }
-    state.selectedPlanId = planId;
-    const isTrial = plan.is_free_trial === true;
-    $('selectedPlanInfo').innerHTML = `<strong>${escapeHtml(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${escapeHtml(plan.payment_method)}`;
-    $('paymentProof').value = '';
-    $('paymentNote').value = '';
-    $('submitSubscriptionBtn').disabled = false;
-    setTrialModalMode(isTrial);
-    $('subscribeModal').style.display = 'flex';
-  }
-
-  function getSubscriptionErrorMessage(error, isTrial) {
-    const code = String(error?.code || '');
-    const message = String(error?.message || '').toLowerCase();
-    if (code === '42501' || message.includes('permission denied')) return 'لا توجد صلاحية لتنفيذ عملية الاشتراك حاليًا. تم تسجيل المحاولة، حاول مرة أخرى.';
-    if (message.includes('authentication required')) return 'انتهت جلسة الدخول. سجل الدخول مرة أخرى ثم حاول.';
-    if (message.includes('plan is not available') || message.includes('subscription plan is not available')) return 'خطة الاشتراك غير متاحة حاليًا.';
-    if (message.includes('invalid plan duration') || message.includes('invalid subscription duration')) return 'مدة خطة الاشتراك غير صحيحة. تم إيقاف العملية لحماية بيانات الاشتراك.';
-    if (message.includes('free trial has already been used')) return 'لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.';
-    if (message.includes('already have an active subscription')) return 'لديك اشتراك فعال بالفعل.';
-    return isTrial ? 'تعذر بدء التجربة المجانية حاليًا. تم تسجيل سبب الخطأ في النظام.' : 'تعذر إنشاء طلب الاشتراك حاليًا. حاول مرة أخرى.';
-  }
-
-  async function startSubscriptionAudit(plan, fullName) {
-    const { data, error } = await supabase.rpc('start_subscription_audit', {
-      p_plan_id: plan.id,
-      p_full_name: fullName || null
-    });
+  async function startAudit(plan, fullName) {
+    const { data, error } = await sb.rpc('start_subscription_audit', { p_plan_id: plan.id, p_full_name: fullName || null });
     if (error) throw error;
-    const auditId = typeof data === 'string' ? data : data?.id;
-    if (!auditId) throw new Error('تعذر إنشاء سجل تدقيق الاشتراك.');
-    return auditId;
+    const id = typeof data === 'string' ? data : data?.id;
+    if (!id) throw new Error('تعذر إنشاء سجل تدقيق الاشتراك.');
+    return id;
   }
 
-  async function finishSubscriptionAudit(auditId, success, errorMessage = null) {
-    if (!auditId) return;
-    const { error } = await supabase.rpc('finish_subscription_audit', {
-      p_audit_id: auditId,
-      p_success: Boolean(success),
-      p_error_message: errorMessage || null
-    });
+  async function finishAudit(id, success, message = null) {
+    if (!id) return;
+    const { error } = await sb.rpc('finish_subscription_audit', { p_audit_id: id, p_success: !!success, p_error_message: message || null });
     if (error) console.error('finish_subscription_audit failed:', error);
   }
 
   async function submitSubscription() {
-    if (!state.user || !state.selectedPlanId) return;
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !sessionData?.session?.user) { showToast('انتهت جلسة الدخول. سجل الدخول مرة أخرى.'); return; }
-    state.user = sessionData.session.user;
-    const plan = state.plans.find((item) => item.id === state.selectedPlanId);
-    if (!plan) return;
-    const durationDays = Number(plan.duration_days);
-    if (!Number.isInteger(durationDays) || durationDays <= 0) { showToast('تعذر بدء الاشتراك: مدة الخطة غير صحيحة.'); console.error('Invalid plan duration before RPC:', plan); return; }
-    const isTrial = plan.is_free_trial === true;
+    const plan = state.plans.find(p => p.id === state.selectedPlanId);
+    if (!state.user || !plan) return;
+
+    const trial = plan.is_free_trial === true;
+    const button = $('submitSubscriptionBtn');
     const file = $('paymentProof').files[0];
     const note = $('paymentNote').value.trim();
-    const button = $('submitSubscriptionBtn');
-    if (isTrial) {
-      if (hasUsedFreeTrial()) { showToast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل'); return; }
-    } else {
-      if (!file) { showToast('من فضلك أرفق صورة التحويل'); return; }
-      if (!file.type.startsWith('image/')) { showToast('يرجى اختيار صورة صحيحة'); return; }
-      if (file.size > 5 * 1024 * 1024) { showToast('حجم الصورة يجب ألا يتجاوز 5 ميجابايت'); return; }
-    }
-    button.disabled = true;
-    button.textContent = isTrial ? 'جاري بدء التجربة...' : 'جاري إرسال الطلب...';
-    let filePath = null;
-    let auditId = null;
     const fullName = state.user.user_metadata?.full_name || state.user.user_metadata?.name || state.user.email || null;
+
+    if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) return toast('مدة خطة الاشتراك غير صحيحة.');
+    if (trial && trialUsed()) return toast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.');
+    if (!trial) {
+      if (!file) return toast('من فضلك أرفق صورة التحويل.');
+      if (!file.type.startsWith('image/')) return toast('يرجى اختيار صورة صحيحة.');
+      if (file.size > 5 * 1024 * 1024) return toast('حجم الصورة يجب ألا يتجاوز 5 ميجابايت.');
+    }
+
+    button.disabled = true;
+    button.textContent = trial ? 'جاري بدء التجربة...' : 'جاري إرسال الطلب...';
+
+    let auditId = null;
+    let filePath = null;
     try {
-      auditId = await startSubscriptionAudit(plan, fullName);
-      if (!isTrial) {
-        const extension = (file.name.split('.').pop() || 'jpg').toLowerCase();
-        filePath = `${state.user.id}/transfer-${Date.now()}.${extension}`;
-        const { error: uploadError } = await supabase.storage.from('subscription-proofs').upload(filePath, file, { cacheControl: '3600', upsert: false });
-        if (uploadError) throw uploadError;
+      auditId = await startAudit(plan, fullName);
+
+      if (!trial) {
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        filePath = `${state.user.id}/transfer-${Date.now()}.${ext}`;
+        const { error } = await sb.storage.from('subscription-proofs').upload(filePath, file, { cacheControl: '3600', upsert: false });
+        if (error) throw error;
       }
-      const { data: rpcData, error: insertError } = await supabase.rpc('create_subscription', {
+
+      const { data, error } = await sb.rpc('create_subscription', {
         p_plan_id: plan.id,
         p_full_name: fullName,
-        p_notes: isTrial ? null : (note || null),
-        p_payment_proof_path: filePath
+        p_notes: trial ? null : (note || null),
+        p_payment_proof_path: filePath,
+        p_audit_id: auditId
       });
-      if (insertError) throw insertError;
-      if (!rpcData || rpcData.success !== true) {
-        const backendMessage = rpcData?.error || 'تعذر إتمام عملية الاشتراك.';
-        throw new Error(backendMessage);
-      }
-      await finishSubscriptionAudit(auditId, true);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'تعذر إتمام عملية الاشتراك.');
+
+      await finishAudit(auditId, true);
       auditId = null;
-      if (filePath) filePath = null;
-      closeSubscribeModal();
-      button.disabled = false;
-      button.textContent = 'إرسال طلب الاشتراك';
-      showToast(isTrial ? 'تم بدء التجربة المجانية بنجاح' : 'تم إرسال طلب الاشتراك بنجاح، وسيتم مراجعته وتفعيله يدويًا');
-      await loadPlans();
+      filePath = null;
+      closeModal();
+      toast(trial ? 'تم بدء التجربة المجانية بنجاح.' : 'تم إرسال طلب الاشتراك بنجاح، وسيتم مراجعته وتفعيله يدويًا.');
+      await loadData();
     } catch (error) {
-      console.error('create_subscription failed:', error);
-      if (auditId) await finishSubscriptionAudit(auditId, false, error?.message || String(error));
-      if (filePath) await supabase.storage.from('subscription-proofs').remove([filePath]).catch(() => {});
+      console.error('subscription failed:', error);
+      if (auditId) await finishAudit(auditId, false, error?.message || String(error));
+      if (filePath) await sb.storage.from('subscription-proofs').remove([filePath]).catch(() => {});
+      showError('subscription failed', error, trial);
+    } finally {
       button.disabled = false;
-      button.textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
-      showDetailedError(isTrial ? 'تعذر بدء التجربة المجانية' : 'خطأ إنشاء طلب الاشتراك', error);
+      button.textContent = trial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
     }
   }
 
   async function replacePendingProof() {
-    const subscription = state.currentSubscription;
-    if (!subscription || subscription.status !== 'pending') { showToast('لا يمكن تعديل إثبات الدفع الآن'); return; }
+    const sub = state.currentSubscription;
     const file = $('paymentProof').files[0];
-    if (!file) { showToast('اختر صورة الإثبات الجديدة أولًا'); return; }
-    if (!file.type.startsWith('image/')) { showToast('يرجى اختيار صورة صحيحة'); return; }
-    if (file.size > 5 * 1024 * 1024) { showToast('حجم الصورة يجب ألا يتجاوز 5 ميجابايت'); return; }
-    const oldPath = subscription.payment_proof_path;
-    const extension = (file.name.split('.').pop() || 'jpg').toLowerCase();
-    const newPath = `${state.user.id}/transfer-${Date.now()}.${extension}`;
+    if (!sub || sub.status !== 'pending') return toast('لا يمكن تعديل إثبات الدفع الآن.');
+    if (!file) return toast('اختر صورة الإثبات الجديدة أولًا.');
+    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) return toast('صورة غير صالحة أو أكبر من 5 ميجابايت.');
+
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const newPath = `${state.user.id}/transfer-${Date.now()}.${ext}`;
     try {
-      const { error: uploadError } = await supabase.storage.from('subscription-proofs').upload(newPath, file, { cacheControl: '3600', upsert: false });
-      if (uploadError) throw uploadError;
-      const { error: updateError } = await supabase.from('subscriptions').update({ payment_proof_path: newPath }).eq('id', subscription.id).eq('user_id', state.user.id).eq('status', 'pending');
-      if (updateError) { await supabase.storage.from('subscription-proofs').remove([newPath]).catch(() => {}); throw updateError; }
-      if (oldPath) await supabase.storage.from('subscription-proofs').remove([oldPath]).catch(() => {});
-      showToast('تم تعديل إثبات الدفع بنجاح');
-      closeSubscribeModal();
-      await loadPlans();
+      const upload = await sb.storage.from('subscription-proofs').upload(newPath, file, { cacheControl: '3600', upsert: false });
+      if (upload.error) throw upload.error;
+      const update = await sb.from('subscriptions').update({ payment_proof_path: newPath }).eq('id', sub.id).eq('user_id', state.user.id).eq('status', 'pending');
+      if (update.error) throw update.error;
+      if (sub.payment_proof_path) await sb.storage.from('subscription-proofs').remove([sub.payment_proof_path]).catch(() => {});
+      closeModal();
+      toast('تم تعديل إثبات الدفع بنجاح.');
+      await loadData();
     } catch (error) {
-      console.error('replacePendingProof failed:', error);
-      showDetailedError('تعذر تعديل إثبات الدفع', error);
+      await sb.storage.from('subscription-proofs').remove([newPath]).catch(() => {});
+      showError('replace proof failed', error);
     }
   }
 
-  async function cancelPendingSubscription() {
-    const subscription = state.currentSubscription;
-    if (!subscription || subscription.status !== 'pending') { showToast('لا يمكن إلغاء هذا الطلب'); return; }
-    const confirmed = await showConfirmPopup('هل أنت متأكد من إلغاء طلب الاشتراك؟ سيتم إلغاء الطلب الحالي.');
-    if (!confirmed) return;
+  async function cancelPending() {
+    const sub = state.currentSubscription;
+    if (!sub || sub.status !== 'pending') return;
+    const ok = await new Promise(resolve => { state.confirm = resolve; $('confirmTitle').textContent = 'تأكيد الإلغاء'; $('confirmMessage').textContent = 'هل أنت متأكد من إلغاء طلب الاشتراك؟'; $('confirmOverlay').style.display = 'flex'; });
+    if (!ok) return;
     try {
-      const { error } = await supabase.from('subscriptions').update({ status: 'canceled' }).eq('id', subscription.id).eq('user_id', state.user.id).eq('status', 'pending');
+      const { error } = await sb.from('subscriptions').update({ status: 'canceled' }).eq('id', sub.id).eq('user_id', state.user.id).eq('status', 'pending');
       if (error) throw error;
-      if (subscription.payment_proof_path) await supabase.storage.from('subscription-proofs').remove([subscription.payment_proof_path]).catch(() => {});
-      showToast('تم إلغاء طلب الاشتراك');
-      closeSubscribeModal();
-      await loadPlans();
-    } catch (error) {
-      console.error('cancelPendingSubscription failed:', error);
-      showDetailedError('تعذر إلغاء طلب الاشتراك', error);
-    }
+      if (sub.payment_proof_path) await sb.storage.from('subscription-proofs').remove([sub.payment_proof_path]).catch(() => {});
+      closeModal();
+      toast('تم إلغاء طلب الاشتراك.');
+      await loadData();
+    } catch (error) { showError('cancel subscription failed', error); }
   }
 
-  document.addEventListener('click', (event) => {
-    const action = event.target.closest('[data-action]')?.dataset;
-    if (!action) return;
-    if (action.action === 'subscribe') openSubscribeModal(action.id);
-    if (action.action === 'open-pending') openPendingSubscription(action.id);
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const { action, id } = el.dataset;
+    if (action === 'subscribe') openSubscribe(id);
+    else if (action === 'open-pending') openPending(id);
+    else if (action === 'submit-subscription') submitSubscription();
+    else if (action === 'replace-proof') replacePendingProof();
+    else if (action === 'cancel-pending') cancelPending();
+    else if (action === 'close-modal') closeModal();
+    else if (action === 'dashboard') window.location.href = 'app.html';
+    else if (action === 'profile') window.location.href = 'profile.html';
+    else if (action === 'confirm-yes') { $('confirmOverlay').style.display = 'none'; state.confirm?.(true); state.confirm = null; }
+    else if (action === 'confirm-no') { $('confirmOverlay').style.display = 'none'; state.confirm?.(false); state.confirm = null; }
   });
 
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const { data } = await supabase.auth.getUser();
-      state.user = data?.user || null;
-      await loadPlans();
+      if (!(await loadUser())) return;
+      await loadData();
     } catch (error) {
       console.error('subscription page initialization failed:', error);
-      showToast('تعذر تحميل صفحة الاشتراكات');
+      const c = $('plans');
+      if (c) c.innerHTML = '<div class="empty">تعذر تحميل صفحة الاشتراكات. أعد تحميل الصفحة.</div>';
     }
   });
 
-  window.goDashboard = goDashboard;
-  window.goProfile = goProfile;
-  window.openSubscribeModal = openSubscribeModal;
-  window.closeSubscribeModal = closeSubscribeModal;
-  window.resolveConfirm = resolveConfirm;
+  window.openSubscribeModal = openSubscribe;
+  window.closeSubscribeModal = closeModal;
   window.submitSubscription = submitSubscription;
   window.replacePendingProof = replacePendingProof;
-  window.cancelPendingSubscription = cancelPendingSubscription;
+  window.cancelPendingSubscription = cancelPending;
 })();
