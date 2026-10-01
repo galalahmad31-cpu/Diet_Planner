@@ -1,9 +1,10 @@
 (function () {
   'use strict';
 
+  // This page uses the central Supabase client only.
+  // It does NOT use can_access() or get_page_access().
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
-
   const $ = (id) => document.getElementById(id);
 
   const state = {
@@ -62,7 +63,6 @@
 
   function getActiveSubscription() {
     if (!state.user) return null;
-
     const today = new Date().toISOString().slice(0, 10);
     return state.subscriptions.find((subscription) =>
       subscription.status === 'paid' &&
@@ -89,12 +89,9 @@
     const proofGroup = $('paymentProof')?.closest('.form-group');
     const noteGroup = $('paymentNote')?.closest('.form-group');
     const submitButton = $('submitSubscriptionBtn');
-
     if (proofGroup) proofGroup.style.display = isTrial ? 'none' : '';
     if (noteGroup) noteGroup.style.display = isTrial ? 'none' : '';
-    if (submitButton) {
-      submitButton.textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
-    }
+    if (submitButton) submitButton.textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
   }
 
   function resetSubscriptionModal() {
@@ -136,6 +133,7 @@
 
   async function loadPlans() {
     const container = $('plans');
+    if (!supabase) throw new Error('Supabase client is unavailable.');
 
     const { data: plans, error: plansError } = await supabase
       .from('subscription_plans')
@@ -218,6 +216,12 @@
     const plan = state.plans.find((item) => item.id === planId);
     if (!plan) return;
 
+    if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) {
+      showToast('هذه الخطة غير صالحة حاليًا: مدة الاشتراك غير صحيحة');
+      console.error('Invalid subscription plan duration:', plan);
+      return;
+    }
+
     if (plan.is_free_trial && hasUsedFreeTrial()) {
       showToast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل');
       return;
@@ -240,11 +244,54 @@
     $('subscribeModal').style.display = 'flex';
   }
 
+  function getSubscriptionErrorMessage(error, isTrial) {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '').toLowerCase();
+
+    if (code === '42501' || message.includes('permission denied')) {
+      return 'لا توجد صلاحية لتنفيذ عملية الاشتراك حاليًا. تم تسجيل المحاولة، حاول مرة أخرى.';
+    }
+    if (message.includes('authentication required')) {
+      return 'انتهت جلسة الدخول. سجل الدخول مرة أخرى ثم حاول.';
+    }
+    if (message.includes('plan is not available') || message.includes('subscription plan is not available')) {
+      return 'خطة الاشتراك غير متاحة حاليًا.';
+    }
+    if (message.includes('invalid plan duration') || message.includes('invalid subscription duration')) {
+      return 'مدة خطة الاشتراك غير صحيحة. تم إيقاف العملية لحماية بيانات الاشتراك.';
+    }
+    if (message.includes('free trial has already been used')) {
+      return 'لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.';
+    }
+    if (message.includes('already have an active subscription')) {
+      return 'لديك اشتراك فعال بالفعل.';
+    }
+
+    return isTrial
+      ? 'تعذر بدء التجربة المجانية حاليًا. تم تسجيل سبب الخطأ في النظام.'
+      : 'تعذر إنشاء طلب الاشتراك حاليًا. حاول مرة أخرى.';
+  }
+
   async function submitSubscription() {
     if (!state.user || !state.selectedPlanId) return;
 
+    // Refresh the authenticated user immediately before the write.
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !sessionData?.session?.user) {
+      showToast('انتهت جلسة الدخول. سجل الدخول مرة أخرى.');
+      return;
+    }
+    state.user = sessionData.session.user;
+
     const plan = state.plans.find((item) => item.id === state.selectedPlanId);
     if (!plan) return;
+
+    const durationDays = Number(plan.duration_days);
+    if (!Number.isInteger(durationDays) || durationDays <= 0) {
+      showToast('تعذر بدء الاشتراك: مدة الخطة غير صحيحة.');
+      console.error('Invalid plan duration before RPC:', plan);
+      return;
+    }
 
     const isTrial = plan.is_free_trial === true;
     const file = $('paymentProof').files[0];
@@ -288,19 +335,16 @@
         if (uploadError) throw uploadError;
       }
 
-      const { data: createdSubscription, error: insertError } = await supabase.rpc(
-        'create_subscription',
-        {
-          p_plan_id: plan.id,
-          p_full_name:
-            state.user.user_metadata?.full_name ||
-            state.user.user_metadata?.name ||
-            state.user.email ||
-            null,
-          p_notes: isTrial ? null : (note || null),
-          p_payment_proof_path: filePath
-        }
-      );
+      const { error: insertError } = await supabase.rpc('create_subscription', {
+        p_plan_id: plan.id,
+        p_full_name:
+          state.user.user_metadata?.full_name ||
+          state.user.user_metadata?.name ||
+          state.user.email ||
+          null,
+        p_notes: isTrial ? null : (note || null),
+        p_payment_proof_path: filePath
+      });
 
       if (insertError) throw insertError;
 
@@ -310,8 +354,10 @@
       showToast(isTrial ? 'تم بدء التجربة المجانية بنجاح' : 'تم إرسال طلب الاشتراك بنجاح، وسيتم مراجعته وتفعيله يدويًا');
       await loadPlans();
     } catch (error) {
-      console.error(error);
-      if (filePath) await supabase.storage.from('subscription-proofs').remove([filePath]);
+      console.error('create_subscription failed:', error);
+      if (filePath) {
+        await supabase.storage.from('subscription-proofs').remove([filePath]).catch(() => {});
+      }
       button.disabled = false;
       button.textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
       showDetailedError(isTrial ? 'تعذر بدء التجربة المجانية' : 'خطأ إنشاء طلب الاشتراك', error);
@@ -357,17 +403,17 @@
         .eq('status', 'pending');
 
       if (updateError) {
-        await supabase.storage.from('subscription-proofs').remove([newPath]);
+        await supabase.storage.from('subscription-proofs').remove([newPath]).catch(() => {});
         throw updateError;
       }
 
-      if (oldPath) await supabase.storage.from('subscription-proofs').remove([oldPath]);
+      if (oldPath) await supabase.storage.from('subscription-proofs').remove([oldPath]).catch(() => {});
 
       showToast('تم تعديل إثبات الدفع بنجاح');
       closeSubscribeModal();
       await loadPlans();
     } catch (error) {
-      console.error(error);
+      console.error('replacePendingProof failed:', error);
       showDetailedError('تعذر تعديل إثبات الدفع', error);
     }
   }
@@ -379,9 +425,7 @@
       return;
     }
 
-    const confirmed = await showConfirmPopup(
-      'هل أنت متأكد من إلغاء طلب الاشتراك؟<br>سيتم حذف طلب الاشتراك.'
-    );
+    const confirmed = await showConfirmPopup('هل أنت متأكد من إلغاء طلب الاشتراك؟ سيتم إلغاء الطلب الحالي.');
     if (!confirmed) return;
 
     const { error } = await supabase
@@ -404,9 +448,8 @@
   function showDetailedError(title, error) {
     $('errorOverlay')?.remove();
 
-    const message = error?.message || error?.error_description || 'خطأ غير معروف';
-    const details = error?.details || '';
-    const hint = error?.hint || '';
+    const rawMessage = error?.message || error?.error_description || 'خطأ غير معروف';
+    const safeMessage = getSubscriptionErrorMessage(error, title.includes('التجربة'));
     const code = error?.code || '';
 
     document.body.insertAdjacentHTML('beforeend', `
@@ -414,14 +457,16 @@
         <div style="width:100%;max-width:560px;background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.25);direction:rtl">
           <h2 style="margin:0 0 14px;font-size:19px;color:#b42318">${escapeHtml(title)}</h2>
           <div style="background:#fff5f5;border:1px solid #f1caca;border-radius:10px;padding:13px;line-height:1.8;font-size:13px;word-break:break-word">
-            <strong>الخطأ:</strong><br>${escapeHtml(message)}
+            <strong>النتيجة:</strong><br>${escapeHtml(safeMessage)}
             ${code ? `<br><br><strong>Code:</strong> ${escapeHtml(code)}` : ''}
-            ${details ? `<br><br><strong>Details:</strong><br>${escapeHtml(details)}` : ''}
-            ${hint ? `<br><br><strong>Hint:</strong><br>${escapeHtml(hint)}` : ''}
           </div>
           <button class="btn btn-primary" style="width:100%;margin-top:15px" data-action="close-error">إغلاق</button>
         </div>
       </div>`);
+
+    // Keep the raw backend error in the browser console for debugging,
+    // but never expose internal database details to the user.
+    console.error('Subscription backend error:', rawMessage, error);
   }
 
   function bindEvents() {
@@ -461,6 +506,7 @@
 
       const accessStatus = await access.getAccessStatus();
       state.user = accessStatus?.user || null;
+
       if (!state.user) {
         window.location.replace('index.html');
         return;
@@ -474,7 +520,7 @@
           <div class="empty">
             <i class="fa-solid fa-circle-exclamation"></i>
             <div class="empty-title">تعذر تحميل خطط الاشتراك</div>
-            <div class="empty-text">${escapeHtml(error?.message || 'حدث خطأ غير معروف.')}</div>
+            <div class="empty-text">تعذر تحميل البيانات حاليًا. حاول تحديث الصفحة.</div>
           </div>`;
       }
     }
