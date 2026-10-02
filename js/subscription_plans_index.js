@@ -24,7 +24,6 @@
     if (m.includes('invalid plan duration') || m.includes('invalid subscription duration')) return 'مدة خطة الاشتراك غير صحيحة.';
     if (m.includes('free trial has already been used')) return 'لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.';
     if (m.includes('already have an active subscription')) return 'لديك اشتراك فعال بالفعل.';
-    if (m.includes('could not choose the best candidate function')) return 'حدث تعارض في دالة الاشتراك. تم تسجيل الخطأ.';
     return trial ? 'تعذر بدء التجربة المجانية حاليًا. تم تسجيل المحاولة.' : 'تعذر إنشاء طلب الاشتراك حاليًا.';
   }
 
@@ -35,17 +34,6 @@
     if (!data?.user) { window.location.replace('index.html'); return false; }
     state.user = data.user;
     return true;
-  }
-
-  async function checkAccess() {
-    const { data, error } = await sb.rpc('get_access_status');
-    if (error) {
-      console.error('get_access_status failed:', error);
-      return;
-    }
-    if (data?.isAdmin === true || data?.is_admin === true) {
-      window.location.replace('app.html');
-    }
   }
 
   async function loadData() {
@@ -148,20 +136,6 @@
     $('subscribeModal').style.display = 'flex';
   }
 
-  async function startAudit(plan, fullName) {
-    const { data, error } = await sb.rpc('start_subscription_audit', { p_plan_id: plan.id, p_full_name: fullName || null });
-    if (error) throw error;
-    const id = typeof data === 'string' ? data : data?.id;
-    if (!id) throw new Error('تعذر إنشاء سجل تدقيق الاشتراك.');
-    return id;
-  }
-
-  async function finishAudit(id, success, message = null) {
-    if (!id) return;
-    const { error } = await sb.rpc('finish_subscription_audit', { p_audit_id: id, p_success: !!success, p_error_message: message || null });
-    if (error) console.error('finish_subscription_audit failed:', error);
-  }
-
   async function submitSubscription() {
     const plan = state.plans.find(p => p.id === state.selectedPlanId);
     if (!state.user || !plan) return;
@@ -183,11 +157,8 @@
     button.disabled = true;
     button.textContent = trial ? 'جاري بدء التجربة...' : 'جاري إرسال الطلب...';
 
-    let auditId = null;
     let filePath = null;
     try {
-      auditId = await startAudit(plan, fullName);
-
       if (!trial) {
         const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
         filePath = `${state.user.id}/transfer-${Date.now()}.${ext}`;
@@ -199,21 +170,17 @@
         p_plan_id: plan.id,
         p_full_name: fullName,
         p_notes: trial ? null : (note || null),
-        p_payment_proof_path: filePath,
-        p_audit_id: auditId
+        p_payment_proof_path: filePath
       });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'تعذر إتمام عملية الاشتراك.');
 
-      await finishAudit(auditId, true);
-      auditId = null;
       filePath = null;
       closeModal();
       toast(trial ? 'تم بدء التجربة المجانية بنجاح.' : 'تم إرسال طلب الاشتراك بنجاح، وسيتم مراجعته وتفعيله يدويًا.');
       await loadData();
     } catch (error) {
       console.error('subscription failed:', error);
-      if (auditId) await finishAudit(auditId, false, error?.message || String(error));
       if (filePath) await sb.storage.from('subscription-proofs').remove([filePath]).catch(() => {});
       toast(errorMessage(error, trial));
     } finally {
@@ -287,8 +254,6 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       if (!(await loadUser())) return;
-      await checkAccess();
-      if (location.pathname.endsWith('app.html')) return;
       await loadData();
     } catch (error) {
       console.error('subscription index initialization failed:', error);
