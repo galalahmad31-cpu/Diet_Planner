@@ -150,7 +150,7 @@
     if (trial && trialUsed()) return toast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.');
     if (!trial) {
       if (!file) return toast('من فضلك أرفق صورة التحويل.');
-      if (!file.type.startsWith('image/')) return toast('يرجى اختيار صورة صحيحة.');
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return toast('يرجى اختيار صورة صحيحة.');
       if (file.size > 5 * 1024 * 1024) return toast('حجم الصورة يجب ألا يتجاوز 5 ميجابايت.');
     }
 
@@ -160,7 +160,7 @@
     let filePath = null;
     try {
       if (!trial) {
-        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const ext = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' })[file.type];
         filePath = `${state.user.id}/transfer-${Date.now()}.${ext}`;
         const { error } = await sb.storage.from('subscription-proofs').upload(filePath, file, { cacheControl: '3600', upsert: false });
         if (error) throw error;
@@ -194,9 +194,9 @@
     const file = $('paymentProof').files[0];
     if (!sub || sub.status !== 'pending') return toast('لا يمكن تعديل إثبات الدفع الآن.');
     if (!file) return toast('اختر صورة الإثبات الجديدة أولًا.');
-    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) return toast('صورة غير صالحة أو أكبر من 5 ميجابايت.');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) return toast('صورة غير صالحة أو أكبر من 5 ميجابايت.');
 
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const ext = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' })[file.type];
     const newPath = `${state.user.id}/transfer-${Date.now()}.${ext}`;
     try {
       const upload = await sb.storage.from('subscription-proofs').upload(newPath, file, { cacheControl: '3600', upsert: false });
