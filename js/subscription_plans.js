@@ -51,7 +51,7 @@
 
     const { data: subscriptions, error: subError } = await sb
       .from('subscriptions')
-      .select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path')
+      .select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,is_free_trial')
       .eq('user_id', state.user.id)
       .order('created_at', { ascending: false });
     if (subError) throw subError;
@@ -71,7 +71,7 @@
   }
 
   function trialUsed() {
-    return state.subscriptions.some(s => state.plans.some(p => p.id === s.plan_id && p.is_free_trial === true));
+    return state.subscriptions.some(s => s.is_free_trial === true || state.plans.some(p => p.id === s.plan_id && p.is_free_trial === true));
   }
 
   function render() {
