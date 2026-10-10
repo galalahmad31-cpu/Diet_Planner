@@ -21,9 +21,17 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   ├── shared/
 │   │   └── security.js              # Shared escaping and rich-HTML sanitization
 │   ├── features/
+│   │   ├── about/
+│   │   │   └── index.js              # About page
 │   │   ├── content/
 │   │   │   ├── article.js           # Article library/editor
 │   │   │   └── recipe.js            # Recipe library/editor
+│   │   ├── feedback/
+│   │   │   └── index.js              # Feedback page
+│   │   ├── finance/
+│   │   │   └── index.js              # Clinic finance page
+│   │   ├── foods/
+│   │   │   └── index.js              # Food library page
 │   │   ├── patients/
 │   │   │   ├── list.js              # Patient list page
 │   │   │   └── profile.js           # Patient profile page
@@ -51,7 +59,7 @@ Do not load a feature controller before the shared helpers it uses. Avoid inline
 
 ## Migration rules
 - Move one cohesive feature at a time; update every loader/reference before deleting the old path.
-- Current migrated groups: `features/content/` (articles and recipes), `features/patients/` (patient list/profile), and `features/visit/` (visit controller and lazy-loaded tools).
+- Current migrated groups: `features/about/`, `features/content/` (articles and recipes), `features/feedback/`, `features/finance/`, `features/foods/`, `features/patients/` (patient list/profile), and `features/visit/` (visit controller and lazy-loaded tools).
 - Preserve public module APIs while moving files so page behavior does not change as a side effect of organization.
 - Use lowercase kebab-case names for feature modules, and keep lazy-loaded modules next to their feature.
 - Do not move all scripts in one bulk change; run syntax/build checks after each small migration.
