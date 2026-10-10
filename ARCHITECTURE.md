@@ -21,19 +21,22 @@
 ## Subscription/security flow
 1. Auth helper routes admins and users with an active paid subscription to `app.html`; other signed-in users go to `subscription_plans_index.html`.
 2. Subscription UI loads active plans and only the current user's subscriptions.
-3. Paid requests upload proof to the private `subscription-proofs` bucket and call `create_subscription`; backend logic validates eligibility and records free-trial claims.
-4. RLS, triggers, and database functions are the security boundary. Frontend checks are UX only.
-5. The two subscription pages intentionally differ in redirects/navigation; do not merge them without regression tests.
+3. Paid requests upload proof to the private `subscription-proofs` bucket and call `create_subscription`; the database now verifies that the referenced proof exists in that bucket and belongs to the caller's own UID folder.
+4. `create_subscription` uses an empty `search_path` and schema-qualified table references. The trigger guarding subscription updates also validates ownership/existence when a pending proof path is changed.
+5. Direct table privileges for `trial_claims` have been revoked from `anon`, `authenticated`, and `PUBLIC`; trial claims are written by the controlled subscription function.
+6. RLS, triggers, and database functions are the security boundary. Frontend checks are UX only.
+7. The two subscription pages intentionally differ in redirects/navigation; do not merge them without regression tests.
 
 ## Known release risks
-- Security Advisor still flags callable `SECURITY DEFINER` RPCs and disabled leaked-password protection.
-- `trial_claims` has RLS enabled with no direct policies; this appears intentional only if access remains inside validated database functions.
-- No automated test suite is configured in `package.json`; run manual tests before release.
+- Security Advisor still flags callable `SECURITY DEFINER` RPCs. Several are intentionally callable by authenticated users and contain authorization checks, but they still require ongoing review.
+- Leaked-password protection remains disabled in Supabase Auth and must be enabled in project Auth settings.
+- `trial_claims` has RLS enabled with no direct policies; direct table grants are revoked, so access should remain through validated database functions only.
+- No automated test suite is configured in `package.json`; run manual tests before release. The changes above have been checked in database metadata, but no authenticated end-to-end browser test has been run.
 
 ## Smoke tests
 - Password login, registration, Google OAuth callback, logout, and role routing.
 - Admin role change; a normal user cannot self-promote.
 - First free trial, duplicate trial, and trial when the plan is inactive.
-- Payment-proof upload: JPEG/PNG/WebP only, maximum 5 MB; failed RPC cleanup; admin approval and expiry.
+- Payment-proof upload: JPEG/PNG/WebP only, maximum 5 MB; reject another user's path and nonexistent objects; failed RPC cleanup; admin approval and expiry.
 - Patient quota, patient/visit access after subscription expiry, and cross-account isolation.
 - Diet, visit, finance, and nutrition-support workflows with active and expired subscriptions.
