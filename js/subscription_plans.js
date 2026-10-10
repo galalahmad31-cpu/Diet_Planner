@@ -230,8 +230,9 @@
     const ok = await new Promise(resolve => { state.confirm = resolve; $('confirmTitle').textContent = 'تأكيد الإلغاء'; $('confirmMessage').textContent = 'هل أنت متأكد من إلغاء طلب الاشتراك؟'; $('confirmOverlay').style.display = 'flex'; });
     if (!ok) return;
     try {
-      const { error } = await sb.from('subscriptions').update({ status: 'canceled' }).eq('id', sub.id).eq('user_id', state.user.id).eq('status', 'pending');
+      const { data, error } = await sb.rpc('cancel_pending_subscription', { p_subscription_id: sub.id });
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.message || 'تعذر إلغاء طلب الاشتراك.');
       if (sub.payment_proof_path) await sb.storage.from('subscription-proofs').remove([sub.payment_proof_path]).catch(() => {});
       closeModal();
       toast('تم إلغاء طلب الاشتراك.');
