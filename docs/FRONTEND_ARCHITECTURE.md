@@ -22,6 +22,7 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   │   └── security.js              # Shared escaping and rich-HTML sanitization
 │   ├── features/
 │   │   └── visit/
+│   │       ├── index.js             # Visit page controller and lazy loader
 │   │       ├── calculator.js        # Visit calculator module (lazy-loaded)
 │   │       ├── diet-plan.js         # Gram-based diet plan (lazy-loaded)
 │   │       └── exchange-plan.js     # Exchange diet plan (lazy-loaded)
