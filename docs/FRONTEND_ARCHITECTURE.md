@@ -20,7 +20,12 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   ├── theme.js                     # Theme preference and switching
 │   ├── shared/
 │   │   └── security.js              # Shared escaping and rich-HTML sanitization
-│   └── [feature].js                 # Feature behavior; no cross-feature UI logic
+│   ├── features/
+│   │   └── visit/
+│   │       ├── calculator.js        # Visit calculator module (lazy-loaded)
+│   │       ├── diet-plan.js         # Gram-based diet plan (lazy-loaded)
+│   │       └── exchange-plan.js     # Exchange diet plan (lazy-loaded)
+│   └── [feature].js                 # Legacy page controllers, migrated incrementally
 ├── scripts/
 │   └── check-js.mjs                 # Dependency-free JavaScript syntax check
 └── docs/
@@ -32,9 +37,15 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 2. Third-party libraries required by the page (pin versions where practical).
 3. `auth-access.js` for authenticated pages.
 4. Shared helpers such as `js/shared/security.js`.
-5. Exactly one page-specific controller.
+5. The page controller loads only the feature modules it needs; large visit tools are lazy-loaded from `js/features/visit/`.
 
 Do not load a feature controller before the shared helpers it uses. Avoid inline event handlers; bind behavior in the page controller.
+
+## Migration rules
+- Move one cohesive feature at a time; update every loader/reference before deleting the old path.
+- Preserve public module APIs while moving files so page behavior does not change as a side effect of organization.
+- Use lowercase kebab-case names for feature modules, and keep lazy-loaded modules next to their feature.
+- Do not move all scripts in one bulk change; run syntax/build checks after each small migration.
 
 ## Responsibilities
 - **HTML:** semantic structure, labels, landmarks, and script/style references only.
