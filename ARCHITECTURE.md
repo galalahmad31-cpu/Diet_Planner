@@ -22,10 +22,11 @@
 1. Auth helper routes admins and users with an active paid subscription to `app.html`; other signed-in users go to `subscription_plans_index.html`.
 2. Subscription UI loads active plans and only the current user's subscriptions.
 3. Paid requests upload proof to the private `subscription-proofs` bucket and call `create_subscription`; the database now verifies that the referenced proof exists in that bucket and belongs to the caller's own UID folder.
-4. `create_subscription` uses an empty `search_path` and schema-qualified table references. The trigger guarding subscription updates also validates ownership/existence when a pending proof path is changed.
-5. Direct table privileges for `trial_claims` have been revoked from `anon`, `authenticated`, and `PUBLIC`; trial claims are written by the controlled subscription function.
-6. RLS, triggers, and database functions are the security boundary. Frontend checks are UX only.
-7. The two subscription pages intentionally differ in redirects/navigation; do not merge them without regression tests.
+4. `create_subscription` uses an empty `search_path` and schema-qualified table references. It verifies that a paid-plan proof exists in the private bucket and belongs to the caller's UID folder.
+5. The subscription-update trigger blocks users from changing entitlement snapshots (`is_free_trial`, duration, patient quota, and feature snapshot) while a request is pending, and validates ownership/existence when the proof path changes.
+6. Direct table privileges for `trial_claims` have been revoked from `anon`, `authenticated`, and `PUBLIC`; trial claims are written by the controlled subscription function.
+7. RLS, triggers, and database functions are the security boundary. Frontend checks are UX only.
+8. The two subscription pages intentionally differ in redirects/navigation; do not merge them without regression tests.
 
 ## Known release risks
 - Security Advisor still flags callable `SECURITY DEFINER` RPCs. Several are intentionally callable by authenticated users and contain authorization checks, but they still require ongoing review.
