@@ -31,12 +31,20 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   │   │   └── recipe.js            # Recipe library/editor
 │   │   ├── dashboard/
 │   │   │   └── index.js              # Main app dashboard
+│   │   ├── profile/
+│   │   │   └── index.js              # User profile page
+│   │   ├── products/
+│   │   │   └── index.js              # Products library
 │   │   ├── feedback/
 │   │   │   └── index.js              # Feedback page
 │   │   ├── finance/
 │   │   │   └── index.js              # Clinic finance page
+│   │   ├── diets/
+│   │   │   └── library.js            # Diet library page
 │   │   ├── foods/
 │   │   │   └── index.js              # Food library page
+│   │   ├── notifications/
+│   │   │   └── index.js              # Notifications page
 │   │   ├── patients/
 │   │   │   ├── list.js              # Patient list page
 │   │   │   └── profile.js           # Patient profile page
@@ -64,7 +72,7 @@ Do not load a feature controller before the shared helpers it uses. Avoid inline
 
 ## Migration rules
 - Move one cohesive feature at a time; update every loader/reference before deleting the old path.
-- Current migrated groups: `features/about/`, `features/admin/`, `features/dashboard/`, `features/content/` (articles and recipes), `features/feedback/`, `features/finance/`, `features/foods/`, `features/patients/` (patient list/profile), and `features/visit/` (visit controller and lazy-loaded tools).
+- Current migrated groups: `features/about/`, `features/admin/`, `features/dashboard/`, `features/content/` (articles and recipes), `features/diets/`, `features/feedback/`, `features/finance/`, `features/foods/`, `features/notifications/`, `features/patients/` (patient list/profile), `features/profile/`, `features/products/`, and `features/visit/` (visit controller and lazy-loaded tools).
 - Preserve public module APIs while moving files so page behavior does not change as a side effect of organization.
 - Use lowercase kebab-case names for feature modules, and keep lazy-loaded modules next to their feature.
 - Do not move all scripts in one bulk change; run syntax/build checks after each small migration.
