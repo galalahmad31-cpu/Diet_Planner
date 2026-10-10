@@ -57,11 +57,11 @@
         if (separator < 1) return;
         const property = declaration.slice(0, separator).trim().toLowerCase();
         const value = declaration.slice(separator + 1).trim();
-        if (!allowedStyles.has(property) || !value || /url\\s*\\(|expression\\s*\\(|[<>]/i.test(value)) return;
+        if (!allowedStyles.has(property) || !value || /url\s*\(|expression\s*\(|[<>]/i.test(value)) return;
 
         let valid = false;
         if (property === 'font-size') {
-          valid = /^(?:\\d{1,3}(?:\\.\\d+)?(?:px|pt|em|rem|%)|xx-small|x-small|small|medium|large|x-large|xx-large)$/i.test(value);
+          valid = /^(?:\d{1,3}(?:\.\d+)?(?:px|pt|em|rem|%)|xx-small|x-small|small|medium|large|x-large|xx-large)$/i.test(value);
         } else if (property === 'text-align') {
           valid = /^(?:left|right|center|justify|start|end)$/i.test(value);
         } else if (property === 'font-weight') {
@@ -71,7 +71,7 @@
         } else if (property === 'text-decoration') {
           valid = /^(?:none|underline|line-through|overline)$/i.test(value);
         } else {
-          valid = /^(?:#[0-9a-f]{3,8}|rgba?\\([\\d\\s.,%]+\\)|hsla?\\([\\d\\s.,%deg]+\\)|[a-z]{1,24})$/i.test(value);
+          valid = /^(?:#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%deg]+\)|[a-z]{1,24})$/i.test(value);
         }
         if (valid) accepted.push([property, value]);
       });
