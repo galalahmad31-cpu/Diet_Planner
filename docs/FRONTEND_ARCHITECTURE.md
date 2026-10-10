@@ -26,6 +26,9 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   │   ├── admin/
 │   │   │   ├── dashboard.js          # Admin tools
 │   │   │   └── roles.js              # Admin role controls
+│   │   ├── calculators/
+│   │   │   ├── quickcalc.js          # Quick nutrition calculator
+│   │   │   └── weight.js             # Weight tracking
 │   │   ├── content/
 │   │   │   ├── article.js           # Article library/editor
 │   │   │   └── recipe.js            # Recipe library/editor
@@ -43,6 +46,9 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   │   │   └── library.js            # Diet library page
 │   │   ├── foods/
 │   │   │   └── index.js              # Food library page
+│   │   ├── nutrition-support/
+│   │   │   ├── index.js              # Nutrition support overview
+│   │   │   └── patient.js            # Patient nutrition support record
 │   │   ├── notifications/
 │   │   │   └── index.js              # Notifications page
 │   │   ├── patients/
@@ -72,7 +78,7 @@ Do not load a feature controller before the shared helpers it uses. Avoid inline
 
 ## Migration rules
 - Move one cohesive feature at a time; update every loader/reference before deleting the old path.
-- Current migrated groups: `features/about/`, `features/admin/`, `features/dashboard/`, `features/content/` (articles and recipes), `features/diets/`, `features/feedback/`, `features/finance/`, `features/foods/`, `features/notifications/`, `features/patients/` (patient list/profile), `features/profile/`, `features/products/`, and `features/visit/` (visit controller and lazy-loaded tools).
+- Current feature groups: `features/about/`, `features/admin/`, `features/calculators/`, `features/content/` (articles and recipes), `features/dashboard/`, `features/diets/`, `features/feedback/`, `features/finance/`, `features/foods/`, `features/notifications/`, `features/nutrition-support/`, `features/patients/`, `features/profile/`, `features/products/`, `features/subscriptions/`, and `features/visit/`. Only shared bootstrap scripts remain at the `js/` root.
 - Preserve public module APIs while moving files so page behavior does not change as a side effect of organization.
 - Use lowercase kebab-case names for feature modules, and keep lazy-loaded modules next to their feature.
 - Do not move all scripts in one bulk change; run syntax/build checks after each small migration.
