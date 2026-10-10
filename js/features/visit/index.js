@@ -94,15 +94,15 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     calculator: {
-      src: 'js/visit-calculator.js',
+      src: 'js/features/visit/calculator.js?v=20261011-2',
       ready: () => typeof initCalculator === 'function'
     },
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20260922-2',
+      src: 'js/features/visit/diet-plan.js?v=20261011-2',
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
-      src: 'js/visit-exchange-plan.js?v=20260923-1',
+      src: 'js/features/visit/exchange-plan.js?v=20261011-2',
       ready: () => !!window.exchangePlan?.init
     }
   };

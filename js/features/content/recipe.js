@@ -31,27 +31,8 @@
     }
 
     function sanitizeEditorHtml(html) {
-        const source = document.createElement('div');
-        source.innerHTML = html || '';
-
-        source.querySelectorAll('script,style,iframe,object,embed,form').forEach((node) => node.remove());
-        source.querySelectorAll('*').forEach((node) => {
-            [...node.attributes].forEach((attribute) => {
-                const name = attribute.name.toLowerCase();
-                const value = attribute.value.trim();
-
-                if (name.startsWith('on')) node.removeAttribute(attribute.name);
-
-                if (name === 'href') {
-                    if (!/^(https?:|mailto:)/i.test(value)) node.removeAttribute(attribute.name);
-                    else node.setAttribute('rel', 'noopener noreferrer');
-                }
-
-                if (name === 'src') node.removeAttribute(attribute.name);
-            });
-        });
-
-        return source.innerHTML.trim();
+        const helper = window.DietPlannerSecurity;
+        return helper ? helper.sanitizeRichHtml(html).trim() : escapeHtml(html).trim();
     }
 
     function editorText(html) {
