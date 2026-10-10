@@ -54,12 +54,14 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   │   ├── patients/
 │   │   │   ├── list.js              # Patient list page
 │   │   │   └── profile.js           # Patient profile page
+│   │   ├── subscriptions/
+│   │   │   ├── admin.js              # Subscription administration
+│   │   │   └── index.js              # Public subscription plans
 │   │   └── visit/
 │   │       ├── index.js             # Visit page controller and lazy loader
 │   │       ├── calculator.js        # Visit calculator module (lazy-loaded)
 │   │       ├── diet-plan.js         # Gram-based diet plan (lazy-loaded)
 │   │       └── exchange-plan.js     # Exchange diet plan (lazy-loaded)
-│   └── [feature].js                 # Legacy page controllers, migrated incrementally
 ├── scripts/
 │   ├── check-js.mjs                 # Dependency-free JavaScript syntax check
 │   └── check-html-assets.mjs        # Check local JS/CSS references in HTML
