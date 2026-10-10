@@ -34,7 +34,8 @@ Keep the existing static HTML/CSS/JavaScript architecture stable while making sh
 │   │       └── exchange-plan.js     # Exchange diet plan (lazy-loaded)
 │   └── [feature].js                 # Legacy page controllers, migrated incrementally
 ├── scripts/
-│   └── check-js.mjs                 # Dependency-free JavaScript syntax check
+│   ├── check-js.mjs                 # Dependency-free JavaScript syntax check
+│   └── check-html-assets.mjs        # Check local JS/CSS references in HTML
 └── docs/
     └── FRONTEND_ARCHITECTURE.md     # This document
 ```
@@ -82,6 +83,6 @@ Do not load a feature controller before the shared helpers it uses. Avoid inline
 ## Refactoring workflow
 1. Create a backup branch before changing the default branch.
 2. Make focused changes on a dedicated branch.
-3. Run `npm run check:js` and `npm run build:css` when dependencies are installed.
+3. Run `npm run check:js`, `npm run check:assets`, and `npm run build:css` when dependencies are installed.
 4. Test authentication, routing, save/cancel flows, errors, keyboard use, mobile layout, and light/dark themes.
 5. Review the diff and deploy only after smoke tests. Do not merge unfinished refactors directly into `main`.
