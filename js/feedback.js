@@ -29,6 +29,8 @@
   function cacheElements() {
     elements.loading = document.getElementById("loadingScreen");
     elements.form = document.getElementById("feedbackForm");
+    elements.composer = document.getElementById("feedbackComposerContent");
+    elements.loginPrompt = document.getElementById("feedbackLoginPrompt");
     elements.rating = document.getElementById("feedbackRating");
     elements.comment = document.getElementById("feedbackComment");
     elements.name = document.getElementById("feedbackName");
@@ -446,14 +448,18 @@
 
     try {
       const accessStatus = await access.getAccessStatus();
-      if (!accessStatus?.authenticated || !accessStatus.user) {
-        hideLoading();
-        showStatus("يجب تسجيل الدخول لاستخدام هذه الصفحة.", "error");
+      state.user = accessStatus?.authenticated ? accessStatus.user : null;
+      state.isAdmin = accessStatus?.isAdmin === true;
+
+      if (!state.user) {
+        elements.composer?.classList.add("hidden");
+        elements.loginPrompt?.classList.remove("hidden");
+        await loadFeedbacks();
         return;
       }
 
-      state.user = accessStatus.user;
-      state.isAdmin = accessStatus.isAdmin === true;
+      elements.composer?.classList.remove("hidden");
+      elements.loginPrompt?.classList.add("hidden");
 
       const displayName = await getDisplayName(state.user);
       if (elements.name) elements.name.textContent = displayName;
