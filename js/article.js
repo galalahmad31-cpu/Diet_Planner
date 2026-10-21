@@ -5,7 +5,63 @@ const $=id=>document.getElementById(id);let user=null,profile=null,isAdmin=false
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const date=v=>v?new Intl.DateTimeFormat('ar-EG',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';
 function toast(m,error=false){const t=$('toast');t.textContent=m;t.className='fixed bottom-5 left-1/2 z-[100] -translate-x-1/2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-xl toast '+(error?'bg-red-600':'bg-brand-600');clearTimeout(timer);timer=setTimeout(()=>t.classList.add('hidden'),2800)}
-function safe(html){const d=document.createElement('div');d.innerHTML=html;d.querySelectorAll('script,iframe,object,embed,style,form,input,button,textarea').forEach(x=>x.remove());d.querySelectorAll('*').forEach(x=>[...x.attributes].forEach(a=>{if(/^on/i.test(a.name))x.removeAttribute(a.name);if((a.name==='href'||a.name==='src')&&/^\s*javascript:/i.test(a.value))x.removeAttribute(a.name)}));return d.innerHTML}
+const SAFE_RICH_TAGS = new Set(['A','B','BLOCKQUOTE','BR','DIV','EM','H1','H2','H3','H4','H5','H6','I','LI','OL','P','SPAN','STRONG','SUB','SUP','TABLE','TBODY','TD','TFOOT','TH','THEAD','TR','U','UL']);
+const DROP_RICH_TAGS = new Set(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','FORM','INPUT','BUTTON','TEXTAREA','SELECT','OPTION','SVG','MATH','TEMPLATE','LINK','META','BASE','VIDEO','AUDIO','SOURCE','IMG','NOSCRIPT']);
+function safeStyle(value) {
+  const allowed = {
+    color: /^(#[0-9a-f]{3,8}|[a-z]{1,20}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%deg]+\))$/i,
+    'background-color': /^(#[0-9a-f]{3,8}|[a-z]{1,20}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%deg]+\))$/i,
+    'font-size': /^\d{1,3}(?:\.\d{1,2})?(?:px|pt|em|rem|%)$/i,
+    'text-align': /^(left|right|center|justify|start|end)$/i,
+    direction: /^(ltr|rtl)$/i,
+    'font-weight': /^(normal|bold|[1-9]00)$/i,
+    'font-style': /^(normal|italic|oblique)$/i,
+    'text-decoration': /^(none|underline|line-through|overline)$/i
+  };
+  return String(value || '').split(';').map(rule => {
+    const index = rule.indexOf(':');
+    if (index < 1) return '';
+    const property = rule.slice(0, index).trim().toLowerCase();
+    const val = rule.slice(index + 1).trim();
+    return allowed[property]?.test(val) ? property + ':' + val : '';
+  }).filter(Boolean).join(';');
+}
+function safe(html) {
+  const doc = new DOMParser().parseFromString(String(html ?? ''), 'text/html');
+  const root = doc.body;
+  const clean = parent => Array.from(parent.childNodes).forEach(node => {
+    if (node.nodeType === Node.COMMENT_NODE) { node.remove(); return; }
+    if (node.nodeType === Node.TEXT_NODE) return;
+    if (node.nodeType !== Node.ELEMENT_NODE) { node.remove(); return; }
+    const tag = node.tagName;
+    if (DROP_RICH_TAGS.has(tag)) { node.remove(); return; }
+    if (!SAFE_RICH_TAGS.has(tag)) {
+      while (node.firstChild) parent.insertBefore(node.firstChild, node);
+      node.remove();
+      return;
+    }
+    Array.from(node.attributes).forEach(attr => {
+      const name = attr.name.toLowerCase(), value = attr.value.trim();
+      if (name === 'dir') {
+        if (!/^(ltr|rtl|auto)$/i.test(value)) node.removeAttribute(attr.name);
+      } else if (tag === 'A' && name === 'href') {
+        if (!/^(https?:|mailto:|#|\/(?!\/))/i.test(value)) node.removeAttribute(attr.name);
+      } else if (name === 'style') {
+        const style = safeStyle(value);
+        if (style) node.setAttribute('style', style); else node.removeAttribute('style');
+      } else if ((tag === 'TD' || tag === 'TH') && (name === 'colspan' || name === 'rowspan')) {
+        if (!/^[1-9]\d{0,2}$/.test(value)) node.removeAttribute(attr.name);
+      } else node.removeAttribute(attr.name);
+    });
+    if (tag === 'A' && node.hasAttribute('href')) {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
+    clean(node);
+  });
+  clean(root);
+  return root.innerHTML;
+}
 
 /* =========================================================
  * ARTICLE TEXT DIRECTION
@@ -30,10 +86,10 @@ async function load(){const{data,error}=await supabase.from('articles').select('
 function render(){const q=$('search').value.trim().toLowerCase(),f=$('filter').value,v=articles.filter(a=>(!q||[a.title,a.author_name].some(x=>String(x||'').toLowerCase().includes(q)))&&(f==='all'||a.visibility===f));$('grid').innerHTML='';$('empty').classList.toggle('hidden',v.length>0);v.forEach(a=>{const mine=a.created_by===user.id,pub=a.visibility==='public',el=document.createElement('article');el.className='card glass rounded-3xl p-5 shadow-sm';el.innerHTML=`<div class="flex justify-between"><span class="rounded-full px-3 py-1 text-[11px] font-bold ${pub?'bg-emerald-50 text-emerald-700':'bg-slate-100 text-slate-600'}">${pub?'🌐 عام':'🔒 خاص'}</span>${mine?`<div><button data-a="edit" data-id="${a.id}" class="h-9 w-9 text-slate-500 hover:text-brand-700"><i class="fa-solid fa-pen"></i></button><button data-a="delete" data-id="${a.id}" class="h-9 w-9 text-slate-500 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></div>`:''}</div><button data-a="view" data-id="${a.id}" class="mt-5 block w-full text-right"><h3 class="text-xl font-extrabold leading-8">${esc(a.title)}</h3><p class="mt-2 text-sm font-semibold text-slate-500">بقلم: ${esc(a.author_name)}</p></button><div class="mt-5 border-t pt-4 text-xs text-slate-400">النشر: ${date(a.published_at)} · آخر تعديل: ${date(a.updated_at)}</div>`; $('grid').appendChild(el)})}
 function syncAccessControl(){const wrap=$('articleAccessWrap');if(wrap)wrap.classList.toggle('hidden',!isAdmin)}
 function setArticleAccess(value){const el=$('articleAccess');if(el)el.value=value||''}
-function openEditor(a=null){editingId=a?.id||null;$('modalTitle').textContent=a?'تعديل المقال':'إضافة مقال';$('title').value=a?.title||'';$('author').value=a?.author_name||profile?.full_name||'';$('editor').innerHTML=a?.content||'';syncTextDirection($('editor'));$('public').checked=a?.visibility==='public';setArticleAccess(a?.required_feature||'');syncAccessControl();$('pubDate').textContent=a?.published_at?date(a.published_at):'سيُحدد عند النشر';$('updDate').textContent=a?.updated_at?date(a.updated_at):'عند الحفظ';state();$('editModal').classList.remove('hidden');document.body.classList.add('overflow-hidden')}
+function openEditor(a=null){editingId=a?.id||null;$('modalTitle').textContent=a?'تعديل المقال':'إضافة مقال';$('title').value=a?.title||'';$('author').value=a?.author_name||profile?.full_name||'';$('editor').innerHTML=safe(a?.content||'');syncTextDirection($('editor'));$('public').checked=a?.visibility==='public';setArticleAccess(a?.required_feature||'');syncAccessControl();$('pubDate').textContent=a?.published_at?date(a.published_at):'سيُحدد عند النشر';$('updDate').textContent=a?.updated_at?date(a.updated_at):'عند الحفظ';state();$('editModal').classList.remove('hidden');document.body.classList.add('overflow-hidden')}
 function closeEditor(){$('editModal').classList.add('hidden');document.body.classList.remove('overflow-hidden');editingId=null}
 function state(){$('toggleText').textContent=$('public').checked?'عام':'خاص';$('state').textContent=$('public').checked?'عام — متاح للمستخدمين':'خاص — ظاهر لك فقط'}
-async function save(){syncTextDirection($('editor'));const title=$('title').value.trim(),author=$('author').value.trim(),content=$('editor').innerHTML.trim(),visibility=$('public').checked?'public':'private';const requiredFeature=isAdmin&&visibility==='public'&&$('articleAccess')?.value==='article'?'article':null;if(!title)return toast('اكتب اسم المقال أولًا.','error');if(!author)return toast('اكتب اسم المؤلف.','error');if(!content||content==='<br>')return toast('اكتب محتوى المقال أولًا.','error');$('save').disabled=true;try{if(editingId){const old=articles.find(a=>a.id===editingId),p={title,author_name:author,content,visibility,required_feature:requiredFeature};if(visibility==='public'&&!old?.published_at)p.published_at=new Date().toISOString();const{error}=await supabase.from('articles').update(p).eq('id',editingId).eq('created_by',user.id);if(error)throw error;toast('تم تعديل المقال.')}else{const p={created_by:user.id,title,author_name:author,content,visibility,required_feature:requiredFeature};if(visibility==='public')p.published_at=new Date().toISOString();const{error}=await supabase.from('articles').insert(p);if(error)throw error;toast('تم إنشاء المقال.')}closeEditor();await load()}catch(e){console.error(e);toast(e.message||'حدث خطأ أثناء الحفظ.','error')}finally{$('save').disabled=false}}
+async function save(){syncTextDirection($('editor'));const title=$('title').value.trim(),author=$('author').value.trim(),content=safe($('editor').innerHTML).trim(),visibility=$('public').checked?'public':'private';const requiredFeature=isAdmin&&visibility==='public'&&$('articleAccess')?.value==='article'?'article':null;if(!title)return toast('اكتب اسم المقال أولًا.','error');if(!author)return toast('اكتب اسم المؤلف.','error');if(!content||content==='<br>')return toast('اكتب محتوى المقال أولًا.','error');$('save').disabled=true;try{if(editingId){const old=articles.find(a=>a.id===editingId),p={title,author_name:author,content,visibility,required_feature:requiredFeature};if(visibility==='public'&&!old?.published_at)p.published_at=new Date().toISOString();const{error}=await supabase.from('articles').update(p).eq('id',editingId).eq('created_by',user.id);if(error)throw error;toast('تم تعديل المقال.')}else{const p={created_by:user.id,title,author_name:author,content,visibility,required_feature:requiredFeature};if(visibility==='public')p.published_at=new Date().toISOString();const{error}=await supabase.from('articles').insert(p);if(error)throw error;toast('تم إنشاء المقال.')}closeEditor();await load()}catch(e){console.error(e);toast(e.message||'حدث خطأ أثناء الحفظ.','error')}finally{$('save').disabled=false}}
 function view(a){$('viewTitle').textContent=a.title;$('viewAuthor').textContent='المؤلف: '+a.author_name;$('viewPub').textContent='النشر: '+date(a.published_at);$('viewUpd').textContent='آخر تعديل: '+date(a.updated_at);$('viewState').textContent=a.visibility==='public'?'🌐 مقال عام':'🔒 مقال خاص';$('viewContent').innerHTML=safe(a.content);syncTextDirection($('viewContent'));$('viewModal').classList.remove('hidden');document.body.classList.add('overflow-hidden')}
 function closeConfirm(){$('confirmModal').classList.add('hidden');document.body.classList.remove('overflow-hidden')}function confirmDelete(){return new Promise(resolve=>{const m=$('confirmModal');m.classList.remove('hidden');document.body.classList.add('overflow-hidden');const finish=v=>{closeConfirm();$('confirmDelete').onclick=null;$('confirmCancel').onclick=null;resolve(v)};$('confirmDelete').onclick=()=>finish(true);$('confirmCancel').onclick=()=>finish(false);m.onclick=e=>{if(e.target===m)finish(false)}})}async function del(id){const a=articles.find(x=>x.id===id);if(!a||a.created_by!==user.id)return;if(!await confirmDelete())return;const{error}=await supabase.from('articles').delete().eq('id',id).eq('created_by',user.id);if(error)return toast(error.message,'error');toast('تم حذف المقال.');load()}
 $('addBtn').onclick=()=>openEditor();$('closeEdit').onclick=$('cancel').onclick=closeEditor;$('save').onclick=save;$('closeView').onclick=()=>{$('viewModal').classList.add('hidden');document.body.classList.remove('overflow-hidden')};$('public').onchange=()=>{state();if(!$('public').checked)setArticleAccess('')};$('search').oninput=render;$('filter').onchange=render;
