@@ -212,8 +212,9 @@
     try {
       const upload = await sb.storage.from('subscription-proofs').upload(newPath, file, { cacheControl: '3600', upsert: false });
       if (upload.error) throw upload.error;
-      const update = await sb.from('subscriptions').update({ payment_proof_path: newPath }).eq('id', sub.id).eq('user_id', state.user.id).eq('status', 'pending');
+      const update = await sb.from('subscriptions').update({ payment_proof_path: newPath }).eq('id', sub.id).eq('user_id', state.user.id).eq('status', 'pending').select('id');
       if (update.error) throw update.error;
+      if (!update.data?.length) throw new Error('تغيّرت حالة طلب الاشتراك؛ لم يتم استبدال إثبات الدفع.');
       if (sub.payment_proof_path) await sb.storage.from('subscription-proofs').remove([sub.payment_proof_path]).catch(() => {});
       closeModal();
       toast('تم تعديل إثبات الدفع بنجاح.');
