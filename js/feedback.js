@@ -16,6 +16,7 @@
   const state = {
     user: null,
     isAdmin: false,
+    ownFeedbackId: null,
     feedback: null,
     editingId: null,
     saving: false,
@@ -193,7 +194,9 @@
     elements.empty?.classList.add("hidden");
 
     elements.list.innerHTML = feedbacks.map((feedback) => {
-      const isOwner = feedback.user_id === state.user?.id;
+      const isOwner = Boolean(
+        state.user?.id && feedback.id === state.ownFeedbackId
+      );
       const canManage = state.isAdmin || isOwner;
       const stars = Array.from({ length: 5 }, (_, index) => {
         const active = index < Number(feedback.rating);
@@ -242,13 +245,19 @@
     const supabase = window.DietPlannerAccess?.supabaseClient;
     if (!supabase) return;
 
+    const source = state.isAdmin ? "app_feedback" : "app_feedback_public";
+    const columns = state.isAdmin
+      ? "id,user_id,rating,comment,display_name,created_at,updated_at"
+      : "id,rating,comment,display_name,created_at,updated_at";
+
     const { data, error } = await supabase
-      .from("app_feedback")
-      .select("id,user_id,rating,comment,display_name,created_at,updated_at")
+      .from(source)
+      .select(columns)
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Feedback list load failed:", error);
+      if (elements.list) elements.list.innerHTML = "";
       showStatus("تعذر تحميل آراء المستخدمين حاليًا. حاول مرة أخرى.", "error");
       return;
     }
@@ -256,8 +265,32 @@
     state.feedbacks = Array.isArray(data) ? data : [];
     renderFeedbackList(state.feedbacks);
 
-    const own = (data || []).find((item) => item.user_id === state.user?.id);
-    if (own && !state.editingId) renderOwnFeedback(own);
+    let own = null;
+    if (state.user?.id && state.isAdmin) {
+      own = state.feedbacks.find((item) => item.user_id === state.user.id) || null;
+    } else if (state.user?.id) {
+      const { data: ownData, error: ownError } = await supabase
+        .from("app_feedback")
+        .select("id,user_id,rating,comment,display_name,created_at,updated_at")
+        .eq("user_id", state.user.id)
+        .maybeSingle();
+
+      if (ownError) {
+        console.error("Own feedback lookup failed:", ownError);
+      } else {
+        own = ownData;
+      }
+    }
+
+    state.ownFeedbackId = own?.id || null;
+    if (own && !state.editingId) {
+      renderOwnFeedback(own);
+    } else if (!own && !state.editingId) {
+      setFormMode(null);
+    }
+
+    // Re-render so the edit/delete controls reflect the resolved ownership.
+    renderFeedbackList(state.feedbacks);
   }
 
   async function saveFeedback(event) {
@@ -361,6 +394,7 @@
 
   async function performDeleteFeedback(feedbackId) {
     if (state.deleting || !feedbackId || !state.user?.id) return;
+    if (!state.isAdmin && feedbackId !== state.ownFeedbackId) return;
 
     state.deleting = true;
     clearStatus();
@@ -394,7 +428,7 @@
     const card = state.feedbacks?.find((item) => item.id === feedbackId);
     if (!card) return;
 
-    if (!state.isAdmin && card.user_id !== state.user?.id) return;
+    if (!state.isAdmin && feedbackId !== state.ownFeedbackId) return;
 
     setFormMode(card);
     elements.form?.scrollIntoView({ behavior: "smooth", block: "start" });
