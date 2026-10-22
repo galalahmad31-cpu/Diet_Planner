@@ -355,7 +355,17 @@ async function loadCalculatorPatientData() {
     // Calculate the current TDEE first so a saved absolute target can be
     // displayed correctly as (target - TDEE) in the adjustment field.
     if (pendingSavedTargetCalories != null) {
+        const savedCalories = Number(pendingSavedTargetCalories);
         calculateSelectedEnergy();
+
+        // If patient measurements are incomplete, keep the approved target visible
+        // instead of leaving the calculator at zero. A later valid energy calculation
+        // will still convert the saved absolute target into a TDEE adjustment.
+        const calculatedTdee = Number(document.getElementById('resTDEE')?.textContent) || 0;
+        if (calculatedTdee <= 0 && savedCalories > 0) {
+            document.getElementById('calcAdjustment').value = savedCalories;
+            updateTargetAndMacros();
+        }
     } else {
         updateTargetAndMacros();
     }
