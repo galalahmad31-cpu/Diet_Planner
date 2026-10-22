@@ -4,7 +4,7 @@
 
    Depends on:
    - js/auth-access.js
-   - public.app_feedback (single source table)
+   - public.app_feedback and restricted public view public.app_feedback_public
 
    Authentication and Supabase client are provided by
    DietPlannerAccess. This file does not duplicate auth logic.
@@ -245,9 +245,9 @@
     const supabase = window.DietPlannerAccess?.supabaseClient;
     if (!supabase) return;
 
-    // Read public-safe columns directly from the single source table.
-    // Column-level grants prevent anonymous users from reading user_id.
-    const source = "app_feedback";
+    // Public users read through a restricted view; admins use the source table.
+    // This preserves public display without granting table-level access to user_id.
+    const source = state.isAdmin ? "app_feedback" : "app_feedback_public";
     const columns = state.isAdmin
       ? "id,user_id,rating,comment,display_name,created_at,updated_at"
       : "id,rating,comment,display_name,created_at,updated_at";
