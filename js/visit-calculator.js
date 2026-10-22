@@ -310,29 +310,43 @@ async function loadCalculatorPatientData() {
 
     let plansQuery = calcDb
         .from('nutrition_plans')
-        .select('target_calories,target_protein,target_carb,target_fat')
-        .eq('patient_id', calcResolvedPatientId);
+        .select('id,plan_name,target_calories,target_protein,target_carb,target_fat,updated_at,created_at')
+        .eq('patient_id', calcResolvedPatientId)
+        .in('plan_name', [
+            'الخطة الغذائية باستخدام الجرامات',
+            'الخطة الغذائية باستخدام البدائل'
+        ]);
 
-    if (calcVisitId) plansQuery = plansQuery.eq('visit_id', calcVisitId);
+    // Match this visit exactly; null visit IDs must not accidentally load another visit's targets.
+    plansQuery = calcVisitId
+        ? plansQuery.eq('visit_id', calcVisitId)
+        : plansQuery.is('visit_id', null);
 
-    const { data: plans } = await plansQuery
+    const { data: plans, error: plansError } = await plansQuery
         .order('updated_at', { ascending:false })
-        .order('created_at', { ascending:false })
-        .limit(1);
+        .order('created_at', { ascending:false });
 
-    const plan = plans?.[0];
+    if (plansError) {
+        console.error('Saved calculator targets load error:', plansError);
+        calcShowToast('تعذر تحميل الأهداف المحفوظة', 'error');
+        return false;
+    }
+
+    // Both plan types are saved together. Prefer the newest row that actually has a saved calorie target.
+    const plan = (plans || []).find(item => item.target_calories != null);
     if (plan) {
-        if (plan.target_calories != null) {
-            pendingSavedTargetCalories = Number(plan.target_calories);
+        const calories = Number(plan.target_calories);
+        if (Number.isFinite(calories) && calories > 0) {
+            pendingSavedTargetCalories = calories;
         }
-        if (plan.target_protein && plan.target_calories) {
-            document.getElementById('macroProPercent').value = Math.round(Number(plan.target_protein) * 4 / Number(plan.target_calories) * 100);
-        }
-        if (plan.target_carb && plan.target_calories) {
-            document.getElementById('macroCarbPercent').value = Math.round(Number(plan.target_carb) * 4 / Number(plan.target_calories) * 100);
-        }
-        if (plan.target_fat && plan.target_calories) {
-            document.getElementById('macroFatPercent').value = Math.round(Number(plan.target_fat) * 9 / Number(plan.target_calories) * 100);
+
+        if (calories > 0) {
+            const proteinPercent = Math.round(Number(plan.target_protein || 0) * 4 / calories * 100);
+            const carbPercent = Math.round(Number(plan.target_carb || 0) * 4 / calories * 100);
+            const fatPercent = Math.max(0, 100 - proteinPercent - carbPercent);
+            document.getElementById('macroProPercent').value = proteinPercent;
+            document.getElementById('macroCarbPercent').value = carbPercent;
+            document.getElementById('macroFatPercent').value = fatPercent;
         }
     }
 
