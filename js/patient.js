@@ -272,11 +272,8 @@
       if (error) throw error;
 
       closeAddPatientModal();
-      showStatus('تم حفظ المريض.', 'success');
-
-      if (data?.id) {
-        window.location.href = `patient-profile.html?id=${encodeURIComponent(data.id)}`;
-      }
+      await loadPatients();
+      showStatus('تم حفظ المريض بنجاح. يمكنك فتح ملفه بالضغط على اسمه.', 'success');
     } catch (error) {
       console.error('Create patient failed:', error);
       showStatus('تعذر حفظ المريض في قاعدة البيانات.');
