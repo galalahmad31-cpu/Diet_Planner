@@ -663,7 +663,7 @@ function renderDays(){
      </div>
      <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2"><button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة وجبة</button><button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">تطبيق دايت ثابت</button></div>
-      <input value="${escapeHtml(d.notes||'')}" onchange="window.dietPlan.updateDayNotes('${escapeHtml(d.id)}',this.value)" placeholder="ملاحظات اليوم" class="flex-1 min-w-[220px] bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs font-semibold">
+      <textarea rows="1" oninput="window.dietPlan.updateDayNotes('${escapeHtml(d.id)}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="ملاحظات اليوم" class="day-note-input flex-1 min-w-[220px] min-h-[38px] overflow-hidden resize-none bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs font-semibold leading-relaxed">${escapeHtml(d.notes||'')}</textarea>
      </div>
      ${(d.meals||[]).map((m,mi)=>`<div class="meal-card border border-slate-200 rounded-2xl overflow-hidden">
       <div class="flex items-center justify-between gap-3 p-3 bg-slate-50"><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" class="font-black bg-transparent outline-none flex-1"><div class="flex items-center gap-2"><button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" class="text-slate-400"><i class="fa-solid fa-arrow-up"></i></button><button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" class="text-slate-400"><i class="fa-solid fa-arrow-down"></i></button><button onclick="window.dietPlan.openFoodModal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="bg-emerald-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة صنف</button><button onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div>
@@ -675,6 +675,10 @@ function renderDays(){
    </section>`;
  }).join(''):'<div class="text-center py-12 text-slate-400 font-bold">لا توجد أيام غذائية بعد. أضف يومًا جديدًا للبدء.</div>';
  daysData.forEach(d=>setDayEditMode(d.id,!!dayEditModes[String(d.id)]));
+ container.querySelectorAll('.day-note-input').forEach(el=>{
+   el.style.height='auto';
+   el.style.height=el.scrollHeight+'px';
+ });
 }
 
 function openPrintSettingsModal(){
