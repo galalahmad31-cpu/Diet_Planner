@@ -169,11 +169,11 @@ async function loadPlan(shouldRender=true){
  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;updateTargets();if(shouldRender)renderDays();return;}
  activeCloudPlanId=plan.id;
  patientInfo.targetCal=plan.target_calories??''; patientInfo.targetPro=plan.target_protein??''; patientInfo.targetCarb=plan.target_carb??''; patientInfo.targetFat=plan.target_fat??''; patientInfo.goal=plan.goal||'loss';
- const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name').eq('plan_id',plan.id).order('day_number',{ascending:true});
+ const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name,notes').eq('plan_id',plan.id).order('day_number',{ascending:true});
  const ids=(dayRows||[]).map(x=>x.id);
  let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
  const mids=meals.map(x=>x.id); let items=[]; if(mids.length){const r=await sb.from('plan_items').select('id,meal_id,food_id,quantity_g,frequency,notes').in('meal_id',mids);items=r.data||[];}
- daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:'',isCollapsed:false,meals:meals.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:items.filter(i=>i.meal_id===m.id).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
+ daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',isCollapsed:false,meals:meals.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:items.filter(i=>i.meal_id===m.id).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
  savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
 }
 
@@ -605,6 +605,7 @@ async function savePlan(){
 
     const daysPayload=localDays.map(day=>({
       title:day.title||'',
+      notes:day.notes||'',
       meals:(day.meals||[]).map(meal=>({
         name:meal.name||'',
         items:(meal.items||[]).map(item=>{
