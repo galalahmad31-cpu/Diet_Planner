@@ -37,7 +37,7 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
     .embedded-calculator .calc-result-tdee{background:#ecfdf5;border:1px solid #a7f3d0}
     .embedded-calculator .calc-result-group{background:#fdf4ff;border:1px solid #f5d0fe}
     @media print{
-      @page{size:A4;margin:14mm 15mm 16mm}
+      @page{size:A4;margin:8mm 10mm 9mm}
 
       html,body{margin:0!important;padding:0!important;background:#fff!important;color:#111827!important}
       body > header,
@@ -131,33 +131,33 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
       }
       #printPlanContent .print-day{
         display:block!important;
-        margin:0 0 9mm!important;
+        margin:0 0 3mm!important;
         padding:0!important;
-        break-inside:avoid-page;
-        page-break-inside:avoid;
+        break-inside:auto!important;
+        page-break-inside:auto!important;
       }
-      #printPlanContent .print-day + .print-day{margin-top:3mm!important}
+      #printPlanContent .print-day + .print-day{margin-top:1mm!important}
       #printPlanContent .print-day-title{
-        margin:0 0 4mm!important;
+        margin:0 0 1.5mm!important;
         padding:0!important;
         border:0!important;
-        font-size:14pt!important;
-        line-height:1.5!important;
+        font-size:10pt!important;
+        line-height:1.25!important;
         font-weight:900!important;
         color:#111827!important;
       }
       #printPlanContent .print-meal{
-        margin:0 0 5mm!important;
-        padding:0!important;
-        break-inside:avoid-page;
-        page-break-inside:avoid;
-      }
-      #printPlanContent .print-meal-title{
         margin:0 0 2mm!important;
         padding:0!important;
+        break-inside:avoid!important;
+        page-break-inside:avoid!important;
+      }
+      #printPlanContent .print-meal-title{
+        margin:0 0 1mm!important;
+        padding:0!important;
         border:0!important;
-        font-size:10.5pt!important;
-        line-height:1.5!important;
+        font-size:8pt!important;
+        line-height:1.2!important;
         font-weight:800!important;
         color:#166534!important;
       }
@@ -165,19 +165,19 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
         width:100%!important;
         border-collapse:collapse!important;
         table-layout:fixed!important;
-        font-size:9pt!important;
-        line-height:1.55!important;
+        font-size:7pt!important;
+        line-height:1.2!important;
       }
       #printPlanContent th{
-        padding:1.8mm 1.5mm!important;
-        font-size:8.5pt!important;
+        padding:.7mm .8mm!important;
+        font-size:6.5pt!important;
         font-weight:800!important;
         color:#374151!important;
         text-align:right!important;
         border-bottom:1px solid #9ca3af!important;
       }
       #printPlanContent td{
-        padding:2mm 1.5mm!important;
+        padding:.8mm .8mm!important;
         color:#1f2937!important;
         text-align:right!important;
         vertical-align:top!important;
@@ -191,8 +191,8 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
       #printPlanContent .print-note{
         margin:2mm 0 0!important;
         padding:0!important;
-        font-size:8.5pt!important;
-        line-height:1.7!important;
+        font-size:7pt!important;
+        line-height:1.3!important;
         color:#6b7280!important;
       }
     }
