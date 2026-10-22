@@ -141,8 +141,8 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
         margin:0 0 1.5mm!important;
         padding:0!important;
         border:0!important;
-        font-size:10pt!important;
-        line-height:1.25!important;
+        font-size:10.5pt!important;
+        line-height:1.3!important;
         font-weight:900!important;
         color:#111827!important;
       }
@@ -156,8 +156,8 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
         margin:0 0 1mm!important;
         padding:0!important;
         border:0!important;
-        font-size:8pt!important;
-        line-height:1.2!important;
+        font-size:8.5pt!important;
+        line-height:1.25!important;
         font-weight:800!important;
         color:#166534!important;
       }
@@ -165,12 +165,12 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
         width:100%!important;
         border-collapse:collapse!important;
         table-layout:fixed!important;
-        font-size:7pt!important;
-        line-height:1.2!important;
+        font-size:7.5pt!important;
+        line-height:1.25!important;
       }
       #printPlanContent th{
         padding:.7mm .8mm!important;
-        font-size:6.5pt!important;
+        font-size:7pt!important;
         font-weight:800!important;
         color:#374151!important;
         text-align:right!important;
@@ -191,8 +191,8 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
       #printPlanContent .print-note{
         margin:2mm 0 0!important;
         padding:0!important;
-        font-size:7pt!important;
-        line-height:1.3!important;
+        font-size:7.5pt!important;
+        line-height:1.35!important;
         color:#6b7280!important;
       }
     }
