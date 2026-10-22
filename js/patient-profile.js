@@ -332,7 +332,14 @@
       return;
     }
 
-    window.location.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
+    await loadVisits();
+    await Swal.fire({
+      title: 'تم إنشاء الزيارة',
+      text: 'تم حفظ الزيارة. يمكنك فتحها بالضغط عليها من قائمة الزيارات.',
+      icon: 'success',
+      confirmButtonText: 'حسنًا',
+      confirmButtonColor: '#178f84'
+    });
   }
 
   function fillPatientData() {
