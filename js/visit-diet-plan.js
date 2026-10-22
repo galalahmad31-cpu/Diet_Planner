@@ -345,7 +345,8 @@ function calculateDay(day){
 }
 function metricCard(label,value,unit,target,pctv,kind){
  const bg={amber:'bg-amber-50 border-amber-200 text-amber-900',slate:'bg-slate-50 border-slate-200 text-slate-800',sky:'bg-sky-50 border-sky-200 text-sky-900',emerald:'bg-emerald-50 border-emerald-200 text-emerald-900'}[kind];
- return `<div class="${bg} border rounded-xl p-3"><div class="flex justify-between items-center mb-1"><span class="text-[11px] font-black">${label}</span>${target?`<span class="text-[10px] font-bold opacity-70">الهدف: ${target}g</span>`:''}</div><div class="flex items-baseline gap-1"><span class="text-xl font-black">${value}</span><span class="text-[10px] font-extrabold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div></div>`:''}</div>`;
+ const compactMineral=['الصوديوم (Na)','البوتاسيوم (K)','الفسفور (P)'].includes(label);
+ return `<div class="${bg} border rounded-xl ${compactMineral?'p-2 sm:p-3':'p-3'}"><div class="flex ${compactMineral?'flex-col items-end gap-1':'justify-between items-center mb-1'}"><span class="${compactMineral?'text-[9px] sm:text-[11px]':'text-[11px]'} font-black leading-tight">${label}</span>${target?`<span class="text-[10px] font-bold opacity-70">الهدف: ${target}g</span>`:''}</div><div class="flex items-baseline gap-1"><span class="${compactMineral?'text-base sm:text-xl':'text-xl'} font-black">${value}</span><span class="${compactMineral?'text-[9px] sm:text-[10px]':'text-[10px]'} font-extrabold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div></div>`:''}</div>`;
 }
 
 async function syncFixedMeals(){
@@ -655,10 +656,10 @@ function renderDays(){
       ${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
       ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
      </div>
-     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-      ${metricCard('الصوديوم (Na)',Math.round(calc.sod),'mg',null,0,'sky')}
-      ${metricCard('البوتاسيوم (K)',Math.round(calc.pot),'mg',null,0,'emerald')}
-      ${metricCard('الفسفور (P)',Math.round(calc.pho),'mg',null,0,'slate')}
+     <div class="grid grid-cols-3 gap-2">
+      <div class="min-w-0">${metricCard('الصوديوم (Na)',Math.round(calc.sod),'mg',null,0,'sky')}</div>
+      <div class="min-w-0">${metricCard('البوتاسيوم (K)',Math.round(calc.pot),'mg',null,0,'emerald')}</div>
+      <div class="min-w-0">${metricCard('الفسفور (P)',Math.round(calc.pho),'mg',null,0,'slate')}</div>
      </div>
      <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2"><button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة وجبة</button><button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">تطبيق دايت ثابت</button></div>
