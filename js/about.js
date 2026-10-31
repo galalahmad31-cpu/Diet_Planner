@@ -253,70 +253,57 @@ async function moveSection(id, direction) {
   const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
   if (targetIndex < 0 || targetIndex >= state.sections.length) return;
 
-  const current = state.sections[currentIndex];
-  const target = state.sections[targetIndex];
-  const currentOrder = Number(current.display_order);
-  const targetOrder = Number(target.display_order);
+  // Reorder the complete list, then persist unique order values. Existing rows
+  // may share display_order, so swapping only two numeric values is unreliable.
+  const reordered = [...state.sections];
+  const [moved] = reordered.splice(currentIndex, 1);
+  reordered.splice(targetIndex, 0, moved);
 
-  if (!Number.isFinite(currentOrder) || !Number.isFinite(targetOrder)) return;
+  const container = $("sectionsContainer");
+  const buttons = container?.querySelectorAll('[data-action="move"]');
+  buttons?.forEach(button => { button.disabled = true; });
 
-  const buttons = $("sectionsContainer")?.querySelectorAll(
-    `[data-action="move"][data-id="${id}"]`
-  );
-  buttons?.forEach(button => {
-    button.disabled = true;
-  });
+  try {
+    const numericOrders = state.sections
+      .map(item => Number(item.display_order))
+      .filter(Number.isFinite);
+    const minOrder = numericOrders.length ? Math.min(...numericOrders) : 0;
+    const tempBase = Math.min(0, minOrder) - reordered.length - 10;
 
-  // Persist the swap sequentially. Parallel updates can race with database
-  // triggers/order constraints and leave the displayed order out of sync.
-  const temporaryOrder = Math.min(
-    0,
-    ...state.sections.map(item => Number(item.display_order)).filter(Number.isFinite)
-  ) - 1;
+    // Phase 1: move every row to a unique temporary order, avoiding collisions
+    // with any existing order values.
+    for (let i = 0; i < reordered.length; i++) {
+      const { error } = await db
+        .from("about_sections")
+        .update({ display_order: tempBase - i })
+        .eq("id", reordered[i].id);
+      if (error) throw error;
+    }
 
-  const firstResult = await db
-    .from("about_sections")
-    .update({ display_order: temporaryOrder })
-    .eq("id", current.id);
+    // Phase 2: persist the desired visual order as 0..n-1.
+    for (let i = 0; i < reordered.length; i++) {
+      const { error } = await db
+        .from("about_sections")
+        .update({ display_order: i })
+        .eq("id", reordered[i].id);
+      if (error) throw error;
+    }
 
-  if (firstResult.error) {
-    console.error("Move about section failed (temporary order):", firstResult.error);
-    alert("تعذر حفظ الترتيب: " + firstResult.error.message);
     await loadSections();
-    return;
-  }
 
-  const secondResult = await db
-    .from("about_sections")
-    .update({ display_order: currentOrder })
-    .eq("id", target.id);
-
-  if (secondResult.error) {
-    console.error("Move about section failed (target order):", secondResult.error);
-    // Restore the original order if the second write fails.
-    const rollback = await db
-      .from("about_sections")
-      .update({ display_order: currentOrder })
-      .eq("id", current.id);
-    if (rollback.error) console.error("Move rollback failed:", rollback.error);
-    alert("تعذر حفظ الترتيب: " + secondResult.error.message);
+    // Verify that the database returns the same order that was requested.
+    const expectedIds = reordered.map(item => item.id);
+    const actualIds = state.sections.map(item => item.id);
+    if (expectedIds.some((itemId, index) => itemId !== actualIds[index])) {
+      throw new Error("تم الحفظ لكن ترتيب العناصر المسترجع لا يطابق الترتيب المطلوب.");
+    }
+  } catch (error) {
+    console.error("Persist about section order failed:", error);
+    alert("تعذر حفظ الترتيب بالكامل: " + (error?.message || "خطأ غير معروف") + "\nتم تحديث الصفحة بالترتيب المحفوظ في قاعدة البيانات.");
     await loadSections();
-    return;
+  } finally {
+    buttons?.forEach(button => { button.disabled = false; });
   }
-
-  const thirdResult = await db
-    .from("about_sections")
-    .update({ display_order: temporaryOrder === currentOrder ? targetOrder : targetOrder })
-    .eq("id", current.id);
-
-  if (thirdResult.error) {
-    console.error("Move about section failed (final order):", thirdResult.error);
-    alert("تم تغيير جزء من الترتيب، لكن تعذر إكمال الحفظ. أعد تحميل الصفحة.");
-    await loadSections();
-    return;
-  }
-
-  await loadSections();
 }
 
 function addSection() {
