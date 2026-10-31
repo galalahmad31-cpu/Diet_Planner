@@ -267,23 +267,56 @@ async function moveSection(id, direction) {
     button.disabled = true;
   });
 
-  const [currentResult, targetResult] = await Promise.all([
-    db.from("about_sections").update({ display_order: targetOrder }).eq("id", current.id),
-    db.from("about_sections").update({ display_order: currentOrder }).eq("id", target.id)
-  ]);
+  // Persist the swap sequentially. Parallel updates can race with database
+  // triggers/order constraints and leave the displayed order out of sync.
+  const temporaryOrder = Math.min(
+    0,
+    ...state.sections.map(item => Number(item.display_order)).filter(Number.isFinite)
+  ) - 1;
 
-  if (currentResult.error || targetResult.error) {
-    console.error("Move about section failed:", currentResult.error || targetResult.error);
+  const firstResult = await db
+    .from("about_sections")
+    .update({ display_order: temporaryOrder })
+    .eq("id", current.id);
+
+  if (firstResult.error) {
+    console.error("Move about section failed (temporary order):", firstResult.error);
+    alert("تعذر حفظ الترتيب: " + firstResult.error.message);
     await loadSections();
     return;
   }
 
-  [state.sections[currentIndex], state.sections[targetIndex]] = [
-    state.sections[targetIndex],
-    state.sections[currentIndex]
-  ];
+  const secondResult = await db
+    .from("about_sections")
+    .update({ display_order: currentOrder })
+    .eq("id", target.id);
 
-  render();
+  if (secondResult.error) {
+    console.error("Move about section failed (target order):", secondResult.error);
+    // Restore the original order if the second write fails.
+    const rollback = await db
+      .from("about_sections")
+      .update({ display_order: currentOrder })
+      .eq("id", current.id);
+    if (rollback.error) console.error("Move rollback failed:", rollback.error);
+    alert("تعذر حفظ الترتيب: " + secondResult.error.message);
+    await loadSections();
+    return;
+  }
+
+  const thirdResult = await db
+    .from("about_sections")
+    .update({ display_order: temporaryOrder === currentOrder ? targetOrder : targetOrder })
+    .eq("id", current.id);
+
+  if (thirdResult.error) {
+    console.error("Move about section failed (final order):", thirdResult.error);
+    alert("تم تغيير جزء من الترتيب، لكن تعذر إكمال الحفظ. أعد تحميل الصفحة.");
+    await loadSections();
+    return;
+  }
+
+  await loadSections();
 }
 
 function addSection() {
