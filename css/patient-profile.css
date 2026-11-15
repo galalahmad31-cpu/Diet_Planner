@@ -86,8 +86,8 @@ details[open] summary{color:var(--dp-primary)}
 .save-actions{display:flex;gap:8px;margin-top:14px}.save-actions button{flex:1;border:0;border-radius:10px;padding:10px;font:800 11px Cairo,sans-serif;cursor:pointer}.save-actions #savePatientButton{background:#16834a;color:white}.save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
 .dashboard-link{display:flex;flex-direction:column;justify-content:space-between;min-height:190px}
 .dashboard-cta{display:block;margin-top:22px;color:#176b63;font-size:12px;font-weight:900}
-.plans-card{grid-column:span 2}
+.plans-card{grid-column:auto}
 .plans-list{display:flex;flex-direction:column;gap:8px}
 #visitsList>div{padding:11px 12px!important}
-@media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}.plans-card{grid-column:span 2}}
+@media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.plans-card{grid-column:auto}.patient-name-bar{padding:16px}.dashboard-card{padding:16px}}
