@@ -4,3 +4,21 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .patient-row:hover{transform:translateY(-1px)}
 .loading{animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* Patient directory: responsive card grid */
+#patientsList{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:15px;padding:20px!important;align-items:stretch}
+.patient-card{min-width:0;display:flex;flex-direction:column;padding:17px;border:1px solid #e0e9ee;border-radius:18px;background:#fff;box-shadow:0 4px 14px rgba(20,55,75,.045);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.patient-card:hover{transform:translateY(-3px);border-color:#b8dcd5;box-shadow:0 10px 24px rgba(20,90,80,.09)}
+.patient-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.patient-avatar{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:#e7f5f1;color:#168675;font-size:17px}
+.patient-number{font-size:10px;font-weight:800;color:#8aa0aa;background:#f3f7f9;padding:5px 9px;border-radius:20px}
+.patient-name{font-size:16px;font-weight:900;line-height:1.65;color:#193e50;margin:0 0 8px;overflow-wrap:anywhere}
+.patient-details{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-height:28px;margin-bottom:16px}
+.patient-meta{font-size:10px;font-weight:800;color:#57758a;display:inline-flex;align-items:center;gap:5px}
+.patient-diagnosis{font-size:10px;font-weight:800;color:#087568;background:#e9f6f2;padding:5px 8px;border-radius:8px;max-width:100%;overflow-wrap:anywhere}
+.patient-card-actions{display:flex;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid #edf2f5}
+.patient-open{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:11px;background:#176e68;color:#fff;font-size:11px;font-weight:900;transition:background .15s}
+.patient-open:hover{background:#125a55}
+.patient-delete{width:39px;flex-shrink:0;display:grid;place-items:center;border:1px solid #f5dce2;border-radius:11px;background:#fff5f7;color:#c43c5d;font-size:13px}
+.patient-delete:hover{background:#ffe8ee}
+@media(max-width:560px){#patientsList{grid-template-columns:1fr;gap:11px;padding:14px!important}.patient-card{padding:15px}.patient-name{font-size:15px}}
