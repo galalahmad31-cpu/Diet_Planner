@@ -502,3 +502,12 @@ button{border-radius:11px}
  #dietPlanContent .gp-total{border-bottom:1px solid #cbd9e5!important}
  #dietPlanContent .gp-minerals{gap:8px 14px!important;padding:10px!important}
 }
+
+/* Deep navy palette: replace grey nutrition summary surfaces */
+#dietPlanContent .gp-totals{background:#173b5b!important;border-color:#173b5b!important}
+#dietPlanContent .gp-total{border-left-color:#315875!important}
+#dietPlanContent .gp-total>span{color:#d7e7f3!important}
+#dietPlanContent .gp-total strong{color:#fff!important}
+#dietPlanContent .gp-total small{color:#b8d0e2!important}
+#dietPlanContent .gp-minerals{background:#0f2d47!important;border-top-color:#315875!important;color:#f2f7fb!important}
+#dietPlanContent .gp-total{border-bottom-color:#315875!important}
