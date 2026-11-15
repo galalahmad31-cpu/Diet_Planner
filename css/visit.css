@@ -306,83 +306,215 @@ button{border-radius:11px}
 }
 
 
-/* Gram diet plan — unified palette and layout */
+/* Diet plan workspace — hierarchy, readability and action clarity */
+#dietPlanContent{background:#f8fafb!important;border-color:#dce7eb!important}
+#dietPlanContent .embedded-diet-plan>main{max-width:100%!important;padding:clamp(12px,2.4vw,26px)!important;gap:20px!important}
+#dietPlanContent .embedded-diet-plan>main>section:first-child{background:linear-gradient(135deg,#fff 0%,#f5fbf9 100%)!important;border:1px solid #dcebe7!important;border-radius:18px!important;padding:clamp(14px,2vw,22px)!important}
+#dietPlanContent #targetCal,#dietPlanContent #targetPro,#dietPlanContent #targetCarb,#dietPlanContent #targetFat{font-variant-numeric:tabular-nums;display:block;margin-top:3px}
+#dietPlanContent #planTab>div:first-child{background:#fff;border:1px solid #e3ebef;border-radius:16px;padding:15px 17px}
+#dietPlanContent #planTab>div:first-child h3{font-size:17px!important;color:#15333e}
+#dietPlanContent #planTab>div:first-child p{font-size:12px!important;line-height:1.8}
+#dietPlanContent [data-action="dietPlan.addNewDay"]{min-height:42px;box-shadow:0 5px 14px #15803d18}
+#dietPlanContent .day-card,#dietPlanContent [data-day-id]{border:1px solid #dfe8ec!important;border-radius:18px!important;background:#fff!important;box-shadow:0 5px 18px #18374608!important;overflow:hidden}
+#dietPlanContent .day-card .day-header,#dietPlanContent [data-day-id] .day-header{background:#f5f9fa!important}
+#dietPlanContent .meal-card,#dietPlanContent .meal-box{border-radius:14px!important;border-color:#e4ecef!important}
+#dietPlanContent .meal-header{border-radius:12px!important}
+#dietPlanContent .day-locked{opacity:1}
+#dietPlanContent button{min-height:36px}
+#dietPlanContent input,#dietPlanContent select,#dietPlanContent textarea{background:#fff!important}
+#dietPlanContent .embedded-diet-plan .overflow-x-auto{border-radius:12px}
+@media(max-width:640px){
+ #dietPlanContent .embedded-diet-plan>main{padding:10px!important;gap:12px!important}
+ #dietPlanContent .embedded-diet-plan>main>section:first-child{padding:12px!important}
+ #dietPlanContent #planTab>div:first-child{padding:12px!important}
+ #dietPlanContent #planTab>div:first-child h3{font-size:15px!important}
+ #dietPlanContent [data-action="dietPlan.addNewDay"]{width:100%;justify-content:center}
+}
+
+
+/* Clinical workflow shortcuts: optional, ordered, and mobile-friendly */
+.visit-workflow{background:#fff;border:1px solid #dce7eb;border-radius:18px;padding:clamp(14px,2vw,20px);box-shadow:0 5px 18px rgba(20,45,60,.025)}
+.workflow-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.workflow-heading h3{font-size:15px;font-weight:900;color:#16313d}
+.workflow-heading p{font-size:11px;color:#718391;margin-top:3px}
+.workflow-badge{font-size:10px;font-weight:800;color:#176b63;background:#eaf7f4;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.workflow-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.workflow-step{display:flex;align-items:center;gap:9px;text-align:right;padding:12px;border:1px solid #e3ebef;border-radius:13px;background:#f9fbfc;min-width:0}
+.workflow-step:hover{border-color:#9bcfc5;background:#f1faf7}
+.workflow-step .step-number{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;border-radius:9px;background:#e4f3ef;color:#176b63;font-size:12px;font-weight:900}
+.workflow-step strong{display:block;font-size:11px;font-weight:900;color:#16313d}
+.workflow-step small{display:block;font-size:9px;color:#718391;margin-top:3px;line-height:1.4}
+.workflow-step>span:nth-child(2){min-width:0;flex:1}
+.workflow-step>i{font-size:10px;color:#8aa19f}
+@media(max-width:760px){.workflow-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.workflow-step{padding:10px}.workflow-step small{font-size:9px}}
+@media(max-width:380px){.workflow-steps{grid-template-columns:1fr}.workflow-heading p{max-width:220px}}
+
+
+/* Gram plan: editorial layout overrides */
+/* Let the plan breathe: remove nested surfaces and use spacing/dividers for hierarchy. */
+#dietPlanContent .day-card,
+#dietPlanContent [data-day-id]{
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:transparent!important;overflow:visible!important;
+}
+#dietPlanContent .day-card>header,
+#dietPlanContent [data-day-id]>header{
+ background:transparent!important;border-bottom:1px solid #dce5e9!important;
+ padding:10px 0 14px!important;
+}
+#dietPlanContent .day-card .meal-card,
+#dietPlanContent [data-day-id] .meal-card{
+ border:0!important;border-radius:0!important;overflow:visible!important;
+ background:transparent!important;margin:0 0 22px!important;
+}
+#dietPlanContent .meal-card>div:first-child{
+ background:transparent!important;border-bottom:1px solid #edf1f3!important;
+ padding:10px 0!important;
+}
+#dietPlanContent .meal-card table{border-collapse:separate!important;border-spacing:0!important}
+#dietPlanContent .meal-card thead th{font-weight:600!important;letter-spacing:.01em}
+#dietPlanContent .meal-card tbody tr{transition:background .12s ease}
+#dietPlanContent .meal-card tbody tr:hover{background:#f8fafb!important}
+#dietPlanContent .meal-card tbody td{vertical-align:middle}
+#dietPlanContent .meal-card input[type="number"]{font-variant-numeric:tabular-nums}
+#dietPlanContent .day-note-input{border-radius:0!important}
+#dietPlanContent .day-note-input:focus{box-shadow:none!important}
+@media(max-width:640px){
+ #dietPlanContent .meal-card{margin-bottom:18px!important}
+ #dietPlanContent .meal-card table{min-width:560px!important}
+ #dietPlanContent .meal-card th,#dietPlanContent .meal-card td{padding-inline:7px!important}
+ #dietPlanContent [data-day-id]>header{align-items:flex-start!important}
+}
+
+
+/* Gram plan: coordinated color system (teal / navy / warm amber) */
 #dietPlanContent{
- --gp-ink:#171717;--gp-muted:#5d5145;--gp-line:#e8dccb;
- --gp-paper:#fffaf2;--gp-card:#fffdf9;--gp-green:#176b4d;--gp-green-dark:#104c37;
- --gp-green-soft:#e8f3eb;--gp-gold:#f2bd4b;--gp-gold-soft:#fff1cc;
- background:var(--gp-paper)!important;color:var(--gp-ink)!important;padding:10px!important;
+ --gp-ink:#173b49;--gp-teal:#16766d;--gp-teal-soft:#e6f5f1;
+ --gp-blue:#315f91;--gp-blue-soft:#edf3fb;--gp-amber:#a96b19;--gp-amber-soft:#fff5e5;
+ --gp-line:#d5e8e3;--gp-muted:#6d8790;
 }
-#dietPlanContent .embedded-diet-plan>main{max-width:100%!important;padding:clamp(12px,2vw,24px)!important;gap:18px!important}
-#dietPlanContent .embedded-diet-plan>main>section:first-child{background:var(--gp-card)!important;border:1px solid var(--gp-line)!important;border-radius:14px!important;padding:clamp(14px,2vw,22px)!important;box-shadow:none!important}
-#dietPlanContent #targetCal,#dietPlanContent #targetPro,#dietPlanContent #targetCarb,#dietPlanContent #targetFat{display:block;margin-top:3px;font-variant-numeric:tabular-nums}
-#dietPlanContent #planTab>div:first-child{background:transparent!important;border:0!important;border-bottom:1px solid var(--gp-line)!important;border-radius:0!important;padding:12px 0!important}
-#dietPlanContent #planTab>div:first-child h3{font-size:17px!important;color:var(--gp-ink)!important}
-#dietPlanContent #planTab>div:first-child p{font-size:12px!important;line-height:1.8;color:var(--gp-muted)!important}
-#dietPlanContent [data-action="dietPlan.addNewDay"]{min-height:42px;background:var(--gp-green)!important;color:#fff!important;border:0!important;border-radius:9px!important}
-#dietPlanContent .gp-day{background:var(--gp-card)!important;border:1px solid var(--gp-line)!important;border-radius:14px!important;padding:16px!important;margin:0 0 16px!important;box-shadow:0 3px 12px #4b321008!important}
-#dietPlanContent .gp-day-head{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:0 0 12px;border-bottom:1px solid var(--gp-line)}
-#dietPlanContent .gp-day-name{display:flex;align-items:center;gap:9px;min-width:0}
-#dietPlanContent .gp-day-name input{min-width:0;flex:1;max-width:260px;font-size:17px;font-weight:900;color:var(--gp-ink);background:transparent;border:0;border-bottom:1px solid var(--gp-line);padding:5px 0}
-#dietPlanContent .gp-meal-count{font-size:11px;color:var(--gp-green-dark);background:var(--gp-green-soft);border-radius:20px;padding:5px 8px;white-space:nowrap}
-#dietPlanContent .gp-day-actions{display:flex;align-items:center;gap:7px;width:100%}
-#dietPlanContent .gp-day-actions button{min-height:40px;font-size:12px;font-weight:800;border-radius:8px;padding:7px 12px}
-#dietPlanContent .gp-day-actions .day-edit-btn{flex:1;background:var(--gp-ink)!important;color:#fff!important;border:1px solid var(--gp-ink)!important}
-#dietPlanContent .gp-day-actions .day-save-btn{flex:1;background:var(--gp-green)!important;color:#fff!important;border:1px solid var(--gp-green)!important}
-#dietPlanContent .gp-icon-action{display:inline-flex;align-items:center;justify-content:center;width:36px;min-width:36px;min-height:36px;padding:0!important;background:var(--gp-card)!important;color:var(--gp-ink)!important;border:1px solid var(--gp-line)!important;border-radius:8px!important}
-#dietPlanContent .gp-day-body{padding-top:13px}
-#dietPlanContent .gp-totals{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0!important;background:var(--gp-green-dark)!important;border:1px solid var(--gp-green-dark)!important;border-radius:11px!important;overflow:hidden!important;margin:0 0 13px!important}
-#dietPlanContent .gp-total{display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:3px 8px!important;padding:11px 12px!important;border:0!important;border-bottom:1px solid #ffffff25!important;border-left:1px solid #ffffff25!important}
-#dietPlanContent .gp-total:nth-child(odd){border-left:0!important}
-#dietPlanContent .gp-total>span{font-size:11px!important;color:#d9eadf!important;font-weight:700!important}
-#dietPlanContent .gp-total strong{font-size:20px!important;color:#fff!important;font-weight:900!important}
-#dietPlanContent .gp-total small{grid-column:1/-1!important;font-size:10px!important;color:#b8d6c4!important}
-#dietPlanContent .gp-minerals{display:flex!important;grid-column:1/-1!important;justify-content:space-around!important;gap:7px 14px!important;flex-wrap:wrap!important;padding:10px!important;background:#0b3828!important;color:#fff!important;border:0!important;font-size:11px!important;font-weight:700!important}
-#dietPlanContent .gp-minerals span{white-space:nowrap}
-#dietPlanContent .gp-day-tools{display:flex;flex-direction:column;gap:8px;margin:0 0 13px;padding:12px 0}
-#dietPlanContent .gp-day-buttons{display:flex;gap:7px}
-#dietPlanContent .gp-day-buttons button{flex:1;min-height:38px;border-radius:8px;font-size:12px;font-weight:800}
-#dietPlanContent .gp-primary{background:var(--gp-green)!important;color:#fff!important}
-#dietPlanContent .gp-secondary{background:var(--gp-gold-soft)!important;color:#654400!important;border:1px solid #e8c76f!important}
-#dietPlanContent .gp-day-note{width:100%;min-height:38px;font-size:12px;border:1px solid var(--gp-line)!important;border-radius:8px!important;padding:8px!important;background:#fff!important;color:var(--gp-muted)}
-#dietPlanContent .gp-edit-hint{margin:8px 0 0;padding:9px 11px;border-radius:8px;background:var(--gp-gold-soft);color:#654400;font-size:11px;font-weight:700;line-height:1.65;border:1px solid #ecd38e}
-#dietPlanContent .gp-edit-hint.is-editing{background:var(--gp-green-soft);color:var(--gp-green-dark);border-color:#b8d8c4}
-#dietPlanContent .gp-meals{display:flex;flex-direction:column;gap:11px}
-#dietPlanContent .gp-meal{background:#fff!important;border:1px solid var(--gp-line)!important;border-radius:11px!important;padding:0 11px 8px!important;margin:0!important;overflow:hidden!important}
-#dietPlanContent .gp-meal-head{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px 0;border-bottom:1px solid var(--gp-line)}
-#dietPlanContent .gp-meal-head>input{font-size:14px;font-weight:900;color:var(--gp-ink)!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--gp-line)!important;padding:6px 0;width:100%;min-height:36px}
-#dietPlanContent .gp-meal-actions{display:flex;align-items:center;gap:6px}
-#dietPlanContent .gp-meal-actions button{min-height:36px;padding:6px 9px;border:1px solid var(--gp-line)!important;border-radius:7px!important;background:#fff!important;color:var(--gp-ink)!important;font-size:11px}
-#dietPlanContent .gp-meal-actions .gp-add-food{flex:1;background:var(--gp-green)!important;color:#fff!important;border-color:var(--gp-green)!important;font-weight:800}
-#dietPlanContent .gp-food-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:8px;padding:11px 3px;background:#fff!important;border-bottom:1px solid var(--gp-line)!important}
-#dietPlanContent .gp-food-main{min-width:0}
-#dietPlanContent .gp-food-name{font-size:13px;font-weight:800;color:var(--gp-ink)!important;line-height:1.55}
-#dietPlanContent .gp-food-household{font-size:11px;color:var(--gp-muted)!important;margin-top:3px}
-#dietPlanContent .gp-grams{display:flex;align-items:center;justify-content:center;gap:4px;align-self:start;background:var(--gp-gold-soft)!important;border:1px solid #e8c76f!important;border-radius:8px;padding:6px;color:#654400!important;font-size:12px;font-weight:900}
-#dietPlanContent .gp-grams input{width:55px!important;min-width:0!important;min-height:28px!important;padding:0!important;border:0!important;background:transparent!important;color:#654400!important;text-align:center!important;font-size:14px!important;font-weight:900!important}
-#dietPlanContent .gp-food-meta{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding-top:4px}
-#dietPlanContent .gp-food-meta>label:not(.gp-calc-toggle){display:flex;flex:1 1 90px;flex-direction:column;gap:4px;font-size:10px;color:var(--gp-muted)!important;min-width:0}
-#dietPlanContent .gp-food-meta input[type=text]{width:100%;min-width:0;min-height:32px;font-size:11px;padding:5px!important;border:1px solid var(--gp-line)!important;border-radius:6px!important;color:var(--gp-ink)!important;background:#fff!important}
-#dietPlanContent .gp-calc-toggle{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--gp-ink)!important;font-weight:700}
-#dietPlanContent .gp-calc-toggle input{min-height:0;width:14px;height:14px;accent-color:var(--gp-green)}
-#dietPlanContent .gp-remove-food{color:#8a392d!important;padding:6px;background:transparent;border:0}
-#dietPlanContent .gp-empty-food,#dietPlanContent .gp-empty-plan{padding:18px 6px;text-align:center;color:var(--gp-muted);font-size:12px}
-#dietPlanContent .gp-day-actions button:disabled,#dietPlanContent .gp-meal-actions button:disabled,#dietPlanContent .gp-day-buttons button:disabled{opacity:.4!important;cursor:not-allowed!important}
-@media(min-width:761px){
- #dietPlanContent .gp-day-head{flex-direction:row;align-items:center;justify-content:space-between}
- #dietPlanContent .gp-day-actions{width:auto}
- #dietPlanContent .gp-day-name input{flex:none;max-width:240px}
- #dietPlanContent .gp-day-tools{flex-direction:row;align-items:center}
- #dietPlanContent .gp-day-buttons{flex:none}
- #dietPlanContent .gp-day-note{flex:1}
- #dietPlanContent .gp-meal-head{flex-direction:row;align-items:center}
- #dietPlanContent .gp-meal-head>input{flex:1}
- #dietPlanContent .gp-food-row{grid-template-columns:minmax(0,1fr) 110px}
- #dietPlanContent .gp-food-meta{grid-column:1/-1}
+/* Day heading: visible identity without restoring a heavy card */
+#dietPlanContent .day-card>header,
+#dietPlanContent [data-day-id]>header{
+ background:linear-gradient(90deg,#eaf6f3 0%,#f4f8fc 100%)!important;
+ border:1px solid #d6e9e4!important;border-right:4px solid var(--gp-teal)!important;
+ border-radius:12px!important;padding:12px 14px!important;margin-bottom:12px!important;
 }
-@media(max-width:420px){
- #dietPlanContent .gp-day{padding:11px!important}
- #dietPlanContent .gp-total strong{font-size:18px!important}
- #dietPlanContent .gp-minerals{font-size:10px!important;gap:6px!important}
- #dietPlanContent .gp-food-meta .gp-food-note{flex-basis:100%}
+#dietPlanContent .day-card>header input,
+#dietPlanContent [data-day-id]>header input{color:var(--gp-ink)!important}
+#dietPlanContent .day-card>header span,
+#dietPlanContent [data-day-id]>header span{color:#527781!important}
+#dietPlanContent .day-edit-btn{color:#315f91!important;background:#edf3fb!important}
+#dietPlanContent .day-save-btn{color:#12685f!important;background:#dff3ec!important}
+#dietPlanContent .day-edit-btn:hover,#dietPlanContent .day-save-btn:hover{filter:brightness(.97)}
+/* Daily nutrition figures: colored micro-labels, clear hierarchy */
+#dietPlanContent .day-card>div>div:first-child,
+#dietPlanContent [data-day-id]>div>div:first-child{background:#f0f7f8!important;border:1px solid #dcebed!important;border-radius:12px!important;padding:12px 14px!important}
+#dietPlanContent .day-card>div>div:first-child>div,
+#dietPlanContent [data-day-id]>div>div:first-child>div{padding:4px 9px;border-radius:8px;background:#fff!important;border:1px solid #e2eeef!important}
+#dietPlanContent .day-card>div>div:first-child strong,
+#dietPlanContent [data-day-id]>div>div:first-child strong{color:#176b63!important}
+#dietPlanContent .day-card>div>div:first-child span,
+#dietPlanContent [data-day-id]>div>div:first-child span{color:#65818b!important}
+/* Action buttons: distinguish add-food / apply-template */
+#dietPlanContent button[onclick*="openAddMealModal"]{background:#e4f4ef!important;color:#12685f!important}
+#dietPlanContent button[onclick*="openFixedMeals"]{background:#eaf0fb!important;color:#345f98!important}
+#dietPlanContent button[onclick*="openFoodModal"]{background:#e4f4ef!important;color:#12685f!important}
+#dietPlanContent button[onclick*="deleteMeal"],#dietPlanContent button[onclick*="deleteDay"]{color:#b65b61!important}
+/* Meal heading and food rows */
+#dietPlanContent .meal-card>div:first-child{border-bottom:2px solid #dbe9f3!important}
+#dietPlanContent .meal-card>div:first-child input{color:#244f78!important;font-weight:800!important}
+#dietPlanContent .meal-card thead{background:#edf4fa!important}
+#dietPlanContent .meal-card thead th{color:#476b87!important;padding-top:10px!important;padding-bottom:10px!important}
+#dietPlanContent .meal-card tbody tr:nth-child(even){background:#f7fafc!important}
+#dietPlanContent .meal-card tbody tr:hover{background:#eaf6f3!important}
+#dietPlanContent .meal-card tbody td:first-child{color:#244555!important}
+#dietPlanContent .meal-card input[type="number"]{background:#e6f5f0!important;border:1px solid #c8e7dc!important;border-radius:8px!important;color:#12685f!important;font-weight:800!important;padding:5px 3px!important}
+#dietPlanContent .meal-card input[type="number"]:focus{box-shadow:0 0 0 3px #16766d20!important;border-color:#75b9a7!important}
+#dietPlanContent .meal-card input[placeholder="—"]{border-bottom-color:#d9e6ed!important}
+#dietPlanContent .day-note-input{color:#98621b!important;border-bottom-color:#e9c98f!important}
+#dietPlanContent .day-note-input::placeholder{color:#b28b55!important}
+@media(max-width:640px){
+ #dietPlanContent .day-card>header,#dietPlanContent [data-day-id]>header{padding:10px!important}
+ #dietPlanContent .day-card>div>div:first-child,#dietPlanContent [data-day-id]>div>div:first-child{padding:9px!important}
+ #dietPlanContent .day-card>div>div:first-child>div,#dietPlanContent [data-day-id]>div>div:first-child>div{padding:3px 6px}
+}
+
+
+/* Gram plan: reset to a restrained, high-contrast two-color system */
+#dietPlanContent{--gp-ink:#102f46;--gp-accent:#087f72;--gp-soft:#e8f5f2;--gp-line:#cbd9e2;color:#102f46!important;background:#fff!important}
+/* Strong hierarchy: one dark day bar, no decorative gradients */
+#dietPlanContent .day-card>header,#dietPlanContent [data-day-id]>header{
+ background:#12384f!important;border:0!important;border-right:5px solid #0aa18d!important;
+ border-radius:8px!important;padding:13px 16px!important;margin:0 0 16px!important;color:#fff!important
+}
+#dietPlanContent .day-card>header input,#dietPlanContent [data-day-id]>header input{color:#fff!important;font-size:18px!important}
+#dietPlanContent .day-card>header span,#dietPlanContent [data-day-id]>header span{color:#c8dce7!important}
+#dietPlanContent .day-card>header button,#dietPlanContent [data-day-id]>header button{color:#d5e7ef!important}
+#dietPlanContent .day-edit-btn{background:#e5edf4!important;color:#163f5b!important}
+#dietPlanContent .day-save-btn{background:#087f72!important;color:#fff!important}
+/* Daily totals: plain white, strong figures; no nested colored chips */
+#dietPlanContent .day-card>div>div:first-child,#dietPlanContent [data-day-id]>div>div:first-child{
+ background:#fff!important;border:0!important;border-bottom:2px solid #d5e3ea!important;border-radius:0!important;padding:10px 0 14px!important
+}
+#dietPlanContent .day-card>div>div:first-child>div,#dietPlanContent [data-day-id]>div>div:first-child>div{
+ background:transparent!important;border:0!important;border-radius:0!important;padding:2px 8px!important
+}
+#dietPlanContent .day-card>div>div:first-child strong,#dietPlanContent [data-day-id]>div>div:first-child strong{color:#087f72!important;font-size:18px!important}
+#dietPlanContent .day-card>div>div:first-child span,#dietPlanContent [data-day-id]>div>div:first-child span{color:#526b7c!important}
+/* One action accent only */
+#dietPlanContent button[onclick*="openAddMealModal"],#dietPlanContent button[onclick*="openFoodModal"]{background:#087f72!important;color:#fff!important;border-radius:7px!important}
+#dietPlanContent button[onclick*="openFixedMeals"]{background:#e8eef4!important;color:#234c6b!important;border-radius:7px!important}
+#dietPlanContent .meal-card>div:first-child{border-bottom:2px solid #0b7f72!important}
+#dietPlanContent .meal-card>div:first-child input{color:#12384f!important;font-size:15px!important}
+#dietPlanContent .meal-card thead{background:#12384f!important}
+#dietPlanContent .meal-card thead th{color:#fff!important;font-weight:700!important;padding:11px 8px!important}
+#dietPlanContent .meal-card tbody tr:nth-child(even){background:#f3f7fa!important}
+#dietPlanContent .meal-card tbody tr:hover{background:#e5f4f0!important}
+#dietPlanContent .meal-card tbody td:first-child{color:#163b52!important;font-weight:700!important}
+#dietPlanContent .meal-card input[type="number"]{background:#e3f4ef!important;border:2px solid #8acbbb!important;border-radius:6px!important;color:#075e54!important;font-weight:900!important}
+#dietPlanContent .meal-card input[type="number"]:focus{box-shadow:0 0 0 3px #087f7228!important;border-color:#087f72!important}
+#dietPlanContent .day-note-input{color:#183d55!important;border-bottom:1px solid #a9bdca!important}
+#dietPlanContent .day-note-input::placeholder{color:#718797!important}
+#dietPlanContent button[onclick*="deleteMeal"],#dietPlanContent button[onclick*="deleteDay"]{color:#b42332!important}
+@media(max-width:640px){#dietPlanContent .day-card>header,#dietPlanContent [data-day-id]>header{padding:11px!important}}
+
+
+/* Gram plan UX pass: reduce competing actions, emphasize edit fields */
+#dietPlanContent .day-card{margin-bottom:34px!important}
+#dietPlanContent .day-card>header,#dietPlanContent [data-day-id]>header{gap:10px!important;box-shadow:0 4px 12px #12384f12!important}
+#dietPlanContent .day-card>header>div:first-child,#dietPlanContent [data-day-id]>header>div:first-child{gap:10px!important}
+#dietPlanContent .day-card>header .day-action-always:first-child,#dietPlanContent [data-day-id]>header .day-action-always:first-child{color:#b9d4df!important;background:#204a62!important;border-radius:6px!important}
+#dietPlanContent .day-card>header .day-edit-btn,#dietPlanContent [data-day-id]>header .day-edit-btn{padding:7px 11px!important}
+#dietPlanContent .day-card>header .day-save-btn,#dietPlanContent [data-day-id]>header .day-save-btn{padding:7px 13px!important}
+#dietPlanContent .day-card>header button[title],#dietPlanContent [data-day-id]>header button[title]{opacity:.75!important}
+/* Targets as a single clean strip; minerals stay quieter */
+#dietPlanContent .day-card>div>div:first-child,#dietPlanContent [data-day-id]>div>div:first-child{display:flex!important;align-items:center!important;gap:7px 12px!important;flex-wrap:wrap!important}
+#dietPlanContent .day-card>div>div:first-child>div,#dietPlanContent [data-day-id]>div>div:first-child>div{display:inline-flex!important;align-items:baseline!important;gap:5px!important;border-left:1px solid #dce6ec!important;padding:3px 10px!important}
+#dietPlanContent .day-card>div>div:first-child>div:first-child,#dietPlanContent [data-day-id]>div>div:first-child>div:first-child{border-left:0!important;padding-right:0!important}
+#dietPlanContent .day-card>div>div:first-child strong,#dietPlanContent [data-day-id]>div>div:first-child strong{font-size:17px!important;line-height:1.3!important}
+#dietPlanContent .day-card>div>div:first-child>div span:last-child,#dietPlanContent [data-day-id]>div>div:first-child>div span:last-child{font-size:10px!important}
+/* Keep add actions grouped and notes unobtrusive */
+#dietPlanContent .day-card>div>div:nth-child(2),#dietPlanContent [data-day-id]>div>div:nth-child(2){margin:8px 0 18px!important;gap:8px!important}
+#dietPlanContent .day-card>div>div:nth-child(2) button,#dietPlanContent [data-day-id]>div>div:nth-child(2) button{font-weight:700!important;padding:8px 12px!important}
+#dietPlanContent .day-note-input{max-width:260px!important;margin-right:auto!important;font-size:12px!important}
+/* Meals: strong title, actions visually secondary */
+#dietPlanContent .meal-card{margin-bottom:26px!important}
+#dietPlanContent .meal-card>div:first-child{padding:9px 0 11px!important;gap:8px!important}
+#dietPlanContent .meal-card>div:first-child input{min-height:34px!important;max-width:260px!important}
+#dietPlanContent .meal-card>div:first-child button[title]{color:#718797!important;padding:5px 7px!important}
+#dietPlanContent .meal-card>div:first-child button[onclick*="openFoodModal"]{padding:7px 12px!important}
+#dietPlanContent .meal-card table{border-collapse:collapse!important}
+#dietPlanContent .meal-card tbody td{padding-top:10px!important;padding-bottom:10px!important}
+#dietPlanContent .meal-card tbody td:first-child{font-size:12px!important}
+#dietPlanContent .meal-card tbody td:nth-child(2){min-width:100px!important}
+#dietPlanContent .meal-card input[type="number"]{width:68px!important;min-height:34px!important;font-size:14px!important}
+#dietPlanContent .meal-card input[type="text"]{font-size:12px!important}
+@media(max-width:640px){
+ #dietPlanContent .day-card>header{align-items:center!important}
+ #dietPlanContent .day-card>header>div:last-child{width:100%!important;justify-content:flex-start!important;padding-right:28px!important}
+ #dietPlanContent .day-card>div>div:first-child>div{border-left:0!important;padding:3px 5px!important}
+ #dietPlanContent .day-note-input{max-width:none!important;width:100%!important}
+ #dietPlanContent .meal-card>div:first-child input{max-width:calc(100% - 110px)!important}
+ #dietPlanContent .meal-card tbody td{padding-top:8px!important;padding-bottom:8px!important}
 }
