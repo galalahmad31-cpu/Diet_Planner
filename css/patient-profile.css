@@ -115,3 +115,22 @@ details[open] summary{color:var(--dp-primary)}
 .plans-list{margin-top:10px}
 @media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.dashboard-details>summary{min-height:84px;padding:15px}.dashboard-panel{padding:13px}}
+
+/* Compact modern dashboard refinement */
+.patient-name-bar{padding:15px 20px;border-radius:14px;box-shadow:0 2px 10px rgba(20,45,60,.025)}
+#patientName{font-size:clamp(1.1rem,2.2vw,1.45rem)!important;font-weight:800;letter-spacing:0}
+.patient-dashboard{gap:10px!important}
+.dashboard-card{border-radius:14px!important;box-shadow:0 2px 9px rgba(20,45,60,.025)!important}
+.dashboard-details>summary{min-height:78px;padding:12px 13px;gap:7px}
+.dashboard-card-head{gap:9px}
+.dashboard-card-head h3{font-size:12.5px!important;font-weight:800;line-height:1.5}
+.dashboard-card-head p{font-size:9px!important;line-height:1.45;margin-top:2px}
+.dashboard-icon{width:35px;height:35px;flex-basis:35px;border-radius:10px;font-size:16px}
+.details-chevron{font-size:10px}
+.dashboard-panel{padding:12px}
+.dashboard-primary-btn{padding:9px 10px;font-size:11px;border-radius:9px}
+.patient-fields label{font-size:10px;margin-bottom:4px}
+.patient-fields input,.patient-fields select,.patient-fields textarea{font-size:11px;padding:8px 9px;min-height:35px;border-radius:8px}
+.save-actions button{font-size:10px;padding:9px;border-radius:8px}
+#visitsList>div{padding:9px 10px!important;border-radius:11px!important}
+@media(max-width:600px){.patient-dashboard{gap:8px!important}.dashboard-details>summary{min-height:72px;padding:11px 12px}.dashboard-panel{padding:10px}.patient-name-bar{padding:13px 15px}}
