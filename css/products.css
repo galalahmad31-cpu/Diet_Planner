@@ -1,0 +1,58 @@
+/* Modern therapeutic food product library */
+body{background:#f2f7f7!important;color:#16313a}
+.glass{background:rgba(255,255,255,.92);border-color:#dce9e8;box-shadow:0 8px 28px rgba(20,65,72,.045)}
+main>.mx-auto>header{position:relative;overflow:hidden;background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);border:0;color:#fff;box-shadow:0 16px 36px rgba(15,90,85,.18)}
+main>.mx-auto>header:after{content:"";position:absolute;width:230px;height:230px;border:35px solid rgba(255,255,255,.07);border-radius:50%;left:-65px;top:-100px;pointer-events:none}
+main>.mx-auto>header h1{color:#fff!important;font-size:clamp(1.35rem,3vw,2rem);letter-spacing:-.5px}
+main>.mx-auto>header p{color:#bcebe0!important}
+main>.mx-auto>header .bg-brand-500{background:rgba(255,255,255,.15)!important;box-shadow:0 8px 22px rgba(0,0,0,.12)}
+main>.mx-auto>header>a{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#fff}
+main>.mx-auto>header>a:hover{background:rgba(255,255,255,.2)}
+#adminToolbar{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
+#adminToolbar .text-brand-800,#adminToolbar .text-brand-700{color:#e2fff5}
+#adminToolbar button{background:#fff;color:#126b5d}
+main>.mx-auto>section:nth-of-type(1){border:1px solid #dbe9e7;background:#fff;box-shadow:0 8px 24px rgba(20,65,72,.04)}
+#categoryFilter,#subcategoryFilter,#searchInput{min-height:46px;border-color:#dce8e7!important;background:#f8fbfb!important;border-radius:13px!important;color:#24444a}
+#categoryFilter:focus,#subcategoryFilter:focus,#searchInput:focus{border-color:#36a99a!important;box-shadow:0 0 0 4px rgba(54,169,154,.1)}
+#resetBtn{padding:7px 12px;border-radius:9px;background:#e9f7f4}
+#productsGrid{align-items:stretch;gap:18px!important}
+.product-modern{position:relative;display:flex;flex-direction:column;gap:0;padding:0!important;overflow:hidden;border:1px solid #dce9e8!important;border-radius:23px!important;background:#fff!important;box-shadow:0 5px 18px rgba(20,65,72,.045)!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.product-modern:before{content:"";height:5px;background:linear-gradient(90deg,#21a38e,#72d5bb);display:block}
+.product-modern:hover{transform:translateY(-5px);border-color:#b8ded6!important;box-shadow:0 18px 38px rgba(20,100,90,.12)!important}
+.product-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 19px 0}
+.product-category-pill{display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap;border-radius:999px;background:#eaf7f4;color:#14786b;padding:7px 10px;font-size:10px;font-weight:800}
+.product-category-pill i{font-size:10px}
+.product-category-pill span{opacity:.4}
+.product-title-row{display:flex;align-items:center;gap:12px;padding:16px 19px 14px}
+.product-symbol{height:47px;width:47px;flex-shrink:0;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#e4f7f2,#c8eee4);color:#12816f;font-size:19px}
+.product-title-row h2{font-size:19px!important;line-height:1.55;font-weight:900;color:#173b43!important;margin:0!important;letter-spacing:-.35px}
+.product-usage{display:flex;align-items:flex-start;gap:10px;margin:0 19px;padding:12px 13px;border-radius:14px;background:#f4f8fa;border:1px solid #eaf0f3}
+.usage-icon{width:29px;height:29px;flex-shrink:0;display:grid;place-items:center;border-radius:9px;background:#e1efff;color:#3a78b9;font-size:12px}
+.product-usage small{display:block;font-size:10px;font-weight:900;color:#72909a;margin-bottom:3px}
+.product-usage p{margin:0;color:#3e5962;font-size:12px;font-weight:700;line-height:1.8;white-space:pre-line}
+.product-description{margin:12px 19px 0;padding:0 2px;color:#647a83;font-size:11px;line-height:1.9}
+.product-formulas{margin-top:17px;padding:15px 17px 17px;background:linear-gradient(180deg,#f8fcfb,#f3f9f8);border-top:1px solid #e5f0ee}
+.formula-section-title{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:#176e63;font-size:12px;font-weight:900}
+.formula-section-title>i{display:grid;place-items:center;width:27px;height:27px;border-radius:9px;background:#d9f3eb;color:#13836f}
+.formula-section-title small{margin-right:auto;font-size:10px;color:#8ba9a2;font-weight:700}
+.formula-showcase{background:#fff;border:1px solid #e1eeeb;border-radius:16px;padding:12px;box-shadow:0 3px 10px rgba(24,95,85,.035)}
+.formula-showcase+.formula-showcase{margin-top:9px}
+.formula-showcase-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.formula-mark{height:34px;width:34px;border-radius:11px;background:#f0eaff;color:#7655bb;display:grid;place-items:center;font-size:13px}
+.formula-title-wrap{display:flex;flex-direction:column;gap:2px;min-width:0}
+.formula-title-wrap strong{font-size:12px;color:#263f48;font-weight:900}
+.formula-title-wrap span{font-size:10px;color:#91a4aa;font-weight:700}
+.nutrition-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.metric{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;padding:9px 3px;border-radius:11px;background:#f4f7fa}
+.metric span{font-size:9px;font-weight:800;color:#71838d;white-space:nowrap}
+.metric strong{font-size:17px;line-height:1.3;font-weight:900;color:#314957;overflow-wrap:anywhere}
+.metric small{font-size:9px;color:#9aabb3;font-weight:700}
+.metric-kcal{background:#fff5e6}.metric-kcal strong{color:#c47b16}
+.metric-carb{background:#eaf4ff}.metric-carb strong{color:#2878c5}
+.metric-protein{background:#eaf8f0}.metric-protein strong{color:#16845c}
+.metric-fat{background:#fff0f3}.metric-fat strong{color:#cf5474}
+.formula-notes{margin-top:10px;padding:9px 10px;border-radius:10px;background:#f8fafc;color:#647783;font-size:10px;line-height:1.8}
+.empty-formula{display:flex;align-items:center;gap:8px;margin:15px 18px 18px;padding:11px;border:1px dashed #dce8e6;border-radius:12px;color:#8ca2a5;font-size:11px;font-weight:700}
+.empty-formula i{color:#45a99a}
+#state{border-color:#dce9e8;background:#fff}
+@media(max-width:640px){#productsGrid{gap:13px!important}.product-title-row h2{font-size:17px!important}.product-card-top{padding:14px 15px 0}.product-title-row{padding:13px 15px}.product-usage{margin:0 15px}.product-description{margin:10px 15px 0}.product-formulas{padding:13px 14px 15px}.nutrition-metrics{gap:4px}.metric{padding:8px 2px}.metric strong{font-size:15px}.metric span{font-size:8px}}
