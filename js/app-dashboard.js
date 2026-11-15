@@ -306,7 +306,20 @@
     elements.logout?.classList.add("hidden");
     elements.accountName?.classList.add("hidden");
     addLockStyles();
-    elements.featureCards.forEach(card => { card.dataset.visitorLocked = "true"; bindLockedCard(card); lockCard(card, true); });
+    elements.featureCards.forEach(card => {
+      const href = (card.getAttribute("href") || "").split("?")[0];
+      // Public pages should remain accessible to visitors.
+      if (href === "about.html" || href === "feedback.html") {
+        card.classList.remove("dp-feature-locked");
+        card.removeAttribute("aria-disabled");
+        card.removeAttribute("title");
+        card.querySelector(".dp-lock-overlay")?.remove();
+        return;
+      }
+      card.dataset.visitorLocked = "true";
+      bindLockedCard(card);
+      lockCard(card, true);
+    });
   }
 
   async function initializeDashboard() {
