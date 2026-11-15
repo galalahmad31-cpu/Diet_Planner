@@ -79,8 +79,8 @@
       addVisitButton.classList.toggle('opacity-50', !canWrite);
       addVisitButton.classList.toggle('cursor-not-allowed', !canWrite);
       addVisitButton.title = canWrite
-        ? 'إضافة زيارة'
-        : 'إضافة الزيارة متاحة أثناء الاشتراك المدفوع فقط';
+        ? 'إضافة خطة جديدة'
+        : 'إضافة الخطة متاحة أثناء الاشتراك المدفوع فقط';
     }
 
     const accessBox = $('writeAccessStatus');
@@ -90,7 +90,7 @@
         accessBox.className =
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
       } else if (state.hasActiveSubscription) {
-        accessBox.textContent = 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الزيارات.';
+        accessBox.textContent = 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الخطط الغذائية.';
         accessBox.className =
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
       } else {
