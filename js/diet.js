@@ -16,10 +16,14 @@ let dietRenderLimit=40;
 const $=id=>document.getElementById(id), num=v=>Number(v||0);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function toast(msg,ok=true){const e=$('toast');e.textContent=msg;e.className=`fixed bottom-5 left-5 z-[150] max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl ${ok?'bg-brand-600':'bg-red-600'}`;e.classList.remove('hidden');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.add('hidden'),3200)}
+function withTimeout(promise,ms,label='الطلب'){
+  let timer;
+  return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(`انتهت مهلة ${label} (${Math.round(ms/1000)} ثوانٍ)`)),ms)})]).finally(()=>clearTimeout(timer));
+}
 async function getSession(){
   const access=window.DietPlannerAccess;
   if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
-  user=await access.getCurrentUser();
+  user=await withTimeout(access.getCurrentUser(),3500,'التحقق من الجلسة');
   if(!user){location.replace('index.html');return false;}
   isAdmin=false;
   access.getUserRole?.(user.id).then(role=>{isAdmin=role==='admin';if(diets.length)renderDiets();}).catch(error=>console.warn('Role lookup deferred:',error));
@@ -74,7 +78,16 @@ async function loadDiets(force=false){
     }
   }
 
-  const {data,error}=await supabase.from('diet_templates').select('id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at').order('updated_at',{ascending:false});
+  let response;
+  try{
+    response=await withTimeout(supabase.from('diet_templates').select('id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at').order('updated_at',{ascending:false}),4500,'تحميل الدايت');
+  }catch(error){
+    $('statusStat').textContent=diets.length?'بيانات محفوظة — تعذر التحديث':'انتهت مهلة تحميل الدايت';
+    $('statusStat').className='mt-1 text-sm font-extrabold text-amber-600';
+    if(!diets.length)toast(error.message,false);
+    return false;
+  }
+  const {data,error}=response;
   if(error){
     if(!diets.length){
       $('statusStat').textContent='خطأ';
@@ -88,8 +101,13 @@ async function loadDiets(force=false){
   authors={};
   const ids=[...new Set([...diets.filter(d=>d.visibility==='public').map(d=>d.created_by).filter(Boolean),user.id].filter(Boolean))];
   if(ids.length){
-    const pr=await supabase.from('profiles').select('id,full_name').in('id',ids);
-    if(!pr.error)(pr.data||[]).forEach(p=>{authors[p.id]=p.full_name||''});
+    withTimeout(supabase.from('profiles').select('id,full_name').in('id',ids),1800,'تحميل أسماء الناشرين').then(pr=>{
+      if(!pr.error){
+        (pr.data||[]).forEach(p=>{authors[p.id]=p.full_name||''});
+        writeCache('diets',{diets,authors});
+        renderDiets();
+      }
+    }).catch(error=>console.warn('Publisher names skipped:',error.message));
   }
   if(!authors[user.id])authors[user.id]=user.user_metadata?.full_name||user.user_metadata?.name||'';
   diets.forEach(d=>{if(d.publisher_name)authors[d.created_by]=d.publisher_name});
@@ -372,7 +390,7 @@ async function initializeDietPage(){
     $('statusStat').textContent='استجابة بطيئة';
     $('statusStat').className='mt-1 text-sm font-extrabold text-amber-600';
     toast('التحميل استغرق وقتًا طويلًا. يمكنك استخدام تحديث المكتبة أو إعادة تحميل الصفحة.',false);
-  },2000);
+  },1500);
   try{
     if(!(await getSession()))return;
     await loadPageData();
