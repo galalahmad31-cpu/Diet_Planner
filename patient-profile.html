@@ -61,45 +61,18 @@
     </div>
   </section>
 
-  <!-- Four patient modules -->
   <section id="modulesSection" class="hidden patient-dashboard mt-5">
-    <article class="dashboard-card patient-data-card">
-      <div class="dashboard-card-head"><span class="dashboard-icon teal">👤</span><div><h3>بيانات المريض</h3><p>البيانات الأساسية والتشخيص</p></div></div>
-      <button id="editButton" class="dashboard-primary-btn">تعديل البيانات</button>
-      <div id="writeAccessStatus" class="access-note">جاري التحقق من صلاحيات التعديل...</div>
-      <details open class="patient-fields">
-        <summary>عرض البيانات</summary>
-        <div class="grid grid-cols-1 gap-3 mt-3">
-          <div><label>اسم المريض</label><input id="nameInput" disabled></div>
-          <div><label>النوع</label><select id="genderInput" disabled><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
-          <div><label>تاريخ الميلاد</label><input id="birthDateInput" type="date" disabled></div>
-          <div><label>العمر (سنة)</label><input id="ageInput" type="number" disabled></div>
-          <div><label>الطول (سم)</label><input id="heightInput" type="number" disabled></div>
-          <div><label>التشخيص الطبي</label><textarea id="diagnosisInput" rows="2" disabled></textarea></div>
-          <div><label>شكوى / أعراض</label><textarea id="complaintsInput" rows="2" disabled></textarea></div>
-          <div><label>ملاحظات سريرية</label><textarea id="notesInput" rows="2" disabled></textarea></div>
-        </div>
-      </details>
-      <div id="saveArea" class="hidden save-actions"><button id="savePatientButton">حفظ التعديلات</button><button id="cancelEditButton">إلغاء</button></div>
-    </article>
-
-    <a id="weightLink" class="dashboard-card dashboard-link">
-      <div class="dashboard-card-head"><span class="dashboard-icon blue">📈</span><div><h3>متابعة القياسات</h3><p>الوزن والقياسات عبر الوقت</p></div></div>
-      <span class="dashboard-cta">فتح متابعة القياسات ←</span>
-    </a>
-
-    <article class="dashboard-card plans-card">
-      <div class="dashboard-card-head"><span class="dashboard-icon green">🍽️</span><div><h3>الخطة الغذائية</h3><p>خطط المريض المسجلة</p></div></div>
-      <button type="button" id="addVisitButton" class="dashboard-primary-btn">＋ إضافة خطة جديدة</button>
-      <div id="visitsLoading" class="text-center py-4 text-xs text-slate-400">جاري تحميل الخطط...</div>
-      <div id="visitsEmpty" class="hidden text-center py-4 text-xs text-slate-400">لا توجد خطط غذائية مسجلة.</div>
-      <div id="visitsList" class="plans-list"></div>
-    </article>
-
-    <a id="financeLink" class="dashboard-card dashboard-link" href="finance.html">
-      <div class="dashboard-card-head"><span class="dashboard-icon purple">💳</span><div><h3>ماليات المريض</h3><p>المدفوعات والمستحقات</p></div></div>
-      <span class="dashboard-cta">فتح صفحة الماليات ←</span>
-    </a>
+    <article class="dashboard-card"><details class="dashboard-details">
+      <summary><span class="dashboard-card-head"><span class="dashboard-icon teal">👤</span><span><h3>بيانات المريض</h3><p>البيانات الأساسية والتشخيص</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary>
+      <div class="dashboard-panel"><button id="editButton" class="dashboard-primary-btn">✏️ تعديل البيانات</button>
+      <div class="patient-fields grid grid-cols-1 gap-3 mt-4">
+      <div><label>اسم المريض</label><input id="nameInput" disabled></div><div><label>النوع</label><select id="genderInput" disabled><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
+      <div><label>تاريخ الميلاد</label><input id="birthDateInput" type="date" disabled></div><div><label>العمر (سنة)</label><input id="ageInput" type="number" disabled></div><div><label>الطول (سم)</label><input id="heightInput" type="number" disabled></div><div><label>التشخيص الطبي</label><textarea id="diagnosisInput" rows="2" disabled></textarea></div><div><label>شكوى / أعراض</label><textarea id="complaintsInput" rows="2" disabled></textarea></div><div><label>ملاحظات سريرية</label><textarea id="notesInput" rows="2" disabled></textarea></div></div>
+      <div id="saveArea" class="hidden save-actions"><button id="savePatientButton">حفظ التعديلات</button><button id="cancelEditButton">إلغاء</button></div></div>
+    </details></article>
+    <article class="dashboard-card"><details class="dashboard-details"><summary><span class="dashboard-card-head"><span class="dashboard-icon blue">📈</span><span><h3>متابعة القياسات</h3><p>الوزن والقياسات عبر الوقت</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary><div class="dashboard-panel"><a id="weightLink" class="dashboard-primary-btn dashboard-open-link">فتح متابعة القياسات ←</a></div></details></article>
+    <article class="dashboard-card"><details class="dashboard-details"><summary><span class="dashboard-card-head"><span class="dashboard-icon green">🍽️</span><span><h3>الخطة الغذائية</h3><p>إدارة الخطط المسجلة للمريض</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary><div class="dashboard-panel"><button type="button" id="addVisitButton" class="dashboard-primary-btn">＋ إضافة خطة جديدة</button><div id="visitsLoading" class="text-center py-4 text-xs text-slate-400">جاري تحميل الخطط...</div><div id="visitsEmpty" class="hidden text-center py-4 text-xs text-slate-400">لا توجد خطط غذائية مسجلة.</div><div id="visitsList" class="plans-list"></div></div></details></article>
+    <article class="dashboard-card"><details class="dashboard-details"><summary><span class="dashboard-card-head"><span class="dashboard-icon purple">💳</span><span><h3>ماليات المريض</h3><p>المدفوعات والمستحقات</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary><div class="dashboard-panel"><a id="financeLink" class="dashboard-primary-btn dashboard-open-link" href="finance.html">فتح صفحة الماليات ←</a></div></details></article>
   </section>
 </main>
 
