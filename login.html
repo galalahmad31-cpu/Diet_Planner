@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل الدخول | Diet Planner</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/theme.css?v=20260921-3">
+  <script src="js/theme.js?v=20260921-3"></script>
+</head>
+<body>
+<div style="text-align:center;margin:18px"><a href="index.html" style="color:#11786f;text-decoration:none;font-weight:700">← العودة إلى الصفحة الرئيسية</a></div>
+<div class="card">
+<div class="logo"><i class="fa-solid fa-leaf"></i></div>
+<h1>Diet Planner</h1>
+<div class="sub">نظام إدارة الخطط الغذائية</div>
+<div class="tabs">
+<button type="button" data-auth-tab="loginForm" class="active">تسجيل الدخول</button>
+<button type="button" data-auth-tab="registerForm">إنشاء حساب</button>
+</div>
+<div id="authMessage" class="msg"></div>
+<form id="loginForm" class="auth-form">
+<div class="field"><label>البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="email"></div>
+<div class="field"><label>كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+<div style="text-align:left;margin-top:-7px;margin-bottom:14px;"><a href="forgot-password.html" style="color:#11786f;text-decoration:none;font-size:12px;font-weight:700;">نسيت كلمة المرور؟</a></div>
+<button id="loginButton" type="button" class="btn">تسجيل الدخول</button>
+<div class="divider"><span>أو</span></div>
+<button id="googleLoginButton" type="button" class="google-btn">
+<i class="fa-brands fa-google"></i>
+<span>المتابعة باستخدام Google</span>
+</button>
+<div style="text-align:center;margin-top:12px;">
+  <a href="privacy.html" style="color:#11786f;text-decoration:none;font-size:12px;font-weight:700;">Privacy Policy</a>
+</div>
+</form>
+<form id="registerForm" class="auth-form" style="display:none">
+<div class="field"><label>الاسم</label><input id="registerName" type="text" autocomplete="name"></div>
+<div class="field"><label>البريد الإلكتروني</label><input id="registerEmail" type="email" autocomplete="email"></div>
+<div class="field"><label>كلمة المرور</label><input id="registerPassword" type="password" autocomplete="new-password"></div>
+<button id="registerButton" type="button" class="btn">إنشاء الحساب</button>
+</form>
+</div>
+<script src="js/auth-access.js?v=20260923-1"></script>
+
+  
+</body>
+</html>
