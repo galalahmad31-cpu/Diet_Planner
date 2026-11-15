@@ -467,3 +467,30 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 #calculatorContent #calcTab .macro-grams strong{color:#1d3b32}
 #calculatorContent #calcTab .macro-footer{background:#e2f8ed;border:1px solid #c6eedb;border-radius:12px;padding:12px;margin-top:12px}
 #calculatorContent #calcTab .macro-footer button{background:#047857;box-shadow:0 4px 10px rgba(4,120,87,.18)}
+
+
+/* Visit module cards: clear color identity + full-row layout */
+.visit-module-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.visit-module-grid #assessmentCard{grid-column:1/-1}
+.visit-module-grid .module-card{
+  min-height:112px;padding:18px!important;border:1px solid transparent!important;
+  border-radius:17px!important;box-shadow:0 5px 16px rgba(15,23,42,.07);
+  display:flex!important;align-items:center
+}
+.visit-module-grid .module-card h4{font-size:15px!important;font-weight:900!important}
+.visit-module-grid .module-card p{font-size:11px!important;line-height:1.7!important}
+.visit-module-grid #assessmentCard{background:linear-gradient(110deg,#fff8e8,#fff)!important;border-color:#f5d58c!important}
+.visit-module-grid #assessmentCard>div>div:first-child{background:#ffedbd!important;color:#a16207!important}
+.visit-module-grid #calculatorCard{background:linear-gradient(110deg,#eaf3ff,#fff)!important;border-color:#9fc5ff!important}
+.visit-module-grid #calculatorCard>div>div:first-child{background:#cfe3ff!important;color:#1d4ed8!important}
+.visit-module-grid #dietPlanCard{background:linear-gradient(110deg,#e8fbf1,#fff)!important;border-color:#8fe0b8!important}
+.visit-module-grid #dietPlanCard>div>div:first-child{background:#c9f4dd!important;color:#047857!important}
+.visit-module-grid #exchangePlanCard{background:linear-gradient(110deg,#f3eaff,#fff)!important;border-color:#cbb3ff!important}
+.visit-module-grid #exchangePlanCard>div>div:first-child{background:#e5d5ff!important;color:#6d28d9!important}
+.visit-module-grid .module-card.module-active{box-shadow:0 0 0 3px currentColor,0 8px 20px rgba(15,23,42,.1)!important}
+@media(max-width:640px){
+ .visit-module-grid{grid-template-columns:1fr}
+ .visit-module-grid #assessmentCard{grid-column:auto}
+ .visit-module-grid .module-card{min-height:76px;padding:13px!important}
+ .visit-module-grid .module-card h4{font-size:13px!important}
+}
