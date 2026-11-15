@@ -337,212 +337,42 @@
                         </div>
                         <div id="calculatorContent" class="hidden w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                             <div class="embedded-calculator w-full p-3 sm:p-5">
-                                <section class="tab-content space-y-6" id="calcTab">
-                                    <!-- ENERGY EQUATION CALCULATOR -->
-                                    <div class="calc-card calc-card-energy bg-white rounded-2xl p-5 space-y-5">
-                                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-100 pb-4">
-                                            <div>
-                                                <h3 class="font-black text-slate-800 text-base flex items-center gap-2">
-                                                    <i class="fa-solid fa-calculator text-amber-500">
-                                                    </i>
-                                                    حاسبة الاحتياج من الطاقة
-                                                </h3>
-                                                <p class="text-[10px] text-slate-400 mt-1">
-                                                    اختر معادلة واحدة فقط، وستظهر المدخلات المطلوبة لها.
-                                                </p>
-                                            </div>
-                                            <div class="flex rounded-xl bg-slate-100 p-1 w-full lg:w-auto">
-                                                <button class="flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-xs font-extrabold transition bg-white text-emerald-700 shadow-sm" id="eqBtnMifflin" data-action="selectEnergyEquation" data-equation="mifflin" type="button">
-                                                    Mifflin-St Jeor
-                                                </button>
-                                                <button class="flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-xs font-extrabold transition text-slate-500" id="eqBtnSchofield" data-action="selectEnergyEquation" data-equation="schofield" type="button">
-                                                    Schofield
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <!-- Common inputs -->
-                                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                                            <div>
-                                                <label class="block font-bold text-slate-600 mb-1">
-                                                    النوع
-                                                </label>
-                                                <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-bold" id="energyGender">
-                                                    <option value="male">
-                                                        ذكر
-                                                    </option>
-                                                    <option value="female">
-                                                        أنثى
-                                                    </option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-slate-600 mb-1">
-                                                    العمر (سنة)
-                                                </label>
-                                                <input class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-bold" id="energyAge" min="0" placeholder="30" step="0.1" type="number"/>
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-slate-600 mb-1">
-                                                    الوزن (كجم)
-                                                </label>
-                                                <input class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-bold" id="energyWeight" min="0.1" placeholder="75" step="0.1" type="number"/>
-                                            </div>
-                                            <div class="col-span-2 md:col-span-3" id="heightField">
-                                                <label class="block font-bold text-slate-600 mb-1">
-                                                    الطول (سم)
-                                                </label>
-                                                <input class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-bold" id="energyHeight" min="30" placeholder="175" step="0.1" type="number"/>
-                                            </div>
-                                        </div>
-                                        <!-- Schofield age-group information -->
-                                        <div class="hidden bg-orange-50 border border-orange-100 rounded-xl p-3 text-[10px] text-orange-800 leading-5" id="schofieldInfo">
-                                            <div class="font-black mb-1">
-                                                Schofield للأطفال والمراهقين
-                                            </div>
-                                            <div id="schofieldGroupHint">
-                                                الفئات: أقل من 3 سنوات، 3–10، 10–18، ثم فئات البالغين.
-                                            </div>
-                                            <div class="text-orange-600 mt-1">
-                                                المعادلة الأصلية تعتمد على الوزن (kg) والعمر والجنس، ولا تحتاج الطول.
-                                            </div>
-                                        </div>
-                                        <div class="pt-3 border-t border-slate-100">
-                                            <label class="block font-bold text-slate-600 mb-1 text-xs">
-                                                مستوى النشاط البدني (لحساب TDEE)
-                                            </label>
-                                            <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs" id="calcActivity">
-                                                <option value="1.2">
-                                                    خامل جداً (بدون تمارين)
-                                                </option>
-                                                <option value="1.375">
-                                                    نشاط خفيف (1-3 أيام/الأسبوع)
-                                                </option>
-                                                <option selected="" value="1.55">
-                                                    نشاط متوسط (3-5 أيام/الأسبوع)
-                                                </option>
-                                                <option value="1.725">
-                                                    نشاط عالٍ (6-7 أيام/الأسبوع)
-                                                </option>
-                                                <option value="1.9">
-                                                    نشاط مفرط جداً (عمل شاق / تدريب مضاعف)
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <button class="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs py-3 rounded-xl transition shadow-sm cursor-pointer" data-action="calculateSelectedEnergy" type="button">
-                                            احسب BMR / TDEE
-                                        </button>
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
-                                            <div class="calc-result-neutral p-3 rounded-xl text-center">
-                                                <span class="block text-[10px] text-slate-500 font-bold mb-1">
-                                                    المعادلة
-                                                </span>
-                                                <span class="text-xs font-black text-slate-700" id="resEquation">
-                                                    Mifflin-St Jeor
-                                                </span>
-                                            </div>
-                                            <div class="calc-result-bmr p-3 rounded-xl text-center">
-                                                <span class="block text-[10px] text-violet-600 font-bold mb-1">
-                                                    BMR
-                                                </span>
-                                                <span class="text-xl font-black text-slate-800" id="resBMR">
-                                                    0
-                                                </span>
-                                                <span class="text-[9px] text-slate-400">
-                                                    kcal/day
-                                                </span>
-                                            </div>
-                                            <div class="calc-result-tdee p-3 rounded-xl text-center">
-                                                <span class="block text-[10px] text-emerald-600 font-bold mb-1">
-                                                    TDEE
-                                                </span>
-                                                <span class="text-xl font-black text-emerald-700" id="resTDEE">
-                                                    0
-                                                </span>
-                                                <span class="text-[9px] text-emerald-500">
-                                                    kcal/day
-                                                </span>
-                                            </div>
-                                            <div class="calc-result-group p-3 rounded-xl text-center">
-                                                <span class="block text-[10px] text-fuchsia-600 font-bold mb-1">
-                                                    فئة Schofield
-                                                </span>
-                                                <span class="text-xs font-black text-slate-700" id="resSchofieldGroup">
-                                                    —
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- TARGET + MACROS -->
-                                    <div class="calc-card calc-card-target bg-white rounded-2xl p-5 space-y-4">
-                                        <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2 flex items-center gap-2">
-                                            <i class="fa-solid fa-bullseye text-sky-500">
-                                            </i>
-                                            <span>
-                                                توزيع الماكروز 
-                                            </span>
-                                        </h3>
-                                        <div class="space-y-4 text-xs">
-                                            <div>
-                                                <label class="block font-bold text-slate-600 mb-1">
-                                                    تعديل السعرات من (TDEE)
-                                
-                                                </label>
-                                                <div class="flex gap-2">
-                                                    <input class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-800 focus:outline-none focus:border-emerald-500" id="calcAdjustment" inputmode="numeric" data-action-input="updateTargetAndMacros" placeholder="مثال: -500 أو +300" type="text" value="-500"/>
-                                                    <div class="bg-sky-50 border border-sky-200 text-sky-800 px-4 py-2 rounded-xl flex items-center justify-center font-black whitespace-nowrap min-w-[100px]">
-                                                        <span id="finalTargetCal">
-                                                            0
-                                                        </span>
-                                                        <span class="text-[10px] ml-1">
-                                                            kcal
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="border-t border-slate-100 pt-3">
-                                                <label class="block font-bold text-slate-800 mb-2">
-                                                    توزيع النسب (يجب أن يكون المجموع 100%)
-                                                </label>
-                                                <div class="grid grid-cols-3 gap-3">
-                                                    <div>
-                                                        <label class="block text-[10px] text-slate-500 mb-1">
-                                                            بروتين %
-                                                        </label>
-                                                        <input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 font-bold text-center" id="macroProPercent" data-action-input="updateTargetAndMacros" type="number" value="30"/>
-                                                        <span class="block text-center mt-1 text-slate-700 font-bold" id="macroProGrams">
-                                                            0g
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-slate-500 mb-1">
-                                                            كاربوهيدرات %
-                                                        </label>
-                                                        <input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 font-bold text-center" id="macroCarbPercent" data-action-input="updateTargetAndMacros" type="number" value="40"/>
-                                                        <span class="block text-center mt-1 text-slate-700 font-bold" id="macroCarbGrams">
-                                                            0g
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-slate-500 mb-1">
-                                                            دهون %
-                                                        </label>
-                                                        <input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 font-bold text-center" id="macroFatPercent" data-action-input="updateTargetAndMacros" type="number" value="30"/>
-                                                        <span class="block text-center mt-1 text-slate-700 font-bold" id="macroFatGrams">
-                                                            0g
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="mt-2 text-[10px] font-bold text-center hidden p-1 rounded" id="macroTotalAlert">
-                                                </div>
-                                            </div>
-                                            <button class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-sm cursor-pointer mt-2 flex justify-center items-center gap-2 active:scale-95" data-action="applyCustomTargetToPatient">
-                                                <i class="fa-solid fa-check">
-                                                </i>
-                                                اعتماد السعرات في خطة المريض
-                                            </button>
-                                        </div>
-                                    </div>
-                                </section>
+                                <section class="tab-content" id="calcTab">
+  <div class="energy-workspace">
+    <div class="workspace-heading">
+      <div><span class="workspace-step">01 · ENERGY</span><h3>حساب الاحتياج من الطاقة</h3><p>بيانات المريض ← المعادلة ← الاحتياج اليومي</p></div>
+      <div class="equation-switch"><button id="eqBtnMifflin" data-action="selectEnergyEquation" data-equation="mifflin" type="button">Mifflin-St Jeor</button><button id="eqBtnSchofield" data-action="selectEnergyEquation" data-equation="schofield" type="button">Schofield</button></div>
+    </div>
+    <div class="patient-inputs">
+      <div><label for="energyGender">النوع</label><select id="energyGender"><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
+      <div><label for="energyAge">العمر (سنة)</label><input id="energyAge" min="0" placeholder="30" step="0.1" type="number"/></div>
+      <div><label for="energyWeight">الوزن (كجم)</label><input id="energyWeight" min="0.1" placeholder="75" step="0.1" type="number"/></div>
+      <div id="heightField"><label for="energyHeight">الطول (سم)</label><input id="energyHeight" min="30" placeholder="175" step="0.1" type="number"/></div>
+    </div>
+    <div id="schofieldInfo" class="schofield-note hidden"><strong>Schofield للأطفال والمراهقين</strong><span id="schofieldGroupHint">الفئات: أقل من 3 سنوات، 3–10، 10–18، ثم فئات البالغين.</span><small>المعادلة الأصلية تعتمد على الوزن (kg) والعمر والجنس، ولا تحتاج الطول.</small></div>
+    <div class="activity-row"><label for="calcActivity">مستوى النشاط البدني</label><select id="calcActivity"><option value="1.2">خامل جداً (بدون تمارين)</option><option value="1.375">نشاط خفيف (1-3 أيام/الأسبوع)</option><option selected value="1.55">نشاط متوسط (3-5 أيام/الأسبوع)</option><option value="1.725">نشاط عالٍ (6-7 أيام/الأسبوع)</option><option value="1.9">نشاط مفرط جداً (عمل شاق / تدريب مضاعف)</option></select><button data-action="calculateSelectedEnergy" type="button">احسب الاحتياج <i class="fa-solid fa-arrow-left"></i></button></div>
+    <div class="energy-results">
+      <div class="result-equation"><small>المعادلة المستخدمة</small><strong id="resEquation">Mifflin-St Jeor</strong><span id="resSchofieldGroup">—</span></div>
+      <div class="result-metric"><small>BMR · معدل الأيض الأساسي</small><strong><b id="resBMR">0</b><em>kcal/day</em></strong></div>
+      <div class="result-metric primary"><small>TDEE · الاحتياج اليومي</small><strong><b id="resTDEE">0</b><em>kcal/day</em></strong></div>
+    </div>
+  </div>
+  <div class="macro-workspace">
+    <div class="workspace-heading">
+      <div><span class="workspace-step">02 · TARGET & MACROS</span><h3>تحديد السعرات وتوزيع الماكروز</h3><p>اضبط الهدف اليومي ثم حدد نسب المغذيات الكبرى</p></div>
+      <div class="target-energy"><small>السعرات المستهدفة</small><strong><span id="finalTargetCal">0</span> <em>kcal</em></strong></div>
+    </div>
+    <div class="target-adjustment"><label for="calcAdjustment">التعديل من TDEE <small>(عجز − / فائض +)</small></label><input id="calcAdjustment" inputmode="numeric" data-action-input="updateTargetAndMacros" placeholder="-500 أو +300" type="text" value="-500"/></div>
+    <div class="macro-section-label"><strong>توزيع الطاقة على الماكروز</strong><span>المجموع المطلوب 100%</span></div>
+    <div class="macro-cards">
+      <div class="macro-item protein"><div class="macro-name"><span class="macro-dot"></span> البروتين</div><div class="macro-percent"><input id="macroProPercent" data-action-input="updateTargetAndMacros" type="number" value="30"/><span>%</span></div><div class="macro-grams"><strong id="macroProGrams">0g</strong><small>جرام / يوم</small></div></div>
+      <div class="macro-item carbs"><div class="macro-name"><span class="macro-dot"></span> الكربوهيدرات</div><div class="macro-percent"><input id="macroCarbPercent" data-action-input="updateTargetAndMacros" type="number" value="40"/><span>%</span></div><div class="macro-grams"><strong id="macroCarbGrams">0g</strong><small>جرام / يوم</small></div></div>
+      <div class="macro-item fats"><div class="macro-name"><span class="macro-dot"></span> الدهون</div><div class="macro-percent"><input id="macroFatPercent" data-action-input="updateTargetAndMacros" type="number" value="30"/><span>%</span></div><div class="macro-grams"><strong id="macroFatGrams">0g</strong><small>جرام / يوم</small></div></div>
+    </div>
+    <div id="macroTotalAlert" class="macro-alert hidden"></div>
+    <div class="macro-footer"><span>القيم بالجرام محسوبة تلقائيًا حسب السعرات والنسب.</span><button data-action="applyCustomTargetToPatient" type="button"><i class="fa-solid fa-check"></i> اعتماد الهدف في خطة المريض</button></div>
+  </div>
+</section>
                             </div>
                         </div>
                         <div id="dietPlanContent" class="hidden w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
