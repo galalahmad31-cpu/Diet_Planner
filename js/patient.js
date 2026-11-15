@@ -164,35 +164,27 @@
       return;
     }
 
-    box.innerHTML = filtered.map((patient) => `
-      <div class="patient-row flex items-center gap-3 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-xl p-3">
-        <button
-          type="button"
-          data-action="open-patient"
-          data-patient-id="${escapeHtml(patient.id)}"
-          class="flex-1 min-w-0 text-right flex items-center gap-3"
-        >
-          <span class="w-10 h-10 shrink-0 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">👤</span>
-          <span class="min-w-0">
-            <span class="block font-extrabold text-slate-800 text-sm truncate">
-              ${escapeHtml(patient.name || 'بدون اسم')}
-            </span>
-            <span class="block text-[10px] text-slate-400 mt-0.5">
-              اضغط لفتح ملف المريض
-            </span>
-          </span>
-        </button>
-
-        <button
-          type="button"
-          data-action="ask-delete"
-          data-patient-id="${escapeHtml(patient.id)}"
-          class="w-9 h-9 shrink-0 rounded-lg bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 flex items-center justify-center text-sm"
-          title="حذف المريض"
-          aria-label="حذف المريض"
-        >🗑️</button>
-      </div>
-    `).join('');
+    box.innerHTML = filtered.map((patient, index) => {
+      const age = patient.age ? `<span class="patient-meta"><i class="fa-solid fa-cake-candles"></i> ${escapeHtml(patient.age)} سنة</span>` : '';
+      const diagnosis = patient.diagnosis ? `<span class="patient-diagnosis">${escapeHtml(patient.diagnosis)}</span>` : '';
+      return `
+      <article class="patient-card">
+        <div class="patient-card-head">
+          <span class="patient-avatar"><i class="fa-solid fa-user"></i></span>
+          <span class="patient-number">ملف ${String(index + 1).padStart(2,'0')}</span>
+        </div>
+        <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
+        <div class="patient-details">${age}${diagnosis}</div>
+        <div class="patient-card-actions">
+          <button type="button" data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}" class="patient-open">
+            فتح الملف <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <button type="button" data-action="ask-delete" data-patient-id="${escapeHtml(patient.id)}" class="patient-delete" title="حذف المريض" aria-label="حذف المريض">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+        </div>
+      </article>`;
+    }).join('');
   }
 
   function openPatient(id) {
