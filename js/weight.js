@@ -68,7 +68,7 @@
   }
 
   function updateWriteControls() {
-    const addButton = $('addWeightBtn');
+    const addButton = $('addMeasurementRowBtn');
     const accessBox = $('weightAccessStatus');
     if (addButton) {
       addButton.disabled = !canWriteWeight();
@@ -128,8 +128,7 @@
         notes: item.notes || ''
       }));
 
-      $('weightLogDate').value = new Date().toISOString().slice(0, 10);
-      render();
+        render();
     } catch (error) {
       console.error('Weight page initialization failed:', error);
       $('patientName').textContent = 'تعذر تحميل البيانات';
@@ -137,51 +136,34 @@
     }
   }
 
-  async function addWeightEntry() {
-    if (!canWriteWeight()) {
-      showToast('إضافة قياسات الوزن متاحة أثناء الاشتراك المدفوع فقط', 'error');
-      return;
+  function openInlineMeasurementRow() {
+    if (!canWriteWeight()) { showToast('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط','error'); return; }
+    if ($('inlineMeasurementRow')) { $('inlineMeasurementRow').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    const row=document.createElement('tr'); row.id='inlineMeasurementRow'; row.className='inline-measurement-row';
+    row.innerHTML=`
+      <td><input type="date" id="inlineDate" value="${new Date().toISOString().slice(0,10)}" aria-label="تاريخ القياس"></td>
+      <td><input type="number" step="0.1" min="0.1" id="inlineWeight" placeholder="كجم" aria-label="الوزن"></td>
+      <td><input type="number" step="0.1" min="0" id="inlineWaist" placeholder="سم" aria-label="محيط الوسط"></td>
+      <td><input type="number" step="0.1" min="0" id="inlineHip" placeholder="سم" aria-label="محيط الأرداف"></td>
+      <td><select id="inlineAdherence" aria-label="الالتزام"><option value="">—</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></td>
+      <td class="no-print"><div class="inline-actions"><button type="button" data-action="save-inline" class="inline-save">حفظ</button><button type="button" data-action="cancel-inline" class="inline-cancel">إلغاء</button></div></td>`;
+    $('weightTableBody').prepend(row); row.scrollIntoView({behavior:'smooth',block:'center'}); $('inlineWeight').focus();
+  }
+
+  async function saveInlineMeasurement() {
+    if (!canWriteWeight()) { showToast('لا توجد صلاحية لإضافة قياس','error'); return; }
+    const date=$('inlineDate').value, weight=Number.parseFloat($('inlineWeight').value);
+    const wr=$('inlineWaist').value, hr=$('inlineHip').value;
+    const waist=wr===''?null:Number.parseFloat(wr), hip=hr===''?null:Number.parseFloat(hr), adherence=$('inlineAdherence').value;
+    if(!date||!Number.isFinite(weight)||weight<=0|| (wr!==''&&(!Number.isFinite(waist)||waist<=0)) || (hr!==''&&(!Number.isFinite(hip)||hip<=0))){
+      showToast('راجع التاريخ والوزن والقياسات المدخلة','error');return;
     }
-    const date = $('weightLogDate').value;
-    const weight = Number.parseFloat($('weightLogVal').value); const waistRaw=$('waistLogVal').value, hipRaw=$('hipLogVal').value; const waist=waistRaw===''?null:Number.parseFloat(waistRaw), hip=hipRaw===''?null:Number.parseFloat(hipRaw); const adherence=$('adherenceLogVal').value;
-
-    if (!date || !Number.isFinite(weight) || weight <= 0) {
-      showToast('أدخل تاريخًا ووزنًا صحيحًا', 'error');
-      return;
-    }
-
-    try {
-      if (!state.user) throw new Error('Authentication required.');
-
-      const { data, error } = await supabase
-        .from('weight_logs')
-        .insert({
-          patient_id: state.patientId,
-          weight,
-          measurement_date: date,
-          waist_cm: waist, hip_cm: hip, diet_adherence: adherence || null,
-          notes: null
-        })
-        .select('id,patient_id,weight,measurement_date,notes,created_at')
-        .single();
-
-      if (error) throw error;
-
-      state.weightLogs.push({
-        id: data.id,
-        date: data.measurement_date,
-        weight: Number(data.weight), waist:data.waist_cm==null?null:Number(data.waist_cm), hip:data.hip_cm==null?null:Number(data.hip_cm), adherence:data.diet_adherence||'',
-        notes: data.notes || ''
-      });
-
-      sortLogs();
-      render();
-      $('weightLogVal').value = ''; $('waistLogVal').value=''; $('hipLogVal').value=''; $('adherenceLogVal').value='';
-      showToast('تم تسجيل القياس بنجاح');
-    } catch (error) {
-      console.error('Add weight failed:', error);
-      showToast('تعذر حفظ قياس الوزن في قاعدة البيانات', 'error');
-    }
+    try{
+      const {data,error}=await supabase.from('weight_logs').insert({patient_id:state.patientId,weight,measurement_date:date,waist_cm:waist,hip_cm:hip,diet_adherence:adherence||null,notes:null}).select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
+      if(error)throw error;
+      state.weightLogs.push({id:data.id,date:data.measurement_date,weight:Number(data.weight),waist:data.waist_cm==null?null:Number(data.waist_cm),hip:data.hip_cm==null?null:Number(data.hip_cm),adherence:data.diet_adherence||'',notes:data.notes||''});
+      sortLogs();render();showToast('تم حفظ القياس'); 
+    }catch(error){console.error('Save inline measurement failed:',error);showToast('تعذر حفظ القياس في قاعدة البيانات','error');}
   }
 
   function sortLogs() {
@@ -621,10 +603,10 @@
   function bindEvents() {
     document.addEventListener('click', (event) => {
       const action = event.target.closest('[data-action]')?.dataset.action;
-      if (action === 'delete-weight') requestDelete(Number(event.target.closest('[data-action]').dataset.index));
+      if (action === 'delete-weight') requestDelete(Number(event.target.closest('[data-action]').dataset.index));\n      if (action === 'save-inline') saveInlineMeasurement();\n      if (action === 'cancel-inline') $('inlineMeasurementRow')?.remove();
     });
 
-    $('addWeightBtn')?.addEventListener('click', addWeightEntry);
+    $('addMeasurementRowBtn')?.addEventListener('click', openInlineMeasurementRow);
     $('weightAxisStep')?.addEventListener('change', () => {
       renderWeightChart(state.weightLogs);
     });
