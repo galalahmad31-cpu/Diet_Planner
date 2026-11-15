@@ -453,3 +453,52 @@ button{border-radius:11px}
  #dietPlanContent .gp-meal-actions{gap:2px}
  #dietPlanContent .gp-food-meta .gp-food-note{flex-basis:100%}
 }
+
+/* Readability pass: action contrast, integrated minerals, visual grouping */
+#dietPlanContent{background:#f2f5f8!important}
+#dietPlanContent .gp-day{background:#fff!important;border:1px solid #d7e1e8!important;border-radius:10px!important;padding:16px!important}
+#dietPlanContent .gp-day-head{padding-bottom:12px;border-bottom:1px solid #e3eaf0}
+#dietPlanContent .gp-day-actions .day-edit-btn{
+ background:#dce8f2!important;color:#173f5b!important;border:1px solid #c4d7e5!important;
+ font-weight:800!important;opacity:1!important
+}
+#dietPlanContent .gp-day-actions .day-save-btn{
+ background:#087f72!important;color:#fff!important;border:1px solid #087f72!important
+}
+#dietPlanContent .gp-day-actions .day-edit-btn:hover{background:#cbddea!important}
+#dietPlanContent .gp-totals{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:0!important;
+ background:#e8eef4!important;border:1px solid #cbd9e5!important;border-radius:8px!important;
+ padding:0!important;margin:0 0 12px!important;overflow:hidden
+}
+#dietPlanContent .gp-total{
+ display:grid!important;grid-template-columns:auto 1fr;align-items:center;gap:3px 8px!important;
+ padding:11px 12px!important;border-left:1px solid #cbd9e5!important
+}
+#dietPlanContent .gp-total:first-child{border-left:0!important}
+#dietPlanContent .gp-total>span{color:#304f68!important;font-size:12px!important;font-weight:700!important}
+#dietPlanContent .gp-total strong{color:#12384f!important;font-size:22px!important;font-weight:900!important}
+#dietPlanContent .gp-total small{grid-column:1/-1;color:#536f85!important;font-size:10px!important}
+#dietPlanContent .gp-minerals{
+ grid-column:1/-1!important;display:flex!important;justify-content:flex-start!important;flex-wrap:wrap!important;
+ gap:8px 18px!important;margin:0!important;padding:9px 12px!important;
+ background:#d6e2ec!important;border-top:1px solid #bdcedd!important;
+ color:#24465f!important;font-size:12px!important;font-weight:800!important
+}
+#dietPlanContent .gp-minerals span{white-space:nowrap}
+#dietPlanContent .gp-meal{background:#f8fafc!important;border:1px solid #e1e8ef!important;border-radius:7px!important;padding:0 12px 8px!important}
+#dietPlanContent .gp-meal-head{border-bottom:2px solid #cbd9e5!important}
+#dietPlanContent .gp-food-row:nth-child(even){background:#f0f5f9!important}
+#dietPlanContent .gp-food-row{border-bottom:1px solid #dce5eb!important}
+#dietPlanContent .gp-food-name{color:#173247!important}
+#dietPlanContent .gp-food-household{color:#526c80!important}
+#dietPlanContent .gp-food-meta>label:not(.gp-calc-toggle){color:#536f85!important}
+#dietPlanContent .gp-food-meta input[type="text"]{color:#294b64!important;border-bottom-color:#bdcedd!important}
+#dietPlanContent .gp-calc-toggle{color:#294b64!important;font-weight:700!important}
+@media(max-width:760px){
+ #dietPlanContent .gp-day{padding:11px!important}
+ #dietPlanContent .gp-totals{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #dietPlanContent .gp-total:nth-child(odd){border-left:0!important}
+ #dietPlanContent .gp-total{border-bottom:1px solid #cbd9e5!important}
+ #dietPlanContent .gp-minerals{gap:8px 14px!important;padding:10px!important}
+}
