@@ -369,6 +369,15 @@ async function save(){
 $('saveDiet').onclick=save;
 async function initializeDietPage(){
   const loader=$('loading');
+  let completed=false;
+  // Fail-safe: auth/network requests may remain pending indefinitely.
+  const watchdog=setTimeout(()=>{
+    if(completed)return;
+    if(loader)loader.style.display='none';
+    $('statusStat').textContent='استجابة بطيئة';
+    $('statusStat').className='mt-1 text-sm font-extrabold text-amber-600';
+    toast('التحميل استغرق وقتًا طويلًا. يمكنك استخدام تحديث المكتبة أو إعادة تحميل الصفحة.',false);
+  },8000);
   try{
     if(!(await getSession()))return;
     await loadPageData();
@@ -376,9 +385,10 @@ async function initializeDietPage(){
     console.error('Diet Library initialization failed:',error);
     $('statusStat').textContent='تعذر الاتصال';
     $('statusStat').className='mt-1 text-sm font-extrabold text-red-600';
-    toast('تعذر تحميل مكتبة الدايت. تحقق من الاتصال ثم اضغط تحديث.',false);
+    toast('تعذر تحميل مكتبة الدايت: '+(error?.message||'خطأ غير معروف'),false);
   }finally{
-    // Never leave the full-screen loader blocking the page.
+    completed=true;
+    clearTimeout(watchdog);
     if(loader)loader.style.display='none';
   }
 }
