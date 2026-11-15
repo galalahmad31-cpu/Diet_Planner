@@ -44,3 +44,45 @@ html[data-theme="dark"] #foodPicker > div,
 html[data-theme="dark"] #deleteConfirmModal > div{background:var(--dp-surface)!important;color:var(--dp-text)!important}
 html[data-theme="dark"] #deleteConfirmModal .bg-slate-100,
 html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;color:var(--dp-text)!important}
+
+
+/* Compact, phone-first diet library */
+@media (max-width: 640px) {
+  main.min-h-screen { padding: 10px !important; }
+  main > .mx-auto > header.glass {
+    padding: 12px !important;
+    border-radius: 16px !important;
+  }
+  main > .mx-auto > header .flex.items-center.gap-4 { gap: 10px !important; }
+  main > .mx-auto > header .h-14.w-14 {
+    width: 40px !important; height: 40px !important; border-radius: 12px !important;
+  }
+  main > .mx-auto > header .h-14 i { font-size: 17px !important; }
+  main > .mx-auto > header h1 { font-size: 19px !important; }
+  main > .mx-auto > header p { font-size: 10px !important; line-height: 1.5; }
+  main > .mx-auto > header .flex.flex-wrap.gap-2 a,
+  main > .mx-auto > header #newBtn { padding: 8px 10px !important; font-size: 10px !important; }
+  main > .mx-auto > section.glass { margin-top: 10px !important; padding: 10px !important; border-radius: 15px !important; }
+  main > .mx-auto > section.glass input,
+  main > .mx-auto > section.glass select,
+  main > .mx-auto > section.glass button { padding: 9px 10px !important; font-size: 12px !important; }
+  main > .mx-auto > section.mt-5.grid { margin-top: 10px !important; gap: 7px !important; }
+  main > .mx-auto > section.mt-5.grid > .glass { padding: 9px !important; border-radius: 12px !important; }
+  main > .mx-auto > section.mt-5.grid .text-2xl { font-size: 18px !important; }
+  #dietGrid { margin-top: 10px !important; grid-template-columns: minmax(0,1fr) !important; gap: 8px !important; }
+  #dietGrid article { border-radius: 15px !important; }
+  #dietGrid article > div:first-child { padding: 11px !important; }
+  #dietGrid article h3 { margin-top: 7px !important; font-size: 14px !important; line-height: 1.5; }
+  #dietGrid article p { font-size: 10px !important; }
+  #dietGrid article .mt-5.grid { margin-top: 10px !important; grid-template-columns: repeat(4,minmax(0,1fr)) !important; gap: 5px !important; }
+  #dietGrid article .mt-5.grid > div { padding: 6px 3px !important; border-radius: 8px !important; }
+  #dietGrid article .mt-5.grid > div > div:last-child { font-size: 12px !important; }
+  #dietGrid article > div:last-child { padding: 8px !important; gap: 6px !important; flex-wrap: wrap; }
+  #dietGrid article button { padding: 7px 9px !important; font-size: 10px !important; border-radius: 8px !important; }
+  #dietGrid article .fa-utensils { font-size: 16px !important; }
+  #empty { padding: 28px 12px !important; border-radius: 15px !important; }
+}
+@media (max-width: 380px) {
+  #dietGrid article > div:last-child > div { gap: 5px !important; }
+  #dietGrid article button { padding: 6px 7px !important; }
+}
