@@ -657,23 +657,25 @@ function renderDays(){
     <div class="gp-day-name">
      <button class="day-action-always gp-icon-action" onclick="window.dietPlan.toggleDayCollapse('${escapeHtml(d.id)}')" aria-label="طي اليوم"><i class="fa-solid ${d.isCollapsed?'fa-chevron-down':'fa-chevron-up'}"></i></button>
      <input value="${escapeHtml(d.title||`اليوم ${di+1}`)}" onchange="window.dietPlan.updateDayTitle('${escapeHtml(d.id)}',this.value)" aria-label="اسم اليوم">
-     <span>${d.meals?.length||0} وجبات</span>
+     <span class="gp-meal-count">${d.meals?.length||0} وجبات</span>
     </div>
     <div class="gp-day-actions">
      <button class="day-edit-btn" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')">تعديل</button>
      <button class="day-save-btn" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')">حفظ</button>
-     <button class="day-action-always gp-icon-action" onclick="window.dietPlan.duplicateDay('${escapeHtml(d.id)}')" title="نسخ اليوم"><i class="fa-regular fa-copy"></i></button>
-     <button class="day-action-always gp-icon-action gp-delete" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')" title="حذف اليوم"><i class="fa-solid fa-trash"></i></button>
+     <button class="day-action-always gp-icon-action" onclick="window.dietPlan.duplicateDay('${escapeHtml(d.id)}')" aria-label="نسخ اليوم"><i class="fa-regular fa-copy"></i></button>
+     <button class="day-action-always gp-icon-action gp-delete" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')" aria-label="حذف اليوم"><i class="fa-solid fa-trash"></i></button>
     </div>
    </header>
    ${d.isCollapsed?'':`<div class="gp-day-body">
     <div class="gp-totals">
-     ${targets.map(([label,value,unit,target])=>`<div class="gp-total"><span>${label}</span><strong>${value}</strong><small>${unit}${target?` · هدف ${target}`:''}</small></div>`).join('')}
+     ${targets.map(([label,value,unit,target])=>`<div class="gp-total"><span>${label}</span><strong>${value}</strong><small>${unit}${target?` · الهدف ${target}`:''}</small></div>`).join('')}
      <div class="gp-minerals"><span>Na ${Math.round(calc.sod)} mg</span><span>K ${Math.round(calc.pot)} mg</span><span>P ${Math.round(calc.pho)} mg</span></div>
     </div>
     <div class="gp-day-tools">
-     <button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="gp-primary"><i class="fa-solid fa-plus"></i> إضافة وجبة</button>
-     <button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="gp-secondary"><i class="fa-solid fa-wand-magic-sparkles"></i> تطبيق دايت</button>
+     <div class="gp-day-buttons">
+      <button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="gp-primary"><i class="fa-solid fa-plus"></i> وجبة</button>
+      <button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="gp-secondary"><i class="fa-solid fa-wand-magic-sparkles"></i> تطبيق دايت</button>
+     </div>
      <textarea rows="1" oninput="window.dietPlan.updateDayNotes('${escapeHtml(d.id)}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="ملاحظة اليوم (اختياري)" class="day-note-input gp-day-note">${escapeHtml(d.notes||'')}</textarea>
     </div>
     <div class="gp-meals">
@@ -681,10 +683,10 @@ function renderDays(){
      <div class="gp-meal-head">
       <input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" aria-label="اسم الوجبة">
       <div class="gp-meal-actions">
-       <button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" title="تحريك لأعلى"><i class="fa-solid fa-arrow-up"></i></button>
-       <button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" title="تحريك لأسفل"><i class="fa-solid fa-arrow-down"></i></button>
-       <button onclick="window.dietPlan.openFoodModal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="gp-add-food"><i class="fa-solid fa-plus"></i> صنف</button>
-       <button onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="gp-delete" title="حذف الوجبة"><i class="fa-solid fa-trash"></i></button>
+       <button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" aria-label="تحريك لأعلى"><i class="fa-solid fa-arrow-up"></i></button>
+       <button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" aria-label="تحريك لأسفل"><i class="fa-solid fa-arrow-down"></i></button>
+       <button onclick="window.dietPlan.openFoodModal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="gp-add-food"><i class="fa-solid fa-plus"></i> إضافة صنف</button>
+       <button onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="gp-delete" aria-label="حذف الوجبة"><i class="fa-solid fa-trash"></i></button>
       </div>
      </div>
      <div class="gp-food-list">
@@ -697,10 +699,10 @@ function renderDays(){
        <div class="gp-food-meta">
         <label><span>التكرار</span><input type="text" value="${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="—"></label>
         <label class="gp-food-note"><span>ملاحظة</span><input type="text" value="${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="إضافة ملاحظة"></label>
-        <label class="gp-calc-toggle" title="احتساب غذائي"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)"> محسوب</label>
-        <button class="gp-delete gp-remove-food" onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" title="حذف الصنف"><i class="fa-solid fa-xmark"></i></button>
+        <label class="gp-calc-toggle" title="احتساب غذائي"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)"> احتساب</label>
+        <button class="gp-delete gp-remove-food" onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" aria-label="حذف الصنف"><i class="fa-solid fa-trash"></i></button>
        </div>
-      </article>`}).join(''):`<div class="gp-empty-food">أضف أول صنف للوجبة من زر «صنف»</div>`}
+      </article>`}).join(''):`<div class="gp-empty-food">الوجبة فارغة — اضغط «إضافة صنف»</div>`}
      </div>
     </section>`).join('')}
     </div>
