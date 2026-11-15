@@ -479,3 +479,68 @@ input:focus,select:focus,textarea:focus{
     .qc-panel{padding:13px!important}
     .qc-result{padding:14px!important}
 }
+
+
+/* =========================================================
+   2026 UI refresh — calmer hierarchy, readable work area
+   ========================================================= */
+.qc-welcome{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:clamp(22px,4vw,38px);margin:0 0 28px;
+  border:1px solid #dcebe8;border-radius:24px;
+  background:radial-gradient(circle at 8% 12%,rgba(255,255,255,.9),transparent 32%),linear-gradient(125deg,#edf8f6 0%,#f7fbfa 52%,#f3f6fc 100%);
+  position:relative;overflow:hidden;
+}
+.qc-welcome:after{content:"";position:absolute;width:220px;height:220px;border:1px solid rgba(23,143,132,.09);border-radius:50%;left:-85px;bottom:-130px;box-shadow:0 0 0 24px rgba(23,143,132,.025),0 0 0 48px rgba(23,143,132,.02)}
+.qc-welcome-copy{max-width:650px;position:relative;z-index:1}
+.qc-eyebrow{display:inline-flex;align-items:center;gap:8px;color:#16877e;font-size:.68rem;font-weight:800;letter-spacing:.13em;margin-bottom:12px}
+.qc-eyebrow:before{content:"";width:22px;height:3px;border-radius:4px;background:#d5a64a}
+.qc-welcome h2{font-size:clamp(1.5rem,3.2vw,2.35rem);line-height:1.45;font-weight:900;color:#173d39;margin:0 0 10px;letter-spacing:-.04em}
+.qc-welcome h2 em{font-style:normal;color:#16877e}
+.qc-welcome p{color:#657d78;font-size:.92rem;line-height:1.9;margin:0;max-width:560px}
+.qc-welcome-side{position:relative;z-index:1;min-width:155px;display:flex;flex-direction:column;align-items:center;gap:7px;padding:20px 24px;border:1px solid rgba(23,143,132,.15);border-radius:18px;background:rgba(255,255,255,.68);box-shadow:0 10px 25px rgba(23,80,72,.05)}
+.qc-welcome-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#168b83;color:white;font-size:23px;box-shadow:0 8px 18px rgba(23,143,132,.18);margin-bottom:3px}
+.qc-welcome-side strong{color:#214b45;font-size:.85rem}
+.qc-welcome-side span{color:#81938f;font-size:.68rem;text-align:center}
+.qc-section-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 2px 15px}
+.qc-section-heading span{font-size:.62rem;font-weight:800;letter-spacing:.14em;color:#9aa9a5}
+.qc-section-heading h2{font-size:1.18rem;font-weight:900;color:#254640;margin:2px 0 0}
+.qc-section-heading small{font-size:.75rem;color:#849590;padding-bottom:4px}
+#sub-content-quick-calc{gap:14px!important}
+#sub-content-quick-calc>.border{border-radius:18px!important;overflow:hidden;box-shadow:0 4px 16px rgba(24,65,59,.035)!important}
+#sub-content-quick-calc>.border:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(24,65,59,.065)!important}
+.qc-tab{min-height:76px!important;padding:16px 22px!important}
+.qc-tab span span:first-child{font-size:1.02rem!important;font-weight:900}
+.qc-tab small{font-size:.72rem!important;line-height:1.5}
+.qc-tab svg{width:22px;height:22px;padding:3px;border-radius:8px;background:var(--qc-soft)}
+#sub-content-quick-calc>[class*=border]>[id$="-content"]{padding:22px!important}
+.qc-panel{padding:18px!important;border-radius:16px!important}
+.qc-panel label{display:block;line-height:1.7;margin-bottom:6px!important;font-size:.76rem!important;font-weight:800!important}
+.qc-panel input,.qc-panel select{min-height:43px;border-radius:11px!important;font-size:.88rem!important}
+.qc-panel h4{font-size:.91rem;line-height:1.7}
+.qc-result{padding:22px!important;border-radius:18px!important}
+.qc-result h4{margin-bottom:8px!important}
+.qc-result .qc-result-value{font-variant-numeric:tabular-nums;line-height:1.6}
+.qc-note{line-height:1.9!important;padding:15px!important}
+.qc-action{min-height:36px;padding-inline:13px!important;border-radius:10px!important}
+.iv-line-row{padding:14px!important;border-radius:13px!important}
+.iv-line-row label{font-size:.68rem!important}
+.iv-line-row input,.iv-line-row select{min-height:40px!important}
+@media(max-width:760px){
+ .qc-welcome{padding:22px 18px;margin-bottom:22px;gap:15px}
+ .qc-welcome-side{min-width:0;padding:13px 12px}
+ .qc-welcome-mark{width:40px;height:40px;border-radius:12px}
+ .qc-welcome-side strong{font-size:.72rem}
+ .qc-welcome-side span{font-size:.6rem}
+ .qc-welcome p{font-size:.82rem}
+ .qc-section-heading h2{font-size:1.05rem}
+ .qc-section-heading small{font-size:.67rem}
+ #sub-content-quick-calc>[class*=border]>[id$="-content"]{padding:14px!important}
+}
+@media(max-width:480px){
+ .qc-welcome{align-items:flex-start}
+ .qc-welcome-side{display:none}
+ .qc-welcome h2{font-size:1.48rem}
+ .qc-section-heading{align-items:flex-start;flex-direction:column;gap:3px}
+ .qc-section-heading small{padding:0}
+}
