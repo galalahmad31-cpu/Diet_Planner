@@ -12,7 +12,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-        <link rel="stylesheet" href="css/article.css?v=20261115-modern">
+        <link rel="stylesheet" href="css/article.css?v=20261115-cardsmodal">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
 
@@ -92,7 +92,7 @@
         </main>
         <div
             id="editModal"
-            class="modal fixed inset-0 z-50 hidden overflow-y-auto p-2 sm:p-5"
+            class="article-modal modal fixed inset-0 z-50 hidden overflow-y-auto p-2 sm:p-5"
             >
             <div class="mx-auto flex min-h-full w-full max-w-6xl items-center">
                 <div class="w-full rounded-3xl bg-white shadow-2xl overflow-hidden">
@@ -195,8 +195,8 @@
             class="modal fixed inset-0 z-50 hidden overflow-y-auto p-2 sm:p-5"
             >
             <div class="mx-auto flex min-h-full w-full max-w-4xl items-center">
-                <article class="w-full rounded-3xl bg-white shadow-2xl overflow-hidden">
-                    <div class="flex items-start justify-between border-b p-5 sm:p-7">
+                <article class="article-reader w-full rounded-3xl bg-white shadow-2xl overflow-hidden">
+                    <div class="article-reader-head flex items-start justify-between border-b p-5 sm:p-7">
                         <div>
                             <div
                                 id="viewState"
