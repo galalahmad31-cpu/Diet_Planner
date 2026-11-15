@@ -114,7 +114,7 @@
 
       const { data: weights, error: weightsError } = await supabase
         .from('weight_logs')
-        .select('id,patient_id,weight,measurement_date,notes,created_at')
+        .select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at')
         .eq('patient_id', state.patientId)
         .order('measurement_date', { ascending: true })
         .order('created_at', { ascending: true });
@@ -124,7 +124,7 @@
       state.weightLogs = (weights || []).map((item) => ({
         id: item.id,
         date: item.measurement_date,
-        weight: Number(item.weight),
+        weight: Number(item.weight), waist: item.waist_cm == null ? null : Number(item.waist_cm), hip: item.hip_cm == null ? null : Number(item.hip_cm), adherence: item.diet_adherence || '',
         notes: item.notes || ''
       }));
 
@@ -143,7 +143,7 @@
       return;
     }
     const date = $('weightLogDate').value;
-    const weight = Number.parseFloat($('weightLogVal').value);
+    const weight = Number.parseFloat($('weightLogVal').value); const waistRaw=$('waistLogVal').value, hipRaw=$('hipLogVal').value; const waist=waistRaw===''?null:Number.parseFloat(waistRaw), hip=hipRaw===''?null:Number.parseFloat(hipRaw); const adherence=$('adherenceLogVal').value;
 
     if (!date || !Number.isFinite(weight) || weight <= 0) {
       showToast('أدخل تاريخًا ووزنًا صحيحًا', 'error');
@@ -159,6 +159,7 @@
           patient_id: state.patientId,
           weight,
           measurement_date: date,
+          waist_cm: waist, hip_cm: hip, diet_adherence: adherence || null,
           notes: null
         })
         .select('id,patient_id,weight,measurement_date,notes,created_at')
@@ -169,13 +170,13 @@
       state.weightLogs.push({
         id: data.id,
         date: data.measurement_date,
-        weight: Number(data.weight),
+        weight: Number(data.weight), waist:data.waist_cm==null?null:Number(data.waist_cm), hip:data.hip_cm==null?null:Number(data.hip_cm), adherence:data.diet_adherence||'',
         notes: data.notes || ''
       });
 
       sortLogs();
       render();
-      $('weightLogVal').value = '';
+      $('weightLogVal').value = ''; $('waistLogVal').value=''; $('hipLogVal').value=''; $('adherenceLogVal').value='';
       showToast('تم تسجيل القياس بنجاح');
     } catch (error) {
       console.error('Add weight failed:', error);
@@ -309,28 +310,17 @@
     const body = $('weightTableBody');
 
     if (!state.weightLogs.length) {
-      body.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-slate-400 font-bold">لا توجد قياسات مسجلة</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-400 font-bold">لا توجد قياسات مسجلة</td></tr>';
       return;
     }
 
-    body.innerHTML = state.weightLogs.map((log, index) => {
-      const previous = index ? state.weightLogs[index - 1].weight : log.weight;
-      const diff = log.weight - previous;
-      const diffText = diff === 0 ? '—' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
-      const diffClass = diff < 0 ? 'text-emerald-600' : diff > 0 ? 'text-rose-500' : 'text-slate-400';
-
-      return `
-        <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
-          <td class="py-2.5 px-3 font-bold">${escapeHtml(formatDate(log.date))}</td>
-          <td class="py-2.5 px-3 text-center font-black text-emerald-700">${log.weight.toFixed(1)} كجم</td>
-          <td class="py-2.5 px-3 text-center font-bold ${diffClass}">${diffText}</td>
-          <td class="py-2.5 px-2 text-center no-print">
-            <button type="button" data-action="delete-weight" data-index="${index}" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer" aria-label="حذف القياس">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </td>
-        </tr>`;
-    }).join('');
+    const adherenceLabels={excellent:'ممتاز',good:'جيد',fair:'متوسط',poor:'ضعيف'};
+    body.innerHTML=state.weightLogs.map((log,index)=>`
+      <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
+      <td class="py-3 px-3 font-bold whitespace-nowrap">${escapeHtml(formatDate(log.date))}</td><td class="py-3 px-3 text-center font-black text-emerald-700">${log.weight.toFixed(1)}</td>
+      <td class="py-3 px-3 text-center">${log.waist==null?'—':log.waist.toFixed(1)}</td><td class="py-3 px-3 text-center">${log.hip==null?'—':log.hip.toFixed(1)}</td>
+      <td class="py-3 px-3 text-center"><span class="adherence-badge">${escapeHtml(adherenceLabels[log.adherence]||'—')}</span></td>
+      <td class="py-3 px-2 text-center no-print"><button type="button" data-action="delete-weight" data-index="${index}" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer" aria-label="حذف القياس"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
   }
 
   function getChartStep() {
