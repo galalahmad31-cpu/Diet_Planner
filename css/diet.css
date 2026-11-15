@@ -86,3 +86,44 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
   #dietGrid article > div:last-child > div { gap: 5px !important; }
   #dietGrid article button { padding: 6px 7px !important; }
 }
+
+
+/* Compact library layout: responsive, list-like cards */
+#dietGrid{grid-template-columns:1fr;gap:8px}
+#dietGrid article{border-radius:14px;box-shadow:none}
+#dietGrid article>div:first-child{padding:12px 14px;border-bottom:0}
+#dietGrid article>div:first-child>div>div:first-child{gap:5px}
+#dietGrid article h3{font-size:15px;line-height:1.5;margin-top:7px}
+#dietGrid article p{font-size:11px;margin-top:2px}
+#dietGrid article>div:first-child>div>div>i{font-size:16px}
+#dietGrid article>div:first-child>div>div:first-child>i{display:none}
+#dietGrid article .mt-5.grid{margin-top:9px;gap:5px}
+#dietGrid article .mt-5.grid>div{padding:5px 7px;border-radius:8px}
+#dietGrid article .mt-5.grid>div>div:first-child{font-size:9px}
+#dietGrid article .mt-5.grid>div>div:last-child{font-size:12px;margin-top:2px}
+#dietGrid article>div:last-child{padding:8px 12px;gap:8px}
+#dietGrid article button{padding:7px 10px;border-radius:8px;font-size:10px}
+@media(min-width:640px){
+ #dietGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
+@media(min-width:1024px){
+ #dietGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+}
+@media(max-width:480px){
+ main.min-h-screen{padding:8px}
+ main>div>header{padding:12px;border-radius:14px}
+ main>div>header .h-14{width:38px;height:38px;border-radius:10px}
+ main>div>header .text-2xl{font-size:17px}
+ main>div>header .text-2xl i{font-size:17px}
+ main>div>header p{font-size:10px;line-height:1.5}
+ main>div>header .flex.flex-wrap.gap-2 a,
+ main>div>header .flex.flex-wrap.gap-2 button{padding:8px 10px;font-size:10px}
+ main>div>section.glass{margin-top:8px;padding:10px;border-radius:14px}
+ #search{padding-top:9px;padding-bottom:9px;font-size:12px}
+ #visibilityFilter,#refreshBtn{padding:9px 10px;font-size:11px}
+ main>div>section.mt-5.grid{margin-top:8px;gap:6px}
+ main>div>section.mt-5.grid>div{padding:8px;border-radius:10px}
+ main>div>section.mt-5.grid .text-2xl{font-size:18px}
+ #dietGrid{margin-top:8px}
+ #dietGrid article .mt-5.grid{grid-template-columns:repeat(4,minmax(0,1fr)}
+}
