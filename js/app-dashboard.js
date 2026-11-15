@@ -62,6 +62,9 @@
         user?.email ||
         "حساب المستخدم";
       elements.accountName.classList.remove("hidden");
+      document.getElementById("accountInfo")?.classList.remove("hidden");
+      document.getElementById("loginCta")?.classList.add("hidden");
+      document.getElementById("registerCta")?.classList.add("hidden");
       elements.logout?.classList.remove("hidden");
     } catch (error) {
       console.error("Profile name lookup failed:", error);
@@ -291,6 +294,7 @@
     document.getElementById("registerCta")?.classList.remove("hidden");
     elements.logout?.classList.add("hidden");
     elements.accountName?.classList.add("hidden");
+    document.getElementById("accountInfo")?.classList.add("hidden");
     addLockStyles();
     elements.featureCards.forEach(card => {
       const href = (card.getAttribute("href") || "").split("?")[0];
