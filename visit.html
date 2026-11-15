@@ -349,10 +349,9 @@
       <div><label for="energyWeight">الوزن (كجم)</label><input id="energyWeight" min="0.1" placeholder="75" step="0.1" type="number"/></div>
       <div id="heightField"><label for="energyHeight">الطول (سم)</label><input id="energyHeight" min="30" placeholder="175" step="0.1" type="number"/></div>
     </div>
-    <div id="schofieldInfo" class="schofield-note hidden" aria-hidden="true"><span id="schofieldGroupHint"></span></div>
     <div class="activity-row"><label for="calcActivity">مستوى النشاط البدني</label><select id="calcActivity"><option value="1.2">خامل جداً (بدون تمارين)</option><option value="1.375">نشاط خفيف (1-3 أيام/الأسبوع)</option><option selected value="1.55">نشاط متوسط (3-5 أيام/الأسبوع)</option><option value="1.725">نشاط عالٍ (6-7 أيام/الأسبوع)</option><option value="1.9">نشاط مفرط جداً (عمل شاق / تدريب مضاعف)</option></select><button data-action="calculateSelectedEnergy" type="button">احسب الاحتياج <i class="fa-solid fa-arrow-left"></i></button></div>
     <div class="energy-results">
-      <div class="result-equation"><small>المعادلة المستخدمة</small><strong id="resEquation">Mifflin-St Jeor</strong><span id="resSchofieldGroup">—</span></div>
+      <div class="result-equation"><small>المعادلة المستخدمة</small><strong id="resEquation">Mifflin-St Jeor</strong></div>
       <div class="result-metric"><small>BMR · معدل الأيض الأساسي</small><strong><b id="resBMR">0</b><em>kcal/day</em></strong></div>
       <div class="result-metric primary"><small>TDEE · الاحتياج اليومي</small><strong><b id="resTDEE">0</b><em>kcal/day</em></strong></div>
     </div>
