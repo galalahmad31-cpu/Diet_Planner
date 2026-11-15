@@ -422,7 +422,7 @@
   }
 
   function bindEvents() {
-    $('editButton')?.addEventListener('click', enableEditing);
+    $('editButton')?.addEventListener('click', enableEditing);\n    $('closePatientModal')?.addEventListener('click', () => { document.querySelector('.patient-data-card .dashboard-details')?.removeAttribute('open'); });\n    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') document.querySelector('.patient-data-card .dashboard-details')?.removeAttribute('open'); });
     $('savePatientButton')?.addEventListener('click', savePatient);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     $('addVisitButton')?.addEventListener('click', addVisit);
