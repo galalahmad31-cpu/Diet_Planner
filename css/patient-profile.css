@@ -91,3 +91,27 @@ details[open] summary{color:var(--dp-primary)}
 #visitsList>div{padding:11px 12px!important}
 @media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.plans-card{grid-column:auto}.patient-name-bar{padding:16px}.dashboard-card{padding:16px}}
+
+/* Collapsible dashboard cards */
+.patient-dashboard{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.dashboard-card{padding:0;overflow:hidden;min-height:0}
+.dashboard-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;padding:18px 16px;min-height:104px;gap:8px;transition:background .18s}
+.dashboard-details>summary::-webkit-details-marker{display:none}
+.dashboard-details>summary:hover{background:#f8fbfc}
+.dashboard-card-head{margin:0!important;flex:1;min-width:0;display:flex;align-items:center;gap:11px}
+.dashboard-card-head>span:last-child{min-width:0}
+.dashboard-card-head h3{font-size:14px!important;white-space:normal}
+.dashboard-card-head p{font-size:10px!important}
+.details-chevron{font-size:12px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
+.dashboard-details[open] .details-chevron{transform:rotate(180deg);color:#176b63}
+.dashboard-details[open]>summary{background:#f8fbfc;border-bottom:1px solid #edf2f4}
+.dashboard-panel{padding:16px;border-top:0;animation:panelIn .18s ease}
+@keyframes panelIn{from{opacity:.5;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.dashboard-open-link{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.patient-fields{min-width:0}
+.patient-fields input,.patient-fields select,.patient-fields textarea{font-size:12px}
+#writeAccessStatus,.access-note{display:none!important}
+#editButton{margin-bottom:4px}
+.plans-list{margin-top:10px}
+@media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.dashboard-details>summary{min-height:84px;padding:15px}.dashboard-panel{padding:13px}}
