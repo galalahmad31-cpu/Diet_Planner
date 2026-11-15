@@ -135,22 +135,32 @@ async function openDiet(id){const d=diets.find(x=>x.id===id);if(!d)return;await 
 function buildDietPreview(){
  const d=diets.find(x=>x.id===editingId)||{};
  const t=calcTotals();
- const macro=[['السعرات الحرارية',t.kcal.toFixed(0),'kcal'],['البروتين',t.protein.toFixed(1),'جم'],['الكربوهيدرات',t.carb.toFixed(1),'جم'],['الدهون',t.fat.toFixed(1),'جم']];
- let h='<div class="diet-preview"><header class="dp-cover"><div class="dp-brand">DIET PLANNER <span>خطة غذائية</span></div><h1>'+esc(d.name||$('dietName').value)+'</h1><p>'+esc(d.description||$('description').value||'')+'</p></header>';
- h+='<section class="dp-summary"><h2>ملخص اليوم</h2><div class="dp-macros">';
- macro.forEach(x=>h+='<div class="dp-macro"><small>'+x[0]+'</small><strong>'+x[1]+'</strong><em>'+x[2]+'</em></div>');
- h+='</div></section><div class="dp-meals-title"><h2>الوجبات اليومية</h2><span>'+day.meals.length+' وجبات</span></div>';
+ const macro=[['السعرات','kcal',t.kcal.toFixed(0)],['البروتين','جم',t.protein.toFixed(1)],['الكربوهيدرات','جم',t.carb.toFixed(1)],['الدهون','جم',t.fat.toFixed(1)]];
+ let h='<article class="diet-preview" dir="rtl">';
+ h+='<header class="dp-cover"><div class="dp-brand"><span>DIET PLANNER</span><span class="dp-tag">خطة غذائية</span></div><h1>'+esc(d.name||$('dietName').value)+'</h1>';
+ if(d.description||$('description').value)h+='<p>'+esc(d.description||$('description').value)+'</p>';
+ h+='</header><section class="dp-summary"><h2 class="dp-section-title">القيم الغذائية اليومية</h2><div class="dp-macros">';
+ macro.forEach(x=>h+='<div class="dp-macro"><span>'+x[0]+'</span><strong>'+x[2]+'</strong><small>'+x[1]+'</small></div>');
+ h+='</div></section><section class="dp-menu"><div class="dp-section-head"><h2 class="dp-section-title">تفاصيل الوجبات</h2><span>'+day.meals.length+' وجبات</span></div>';
  day.meals.forEach((m,i)=>{
-  h+='<section class="dp-meal"><header><span class="dp-meal-num">'+(i+1)+'</span><h3>'+esc(m.name||'وجبة')+'</h3><small>'+m.items.length+' أصناف</small></header><div class="dp-food-list">';
-  if(!m.items.length)h+='<p class="dp-empty">لا توجد أصناف في هذه الوجبة</p>';
-  m.items.forEach(it=>{
-   const f=foods.find(x=>String(x.id)===String(it.food_id));
-   h+='<article class="dp-food"><div class="dp-food-name"><strong>'+esc(f?.name_ar||'صنف غير موجود')+'</strong>'+(f?.name_en?'<small>'+esc(f.name_en)+'</small>':'')+(it.notes?'<p>'+esc(it.notes)+'</p>':'')+'</div><div class="dp-quantity">'+num(it.quantity_g)+' <small>جم</small></div>'+(it.frequency?'<span class="dp-frequency">'+esc(it.frequency)+'</span>':'')+'</article>';
-  });
-  h+='</div></section>';
+  h+='<section class="dp-meal"><header class="dp-meal-head"><span class="dp-meal-num">'+(i+1)+'</span><h3>'+esc(m.name||('وجبة '+(i+1)))+'</h3><span class="dp-count">'+m.items.length+' أصناف</span></header>';
+  if(!m.items.length)h+='<p class="dp-empty">لم تتم إضافة أصناف لهذه الوجبة.</p>';
+  else {h+='<div class="dp-food-list">';
+   m.items.forEach(it=>{
+    const f=foods.find(x=>String(x.id)===String(it.food_id));
+    h+='<div class="dp-food"><div class="dp-food-main"><strong>'+esc(f?.name_ar||'صنف غير موجود')+'</strong>'+(f?.name_en?'<small>'+esc(f.name_en)+'</small>':'')+'</div>';
+    h+='<div class="dp-food-detail"><span class="dp-label">الكمية</span><b>'+num(it.quantity_g)+' جم</b></div>';
+    if(it.frequency)h+='<div class="dp-food-detail"><span class="dp-label">التكرار</span><b>'+esc(it.frequency)+'</b></div>';
+    if(it.notes)h+='<div class="dp-food-note"><span class="dp-label">ملاحظة</span><p>'+esc(it.notes)+'</p></div>';
+    h+='</div>';
+   });
+   h+='</div>';
+  }
+  h+='</section>';
  });
- if($('notes').value.trim())h+='<section class="dp-notes"><h2>ملاحظات وتعليمات</h2><p>'+esc($('notes').value).replace(/\n/g,'<br>')+'</p></section>';
- h+='<footer class="dp-footer"><span>Diet Planner</span><span>تم إعداد الخطة للعرض والطباعة</span></footer></div>';
+ h+='</section>';
+ if($('notes').value.trim())h+='<section class="dp-notes"><h2 class="dp-section-title">ملاحظات وتعليمات</h2><p>'+esc($('notes').value).replace(/\n/g,'<br>')+'</p></section>';
+ h+='<footer class="dp-footer"><span>Diet Planner</span><span>خطة غذائية منظمة</span></footer></article>';
  return h;
 }
 function setReadOnly(ro){
