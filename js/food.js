@@ -169,14 +169,14 @@ function closeDeleteConfirm(){
 }
 function openDeleteConfirm(food){
   deleteTarget=food;
-  $('deleteConfirmText').textContent=`هل تريد حذف الصنف المخصص "${food.name_ar}"؟ لا يمكن التراجع عن الحذف.`;
+  $('deleteConfirmText').textContent=`هل تريد حذف الصنف "${food.name_ar}"؟ لا يمكن التراجع عن الحذف.`;
   $('deleteConfirmModal').classList.remove('hidden');
   $('deleteConfirmModal').classList.add('flex');
 }
 $('cancelDeleteBtn').onclick=closeDeleteConfirm;
 $('confirmDeleteBtn').onclick=async()=>{
   const f=deleteTarget;
-  if(!f || !isAdmin)return;
+  if(!f || !(isAdmin||(f.is_custom&&f.created_by===user.id)))return;
   const btn=$('confirmDeleteBtn');
   btn.disabled=true;
   btn.innerHTML='جاري الحذف...';
@@ -192,7 +192,8 @@ $('foodForm').onsubmit=async e=>{
   e.preventDefault();$('saveBtn').disabled=true;$('saveBtn').textContent='جاري الحفظ...';
   const editId=$('editId').value;
   const existing=editId?foods.find(f=>f.id===editId):null;
-  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:existing?existing.is_custom:!isAdmin,created_by:existing?existing.created_by:(isAdmin?null:user.id)};\n  if(!editId && isAdmin){ payload.is_custom = false; payload.created_by = null; }
+  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:existing?existing.is_custom:!isAdmin,created_by:existing?existing.created_by:(isAdmin?null:user.id)};
+  if(!editId && isAdmin){ payload.is_custom = false; payload.created_by = null; }
   let error=null;
   if(editId){
     ({error}=await supabase.from('foods').update(payload).eq('id',editId));
