@@ -480,7 +480,12 @@
     $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', savePatient);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
-    $('addVisitButton')?.addEventListener('click', addVisit);\n    $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);\n    $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);\n    $('patientFinanceCloseBottom')?.addEventListener('click', closePatientFinanceModal);\n    $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });\n    document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
+    $('addVisitButton')?.addEventListener('click', addVisit);
+    $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
+    $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);
+    $('patientFinanceCloseBottom')?.addEventListener('click', closePatientFinanceModal);
+    $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });
+    document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
 
     // Use delegation so the close control remains reliable inside the modal.
     document.addEventListener('click', (event) => {
