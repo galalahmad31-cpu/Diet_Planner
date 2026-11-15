@@ -421,11 +421,31 @@
     cancelEditing();
   }
 
+  function closePatientModal() {
+    const details = document.querySelector('.patient-data-card .dashboard-details');
+    if (details) details.open = false;
+    cancelEditing();
+  }
+
   function bindEvents() {
-    $('editButton')?.addEventListener('click', enableEditing);\n    $('closePatientModal')?.addEventListener('click', () => { document.querySelector('.patient-data-card .dashboard-details')?.removeAttribute('open'); });\n    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') document.querySelector('.patient-data-card .dashboard-details')?.removeAttribute('open'); });
+    $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', savePatient);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     $('addVisitButton')?.addEventListener('click', addVisit);
+
+    // Use delegation so the close control remains reliable inside the modal.
+    document.addEventListener('click', (event) => {
+      const closeButton = event.target.closest('#closePatientModal');
+      if (closeButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        closePatientModal();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closePatientModal();
+    });
   }
 
   async function init() {
