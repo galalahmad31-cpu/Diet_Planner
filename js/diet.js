@@ -368,9 +368,19 @@ async function save(){
 }
 $('saveDiet').onclick=save;
 async function initializeDietPage(){
-  if(!(await getSession()))return;
-  await loadPageData();
-  $('loading').style.display='none';
+  const loader=$('loading');
+  try{
+    if(!(await getSession()))return;
+    await loadPageData();
+  }catch(error){
+    console.error('Diet Library initialization failed:',error);
+    $('statusStat').textContent='تعذر الاتصال';
+    $('statusStat').className='mt-1 text-sm font-extrabold text-red-600';
+    toast('تعذر تحميل مكتبة الدايت. تحقق من الاتصال ثم اضغط تحديث.',false);
+  }finally{
+    // Never leave the full-screen loader blocking the page.
+    if(loader)loader.style.display='none';
+  }
 }
 initializeDietPage();
 })();
