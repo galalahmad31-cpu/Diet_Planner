@@ -304,3 +304,29 @@ button{border-radius:11px}
  header .h-16{height:auto;min-height:64px;padding-block:8px}
  header a,header button{padding:8px 10px!important;font-size:11px!important}
 }
+
+
+/* Diet plan workspace — hierarchy, readability and action clarity */
+#dietPlanContent{background:#f8fafb!important;border-color:#dce7eb!important}
+#dietPlanContent .embedded-diet-plan>main{max-width:100%!important;padding:clamp(12px,2.4vw,26px)!important;gap:20px!important}
+#dietPlanContent .embedded-diet-plan>main>section:first-child{background:linear-gradient(135deg,#fff 0%,#f5fbf9 100%)!important;border:1px solid #dcebe7!important;border-radius:18px!important;padding:clamp(14px,2vw,22px)!important}
+#dietPlanContent #targetCal,#dietPlanContent #targetPro,#dietPlanContent #targetCarb,#dietPlanContent #targetFat{font-variant-numeric:tabular-nums;display:block;margin-top:3px}
+#dietPlanContent #planTab>div:first-child{background:#fff;border:1px solid #e3ebef;border-radius:16px;padding:15px 17px}
+#dietPlanContent #planTab>div:first-child h3{font-size:17px!important;color:#15333e}
+#dietPlanContent #planTab>div:first-child p{font-size:12px!important;line-height:1.8}
+#dietPlanContent [data-action="dietPlan.addNewDay"]{min-height:42px;box-shadow:0 5px 14px #15803d18}
+#dietPlanContent .day-card,#dietPlanContent [data-day-id]{border:1px solid #dfe8ec!important;border-radius:18px!important;background:#fff!important;box-shadow:0 5px 18px #18374608!important;overflow:hidden}
+#dietPlanContent .day-card .day-header,#dietPlanContent [data-day-id] .day-header{background:#f5f9fa!important}
+#dietPlanContent .meal-card,#dietPlanContent .meal-box{border-radius:14px!important;border-color:#e4ecef!important}
+#dietPlanContent .meal-header{border-radius:12px!important}
+#dietPlanContent .day-locked{opacity:1}
+#dietPlanContent button{min-height:36px}
+#dietPlanContent input,#dietPlanContent select,#dietPlanContent textarea{background:#fff!important}
+#dietPlanContent .embedded-diet-plan .overflow-x-auto{border-radius:12px}
+@media(max-width:640px){
+ #dietPlanContent .embedded-diet-plan>main{padding:10px!important;gap:12px!important}
+ #dietPlanContent .embedded-diet-plan>main>section:first-child{padding:12px!important}
+ #dietPlanContent #planTab>div:first-child{padding:12px!important}
+ #dietPlanContent #planTab>div:first-child h3{font-size:15px!important}
+ #dietPlanContent [data-action="dietPlan.addNewDay"]{width:100%;justify-content:center}
+}
