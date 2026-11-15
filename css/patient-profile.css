@@ -140,3 +140,11 @@ details[open] summary{color:var(--dp-primary)}
 .dashboard-details[open] .dashboard-panel{background:#fbfdfd;border-top:1px solid #edf2f4;padding:16px 18px;border-radius:0 0 13px 13px}
 .dashboard-details[open]>summary{background:#f4faf8}
 @media(max-width:600px){.dashboard-details[open] .dashboard-panel{padding:12px}}
+
+/* Patient details as centered modal popup (not inline expansion) */
+.patient-dashboard>.dashboard-card:has(.dashboard-details[open]){grid-column:auto!important}
+.patient-dashboard .dashboard-details[open]::before{content:"";position:fixed;inset:0;background:rgba(12,27,38,.48);backdrop-filter:blur(3px);z-index:80}
+.patient-dashboard .dashboard-details[open] .dashboard-panel{position:fixed;z-index:81;top:50%;left:50%;transform:translate(-50%,-50%);width:min(620px,calc(100vw - 28px));max-height:calc(100vh - 36px);overflow:auto;background:#fff;border:1px solid #e3ecef;border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(8,25,35,.24);animation:patientModalIn .18s ease}
+.patient-dashboard .dashboard-details[open]>summary{position:relative;z-index:82;background:#f4faf8;border-radius:14px}
+@keyframes patientModalIn{from{opacity:0;transform:translate(-50%,-48%)}to{opacity:1;transform:translate(-50%,-50%)}}
+@media(max-width:600px){.patient-dashboard .dashboard-details[open] .dashboard-panel{padding:15px;border-radius:15px;max-height:calc(100dvh - 24px)}}
