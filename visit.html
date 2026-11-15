@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>
-            الزيارة | Diet Planner | د. أحمد جلال
+            الخطة الغذائية | Diet Planner | د. أحمد جلال
         </title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
@@ -18,7 +18,7 @@
         <!-- Visit core loads first; feature modules are loaded on demand by visit.js. -->
         <script src="js/visit.js" defer>
         </script>
-        <link rel="stylesheet" href="css/visit.css">
+        <link rel="stylesheet" href="css/visit.css?v=20261115-plan-only">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
         </script>
@@ -54,7 +54,7 @@
         </header>
         <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
             <section id="loadingState" class="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 text-center text-sm text-slate-400">
-                جاري تحميل بيانات الزيارة...
+                جاري تحميل الخطة الغذائية...
             </section>
             <section id="errorState" class="hidden bg-white border border-red-200 rounded-2xl shadow-sm p-8 text-center">
                 <div class="text-3xl mb-3">
@@ -80,7 +80,7 @@
                                     —
                                 </h2>
                                 <p class="text-xs text-slate-400 mt-1">
-                                    زيارة رقم
+                                    خطة رقم
                                     <span id="visitNumber" class="font-extrabold text-slate-600">
                                         —
                                     </span>
@@ -103,10 +103,10 @@
                 <section class="mt-6">
                     <div class="mb-4">
                         <h3 class="font-black text-slate-800 text-lg">
-                            محتوى الزيارة
+                            محتوى الخطة الغذائية
                         </h3>
                         <p class="text-xs text-slate-400 mt-1">
-                            اختر القسم الذي تريد العمل عليه داخل الزيارة.
+                            الحسابات والخطط الغذائية الخاصة بالمريض.
                         </p>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 items-stretch">
@@ -153,7 +153,7 @@
                                         الخطة بالجرامات
                                     </h4>
                                     <p class="text-[9px] sm:text-[11px] text-slate-400 mt-1 leading-snug">
-                                        إنشاء ومتابعة الخطة الغذائية الخاصة بهذه الزيارة.
+                                        إنشاء ومتابعة الخطة الغذائية الحالية.
                                     </p>
                                 </div>
                             </div>
