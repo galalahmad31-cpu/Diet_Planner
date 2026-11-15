@@ -456,7 +456,7 @@ async function applyCustomTargetToPatient() {
     calcShowToast(`تم اعتماد الهدف (${targetCal} سعر) والماكروز وحفظ خطتي الجرامات والبدائل بنجاح`);
 }
 
-async async function initCalculator(){
+async function initCalculator(){
     if (calcInitialized) return true;
 
     const ctx = window.visitContext || {};
