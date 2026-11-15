@@ -158,3 +158,35 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
  #editor.is-viewing .diet-table th,#editor.is-viewing .diet-table td{padding:8px 6px}
  #editor.is-viewing .diet-table{font-size:11px}
 }
+
+/* Distinct editorial-style diet preview */
+.diet-preview{max-width:980px;margin:0 auto;padding:8px 0 18px;color:#20313b}
+.dp-cover{position:relative;overflow:hidden;border-radius:20px;padding:28px 30px;background:linear-gradient(125deg,#102d3d,#176d70);color:#fff}
+.dp-cover:after{content:"";position:absolute;width:220px;height:220px;border:35px solid #ffffff12;border-radius:50%;left:-60px;top:-95px}
+.dp-cover small{font-size:10px;letter-spacing:2px;color:#b8e4dc;font-weight:800}
+.dp-cover h1{font-size:28px;font-weight:900;margin:12px 0 5px;position:relative;z-index:1}
+.dp-cover p{font-size:13px;color:#d9eeeb;margin:0 0 16px}
+.dp-cover span{display:inline-block;border:1px solid #ffffff35;border-radius:20px;padding:5px 12px;font-size:10px}
+.dp-macros{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 22px}
+.dp-macros>div{background:#fff;border:1px solid #e7edef;border-radius:13px;padding:14px;text-align:center}
+.dp-macros small,.dp-macros em{display:block;font-size:10px;color:#7a8b92;font-style:normal}
+.dp-macros strong{display:block;font-size:23px;font-weight:900;color:#176d70;margin:5px 0}
+.dp-meal{border:1px solid #e5ecee;border-radius:16px;background:#fff;overflow:hidden;margin:12px 0}
+.dp-meal>header{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#f2f7f7;border-bottom:1px solid #e5ecee}
+.dp-meal>header>b{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#176d70;color:#fff;font-size:12px}
+.dp-meal h2{font-size:16px;font-weight:900;margin:0;flex:1}
+.dp-meal>header>small{font-size:10px;color:#71848b}
+.dp-foods{padding:4px 16px}
+.dp-foods article{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px dashed #e7edef}
+.dp-foods article:last-child{border-bottom:0}
+.dp-foods article>div{flex:1;min-width:0}
+.dp-foods strong{font-size:13px;font-weight:800;display:block}
+.dp-foods article small{font-size:10px;color:#82939a;display:block;margin-top:3px}
+.dp-foods article p{font-size:10px;color:#a16a22;margin:4px 0 0}
+.dp-foods article>b{white-space:nowrap;background:#eaf5f3;color:#176d70;border-radius:9px;padding:7px 10px;font-size:14px}
+.dp-foods article>b small{display:inline;font-size:9px}
+.dp-foods article>span{font-size:10px;color:#71848b;white-space:nowrap}
+.dp-notes{background:#fff8e9;border:1px solid #f4e3bd;border-radius:13px;padding:14px 17px;margin-top:16px}
+.dp-notes b{font-size:12px;color:#93651c}.dp-notes p{font-size:12px;line-height:1.8;margin:5px 0 0;color:#715b36}
+.dp-footer{display:flex;justify-content:space-between;padding:18px 4px;color:#91a0a5;font-size:10px;border-top:1px solid #e5ecee;margin-top:18px}
+@media(max-width:600px){.diet-preview{padding:0}.dp-cover{padding:20px;border-radius:14px}.dp-cover h1{font-size:21px}.dp-macros{gap:6px;margin:9px 0 15px}.dp-macros>div{padding:9px 4px;border-radius:10px}.dp-macros strong{font-size:17px}.dp-macros small,.dp-macros em{font-size:9px}.dp-meal{border-radius:12px}.dp-meal h2{font-size:14px}.dp-foods{padding:3px 10px}.dp-foods article{gap:7px;padding:11px 0}.dp-foods strong{font-size:12px}.dp-foods article>b{font-size:12px;padding:6px 8px}}
