@@ -134,3 +134,9 @@ details[open] summary{color:var(--dp-primary)}
 .save-actions button{font-size:10px;padding:9px;border-radius:8px}
 #visitsList>div{padding:9px 10px!important;border-radius:11px!important}
 @media(max-width:600px){.patient-dashboard{gap:8px!important}.dashboard-details>summary{min-height:72px;padding:11px 12px}.dashboard-panel{padding:10px}.patient-name-bar{padding:13px 15px}}
+
+/* Expanded patient data: full-width inline popover below its card */
+.patient-dashboard>.dashboard-card:has(.dashboard-details[open]){grid-column:1/-1!important}
+.dashboard-details[open] .dashboard-panel{background:#fbfdfd;border-top:1px solid #edf2f4;padding:16px 18px;border-radius:0 0 13px 13px}
+.dashboard-details[open]>summary{background:#f4faf8}
+@media(max-width:600px){.dashboard-details[open] .dashboard-panel{padding:12px}}
