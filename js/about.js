@@ -217,17 +217,18 @@ function render() {
 }
 
 async function initializeUser() {
-  if (!db || !window.DietPlannerAccess?.getCurrentUser) {
-    throw new Error("تعذر تهيئة الاتصال الآمن بالتطبيق.");
-  }
+  // صفحة "عن التطبيق" عامة: الزائر يقرأ المحتوى دون تسجيل الدخول.
+  // صلاحيات الإضافة والتعديل والحذف تظل مقتصرة على Admin.
+  if (!db) throw new Error("تعذر تهيئة الاتصال بقاعدة البيانات.");
 
-  const accessStatus = await window.DietPlannerAccess.getAccessStatus();
-  if (!accessStatus?.authenticated || !accessStatus.user) {
-    window.location.replace("index.html");
-    return false;
-  }
+  const access = window.DietPlannerAccess;
+  const accessStatus = access?.getAccessStatus
+    ? await access.getAccessStatus()
+    : null;
 
-  state.isAdmin = accessStatus.isAdmin === true;
+  state.isAdmin = accessStatus?.authenticated === true &&
+    accessStatus?.isAdmin === true;
+
   setAdminUI();
   return true;
 }
