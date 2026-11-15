@@ -522,31 +522,26 @@ function render() {
       : '';
 
     const formulaHtml = formulas.length
-      ? formulas.map(formula => (
-          '<div class="mt-3 rounded-2xl border border-slate-100 bg-white p-3">' +
-          '<div class="flex items-start justify-between gap-2">' +
-          '<div><div class="text-sm font-extrabold text-slate-800">' + esc(formula.formula_name) + '</div>' +
-          '<div class="mt-1 text-[10px] font-bold text-slate-400">' +
-          esc(formula.basis_amount != null ? fmt(formula.basis_amount) + ' ' + (formula.basis_unit || '') : 'أساس غير محدد') +
-          '</div></div></div>' +
-          '<div class="mt-3 grid grid-cols-4 gap-2 text-center">' +
-          '<div><div class="text-[10px] text-slate-400">السعرات</div><div class="mt-1 text-sm font-extrabold text-amber-600">' + fmt(formula.kcal) + '</div></div>' +
-          '<div><div class="text-[10px] text-slate-400">كارب</div><div class="mt-1 text-sm font-extrabold text-sky-600">' + fmt(formula.carb) + '</div></div>' +
-          '<div><div class="text-[10px] text-slate-400">بروتين</div><div class="mt-1 text-sm font-extrabold text-emerald-600">' + fmt(formula.protein) + '</div></div>' +
-          '<div><div class="text-[10px] text-slate-400">دهون</div><div class="mt-1 text-sm font-extrabold text-rose-600">' + fmt(formula.fat) + '</div></div>' +
+      ? '<div class="product-formulas"><div class="formula-section-title"><i class="fa-solid fa-chart-pie"></i><span>القيمة الغذائية</span><small>' + formulas.length + ' تركيبة</small></div>' +
+        formulas.map(formula => (
+          '<section class="formula-showcase">' +
+          '<div class="formula-showcase-head"><div class="formula-mark"><i class="fa-solid fa-flask"></i></div><div class="formula-title-wrap"><strong>' + esc(formula.formula_name) + '</strong><span>لكل ' + esc(formula.basis_amount != null ? fmt(formula.basis_amount) + ' ' + (formula.basis_unit || '') : 'كمية غير محددة') + '</span></div></div>' +
+          '<div class="nutrition-metrics">' +
+          '<div class="metric metric-kcal"><span>طاقة</span><strong>' + fmt(formula.kcal) + '</strong><small>kcal</small></div>' +
+          '<div class="metric metric-carb"><span>كربوهيدرات</span><strong>' + fmt(formula.carb) + '</strong><small>g</small></div>' +
+          '<div class="metric metric-protein"><span>بروتين</span><strong>' + fmt(formula.protein) + '</strong><small>g</small></div>' +
+          '<div class="metric metric-fat"><span>دهون</span><strong>' + fmt(formula.fat) + '</strong><small>g</small></div>' +
           '</div>' +
-          (formula.notes ? '<div class="rich-text-content mt-3 text-[11px] leading-5 text-slate-500">' + richTextForDisplay(formula.notes) + '</div>' : '') +
-          '</div>'
-        )).join('')
-      : '<div class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-3 text-xs font-semibold text-slate-400">لا توجد بيانات تركيبة لهذا المنتج.</div>';
+          (formula.notes ? '<div class="formula-notes rich-text-content">' + richTextForDisplay(formula.notes) + '</div>' : '') +
+          '</section>'
+        )).join('') + '</div>'
+      : '<div class="empty-formula"><i class="fa-solid fa-circle-info"></i><span>لم تُضاف بيانات غذائية لهذا المنتج بعد.</span></div>';
 
-    return '<article class="product-card glass rounded-3xl p-5 shadow-sm">' +
-      '<div class="flex items-start justify-between gap-3">' +
-      '<div class="min-w-0"><div class="text-xs font-bold text-brand-600">' + esc(cat?.name || 'غير مصنف') + ' · ' + esc(sub?.name || 'غير مصنف') + '</div>' +
-      '<h2 class="mt-1 text-lg font-extrabold text-slate-800">' + esc(p.product_name) + '</h2></div>' +
-      adminActions + '</div>' +
-      '<div class="mt-4 rounded-2xl bg-slate-50 p-3"><div class="text-xs font-bold text-slate-500">الاستخدام</div><div class="mt-1 text-sm font-semibold leading-6 text-slate-700">' + esc(p.usage || '—') + '</div></div>' +
-      (p.notes ? '<div class="rich-text-content mt-3 text-[11px] leading-5 text-slate-500">' + richTextForDisplay(p.notes) + '</div>' : '') +
+    return '<article class="product-card product-modern">' +
+      '<div class="product-card-top"><div class="product-category-pill"><i class="fa-solid fa-layer-group"></i>' + esc(cat?.name || 'غير مصنف') + '<span>/</span>' + esc(sub?.name || 'غير مصنف') + '</div>' + adminActions + '</div>' +
+      '<div class="product-title-row"><div class="product-symbol"><i class="fa-solid fa-capsules"></i></div><h2>' + esc(p.product_name) + '</h2></div>' +
+      '<div class="product-usage"><span class="usage-icon"><i class="fa-solid fa-bullseye"></i></span><div><small>الاستخدامات</small><p>' + esc(p.usage || 'لم يحدد الاستخدام') + '</p></div></div>' +
+      (p.notes ? '<div class="product-description rich-text-content">' + richTextForDisplay(p.notes) + '</div>' : '') +
       formulaHtml +
       '</article>';
   }).join('');
