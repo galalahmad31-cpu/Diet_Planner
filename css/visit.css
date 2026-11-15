@@ -330,3 +330,21 @@ button{border-radius:11px}
  #dietPlanContent #planTab>div:first-child h3{font-size:15px!important}
  #dietPlanContent [data-action="dietPlan.addNewDay"]{width:100%;justify-content:center}
 }
+
+
+/* Clinical workflow shortcuts: optional, ordered, and mobile-friendly */
+.visit-workflow{background:#fff;border:1px solid #dce7eb;border-radius:18px;padding:clamp(14px,2vw,20px);box-shadow:0 5px 18px rgba(20,45,60,.025)}
+.workflow-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.workflow-heading h3{font-size:15px;font-weight:900;color:#16313d}
+.workflow-heading p{font-size:11px;color:#718391;margin-top:3px}
+.workflow-badge{font-size:10px;font-weight:800;color:#176b63;background:#eaf7f4;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.workflow-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.workflow-step{display:flex;align-items:center;gap:9px;text-align:right;padding:12px;border:1px solid #e3ebef;border-radius:13px;background:#f9fbfc;min-width:0}
+.workflow-step:hover{border-color:#9bcfc5;background:#f1faf7}
+.workflow-step .step-number{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;border-radius:9px;background:#e4f3ef;color:#176b63;font-size:12px;font-weight:900}
+.workflow-step strong{display:block;font-size:11px;font-weight:900;color:#16313d}
+.workflow-step small{display:block;font-size:9px;color:#718391;margin-top:3px;line-height:1.4}
+.workflow-step>span:nth-child(2){min-width:0;flex:1}
+.workflow-step>i{font-size:10px;color:#8aa19f}
+@media(max-width:760px){.workflow-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.workflow-step{padding:10px}.workflow-step small{font-size:9px}}
+@media(max-width:380px){.workflow-steps{grid-template-columns:1fr}.workflow-heading p{max-width:220px}}
