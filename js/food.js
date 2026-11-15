@@ -109,7 +109,7 @@ function render(){
     <td class="px-3 py-3 text-center">${f.sodium}</td><td class="px-3 py-3 text-center">${f.potassium}</td><td class="px-3 py-3 text-center">${f.phosphorus}</td><td class="px-3 py-3 text-center">${f.water}</td>
     <td class="px-3 py-3 text-center">${f.preparation_method?`<button type="button" data-prep="${esc(f.id)}" class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">أعرض</button>`:'—'}</td>
     <td class="px-3 py-3 text-center">${f.is_custom?'<span class="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-600">مخصص</span>':'<span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">أساسي</span>'}</td>
-    <td class="px-3 py-3 text-center">${isAdmin?`<div class="flex justify-center gap-1"><button data-edit="${esc(f.id)}" class="edit rounded-lg bg-slate-100 px-2.5 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600"><i class="fa-solid fa-pen"></i></button><button data-del="${esc(f.id)}" class="del rounded-lg bg-red-50 px-2.5 py-2 text-red-500 hover:bg-red-100"><i class="fa-solid fa-trash"></i></button></div>`:'<span class="text-slate-300">—</span>'}</td>
+    <td class="px-3 py-3 text-center">`<button data-action="${esc(f.id)}" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-brand-50">إجراء</button>`</td>
   </tr>`).join('');
   $('empty').classList.toggle('hidden',filtered.length>0);
   $('shownCount').textContent=`${visibleFoods.length} من ${filtered.length} معروض`;
@@ -133,6 +133,12 @@ function openModal(food=null){
   ['kcal','protein','carb','fat','sodium','potassium','phosphorus','water'].forEach(k=>$(k).value=food?.[k]??'');
   $('preparationMethod').value=food?.preparation_method||'';
 }
+let actionFood=null;
+function closeFoodAction(){$('foodActionModal').classList.add('hidden');$('foodActionModal').classList.remove('flex');actionFood=null;}
+function openFoodAction(food){actionFood=food;$('foodActionTitle').textContent='إجراء: '+food.name_ar;$('foodActionModal').classList.remove('hidden');$('foodActionModal').classList.add('flex');}
+$('foodActionCancel').onclick=closeFoodAction;
+$('foodActionEdit').onclick=()=>{const f=actionFood;closeFoodAction();if(!f)return;if(isAdmin||(f.is_custom&&f.created_by===user.id))openModal(f);else toast('يمكنك تعديل الأصناف المخصصة التي أضفتها فقط',false);};
+$('foodActionDelete').onclick=()=>{const f=actionFood;closeFoodAction();if(!f)return;if(isAdmin||(f.is_custom&&f.created_by===user.id))openDeleteConfirm(f);else toast('يمكنك حذف الأصناف المخصصة التي أضفتها فقط',false);};
 function openPreparationModal(food){$('prepModalTitle').textContent=food.name_ar+' — طريقة التحضير';$('prepModalText').textContent=food.preparation_method||'لا توجد طريقة تحضير مسجلة.';$('prepModal').classList.remove('hidden');$('prepModal').classList.add('flex');}
 function closePreparationModal(){$('prepModal').classList.add('hidden');$('prepModal').classList.remove('flex');}
 $('closePrepModal').onclick=closePreparationModal;
@@ -144,7 +150,8 @@ $('refreshBtn').onclick=loadFoods;
 $('loadMoreFoods').onclick=loadMoreFoods;
 
 $('foodRows').addEventListener('click',async e=>{
-  const edit=e.target.closest('[data-edit]'), del=e.target.closest('[data-del]'), prep=e.target.closest('[data-prep]');
+  const action=e.target.closest('[data-action]'), edit=e.target.closest('[data-edit]'), del=e.target.closest('[data-del]'), prep=e.target.closest('[data-prep]');
+  if(action){const f=foods.find(x=>x.id===action.dataset.action);if(f)openFoodAction(f);}
   if(prep){const f=foods.find(x=>x.id===prep.dataset.prep);if(f)openPreparationModal(f);}
   if(edit){const f=foods.find(x=>x.id===edit.dataset.edit);if(f)openModal(f);}
   if(del){
@@ -211,7 +218,7 @@ async function init(){
   }
   const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
   if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return;}
-  user=accessStatus.user;
+  user=accessStatus.user;isAdmin=accessStatus.isAdmin===true;
   await Promise.all([loadFoods(),loadExchanges()]);
   $('loading').style.display='none';
 }
