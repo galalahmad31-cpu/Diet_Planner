@@ -233,6 +233,13 @@ async function addNewDay(){
  renderDays();
  showToast(`تمت إضافة اليوم ${n} — اضغط حفظ لتخزينه`);
 }
+function duplicateDay(id){
+ const source=daysData.find(d=>String(d.id)===String(id));if(!source)return;
+ const stamp=Date.now(),copy=cloneDays([source])[0];
+ copy.id='d_'+stamp;copy.title=(source.title||'اليوم')+' — نسخة';copy.isCollapsed=false;
+ copy.meals=(copy.meals||[]).map((m,mi)=>({...m,id:'m_'+stamp+'_'+mi,items:(m.items||[]).map((it,ii)=>({...it,itemId:'it_'+stamp+'_'+mi+'_'+ii}))}));
+ daysData.push(copy);dayEditModes[String(copy.id)]=true;renderDays();showToast('تم نسخ اليوم. عدّل النسخة ثم اضغط حفظ');
+}
 function toggleDayCollapse(id){const d=daysData.find(x=>x.id===id);if(d){d.isCollapsed=!d.isCollapsed;renderDays();}}
 function updateDayTitle(id,v){const d=daysData.find(x=>String(x.id)===String(id));if(d&&isDayEditing(id))d.title=v;}
 function updateDayNotes(id,v){const d=daysData.find(x=>String(x.id)===String(id));if(d&&isDayEditing(id))d.notes=v;}
@@ -755,5 +762,5 @@ function init(){
  return dietInitPromise;
 }
 
-window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, toggleDayCollapse, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, metricCard, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, savePlan, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
+window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, toggleDayCollapse, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, metricCard, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, savePlan, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
 })();
