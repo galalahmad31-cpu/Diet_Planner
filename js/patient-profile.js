@@ -171,12 +171,23 @@
       return;
     }
 
+    const overview = $('patientOverview');
+    if (overview) overview.classList.remove('hidden');
+    $('visitCount').textContent = String(data?.length || 0);
+    const latest = data?.[0];
+    $('lastVisitDate').textContent = latest ? formatVisitDate(latest.visit_date) : 'لا توجد زيارات';
+    const latestLink = $('latestVisitLink');
+    if (latestLink) {
+      latestLink.href = latest ? `visit.html?id=${encodeURIComponent(latest.id)}` : '#';
+      latestLink.classList.toggle('is-disabled', !latest);
+    }
+
     if (!data?.length) {
       empty.classList.remove('hidden');
       return;
     }
 
-    data.forEach((visit) => {
+    data.forEach((visit, index) => {
       const row = document.createElement('div');
       row.className = 'flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-emerald-300 px-4 py-3 transition' + (index === 0 ? ' latest-visit-row' : '');
 
@@ -332,7 +343,7 @@
       return;
     }
 
-    await loadVisits();
+    window.location.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
   }
 
   function fillPatientData() {
