@@ -107,6 +107,7 @@ function render(){
     <td class="px-3 py-3 text-slate-600">${esc(f.household)}</td>
     <td class="px-3 py-3 text-center font-bold">${f.kcal}</td><td class="px-3 py-3 text-center">${f.carb}</td><td class="px-3 py-3 text-center">${f.protein}</td><td class="px-3 py-3 text-center">${f.fat}</td>
     <td class="px-3 py-3 text-center">${f.sodium}</td><td class="px-3 py-3 text-center">${f.potassium}</td><td class="px-3 py-3 text-center">${f.phosphorus}</td><td class="px-3 py-3 text-center">${f.water}</td>
+    <td class="px-3 py-3 text-center">${f.preparation_method?`<button type="button" data-prep="${esc(f.id)}" class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">أعرض</button>`:'—'}</td>
     <td class="px-3 py-3 text-center">${f.is_custom?'<span class="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-600">مخصص</span>':'<span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">أساسي</span>'}</td>
     <td class="px-3 py-3 text-center">${isAdmin?`<div class="flex justify-center gap-1"><button data-edit="${esc(f.id)}" class="edit rounded-lg bg-slate-100 px-2.5 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600"><i class="fa-solid fa-pen"></i></button><button data-del="${esc(f.id)}" class="del rounded-lg bg-red-50 px-2.5 py-2 text-red-500 hover:bg-red-100"><i class="fa-solid fa-trash"></i></button></div>`:'<span class="text-slate-300">—</span>'}</td>
   </tr>`).join('');
@@ -130,7 +131,11 @@ function openModal(food=null){
   $('editId').value=food?.id||'';$('modalTitle').textContent=food?'تعديل بيانات الصنف':(isAdmin?'إضافة صنف أساسي':'إضافة صنف مخصص');
   $('nameAr').value=food?.name_ar||'';$('nameEn').value=food?.name_en||'';$('household').value=food?.household||'';
   ['kcal','protein','carb','fat','sodium','potassium','phosphorus','water'].forEach(k=>$(k).value=food?.[k]??'');
+  $('preparationMethod').value=food?.preparation_method||'';
 }
+function openPreparationModal(food){$('prepModalTitle').textContent=food.name_ar+' — طريقة التحضير';$('prepModalText').textContent=food.preparation_method||'لا توجد طريقة تحضير مسجلة.';$('prepModal').classList.remove('hidden');$('prepModal').classList.add('flex');}
+function closePreparationModal(){$('prepModal').classList.add('hidden');$('prepModal').classList.remove('flex');}
+$('closePrepModal').onclick=closePreparationModal;
 function closeModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex');}
 $('addBtn').onclick=()=>openModal();$('closeModal').onclick=closeModal;$('cancelBtn').onclick=closeModal;
 $('search').oninput=()=>{visibleFoodCount=FOOD_PAGE_SIZE;render();};
@@ -139,7 +144,8 @@ $('refreshBtn').onclick=loadFoods;
 $('loadMoreFoods').onclick=loadMoreFoods;
 
 $('foodRows').addEventListener('click',async e=>{
-  const edit=e.target.closest('[data-edit]'), del=e.target.closest('[data-del]');
+  const edit=e.target.closest('[data-edit]'), del=e.target.closest('[data-del]'), prep=e.target.closest('[data-prep]');
+  if(prep){const f=foods.find(x=>x.id===prep.dataset.prep);if(f)openPreparationModal(f);}
   if(edit){const f=foods.find(x=>x.id===edit.dataset.edit);if(f)openModal(f);}
   if(del){
     const f=foods.find(x=>x.id===del.dataset.del);
@@ -177,9 +183,10 @@ $('confirmDeleteBtn').onclick=async()=>{
 
 $('foodForm').onsubmit=async e=>{
   e.preventDefault();$('saveBtn').disabled=true;$('saveBtn').textContent='جاري الحفظ...';
-  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:editId?(foods.find(f=>f.id===editId)?.is_custom??false):!isAdmin,created_by:editId?(foods.find(f=>f.id===editId)?.created_by??null):(isAdmin?null:user.id)};
-  let error=null;
   const editId=$('editId').value;
+  const existing=editId?foods.find(f=>f.id===editId):null;
+  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:existing?existing.is_custom:!isAdmin,created_by:existing?existing.created_by:(isAdmin?null:user.id)};
+  let error=null;
   if(editId){
     ({error}=await supabase.from('foods').update(payload).eq('id',editId));
   }else{
