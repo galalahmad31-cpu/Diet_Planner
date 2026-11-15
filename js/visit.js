@@ -180,11 +180,21 @@ const db = window.DietPlannerAccess?.supabaseClient;
     if (module === 'assessment') {
       loadAssessment();
     } else {
-      const loaded = await loadModule(module);
-
-      if (!loaded) {
-        content.classList.add('hidden');
-        return;
+      // Calculator is loaded statically by visit.html (defer, before this file).
+      // Avoid injecting a second script and masking parse/runtime errors as a generic load failure.
+      if (module === 'calculator') {
+        if (typeof initCalculator !== 'function') {
+          console.error('[Visit] calculator script missing; page build/cache is stale or script failed.');
+          content.classList.add('hidden');
+          showError('ملف حاسبة الاحتياجات لم يعمل (نسخة الصفحة: 20261116-3). حدّث الصفحة أو أعد فتحها.');
+          return;
+        }
+      } else {
+        const loaded = await loadModule(module);
+        if (!loaded) {
+          content.classList.add('hidden');
+          return;
+        }
       }
 
       if (module === 'calculator') {
