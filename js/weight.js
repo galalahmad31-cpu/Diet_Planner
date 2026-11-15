@@ -106,7 +106,8 @@
         .maybeSingle();
 
       if (patientError) throw patientError;
-      if (!patient) throw new Error('Patient not found.');\n      if (patient.user_id && patient.user_id !== state.user.id && !state.isAdmin) throw new Error('Patient access denied.');
+      if (!patient) throw new Error('Patient not found.');
+      if (patient.user_id && patient.user_id !== state.user.id && !state.isAdmin) throw new Error('Patient access denied.');
 
       state.patient = patient;
       $('patientName').textContent = patient.name || 'المريض';
@@ -602,10 +603,12 @@
 
   function bindEvents() {
     document.addEventListener('click', (event) => {
-      const action = event.target.closest('[data-action]')?.dataset.action;
-      if (action === 'delete-weight') requestDelete(Number(event.target.closest('[data-action]').dataset.index));
-      if (action === 'save-inline') saveInlineMeasurement();
-      if (action === 'cancel-inline') $('inlineMeasurementRow')?.remove();
+      const actionElement = event.target instanceof Element ? event.target.closest('[data-action]') : null;
+      if (!actionElement) return;
+      const action = actionElement.dataset.action;
+      if (action === 'delete-weight') requestDelete(Number(actionElement.dataset.index));
+      else if (action === 'save-inline') saveInlineMeasurement();
+      else if (action === 'cancel-inline') $('inlineMeasurementRow')?.remove();
     });
 
     $('addMeasurementRowBtn')?.addEventListener('click', openInlineMeasurementRow);
