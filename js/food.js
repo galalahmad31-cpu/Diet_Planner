@@ -109,7 +109,7 @@ function render(){
     <td class="px-3 py-3 text-center">${f.sodium}</td><td class="px-3 py-3 text-center">${f.potassium}</td><td class="px-3 py-3 text-center">${f.phosphorus}</td><td class="px-3 py-3 text-center">${f.water}</td>
     <td class="px-3 py-3 text-center">${f.preparation_method?`<button type="button" data-prep="${esc(f.id)}" class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">أعرض</button>`:'—'}</td>
     <td class="px-3 py-3 text-center">${f.is_custom?'<span class="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-600">مخصص</span>':'<span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">أساسي</span>'}</td>
-    <td class="px-3 py-3 text-center">`<button data-action="${esc(f.id)}" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-brand-50">إجراء</button>`</td>
+    <td class="px-3 py-3 text-center"><button data-action="${esc(f.id)}" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-brand-50">إجراء</button></td>
   </tr>`).join('');
   $('empty').classList.toggle('hidden',filtered.length>0);
   $('shownCount').textContent=`${visibleFoods.length} من ${filtered.length} معروض`;
@@ -219,8 +219,9 @@ async function init(){
   const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
   if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return;}
   user=accessStatus.user;isAdmin=accessStatus.isAdmin===true;
-  await Promise.all([loadFoods(),loadExchanges()]);
-  $('loading').style.display='none';
+  try{await Promise.all([loadFoods(),loadExchanges()]);}
+  catch(error){console.error('Food library initialization failed:',error);toast('حدث خطأ أثناء تحميل المكتبة: '+(error?.message||'خطأ غير معروف'),false);}
+  finally{$('loading').style.display='none';}
 }
 init();
 })();
