@@ -58,9 +58,7 @@
     const path = window.location.pathname;
 
     return (
-      path.endsWith("/index.html") ||
-      path === "/" ||
-      path === ""
+      path.endsWith("/login.html")
     );
   }
 
@@ -271,7 +269,7 @@
     }
 
     if (role === "admin") {
-      window.location.replace("app.html");
+      window.location.replace("index.html");
       return true;
     }
 
@@ -422,7 +420,7 @@
           provider: "google",
           options: {
             redirectTo:
-              "https://nutrition-3.vercel.app/index.html"
+              "https://galalahmad31-cpu.github.io/Diet_Planner/index.html"
           }
         });
 
