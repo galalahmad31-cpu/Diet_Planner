@@ -296,3 +296,57 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 #calculatorContent .calc-card-target .grid.grid-cols-3{gap:7px}#calculatorContent .calc-card-target input{min-height:42px}#calculatorContent #finalTargetCal{font-size:19px}
 @media(max-width:900px){#calculatorContent #calcTab{grid-template-columns:1fr;gap:14px}}
 @media(max-width:520px){#calculatorContent .embedded-calculator{padding:10px}#calculatorContent #calcTab>.calc-card{padding:14px;border-radius:16px}#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:76px;padding:8px}#calculatorContent .calc-card-target .grid.grid-cols-3{gap:7px}}
+
+/* Calculator UI refinement v2 */
+#calculatorContent{background:#f4f7fb!important}
+#calculatorContent .embedded-calculator{padding:12px;background:transparent}
+#calculatorContent #calcTab{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);gap:12px;align-items:stretch}
+#calculatorContent #calcTab>.calc-card{box-sizing:border-box;margin:0!important;min-width:0;padding:16px!important;border:1px solid #e5eaf1;border-radius:17px;background:#fff;box-shadow:0 5px 18px rgba(25,45,75,.045)}
+#calculatorContent .calc-card-energy{border-top:3px solid #3b82f6;background:linear-gradient(180deg,#f5f9ff 0,#fff 100px)}
+#calculatorContent .calc-card-target{border-top:3px solid #10b981;background:linear-gradient(180deg,#f2fcf8 0,#fff 100px)}
+#calculatorContent #calcTab h3{font-size:14px;line-height:1.5}
+#calculatorContent #calcTab h3 i{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;background:#e8f1ff;border-radius:9px;color:#2563eb!important}
+#calculatorContent #calcTab p{font-size:10px;line-height:1.65;color:#8491a5}
+#calculatorContent #calcTab label{font-size:11px;line-height:1.5;color:#526176}
+#calculatorContent #calcTab input,#calculatorContent #calcTab select{box-sizing:border-box;width:100%;min-height:38px;padding:8px 10px!important;border:1px solid #e1e7ef;border-radius:10px;background:#fff;color:#243247;font-size:12px;outline:none;transition:border-color .15s,box-shadow .15s}
+#calculatorContent #calcTab input:focus,#calculatorContent #calcTab select:focus{border-color:#93b4f7;box-shadow:0 0 0 3px rgba(59,130,246,.10)}
+#calculatorContent .calc-card-energy .grid.grid-cols-2.md\\:grid-cols-3{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px!important}
+#calculatorContent #heightField{grid-column:auto!important}
+#calculatorContent #eqBtnMifflin,#calculatorContent #eqBtnSchofield{padding:8px 12px!important;font-size:10px!important;border-radius:8px!important}
+#calculatorContent #calcTab button[data-action="calculateSelectedEnergy"]{min-height:40px;padding:10px!important;border-radius:10px;background:#2563eb!important;box-shadow:none!important;font-size:11px!important}
+#calculatorContent .calc-card-energy>div:has(#calcActivity){padding-top:10px!important;border-top-color:#edf1f6!important}
+#calculatorContent .calc-card-energy>div:has(#resBMR){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important;padding-top:12px!important}
+#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:74px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px!important;border-radius:12px!important}
+#calculatorContent .calc-result-neutral{background:#f7f9fc;border:1px solid #e8edf4}
+#calculatorContent .calc-result-bmr{background:#f5f3ff;border:1px solid #e5ddff}
+#calculatorContent .calc-result-tdee{background:#ecfdf5;border:1px solid #c7f1dc}
+#calculatorContent .calc-result-group{background:#fff7ed;border:1px solid #ffead1}
+#calculatorContent #resBMR,#calculatorContent #resTDEE{font-size:21px;line-height:1.2}
+#calculatorContent #resEquation,#calculatorContent #resSchofieldGroup{font-size:11px!important;text-align:center}
+#calculatorContent .calc-card-target h3{padding-bottom:12px!important;border-bottom-color:#e8f2ed!important}
+#calculatorContent .calc-card-target h3 i{background:#dcfce7;color:#059669!important}
+#calculatorContent .calc-card-target .space-y-4{display:flex;flex-direction:column;gap:12px!important}
+#calculatorContent .calc-card-target .space-y-4>div{margin:0!important}
+#calculatorContent #calcAdjustment{font-size:13px!important;font-weight:800}
+#calculatorContent #finalTargetCal{font-size:17px;line-height:1.2;color:#0369a1}
+#calculatorContent .calc-card-target .grid.grid-cols-3{gap:8px!important}
+#calculatorContent .calc-card-target .grid.grid-cols-3>div{padding:9px 7px 8px;background:#f8fafc;border:1px solid #edf1f6;border-radius:12px}
+#calculatorContent .calc-card-target .grid.grid-cols-3 label{text-align:center;font-size:10px}
+#calculatorContent .calc-card-target .grid.grid-cols-3 input{min-height:36px;text-align:center;font-size:13px!important;font-weight:800;background:#fff}
+#calculatorContent .calc-card-target .grid.grid-cols-3 span[id$="Grams"]{display:block;margin-top:6px;font-size:13px;font-weight:900;color:#0f766e}
+#calculatorContent #macroTotalAlert{font-size:10px;line-height:1.5}
+#calculatorContent button[data-action="applyCustomTargetToPatient"]{min-height:42px;padding:10px!important;border-radius:10px;font-size:11px!important;box-shadow:none!important}
+@media(max-width:900px){#calculatorContent #calcTab{grid-template-columns:1fr;gap:10px}}
+@media(max-width:560px){
+#calculatorContent .embedded-calculator{padding:8px}
+#calculatorContent #calcTab>.calc-card{padding:12px!important;border-radius:14px}
+#calculatorContent #calcTab h3{font-size:13px}
+#calculatorContent .calc-card-energy .grid.grid-cols-2.md\\:grid-cols-3{gap:8px!important}
+#calculatorContent #calcTab label{font-size:10px}
+#calculatorContent #calcTab input,#calculatorContent #calcTab select{min-height:36px;padding:7px 8px!important;font-size:11px}
+#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:68px;padding:8px!important}
+#calculatorContent #resBMR,#calculatorContent #resTDEE{font-size:18px}
+#calculatorContent .calc-card-target .grid.grid-cols-3{gap:5px!important}
+#calculatorContent .calc-card-target .grid.grid-cols-3>div{padding:7px 4px}
+#calculatorContent .calc-card-target .grid.grid-cols-3 label{font-size:9px}
+}
