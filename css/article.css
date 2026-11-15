@@ -43,3 +43,14 @@
 .article-reader-content>p{margin:0 0 1.25em}.article-reader-content h1,.article-reader-content h2,.article-reader-content h3{color:#163c40;line-height:1.7;margin:1.5em 0 .6em}.article-reader-content h2{border-right:4px solid #178f84;padding-right:12px;background:linear-gradient(90deg,transparent,#effaf6);border-radius:5px}
 .article-reader-content img{max-width:100%;height:auto;border-radius:16px}.article-reader-content ul,.article-reader-content ol{padding-right:1.5em;margin:1em 0}.article-reader-content blockquote{margin:1.4em 0;padding:18px 22px;background:#effaf6;border-right:4px solid #178f84;border-radius:14px;color:#285b55}
 @media(max-width:640px){.article-card-cover{height:125px}.article-card-body{padding:16px}.article-card-title h3{font-size:17px}.article-reader-head{padding:18px!important}.article-reader-content{font-size:15px;line-height:2}.article-reader{border-radius:20px}}
+
+/* Compact knowledge hero: retain the visual identity with less vertical space */
+.article-hero{padding:1.15rem 1.5rem!important;min-height:190px}
+.article-hero h2{margin-top:.65rem!important;font-size:1.65rem!important;line-height:1.45!important}
+.article-hero p{margin-top:.45rem!important;line-height:1.7!important}
+.article-stats{margin-top:.75rem!important}
+.article-stats span{padding:5px 9px;font-size:11px}
+.article-hero-art{width:125px;height:145px;gap:10px;border-radius:20px}
+.article-hero-art i{font-size:40px}
+.article-hero-art span{font-size:9px;letter-spacing:1.3px}
+@media(max-width:640px){.article-hero{padding:1rem 1.1rem!important;min-height:0}.article-hero h2{font-size:1.35rem!important}.article-hero-art{width:86px;height:100px;left:4%;gap:6px}.article-hero-art i{font-size:28px}.article-hero-art span{font-size:7px}.article-hero .max-w-3xl{max-width:78%}.article-stats{gap:5px}.article-stats span{padding:4px 7px;font-size:9px}}
