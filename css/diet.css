@@ -210,9 +210,13 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
  .dp-meal>header{padding:10px 12px}
  .dp-meal h3{font-size:13px}
  .dp-food-list{padding:0 10px}
- .dp-food{gap:7px;padding:10px 0}
+ .dp-food{gap:7px;padding:10px 0;flex-wrap:wrap}
+ .dp-food-name{flex:1 1 calc(100% - 75px)}
  .dp-food-name strong{font-size:12px}
  .dp-quantity{font-size:12px;padding:6px 8px}
+ .dp-frequency{margin-right:auto;font-size:9px}
+ .dp-meals-title h2{font-size:14px}
+ .dp-meals-title span{font-size:10px}
 }
 @media print{
  body{background:#fff!important}
