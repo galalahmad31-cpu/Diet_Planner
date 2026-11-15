@@ -171,17 +171,6 @@
       return;
     }
 
-    const overview = $('patientOverview');
-    if (overview) overview.classList.remove('hidden');
-    $('visitCount').textContent = String(data?.length || 0);
-    const latest = data?.[0];
-    $('lastVisitDate').textContent = latest ? formatVisitDate(latest.visit_date) : 'لا توجد زيارات';
-    const latestLink = $('latestVisitLink');
-    if (latestLink) {
-      latestLink.href = latest ? `visit.html?id=${encodeURIComponent(latest.id)}` : '#';
-      latestLink.classList.toggle('is-disabled', !latest);
-    }
-
     if (!data?.length) {
       empty.classList.remove('hidden');
       return;
