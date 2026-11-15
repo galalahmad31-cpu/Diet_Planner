@@ -154,3 +154,8 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #modulesSection .measurements-card summary .details-chevron,
 #modulesSection .plans-card summary .details-chevron,
 #modulesSection .patient-finance-card .details-chevron{color:#fff!important}
+
+/* Direct measurements card navigation */
+.measurements-card .dashboard-card-direct-link{display:flex;align-items:center;gap:12px;width:100%;text-decoration:none;cursor:pointer}
+.measurements-card .dashboard-card-arrow{font-size:20px;font-weight:900;color:#bfdbfe;transition:transform .18s}
+.measurements-card .dashboard-card-direct-link:hover .dashboard-card-arrow{transform:translateX(-4px)}
