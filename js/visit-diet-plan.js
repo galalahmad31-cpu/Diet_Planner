@@ -352,7 +352,7 @@ function calculateDay(day){
 }
 function metricCard(label,value,unit,target,pctv,kind){
  const bg={amber:'bg-amber-50 border-amber-200 text-amber-900',slate:'bg-slate-50 border-slate-200 text-slate-800',sky:'bg-sky-50 border-sky-200 text-sky-900',emerald:'bg-emerald-50 border-emerald-200 text-emerald-900'}[kind];
- return \`<div class="\${bg} border rounded-md px-1.5 py-1 min-w-0"><div class="flex items-center justify-center gap-1"><span class="text-[8px] sm:text-[9px] font-bold leading-tight whitespace-nowrap">\${label}</span>\${target?\`<span class="text-[8px] opacity-70">/\${target}</span>\`:''}</div><div class="flex items-baseline justify-center gap-0.5 leading-tight"><span class="text-[12px] sm:text-[14px] font-black tabular-nums">\${value}</span><span class="text-[8px] font-bold">\${unit}</span></div>\${target?\`<div class="w-full bg-white/60 h-1 rounded-full mt-1 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:\${pctv}%"></div></div>\`:''}</div>\`;
+ return `<div class="${bg} border rounded-md px-1.5 py-1 min-w-0"><div class="flex items-center justify-center gap-1"><span class="text-[8px] sm:text-[9px] font-bold leading-tight whitespace-nowrap">${label}</span>${target?`<span class="text-[8px] opacity-70">/${target}</span>`:''}</div><div class="flex items-baseline justify-center gap-0.5 leading-tight"><span class="text-[12px] sm:text-[14px] font-black tabular-nums">${value}</span><span class="text-[8px] font-bold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1 rounded-full mt-1 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div></div>`:''}</div>`;
 }
 
 async function syncFixedMeals(){
