@@ -593,3 +593,20 @@ button{border-radius:11px}
  #dietPlanContent .gp-meal-head>input{flex:1!important}
  #dietPlanContent .gp-food-row{grid-template-columns:minmax(0,1fr) 110px!important}
 }
+
+/* UX follow-through: explicit edit state and comfortable touch targets */
+#dietPlanContent .gp-edit-hint{margin:10px 0 0;padding:8px 10px;border-radius:7px;background:#f3f4f6;color:#374151;font-size:11px;font-weight:700;line-height:1.6}
+#dietPlanContent .gp-edit-hint.is-editing{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+#dietPlanContent .gp-day-actions button:disabled,
+#dietPlanContent .gp-meal-actions button:disabled,
+#dietPlanContent .gp-day-buttons button:disabled{opacity:.42!important;filter:grayscale(1);cursor:not-allowed!important}
+#dietPlanContent .gp-day-actions .day-edit-btn{min-height:40px!important}
+#dietPlanContent .gp-day-actions .day-save-btn{min-height:40px!important}
+@media(max-width:760px){
+ #dietPlanContent .gp-edit-hint{font-size:11px;margin-top:8px}
+ #dietPlanContent .gp-day-actions button{min-height:40px!important}
+ #dietPlanContent .gp-meal-actions button{min-height:36px!important}
+ #dietPlanContent .gp-food-meta>label:not(.gp-calc-toggle){font-size:10px!important}
+ #dietPlanContent .gp-food-meta input[type=text]{min-height:34px!important;font-size:12px!important}
+ #dietPlanContent .gp-calc-toggle{min-height:30px!important}
+}
