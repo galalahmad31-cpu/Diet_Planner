@@ -603,7 +603,9 @@
   function bindEvents() {
     document.addEventListener('click', (event) => {
       const action = event.target.closest('[data-action]')?.dataset.action;
-      if (action === 'delete-weight') requestDelete(Number(event.target.closest('[data-action]').dataset.index));\n      if (action === 'save-inline') saveInlineMeasurement();\n      if (action === 'cancel-inline') $('inlineMeasurementRow')?.remove();
+      if (action === 'delete-weight') requestDelete(Number(event.target.closest('[data-action]').dataset.index));
+      if (action === 'save-inline') saveInlineMeasurement();
+      if (action === 'cancel-inline') $('inlineMeasurementRow')?.remove();
     });
 
     $('addMeasurementRowBtn')?.addEventListener('click', openInlineMeasurementRow);
