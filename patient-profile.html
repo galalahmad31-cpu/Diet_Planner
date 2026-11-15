@@ -89,11 +89,11 @@
    <div><label>نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0"></div>
    <div><label>حالة السداد</label><select id="pfInputPaid"><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
    <div><label>مدة المتابعة (يوم)</label><input id="pfInputFollowDays" type="number" min="1"></div>
-   <div><label>آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date"></div>
+   <div><label>آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date"></div><div><label>موعد المتابعة القادمة (يدوي)</label><input id="pfInputNextFollow" type="date"></div>
   </div>
   <div class="finance-summary-box mt-3"><small>القيمة بعد الخصم</small><strong id="pfInputDiscountedPreview">—</strong><small>نهاية الاشتراك: <span id="pfInputEndPreview">—</span></small></div>
   <div id="patientFinanceError" class="hidden text-xs text-red-600 mt-2"></div>
-  <footer class="patient-finance-actions"><button type="button" id="savePatientFinance">حفظ الماليات</button><button type="button" id="cancelPatientFinance">إلغاء</button></footer>
+  <div class="patient-attendance-row"><button type="button" id="markPatientAttendance">✓ تسجيل حضور الجلسة اليوم</button><small>يسجل تاريخ اليوم كآخر زيارة، مع الاحتفاظ بموعد المتابعة الذي تحدده يدويًا.</small></div><footer class="patient-finance-actions"><button type="button" id="savePatientFinance">حفظ الماليات</button><button type="button" id="cancelPatientFinance">إلغاء</button></footer>
  </section>
 </div>
 
