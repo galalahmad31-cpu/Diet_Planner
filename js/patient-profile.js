@@ -469,18 +469,6 @@
       $('patientFinanceForm').classList.remove('hidden');updateFinancePreview();
     }catch(e){console.error('Finance load error',e);$('patientFinanceLoading').textContent='تعذر تحميل الماليات: '+(e.message||'تحقق من صلاحيات قاعدة البيانات');}
   }
-  async function markPatientAttendance(){
-    if(!state.user||!patientId)return;
-    const today=new Date();const iso=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-    $('pfInputLastVisit').value=iso;
-    const btn=$('markPatientAttendance');btn.disabled=true;btn.textContent='جارٍ تسجيل الحضور...';
-    try{
-      const payload={patient_id:patientId,user_id:state.user.id,last_visit_date:iso,next_follow_up_date:$('pfInputNextFollow').value||null};
-      const {error}=await supabase.from('patient_finances').upsert(payload,{onConflict:'patient_id'});if(error)throw error;
-      alert('تم تسجيل حضور الجلسة بتاريخ اليوم. موعد المتابعة اليدوي محفوظ.');
-    }catch(e){$('patientFinanceError').textContent=e.message||'تعذر تسجيل الحضور';$('patientFinanceError').classList.remove('hidden');}
-    finally{btn.disabled=false;btn.textContent='✓ تسجيل حضور الجلسة اليوم';}
-  }
   async function savePatientFinance() {
     if(!state.user||!patientId)return;
     const err=$('patientFinanceError');err.classList.add('hidden');
@@ -508,7 +496,6 @@
     $('addVisitButton')?.addEventListener('click', addVisit);
     $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
     $('savePatientFinance')?.addEventListener('click', savePatientFinance);
-    $('markPatientAttendance')?.addEventListener('click', markPatientAttendance);
     $('cancelPatientFinance')?.addEventListener('click', closePatientFinanceModal);
     ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
     $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);
