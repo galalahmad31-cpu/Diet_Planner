@@ -71,3 +71,24 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 /* Explicit visibility states for edit mode */
 #saveArea.hidden{display:none!important}
 #editButton.hidden{display:none!important}
+
+/* Patient-only finance modal */
+.finance-card-trigger{width:100%;min-height:76px;padding:12px;display:flex;align-items:center;gap:8px;text-align:right;background:#fff;border:0;cursor:pointer}
+.finance-card-trigger:hover{background:#f8fbfc}
+.patient-finance-modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px}
+.patient-finance-modal.hidden{display:none!important}
+.patient-finance-backdrop{position:absolute;inset:0;background:rgba(12,27,38,.52);backdrop-filter:blur(3px)}
+.patient-finance-dialog{position:relative;width:min(620px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border:1px solid #e3ecef;border-radius:18px;padding:18px;box-shadow:0 24px 80px rgba(8,25,35,.24);animation:patientModalIn .18s ease}
+.patient-finance-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid #edf2f4;margin-bottom:14px}
+.patient-finance-modal-head h2{font-size:15px;font-weight:900;color:#173642}.patient-finance-modal-head p{font-size:11px;color:#82919a;margin-top:3px}
+#closePatientFinance{width:30px;height:30px;border:0;border-radius:9px;background:#f1f5f7;color:#64748b;cursor:pointer}
+.finance-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.finance-summary-box{background:#f6faf9;border:1px solid #e4efec;border-radius:12px;padding:12px}
+.finance-summary-box small{display:block;font-size:10px;color:#82919a}.finance-summary-box strong{display:block;font-size:13px;color:#176b63;margin-top:5px}
+.finance-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.finance-details-grid>div{padding:10px;border:1px solid #edf1f4;border-radius:10px}
+.finance-details-grid label{display:block;font-size:10px;color:#82919a;margin-bottom:4px}.finance-details-grid strong{font-size:11px;color:#263d49}
+.finance-state{text-align:center;padding:25px 10px;font-size:12px;color:#718096}
+.patient-finance-dialog footer{display:flex;justify-content:flex-end;margin-top:15px}
+#patientFinanceCloseBottom{border:0;border-radius:9px;background:#edf2f5;color:#52636e;padding:9px 20px;font-size:11px;font-weight:800;cursor:pointer}
+@media(max-width:480px){.patient-finance-dialog{padding:14px}.finance-details-grid{gap:8px}.finance-details-grid>div{padding:8px}.finance-summary-box{padding:10px}}
