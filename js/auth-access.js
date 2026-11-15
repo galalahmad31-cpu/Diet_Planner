@@ -283,7 +283,7 @@
     }
 
     if (active) {
-      window.location.replace("app.html");
+      window.location.replace("index.html");
       return true;
     }
 
@@ -479,7 +479,7 @@
       .getElementById("googleLoginButton")
       ?.addEventListener("click", loginWithGoogle);
 
-    const isAuthCallback =
+    if (window.location.hash === "#register") {\n      document.querySelector('[data-auth-tab="registerForm"]')?.click();\n    }\n\n    const isAuthCallback =
       window.location.hash.includes("access_token=") ||
       window.location.hash.includes("refresh_token=") ||
       new URLSearchParams(window.location.search).has("code");
