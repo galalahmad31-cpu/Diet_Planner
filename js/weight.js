@@ -98,15 +98,15 @@
         return;
       }
 
+      // Load patient by ID; RLS remains responsible for access control.
       const { data: patient, error: patientError } = await supabase
         .from('patients')
-        .select('id,name,height')
+        .select('id,name,height,user_id')
         .eq('id', state.patientId)
-        .eq('user_id', state.user.id)
         .maybeSingle();
 
       if (patientError) throw patientError;
-      if (!patient) throw new Error('Patient not found.');
+      if (!patient) throw new Error('Patient not found.');\n      if (patient.user_id && patient.user_id !== state.user.id && !state.isAdmin) throw new Error('Patient access denied.');
 
       state.patient = patient;
       $('patientName').textContent = patient.name || 'المريض';
