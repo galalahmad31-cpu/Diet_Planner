@@ -64,7 +64,7 @@
   <section id="modulesSection" class="hidden patient-dashboard mt-5">
     <article class="dashboard-card patient-data-card"><details class="dashboard-details">
       <summary><span class="dashboard-card-head"><span class="dashboard-icon teal">👤</span><span><h3>بيانات المريض</h3><p>البيانات الأساسية والتشخيص</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary>
-      <div class="dashboard-panel"><button id="editButton" class="dashboard-primary-btn">✏️ تعديل البيانات</button>
+      <div class="dashboard-panel"><div class="modal-panel-header"><strong>بيانات المريض</strong><button type="button" id="closePatientModal" aria-label="إغلاق">✕</button></div><button id="editButton" class="dashboard-primary-btn">✏️ تعديل البيانات</button>
       <div class="patient-fields grid grid-cols-1 gap-3 mt-4">
       <div><label>اسم المريض</label><input id="nameInput" disabled></div><div><label>النوع</label><select id="genderInput" disabled><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
       <div><label>تاريخ الميلاد</label><input id="birthDateInput" type="date" disabled></div><div><label>العمر (سنة)</label><input id="ageInput" type="number" disabled></div><div><label>الطول (سم)</label><input id="heightInput" type="number" disabled></div><div><label>التشخيص الطبي</label><textarea id="diagnosisInput" rows="2" disabled></textarea></div><div><label>شكوى / أعراض</label><textarea id="complaintsInput" rows="2" disabled></textarea></div><div><label>ملاحظات سريرية</label><textarea id="notesInput" rows="2" disabled></textarea></div></div>
