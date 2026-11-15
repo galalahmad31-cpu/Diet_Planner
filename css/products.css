@@ -99,3 +99,19 @@ main>.mx-auto>section:nth-of-type(1){border:1px solid #dbe9e7;background:#fff;bo
 .product-title-row h2{font-size:16px!important}
 .product-formulas{padding:11px 13px 13px}
 }
+
+/* Clearer typography and distinct, accessible color hierarchy */
+.product-category-pill{background:#e4f3ef!important;color:#087568!important;font-weight:900}
+.product-title-row h2{color:#123e50!important;font-weight:950!important}
+.product-usage small{color:#39718a!important}
+.product-usage p{color:#294b5b!important;font-weight:750!important}
+.formula-section-title{color:#087568!important}
+.formula-title-wrap strong{color:#243f59!important;font-weight:900!important}
+.formula-title-wrap span{color:#647d8d!important}
+.metric span{color:#536d7d!important;font-weight:900!important}
+.metric strong{font-weight:950!important}
+.metric-kcal{background:#fff0d8!important}.metric-kcal strong{color:#a95b00!important}
+.metric-carb{background:#e5f1ff!important}.metric-carb strong{color:#075eae!important}
+.metric-protein{background:#e1f6e9!important}.metric-protein strong{color:#087443!important}
+.metric-fat{background:#ffe8ef!important}.metric-fat strong{color:#b42355!important}
+.formula-notes{color:#405d6b!important}
