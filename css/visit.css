@@ -511,3 +511,12 @@ button{border-radius:11px}
 #dietPlanContent .gp-total small{color:#b8d0e2!important}
 #dietPlanContent .gp-minerals{background:#0f2d47!important;border-top-color:#315875!important;color:#f2f7fb!important}
 #dietPlanContent .gp-total{border-bottom-color:#315875!important}
+
+/* User preference: near-black table and summary strip, no grey */
+#dietPlanContent .gp-meal{background:#fff!important;border-color:#111827!important}
+#dietPlanContent .gp-food-row,
+#dietPlanContent .gp-food-row:nth-child(even){background:#fff!important;border-bottom:1px solid #111827!important}
+#dietPlanContent .gp-meal-head{border-bottom:2px solid #111827!important}
+#dietPlanContent .gp-totals{background:#111827!important;border-color:#000!important}
+#dietPlanContent .gp-total{border-left-color:#374151!important;border-bottom-color:#374151!important}
+#dietPlanContent .gp-minerals{background:#000!important;border-top-color:#374151!important;color:#fff!important}
