@@ -128,3 +128,22 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-card .finance-card-trigger p{opacity:.86}
 .patient-finance-card .finance-card-trigger .details-chevron{color:#fff!important}
 .patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
+
+/* Distinct dashboard card palettes */
+.patient-data-card .dashboard-details>summary{background:linear-gradient(135deg,#123b50,#176b63);border-radius:13px;color:#fff}
+.patient-data-card .dashboard-card-head h3,.patient-data-card .dashboard-card-head p{color:#fff!important}
+.patient-data-card .dashboard-card-head p{opacity:.86}
+.patient-data-card .dashboard-icon.teal{background:rgba(255,255,255,.16);color:#fff}
+.patient-data-card .details-chevron{color:#fff!important}
+.patient-dashboard>.dashboard-card:nth-child(2) .dashboard-details>summary{background:linear-gradient(135deg,#174c78,#287db2);border-radius:13px}
+.patient-dashboard>.dashboard-card:nth-child(2) .dashboard-card-head h3,.patient-dashboard>.dashboard-card:nth-child(2) .dashboard-card-head p{color:#fff!important}
+.patient-dashboard>.dashboard-card:nth-child(2) .dashboard-card-head p{opacity:.86}
+.patient-dashboard>.dashboard-card:nth-child(2) .dashboard-icon.blue{background:rgba(255,255,255,.16);color:#fff}
+.patient-dashboard>.dashboard-card:nth-child(2) .details-chevron{color:#fff!important}
+.patient-dashboard>.dashboard-card:nth-child(3) .dashboard-details>summary{background:linear-gradient(135deg,#17633d,#26965d);border-radius:13px}
+.patient-dashboard>.dashboard-card:nth-child(3) .dashboard-card-head h3,.patient-dashboard>.dashboard-card:nth-child(3) .dashboard-card-head p{color:#fff!important}
+.patient-dashboard>.dashboard-card:nth-child(3) .dashboard-card-head p{opacity:.86}
+.patient-dashboard>.dashboard-card:nth-child(3) .dashboard-icon.green{background:rgba(255,255,255,.16);color:#fff}
+.patient-dashboard>.dashboard-card:nth-child(3) .details-chevron{color:#fff!important}
+.patient-dashboard .dashboard-details>summary{transition:filter .14s ease}
+.patient-dashboard .dashboard-details>summary:hover{filter:brightness(1.06)}
