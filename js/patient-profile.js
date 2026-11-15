@@ -138,6 +138,7 @@
     fillPatientData();
     await refreshWriteAccess();
     setLink('weightLink', 'weight.html');
+    setLink('financeLink', 'finance.html');
 
     $('loadingState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
@@ -186,14 +187,14 @@
       visitLink.innerHTML = `
         <div class="w-10 h-10 shrink-0 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">${escapeHtml(visit.visit_number)}</div>
         <div class="min-w-0">
-          <div class="font-extrabold text-sm text-slate-800">زيارة رقم ${escapeHtml(visit.visit_number)}</div>
+          <div class="font-extrabold text-sm text-slate-800">خطة رقم ${escapeHtml(visit.visit_number)}</div>
           <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(formatVisitDate(visit.visit_date))}</div>
         </div>`;
 
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
       deleteButton.className = 'shrink-0 w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center';
-      deleteButton.title = 'حذف الزيارة';
+      deleteButton.title = 'حذف الخطة';
       deleteButton.setAttribute('aria-label', 'حذف الزيارة');
       deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
       deleteButton.addEventListener('click', (event) => {
@@ -244,8 +245,8 @@
     }
 
     const result = await Swal.fire({
-      title: 'حذف الزيارة',
-      text: `هل أنت متأكد من حذف الزيارة رقم ${visit.visit_number}؟`,
+      title: 'حذف الخطة',
+      text: `هل أنت متأكد من حذف الخطة رقم ${visit.visit_number}؟`,
       showCancelButton: true,
       confirmButtonText: 'حذف',
       cancelButtonText: 'إلغاء',
@@ -289,7 +290,7 @@
 
   async function addVisit() {
     if (!canWrite()) {
-      alert('إضافة الزيارة متاحة أثناء الاشتراك المدفوع فقط.');
+      alert('إضافة الخطة متاحة أثناء الاشتراك المدفوع فقط.');
       return;
     }
 
@@ -309,7 +310,7 @@
 
     if (lastError) {
       console.error('Get last visit failed:', lastError);
-      alert('تعذر معرفة رقم الزيارة التالية.');
+      alert('تعذر معرفة رقم الخطة التالية.');
       return;
     }
 
@@ -328,7 +329,7 @@
 
     if (error) {
       console.error('Create visit failed:', error);
-      alert('تعذر إنشاء الزيارة.');
+      alert('تعذر إنشاء الخطة.');
       return;
     }
 
