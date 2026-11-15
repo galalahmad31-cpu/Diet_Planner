@@ -520,3 +520,21 @@ button{border-radius:11px}
 #dietPlanContent .gp-totals{background:#111827!important;border-color:#000!important}
 #dietPlanContent .gp-total{border-left-color:#374151!important;border-bottom-color:#374151!important}
 #dietPlanContent .gp-minerals{background:#000!important;border-top-color:#374151!important;color:#fff!important}
+
+/* Mobile typography: compact diet table and nutrition strip */
+@media(max-width:760px){
+ #dietPlanContent .gp-day-name{font-size:15px!important}
+ #dietPlanContent .gp-day-note{font-size:11px!important}
+ #dietPlanContent .gp-total>span{font-size:10px!important}
+ #dietPlanContent .gp-total strong{font-size:17px!important}
+ #dietPlanContent .gp-total small{font-size:9px!important}
+ #dietPlanContent .gp-minerals{font-size:10px!important}
+ #dietPlanContent .gp-meal-head{font-size:12px!important}
+ #dietPlanContent .gp-food-name{font-size:12px!important}
+ #dietPlanContent .gp-food-household{font-size:10px!important}
+ #dietPlanContent .gp-food-meta>label:not(.gp-calc-toggle),
+ #dietPlanContent .gp-calc-toggle{font-size:10px!important}
+ #dietPlanContent .gp-food-meta input[type="text"]{font-size:11px!important}
+ #dietPlanContent .gp-grams{font-size:14px!important}
+ #dietPlanContent .gp-day-actions button{font-size:11px!important;padding:6px 9px!important}
+}
