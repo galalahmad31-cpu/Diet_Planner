@@ -420,7 +420,7 @@
           provider: "google",
           options: {
             redirectTo:
-              "https://galalahmad31-cpu.github.io/Diet_Planner/index.html"
+              "https://galalahmad31-cpu.github.io/Diet_Planner/login.html"
           }
         });
 
