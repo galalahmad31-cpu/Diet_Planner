@@ -15,7 +15,7 @@
     logout: document.getElementById("logoutBtn"),
     adminCard: document.getElementById("adminCard"),
     featureCards: document.querySelectorAll(
-      "a.nav-card[data-feature]"
+      "a.nav-card:not(#adminCard)"
     )
   };
 
