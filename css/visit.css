@@ -420,3 +420,50 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 #calculatorContent #calcTab .macro-footer button{justify-content:center}
 }
 @media(max-width:420px){#calculatorContent #calcTab .energy-workspace,#calculatorContent #calcTab .macro-workspace{padding:12px}#calculatorContent #calcTab .target-adjustment{align-items:stretch;flex-direction:column}#calculatorContent #calcTab .target-adjustment input{max-width:none;width:100%}}
+
+/* Color hierarchy: distinguish calculator workspaces and result groups */
+#calculatorContent #calcTab .energy-workspace{
+  background:linear-gradient(145deg,#f0f7ff 0%,#ffffff 58%);
+  border:1px solid #cfe2ff;border-top:5px solid #2563eb;
+  box-shadow:0 8px 24px rgba(37,99,235,.08)
+}
+#calculatorContent #calcTab .macro-workspace{
+  background:linear-gradient(145deg,#effcf6 0%,#ffffff 55%);
+  border:1px solid #c8efdc;border-top:5px solid #059669;
+  box-shadow:0 8px 24px rgba(5,150,105,.08)
+}
+#calculatorContent #calcTab .workspace-step{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:6px;
+  background:#dbeafe;color:#1d4ed8;letter-spacing:.7px;margin-bottom:8px
+}
+#calculatorContent #calcTab .macro-workspace .workspace-step{background:#d1fae5;color:#047857}
+#calculatorContent #calcTab .workspace-heading h3{color:#173b70}
+#calculatorContent #calcTab .macro-workspace .workspace-heading h3{color:#075c45}
+#calculatorContent #calcTab .patient-inputs>div{padding:10px;border-radius:12px;background:rgba(255,255,255,.82);border:1px solid #dce9fa}
+#calculatorContent #calcTab .patient-inputs label{color:#315a91}
+#calculatorContent #calcTab .patient-inputs input,#calculatorContent #calcTab .patient-inputs select{
+  background:#fff;border-color:#c9dcf6;box-shadow:inset 0 1px 2px rgba(30,64,175,.03)
+}
+#calculatorContent #calcTab .activity-row{background:#e8f1ff;border:1px solid #d4e4fb;border-radius:12px;padding:12px;margin-top:12px}
+#calculatorContent #calcTab .activity-row label{color:#244f8d}
+#calculatorContent #calcTab .activity-row select{border-color:#bfd5f4;background:#fff}
+#calculatorContent #calcTab .energy-results>div{background:#e8f0fb;border-color:#d2e1f5}
+#calculatorContent #calcTab .energy-results .primary{background:#d9f7e9;border-color:#a9e8ca}
+#calculatorContent #calcTab .energy-results .result-equation{background:#f0eaff;border-color:#ded2ff}
+#calculatorContent #calcTab .energy-results .result-equation strong{color:#6d28d9}
+#calculatorContent #calcTab .target-adjustment{background:#e2f8ed;border-color:#bdebd5}
+#calculatorContent #calcTab .target-adjustment label{color:#087f5b}
+#calculatorContent #calcTab .macro-section-label{color:#087f5b}
+#calculatorContent #calcTab .macro-item{background:#fff;border-color:#d5eee2;box-shadow:0 3px 10px rgba(5,150,105,.04)}
+#calculatorContent #calcTab .macro-item.protein{background:linear-gradient(135deg,#f4efff,#fff 65%);border-color:#ded2ff}
+#calculatorContent #calcTab .macro-item.carbs{background:linear-gradient(135deg,#fff7e6,#fff 65%);border-color:#f9e2b6}
+#calculatorContent #calcTab .macro-item.fats{background:linear-gradient(135deg,#e9faff,#fff 65%);border-color:#c5edf7}
+#calculatorContent #calcTab .protein .macro-name{color:#6d28d9}
+#calculatorContent #calcTab .carbs .macro-name{color:#b45309}
+#calculatorContent #calcTab .fats .macro-name{color:#087e9b}
+#calculatorContent #calcTab .protein .macro-percent input{border-color:#d8c9ff;color:#6d28d9}
+#calculatorContent #calcTab .carbs .macro-percent input{border-color:#f5d79b;color:#b45309}
+#calculatorContent #calcTab .fats .macro-percent input{border-color:#b7e8f4;color:#087e9b}
+#calculatorContent #calcTab .macro-grams strong{color:#1d3b32}
+#calculatorContent #calcTab .macro-footer{background:#e2f8ed;border:1px solid #c6eedb;border-radius:12px;padding:12px;margin-top:12px}
+#calculatorContent #calcTab .macro-footer button{background:#047857;box-shadow:0 4px 10px rgba(4,120,87,.18)}
