@@ -133,12 +133,25 @@ function setDietAccess(value){const el=$('dietAccess');if(el)el.value=value||''}
 function openNew(){editingId=null;day={day_number:1,day_name:'اليوم',meals:[]};$('editorTitle').textContent='إنشاء دايت جديد';$('dietName').value='';$('description').value='';$('notes').value='';$('visibility').value='private';setDietAccess('');syncAccessControl();setReadOnly(false);renderDay();toggleEditor(true)}
 async function openDiet(id){const d=diets.find(x=>x.id===id);if(!d)return;await loadFoods();editingId=id;$('editorTitle').textContent=d.created_by===user.id?'تعديل الدايت':'معاينة الدايت';$('dietName').value=d.name||'';$('description').value=d.description||'';$('notes').value=d.notes||'';$('visibility').value=d.visibility||'private';setDietAccess(d.required_feature||'');syncAccessControl();const {data:dr,error}=await supabase.from('diet_template_days').select('id,diet_id,day_number,day_name').eq('diet_id',id).order('day_number',{ascending:true}).limit(1);if(error){toast('تعذر تحميل اليوم',false);return}const drow=dr?.[0];if(!drow){day={day_number:1,day_name:'اليوم',meals:[]}}else{const {data:mr,error:me}=await supabase.from('diet_template_meals').select('id,day_id,meal_name,meal_order,frequency').eq('day_id',drow.id).order('meal_order',{ascending:true});if(me){toast('تعذر تحميل الوجبات: '+(me.message||me),false);return}const mids=(mr||[]).map(x=>x.id);let ir=[];if(mids.length){const r=await supabase.from('diet_template_items').select('id,meal_id,food_id,quantity_g,household_measure,frequency,notes,item_order').in('meal_id',mids).order('item_order',{ascending:true});if(r.error){toast('تعذر تحميل الأصناف',false);return}ir=r.data||[];}day={id:drow.id,day_number:1,day_name:drow.day_name||'اليوم',meals:(mr||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',items:ir.filter(i=>i.meal_id===m.id).map(i=>({id:i.id,food_id:String(i.food_id),quantity_g:num(i.quantity_g),household_measure:i.household_measure||'',frequency:i.frequency||'',notes:i.notes||'',includeInCalculation:true}))}))} }const canEdit=d.created_by===user.id||isAdmin;renderDay();toggleEditor(true);setReadOnly(!canEdit);if(!canEdit)toast('هذا قالب منشور — وضع العرض فقط')}
 function buildDietPreview(){
- const d=diets.find(x=>x.id===editingId)||{}; const t=calcTotals();
- const macro=[['السعرات',t.kcal.toFixed(0),'kcal'],['البروتين',t.protein.toFixed(1),'جم'],['الكربوهيدرات',t.carb.toFixed(1),'جم'],['الدهون',t.fat.toFixed(1),'جم']];
- let h='<div class="diet-preview"><div class="dp-cover"><small>DIET PLAN · DAILY MENU</small><h1>'+esc(d.name||$('dietName').value)+'</h1><p>'+esc(d.description||$('description').value||'خطة غذائية يومية')+'</p><span>خطة يومية · معاينة منظمة</span></div><div class="dp-macros">';
- macro.forEach((x,i)=>h+='<div><small>'+x[0]+'</small><strong>'+x[1]+'</strong><em>'+x[2]+'</em></div>'); h+='</div>';
- day.meals.forEach((m,i)=>{h+='<section class="dp-meal"><header><b>'+String(i+1).padStart(2,'0')+'</b><h2>'+esc(m.name||'وجبة')+'</h2><small>'+m.items.length+' أصناف</small></header><div class="dp-foods">';m.items.forEach(it=>{const f=foods.find(x=>String(x.id)===String(it.food_id));h+='<article><div><strong>'+esc(f?.name_ar||'صنف غير موجود')+'</strong>'+(f?.name_en?'<small>'+esc(f.name_en)+'</small>':'')+(it.notes?'<p>'+esc(it.notes)+'</p>':'')+'</div><b>'+num(it.quantity_g)+' <small>جم</small></b>'+(it.frequency?'<span>'+esc(it.frequency)+'</span>':'')+'</article>'});h+='</div></section>'});
- if($('notes').value.trim())h+='<aside class="dp-notes"><b>ملاحظات وتعليمات</b><p>'+esc($('notes').value)+'</p></aside>';return h+'<footer class="dp-footer">Diet Planner <span>عرض الخطة الغذائية</span></footer></div>';
+ const d=diets.find(x=>x.id===editingId)||{};
+ const t=calcTotals();
+ const macro=[['السعرات الحرارية',t.kcal.toFixed(0),'kcal'],['البروتين',t.protein.toFixed(1),'جم'],['الكربوهيدرات',t.carb.toFixed(1),'جم'],['الدهون',t.fat.toFixed(1),'جم']];
+ let h='<div class="diet-preview"><header class="dp-cover"><div class="dp-brand">DIET PLANNER <span>خطة غذائية</span></div><h1>'+esc(d.name||$('dietName').value)+'</h1><p>'+esc(d.description||$('description').value||'')+'</p></header>';
+ h+='<section class="dp-summary"><h2>ملخص اليوم</h2><div class="dp-macros">';
+ macro.forEach(x=>h+='<div class="dp-macro"><small>'+x[0]+'</small><strong>'+x[1]+'</strong><em>'+x[2]+'</em></div>');
+ h+='</div></section><div class="dp-meals-title"><h2>الوجبات اليومية</h2><span>'+day.meals.length+' وجبات</span></div>';
+ day.meals.forEach((m,i)=>{
+  h+='<section class="dp-meal"><header><span class="dp-meal-num">'+(i+1)+'</span><h3>'+esc(m.name||'وجبة')+'</h3><small>'+m.items.length+' أصناف</small></header><div class="dp-food-list">';
+  if(!m.items.length)h+='<p class="dp-empty">لا توجد أصناف في هذه الوجبة</p>';
+  m.items.forEach(it=>{
+   const f=foods.find(x=>String(x.id)===String(it.food_id));
+   h+='<article class="dp-food"><div class="dp-food-name"><strong>'+esc(f?.name_ar||'صنف غير موجود')+'</strong>'+(f?.name_en?'<small>'+esc(f.name_en)+'</small>':'')+(it.notes?'<p>'+esc(it.notes)+'</p>':'')+'</div><div class="dp-quantity">'+num(it.quantity_g)+' <small>جم</small></div>'+(it.frequency?'<span class="dp-frequency">'+esc(it.frequency)+'</span>':'')+'</article>';
+  });
+  h+='</div></section>';
+ });
+ if($('notes').value.trim())h+='<section class="dp-notes"><h2>ملاحظات وتعليمات</h2><p>'+esc($('notes').value).replace(/\n/g,'<br>')+'</p></section>';
+ h+='<footer class="dp-footer"><span>Diet Planner</span><span>تم إعداد الخطة للعرض والطباعة</span></footer></div>';
+ return h;
 }
 function setReadOnly(ro){
   $('editor').classList.toggle('is-viewing',ro);
