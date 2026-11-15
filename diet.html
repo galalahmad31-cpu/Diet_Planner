@@ -17,11 +17,11 @@
     </head>
     <body>
         <div id="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#f7fafb]">
-            <div class="flex flex-col items-center gap-3">
-                <div class="spinner">
-                </div>
-                <span class="text-sm font-semibold text-slate-500">جاري تحميل مكتبة الدايت...</span>
-            </div>
+          <div class="flex flex-col items-center gap-3">
+            <div class="spinner"></div>
+            <span id="loadingText" class="text-sm font-semibold text-slate-500">جاري تحميل مكتبة الدايت...</span>
+            <button id="loadingRetry" type="button" class="hidden rounded-xl bg-teal-700 px-4 py-2 text-sm font-bold text-white">إعادة المحاولة</button>
+          </div>
         </div>
         <main class="min-h-screen p-4 sm:p-6">
             <div class="mx-auto max-w-[1550px]">
