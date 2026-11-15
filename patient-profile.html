@@ -76,6 +76,28 @@
   </section>
 </main>
 
+<div id="patientFinanceModal" class="patient-finance-modal hidden" role="dialog" aria-modal="true" aria-labelledby="patientFinanceTitle">
+ <div class="patient-finance-backdrop" data-close-finance></div>
+ <section class="patient-finance-dialog">
+  <header class="patient-finance-modal-head"><div><h2 id="patientFinanceTitle">ماليات المريض</h2><p id="patientFinanceName"></p></div><button type="button" id="closePatientFinance">✕</button></header>
+  <div id="patientFinanceLoading" class="finance-state">جاري تحميل البيانات المالية...</div>
+  <div id="patientFinanceEmpty" class="hidden finance-state">لا توجد بيانات مالية مسجلة. يمكنك إدخال بيانات الاشتراك أدناه.</div>
+  <div id="patientFinanceForm" class="patient-fields grid grid-cols-1 sm:grid-cols-2 gap-3">
+   <div><label>بداية الاشتراك</label><input id="pfInputStart" type="date"></div>
+   <div><label>مدة الاشتراك (شهر)</label><input id="pfInputMonths" type="number" min="1"></div>
+   <div><label>قيمة الاشتراك (جنيه)</label><input id="pfInputAmount" type="number" min="0" step="0.01"></div>
+   <div><label>نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0"></div>
+   <div><label>حالة السداد</label><select id="pfInputPaid"><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
+   <div><label>مدة المتابعة (يوم)</label><input id="pfInputFollowDays" type="number" min="1"></div>
+   <div><label>آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date"></div>
+  </div>
+  <div class="finance-summary-box mt-3"><small>القيمة بعد الخصم</small><strong id="pfInputDiscountedPreview">—</strong><small>نهاية الاشتراك: <span id="pfInputEndPreview">—</span></small></div>
+  <div id="patientFinanceError" class="hidden text-xs text-red-600 mt-2"></div>
+  <footer class="patient-finance-actions"><button type="button" id="savePatientFinance">حفظ الماليات</button><button type="button" id="cancelPatientFinance">إلغاء</button></footer>
+ </section>
+</div>
+
+
 
 
   
