@@ -348,3 +348,40 @@ button{border-radius:11px}
 .workflow-step>i{font-size:10px;color:#8aa19f}
 @media(max-width:760px){.workflow-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.workflow-step{padding:10px}.workflow-step small{font-size:9px}}
 @media(max-width:380px){.workflow-steps{grid-template-columns:1fr}.workflow-heading p{max-width:220px}}
+
+
+/* Gram plan: editorial layout overrides */
+/* Let the plan breathe: remove nested surfaces and use spacing/dividers for hierarchy. */
+#dietPlanContent .day-card,
+#dietPlanContent [data-day-id]{
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:transparent!important;overflow:visible!important;
+}
+#dietPlanContent .day-card>header,
+#dietPlanContent [data-day-id]>header{
+ background:transparent!important;border-bottom:1px solid #dce5e9!important;
+ padding:10px 0 14px!important;
+}
+#dietPlanContent .day-card .meal-card,
+#dietPlanContent [data-day-id] .meal-card{
+ border:0!important;border-radius:0!important;overflow:visible!important;
+ background:transparent!important;margin:0 0 22px!important;
+}
+#dietPlanContent .meal-card>div:first-child{
+ background:transparent!important;border-bottom:1px solid #edf1f3!important;
+ padding:10px 0!important;
+}
+#dietPlanContent .meal-card table{border-collapse:separate!important;border-spacing:0!important}
+#dietPlanContent .meal-card thead th{font-weight:600!important;letter-spacing:.01em}
+#dietPlanContent .meal-card tbody tr{transition:background .12s ease}
+#dietPlanContent .meal-card tbody tr:hover{background:#f8fafb!important}
+#dietPlanContent .meal-card tbody td{vertical-align:middle}
+#dietPlanContent .meal-card input[type="number"]{font-variant-numeric:tabular-nums}
+#dietPlanContent .day-note-input{border-radius:0!important}
+#dietPlanContent .day-note-input:focus{box-shadow:none!important}
+@media(max-width:640px){
+ #dietPlanContent .meal-card{margin-bottom:18px!important}
+ #dietPlanContent .meal-card table{min-width:560px!important}
+ #dietPlanContent .meal-card th,#dietPlanContent .meal-card td{padding-inline:7px!important}
+ #dietPlanContent [data-day-id]>header{align-items:flex-start!important}
+}
