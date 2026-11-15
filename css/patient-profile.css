@@ -120,3 +120,11 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 @media(max-width:480px){.patient-finance-modal-head{margin:-14px -14px 14px;padding:14px 15px}.patient-finance-dialog{padding:14px}}
 
 #closePatientFinance{background:rgba(255,255,255,.16)!important;color:#fff!important;border:1px solid rgba(255,255,255,.3)!important}
+
+/* Finance card label contrast + snappy modal entrance */
+.patient-finance-card .finance-card-trigger{background:linear-gradient(135deg,#123b50,#176b63);border-radius:14px;color:#fff;transition:filter .12s ease}
+.patient-finance-card .finance-card-trigger:hover{background:linear-gradient(135deg,#0e3042,#12594f);filter:brightness(1.06)}
+.patient-finance-card .finance-card-trigger h3,.patient-finance-card .finance-card-trigger p{color:#fff!important}
+.patient-finance-card .finance-card-trigger p{opacity:.86}
+.patient-finance-card .finance-card-trigger .details-chevron{color:#fff!important}
+.patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
