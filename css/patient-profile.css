@@ -47,3 +47,12 @@ details[open] summary{color:var(--dp-primary)}
  #editButton{width:100%}
  #addVisitButton{padding:9px 11px;font-size:11px}
 }
+
+/* Patient hub overview */
+#patientOverview .overview-tile{display:flex;flex-direction:column;gap:7px;padding:17px 19px;background:#fff;border:1px solid #e3ecef;border-radius:16px;min-height:95px;justify-content:center}
+#patientOverview .overview-tile span{font-size:11px;font-weight:700;color:#718096}
+#patientOverview .overview-tile strong{font-size:19px;font-weight:900;color:#173642}
+#patientOverview .overview-action{background:linear-gradient(135deg,#eaf5f2,#f7fbfa);border-color:#cfe6df;text-decoration:none}
+#patientOverview .overview-action strong{font-size:14px;color:#176b63}
+#patientOverview .overview-action.is-disabled{opacity:.55;pointer-events:none}
+#visitsList .latest-visit-row{border-color:#b9d9d1!important;background:#f2faf7!important}
