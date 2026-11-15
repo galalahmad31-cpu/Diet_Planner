@@ -65,3 +65,29 @@ details[open] summary{color:var(--dp-primary)}
 #modulesSection .module-card h4{font-size:16px}
 #modulesSection .module-card p{font-size:12px}
 @media(max-width:640px){#modulesSection{grid-template-columns:1fr}#modulesSection>div{grid-column:auto}}
+
+/* Four-card patient workspace */
+.patient-name-bar{background:#fff;border:1px solid #e4edf0;border-radius:18px;padding:20px 24px;box-shadow:0 5px 20px rgba(20,45,60,.035)}
+.patient-dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:stretch}
+.dashboard-card{min-width:0;background:#fff;border:1px solid #e1eaee;border-radius:20px;padding:20px;box-shadow:0 7px 24px rgba(20,45,60,.04);text-decoration:none;color:inherit;transition:transform .18s,border-color .18s,box-shadow .18s}
+.dashboard-card:hover{transform:translateY(-3px);border-color:#b8d9d2;box-shadow:0 12px 28px rgba(20,45,60,.08)}
+.dashboard-card-head{display:flex;align-items:center;gap:12px;margin-bottom:17px}
+.dashboard-card-head h3{font-size:16px;font-weight:900;color:#163541;margin:0}
+.dashboard-card-head p{font-size:11px;color:#82919a;margin-top:4px;line-height:1.6}
+.dashboard-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:14px;font-size:20px}
+.dashboard-icon.teal{background:#e8f5f1;color:#176b63}.dashboard-icon.blue{background:#eaf3fc;color:#397ca8}.dashboard-icon.green{background:#eaf7ee;color:#16834a}.dashboard-icon.purple{background:#f1edff;color:#7654bd}
+.dashboard-primary-btn{width:100%;border:0;border-radius:12px;background:#176b63;color:#fff;padding:11px 12px;font:800 12px Cairo,sans-serif;cursor:pointer;transition:.15s}
+.dashboard-primary-btn:hover{background:#12574f}.dashboard-primary-btn:disabled{opacity:.45;cursor:not-allowed}
+.access-note{margin:12px 0;padding:9px 10px;border-radius:10px;background:#f7fafb;color:#718096;font-size:10px;line-height:1.7}
+.patient-fields summary{font-size:12px;font-weight:800;color:#60717a;cursor:pointer;padding:7px 0}
+.patient-fields label{display:block;font-size:11px;font-weight:800;color:#718096;margin-bottom:5px}
+.patient-fields input,.patient-fields select,.patient-fields textarea{width:100%;border:1px solid #dce6eb;border-radius:10px;padding:9px 10px;font:600 12px Cairo,sans-serif;background:#f8fafb;min-height:39px}
+.patient-fields input:disabled,.patient-fields select:disabled,.patient-fields textarea:disabled{opacity:.8}
+.save-actions{display:flex;gap:8px;margin-top:14px}.save-actions button{flex:1;border:0;border-radius:10px;padding:10px;font:800 11px Cairo,sans-serif;cursor:pointer}.save-actions #savePatientButton{background:#16834a;color:white}.save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
+.dashboard-link{display:flex;flex-direction:column;justify-content:space-between;min-height:190px}
+.dashboard-cta{display:block;margin-top:22px;color:#176b63;font-size:12px;font-weight:900}
+.plans-card{grid-column:span 2}
+.plans-list{display:flex;flex-direction:column;gap:8px}
+#visitsList>div{padding:11px 12px!important}
+@media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}.plans-card{grid-column:span 2}}
+@media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.plans-card{grid-column:auto}.patient-name-bar{padding:16px}.dashboard-card{padding:16px}}
