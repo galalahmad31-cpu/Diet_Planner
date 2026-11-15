@@ -61,6 +61,10 @@
         user?.user_metadata?.name ||
         user?.email ||
         "حساب المستخدم";
+      elements.accountName.classList.remove("hidden");
+      document.getElementById("loginCta")?.classList.add("hidden");
+      document.getElementById("registerCta")?.classList.add("hidden");
+      elements.logout?.classList.remove("hidden");
     } catch (error) {
       console.error("Profile name lookup failed:", error);
       elements.accountName.textContent = "حساب المستخدم";
@@ -326,6 +330,7 @@
       // The central auth layer is responsible for auth routing.
       if (!status.authenticated || !status.user) {
         renderAdminCard(false);
+        renderVisitorDashboard();
         return;
       }
 
