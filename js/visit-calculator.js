@@ -315,9 +315,9 @@ async function loadCalculatorPatientData() {
         .order('created_at', { ascending:false });
 
     if (plansError) {
-        console.error('Saved calculator targets load error:', plansError);
-        calcShowToast('تعذر تحميل الأهداف المحفوظة', 'error');
-        return false;
+        // Saved targets are optional for opening the calculator. A schema/RLS
+        // issue in this secondary query must not block energy calculations.
+        console.warn('Saved calculator targets could not be loaded:', plansError);
     }
 
     // Both plan types are saved together. Prefer the newest row that actually has a saved calorie target.
