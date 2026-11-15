@@ -23,7 +23,7 @@ function withTimeout(promise,ms,label='الطلب'){
 async function getSession(){
   const access=window.DietPlannerAccess;
   if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
-  user=await withTimeout(access.getCurrentUser(),3500,'التحقق من الجلسة');
+  user=await withTimeout(access.getCurrentUser(),2000,'التحقق من الجلسة');
   if(!user){location.replace('index.html');return false;}
   isAdmin=false;
   access.getUserRole?.(user.id).then(role=>{isAdmin=role==='admin';if(diets.length)renderDiets();}).catch(error=>console.warn('Role lookup deferred:',error));
@@ -80,7 +80,7 @@ async function loadDiets(force=false){
 
   let response;
   try{
-    response=await withTimeout(supabase.from('diet_templates').select('id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at').order('updated_at',{ascending:false}),4500,'تحميل الدايت');
+    response=await withTimeout(supabase.from('diet_templates').select('id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at').order('updated_at',{ascending:false}),3500,'تحميل الدايت');
   }catch(error){
     $('statusStat').textContent=diets.length?'بيانات محفوظة — تعذر التحديث':'انتهت مهلة تحميل الدايت';
     $('statusStat').className='mt-1 text-sm font-extrabold text-amber-600';
