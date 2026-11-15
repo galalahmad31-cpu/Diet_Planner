@@ -660,13 +660,13 @@ function renderDays(){
      <span class="gp-meal-count">${d.meals?.length||0} وجبات</span>
     </div>
     <div class="gp-day-actions">
-     <button class="day-edit-btn" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')">تعديل</button>
-     <button class="day-save-btn" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')">حفظ</button>
+     <button class="day-edit-btn" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')">${isDayEditing(d.id)?'قيد التعديل':'ابدأ التعديل'}</button>
+     <button class="day-save-btn" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')">حفظ اليوم</button>
      <button class="day-action-always gp-icon-action" onclick="window.dietPlan.duplicateDay('${escapeHtml(d.id)}')" aria-label="نسخ اليوم"><i class="fa-regular fa-copy"></i></button>
      <button class="day-action-always gp-icon-action gp-delete" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')" aria-label="حذف اليوم"><i class="fa-solid fa-trash"></i></button>
     </div>
    </header>
-   ${d.isCollapsed?'':`<div class="gp-day-body">
+   ${d.isCollapsed?'':`<div class="gp-edit-hint ${isDayEditing(d.id)?'is-editing':''}">${isDayEditing(d.id)?'✎ وضع التعديل نشط — احفظ اليوم عند الانتهاء':'🔒 اليوم محفوظ — اضغط «ابدأ التعديل» لتغيير الأصناف والكميات'}</div><div class="gp-day-body">
     <div class="gp-totals">
      ${targets.map(([label,value,unit,target])=>`<div class="gp-total"><span>${label}</span><strong>${value}</strong><small>${unit}${target?` · الهدف ${target}`:''}</small></div>`).join('')}
      <div class="gp-minerals"><span>Na ${Math.round(calc.sod)} mg</span><span>K ${Math.round(calc.pot)} mg</span><span>P ${Math.round(calc.pho)} mg</span></div>
