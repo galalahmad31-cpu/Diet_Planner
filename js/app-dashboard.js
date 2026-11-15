@@ -62,8 +62,6 @@
         user?.email ||
         "حساب المستخدم";
       elements.accountName.classList.remove("hidden");
-      document.getElementById("loginCta")?.classList.add("hidden");
-      document.getElementById("registerCta")?.classList.add("hidden");
       elements.logout?.classList.remove("hidden");
     } catch (error) {
       console.error("Profile name lookup failed:", error);
