@@ -49,19 +49,7 @@ function calcShowToast(msg, type = 'success') {
             document.getElementById('resEquation').textContent =
                 selectedEnergyEquation === 'mifflin' ? 'Mifflin-St Jeor' : 'Schofield';
 
-            updateSchofieldGroupHint();
         }
-
-        function updateSchofieldGroupHint() {
-            const age = parseFloat(document.getElementById('energyAge').value);
-            const hint = document.getElementById('schofieldGroupHint');
-            const result = document.getElementById('resSchofieldGroup');
-
-            if (!Number.isFinite(age)) {
-                hint.textContent = 'الفئات: أقل من 3 سنوات، 3–10، 10–18، 18–30، 30–60، وأكثر من 60 سنة.';
-                result.textContent = '—';
-                return;
-            }
 
             let group = '';
             if (age < 3) group = '<3 سنوات';
@@ -119,7 +107,7 @@ function calcShowToast(msg, type = 'success') {
 
             document.getElementById('resBMR').textContent = Math.round(bmr);
             document.getElementById('resTDEE').textContent = tdee;
-            document.getElementById('resSchofieldGroup').textContent = group;
+
             document.getElementById('resEquation').textContent =
                 selectedEnergyEquation === 'mifflin' ? 'Mifflin-St Jeor' : 'Schofield';
 
@@ -349,8 +337,6 @@ async function loadCalculatorPatientData() {
             document.getElementById('macroFatPercent').value = fatPercent;
         }
     }
-
-    updateSchofieldGroupHint();
 
     // Calculate the current TDEE first so a saved absolute target can be
     // displayed correctly as (target - TDEE) in the adjustment field.
