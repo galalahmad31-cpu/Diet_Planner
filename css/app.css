@@ -1,1 +1,37 @@
 *{box-sizing:border-box}body{margin:0;font-family:Cairo,sans-serif;background:radial-gradient(circle at 90% 0%,rgba(23,143,132,.10),transparent 28%),radial-gradient(circle at 5% 95%,rgba(23,143,132,.07),transparent 25%),#f7fafb;color:#17252a}.glass{background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(226,232,240,.85)}.nav-card{transition:transform .22s,box-shadow .22s,border-color .22s}.nav-card:hover{transform:translateY(-4px);box-shadow:0 18px 45px rgba(15,71,67,.11);border-color:rgba(23,143,132,.28)}.icon-box{transition:transform .22s}.nav-card:hover .icon-box{transform:scale(1.06)}.loading{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#f7fafb}.spinner{width:34px;height:34px;border:3px solid #d9efec;border-top-color:#178f84;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+
+
+/* Compact dashboard layout for phones */
+@media (max-width: 640px) {
+  body { font-size: 14px; }
+  main { padding: 10px !important; }
+  main > div { max-width: 100%; }
+  header.glass { padding: 12px 14px !important; border-radius: 18px !important; }
+  header .flex.items-center.gap-4 { gap: 10px; }
+  header .h-14.w-14 { width: 44px; height: 44px; border-radius: 13px; }
+  header .h-14.w-14 i { font-size: 19px; }
+  header h1 { font-size: 21px !important; }
+  header p { font-size: 11px !important; }
+  header .flex.items-center.justify-between.gap-3 { gap: 8px; }
+  #doctorName { font-size: 12px; }
+  header #logoutBtn { width: 38px; height: 38px; }
+  main section.mt-7 { margin-top: 14px; }
+  main section .rounded-3xl.bg-gradient-to-l { padding: 15px 16px !important; border-radius: 18px !important; box-shadow: 0 5px 16px rgba(15,71,67,.08) !important; }
+  main section .rounded-3xl.bg-gradient-to-l .mb-3 { margin-bottom: 7px; }
+  main section .rounded-3xl.bg-gradient-to-l h2 { font-size: 19px !important; }
+  main section .rounded-3xl.bg-gradient-to-l p { margin-top: 7px; font-size: 12px !important; line-height: 1.7; }
+  main section .mb-4 { margin-bottom: 10px; }
+  main section h3 { font-size: 15px !important; }
+  main section .grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 9px !important; }
+  .nav-card { padding: 12px !important; border-radius: 17px !important; min-width: 0; }
+  .nav-card .icon-box { width: 40px !important; height: 40px !important; border-radius: 12px !important; }
+  .nav-card .icon-box i { font-size: 16px !important; }
+  .nav-card h4 { margin-top: 10px !important; font-size: 13px !important; line-height: 1.5; }
+  .nav-card p { margin-top: 5px !important; font-size: 10px !important; line-height: 1.6 !important; }
+  .nav-card > div:first-child > i { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  main { padding: 8px !important; }
+  .nav-card { padding: 10px !important; }
+  .nav-card p { font-size: 9px !important; }
+}
