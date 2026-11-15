@@ -149,7 +149,7 @@ function buildDietPreview(){
  const d=diets.find(x=>x.id===editingId)||{};
  const t=calcTotals();
  const macro=[['السعرات','kcal',t.kcal.toFixed(0)],['البروتين','جم',t.protein.toFixed(1)],['الكربوهيدرات','جم',t.carb.toFixed(1)],['الدهون','جم',t.fat.toFixed(1)]];
- let h='<style id="dp-preview-inline">
+ let h=`<style id="dp-preview-inline">
 .diet-preview{width:100%;max-width:820px;margin:0 auto;padding:16px;color:#243746;font:14px Cairo,sans-serif;direction:rtl;background:#f8fafb;text-align:right}
 .diet-preview *{box-sizing:border-box}.diet-preview h1,.diet-preview h2,.diet-preview h3,.diet-preview p{margin-top:0}
 .dp-cover{padding:26px 28px;margin-bottom:22px;border-radius:16px;background:#123247;color:#fff}
@@ -170,7 +170,7 @@ function buildDietPreview(){
 .dp-notes .dp-section-title{margin-bottom:7px;color:#8b641f}.dp-notes p{margin:0;font-size:12px;line-height:2.1;color:#6e5a37;overflow-wrap:anywhere}
 .dp-footer{display:flex;justify-content:space-between;gap:12px;margin-top:22px;padding:13px 2px;border-top:1px solid #e5ecee;color:#91a0a8;font-size:10px}
 @media(max-width:600px){.diet-preview{padding:8px 0 16px}.dp-cover{padding:18px 16px;margin-bottom:17px;border-radius:12px}.dp-brand{font-size:9px}.dp-cover h1{font-size:21px;margin-top:14px}.dp-cover p{font-size:12px}.dp-section-title{font-size:14px}.dp-macros{gap:6px}.dp-macro{padding:10px 3px;border-radius:9px}.dp-macro span{font-size:9px;text-align:center}.dp-macro strong{font-size:17px}.dp-meal{margin-bottom:11px;border-radius:10px}.dp-meal-head{gap:8px;padding:10px}.dp-meal-num{flex-basis:27px;height:27px}.dp-meal-head h3{font-size:13px}.dp-count{font-size:9px}.dp-food-list{padding:0 10px}.dp-food{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:12px 0}.dp-food-main{grid-column:1;grid-row:1}.dp-food-main strong{font-size:12px}.dp-food-detail{grid-column:2;grid-row:1;align-items:flex-end}.dp-food-detail .dp-label{font-size:9px}.dp-food-detail b{font-size:12px}.dp-food-note{grid-column:1/-1}.dp-notes{padding:12px;margin-top:15px}.dp-notes p{font-size:11px}.dp-footer{font-size:9px}}
-</style><article class="diet-preview" dir="rtl">');
+</style><article class="diet-preview" dir="rtl">`;
  h+='<header class="dp-cover"><div class="dp-brand"><span>DIET PLANNER</span><span class="dp-tag">خطة غذائية</span></div><h1>'+esc(d.name||$('dietName').value)+'</h1>';
  if(d.description||$('description').value)h+='<p>'+esc(d.description||$('description').value)+'</p>';
  h+='</header><section class="dp-summary"><h2 class="dp-section-title">القيم الغذائية اليومية</h2><div class="dp-macros">';
