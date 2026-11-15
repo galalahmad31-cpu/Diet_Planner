@@ -56,3 +56,12 @@ details[open] summary{color:var(--dp-primary)}
 #patientOverview .overview-action strong{font-size:14px;color:#176b63}
 #patientOverview .overview-action.is-disabled{opacity:.55;pointer-events:none}
 #visitsList .latest-visit-row{border-color:#b9d9d1!important;background:#f2faf7!important}
+
+/* Patient profile redesign */
+#modulesSection{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#modulesSection>div{grid-column:1/-1}
+#modulesSection .module-card{margin-top:0!important;min-height:112px;display:flex;align-items:center;transition:transform .2s,box-shadow .2s}
+#modulesSection .module-card:hover{transform:translateY(-2px)}
+#modulesSection .module-card h4{font-size:16px}
+#modulesSection .module-card p{font-size:12px}
+@media(max-width:640px){#modulesSection{grid-template-columns:1fr}#modulesSection>div{grid-column:auto}}
