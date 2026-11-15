@@ -54,3 +54,11 @@
 .article-hero-art i{font-size:40px}
 .article-hero-art span{font-size:9px;letter-spacing:1.3px}
 @media(max-width:640px){.article-hero{padding:1rem 1.1rem!important;min-height:0}.article-hero h2{font-size:1.35rem!important}.article-hero-art{width:86px;height:100px;left:4%;gap:6px}.article-hero-art i{font-size:28px}.article-hero-art span{font-size:7px}.article-hero .max-w-3xl{max-width:78%}.article-stats{gap:5px}.article-stats span{padding:4px 7px;font-size:9px}}
+
+/* Reduce the green cover area inside each article card */
+.article-card-cover{height:92px;padding:10px 13px}
+.article-category{padding:5px 9px;font-size:10px}
+.cover-symbol{width:54px;height:54px;left:22px;top:18px;border-radius:16px}
+.cover-symbol i{font-size:26px}
+.cover-label{bottom:9px;right:13px;font-size:7px;letter-spacing:1.4px}
+@media(max-width:640px){.article-card-cover{height:82px;padding:8px 10px}.cover-symbol{width:46px;height:46px;left:18px;top:17px}.cover-symbol i{font-size:22px}.cover-label{font-size:6px;bottom:7px;right:10px}}
