@@ -61,3 +61,9 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 @keyframes patientModalIn{from{opacity:0;transform:translate(-50%,-48%)}to{opacity:1;transform:translate(-50%,-50%)}}
 @media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}.patient-data-card .dashboard-details[open] .dashboard-panel{padding:14px}}
+
+/* Modal header and layering: keep dashboard card in its grid position */
+.patient-data-card .dashboard-details[open]>summary{position:static!important;z-index:auto!important;background:#f4faf8}
+.modal-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #edf2f4;color:#173642;font-size:13px;font-weight:800}
+#closePatientModal{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:9px;background:#f1f5f7;color:#64748b;font-size:14px;cursor:pointer}
+#closePatientModal:hover{background:#e5edf1;color:#263d49}
