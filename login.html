@@ -14,10 +14,11 @@
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 <body>
-<div style="text-align:center;margin:18px"><a href="index.html" style="color:#11786f;text-decoration:none;font-weight:700">← العودة إلى الصفحة الرئيسية</a></div>
+
 <div class="card">
 <div class="logo"><i class="fa-solid fa-leaf"></i></div>
 <h1>Diet Planner</h1>
+<div class="auth-intro">مساحتك المهنية لتنظيم التغذية العلاجية</div>
 <div class="sub">نظام إدارة الخطط الغذائية</div>
 <div class="tabs">
 <button type="button" data-auth-tab="loginForm" class="active">تسجيل الدخول</button>
@@ -25,8 +26,8 @@
 </div>
 <div id="authMessage" class="msg"></div>
 <form id="loginForm" class="auth-form">
-<div class="field"><label>البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="email"></div>
-<div class="field"><label>كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+<div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required></div>
+<div class="field"><label for="loginPassword">كلمة المرور</label><div class="password-wrap"><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required><button type="button" class="show-password" data-toggle-password="loginPassword" aria-label="إظهار كلمة المرور"><i class="fa-regular fa-eye"></i></button></div></div>
 <div style="text-align:left;margin-top:-7px;margin-bottom:14px;"><a href="forgot-password.html" style="color:#11786f;text-decoration:none;font-size:12px;font-weight:700;">نسيت كلمة المرور؟</a></div>
 <button id="loginButton" type="button" class="btn">تسجيل الدخول</button>
 <div class="divider"><span>أو</span></div>
@@ -34,18 +35,23 @@
 <i class="fa-brands fa-google"></i>
 <span>المتابعة باستخدام Google</span>
 </button>
+<div class="auth-footer"><a href="index.html">← العودة للرئيسية</a><a href="privacy.html">سياسة الخصوصية</a></div>
 <div style="text-align:center;margin-top:12px;">
-  <a href="privacy.html" style="color:#11786f;text-decoration:none;font-size:12px;font-weight:700;">Privacy Policy</a>
+  
 </div>
 </form>
 <form id="registerForm" class="auth-form" style="display:none">
-<div class="field"><label>الاسم</label><input id="registerName" type="text" autocomplete="name"></div>
-<div class="field"><label>البريد الإلكتروني</label><input id="registerEmail" type="email" autocomplete="email"></div>
-<div class="field"><label>كلمة المرور</label><input id="registerPassword" type="password" autocomplete="new-password"></div>
+<div class="field"><label for="registerName">الاسم بالكامل</label><input id="registerName" name="name" type="text" autocomplete="name" placeholder="اسمك" required></div>
+<div class="field"><label for="registerEmail">البريد الإلكتروني</label><input id="registerEmail" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required></div>
+<div class="field"><label for="registerPassword">كلمة المرور</label><div class="password-wrap"><input id="registerPassword" name="new-password" type="password" autocomplete="new-password" placeholder="8 أحرف على الأقل" required><button type="button" class="show-password" data-toggle-password="registerPassword" aria-label="إظهار كلمة المرور"><i class="fa-regular fa-eye"></i></button></div><p class="field-hint">استخدم كلمة مرور قوية تحتوي على أحرف وأرقام ورمز.</p></div>
 <button id="registerButton" type="button" class="btn">إنشاء الحساب</button>
 </form>
+<div class="auth-bottom-note">بياناتك وحسابك في مكان واحد — Diet Planner</div>
 </div>
-<script src="js/auth-access.js?v=20260923-1"></script>
+<script>
+document.querySelectorAll("[data-toggle-password]").forEach(button=>button.addEventListener("click",()=>{const input=document.getElementById(button.dataset.togglePassword);const visible=input.type==="password";input.type=visible?"text":"password";button.innerHTML=visible?'<i class="fa-regular fa-eye-slash"></i>':'<i class="fa-regular fa-eye"></i>';button.setAttribute("aria-label",visible?"إخفاء كلمة المرور":"إظهار كلمة المرور")}));
+</script>
+<script src="js/auth-access.js?v=20261115-ux1"></script>
 
   
 </body>
