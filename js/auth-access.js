@@ -479,7 +479,11 @@
       .getElementById("googleLoginButton")
       ?.addEventListener("click", loginWithGoogle);
 
-    if (window.location.hash === "#register") {\n      document.querySelector('[data-auth-tab="registerForm"]')?.click();\n    }\n\n    const isAuthCallback =
+    if (window.location.hash === "#register") {
+      document.querySelector('[data-auth-tab="registerForm"]')?.click();
+    }
+
+    const isAuthCallback =
       window.location.hash.includes("access_token=") ||
       window.location.hash.includes("refresh_token=") ||
       new URLSearchParams(window.location.search).has("code");
