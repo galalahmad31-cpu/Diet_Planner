@@ -17,17 +17,12 @@ const $=id=>document.getElementById(id), num=v=>Number(v||0);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function toast(msg,ok=true){const e=$('toast');e.textContent=msg;e.className=`fixed bottom-5 left-5 z-[150] max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl ${ok?'bg-brand-600':'bg-red-600'}`;e.classList.remove('hidden');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.add('hidden'),3200)}
 async function getSession(){
-  if(!supabase){
-    toast('تعذر تهيئة الاتصال الآمن بالتطبيق',false);
-    return false;
-  }
-  const access=await window.DietPlannerAccess?.getAccessStatus?.();
-  if(!access?.authenticated){
-    location.replace('index.html');
-    return false;
-  }
-  user=access.user;
-  isAdmin=access.isAdmin;
+  const access=window.DietPlannerAccess;
+  if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
+  user=await access.getCurrentUser();
+  if(!user){location.replace('index.html');return false;}
+  isAdmin=false;
+  access.getUserRole?.(user.id).then(role=>{isAdmin=role==='admin';if(diets.length)renderDiets();}).catch(error=>console.warn('Role lookup deferred:',error));
   return true;
 }
 const CACHE_TTL=5*60*1000;
