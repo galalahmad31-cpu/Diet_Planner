@@ -22,3 +22,18 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .patient-delete{width:39px;flex-shrink:0;display:grid;place-items:center;border:1px solid #f5dce2;border-radius:11px;background:#fff5f7;color:#c43c5d;font-size:13px}
 .patient-delete:hover{background:#ffe8ee}
 @media(max-width:560px){#patientsList{grid-template-columns:1fr;gap:11px;padding:14px!important}.patient-card{padding:15px}.patient-name{font-size:15px}}
+
+/* Compact patient cards */
+#patientsList{grid-template-columns:repeat(auto-fill,minmax(min(100%,225px),1fr))!important;gap:11px!important;padding:16px!important}
+.patient-card{padding:13px;border-radius:15px}
+.patient-card-head{margin-bottom:9px}
+.patient-avatar{width:35px;height:35px;border-radius:11px;font-size:14px}
+.patient-number{font-size:9px;padding:4px 7px}
+.patient-name{font-size:14px;line-height:1.5;margin-bottom:6px}
+.patient-details{gap:5px;min-height:22px;margin-bottom:10px}
+.patient-meta,.patient-diagnosis{font-size:9px}
+.patient-diagnosis{padding:4px 7px}
+.patient-card-actions{gap:6px;padding-top:9px}
+.patient-open{padding:8px 10px;font-size:10px;border-radius:9px}
+.patient-delete{width:33px;border-radius:9px;font-size:12px}
+@media(max-width:560px){#patientsList{gap:9px!important;padding:12px!important}.patient-card{padding:12px}.patient-name{font-size:14px}}
