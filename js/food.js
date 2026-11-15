@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const supabase = window.DietPlannerAccess?.supabaseClient;
-let foods=[], exchanges=[], user=null;
+let foods=[], exchanges=[], user=null, isAdmin=false;
 const FOOD_PAGE_SIZE=50;
 let visibleFoodCount=FOOD_PAGE_SIZE;
 
@@ -88,7 +88,7 @@ function switchTab(tab){
 }
 
 async function loadFoods(){
-  const {data,error}=await supabase.from('foods').select('id,name_ar,name_en,household,kcal,protein,carb,fat,sodium,potassium,phosphorus,water,is_custom,created_by').order('name_ar',{ascending:true});
+  const {data,error}=await supabase.from('foods').select('id,name_ar,name_en,household,kcal,protein,carb,fat,sodium,potassium,phosphorus,water,preparation_method,is_custom,created_by').order('name_ar',{ascending:true});
   if(error){console.error(error);toast('تعذر تحميل مكتبة الأغذية: '+error.message,false);return;}
   foods=(data||[]).map(f=>({...f,id:String(f.id),kcal:num(f.kcal),protein:num(f.protein),carb:num(f.carb),fat:num(f.fat),sodium:num(f.sodium),potassium:num(f.potassium),phosphorus:num(f.phosphorus),water:num(f.water),is_custom:Boolean(f.is_custom)}));
   visibleFoodCount=FOOD_PAGE_SIZE;
@@ -108,7 +108,7 @@ function render(){
     <td class="px-3 py-3 text-center font-bold">${f.kcal}</td><td class="px-3 py-3 text-center">${f.carb}</td><td class="px-3 py-3 text-center">${f.protein}</td><td class="px-3 py-3 text-center">${f.fat}</td>
     <td class="px-3 py-3 text-center">${f.sodium}</td><td class="px-3 py-3 text-center">${f.potassium}</td><td class="px-3 py-3 text-center">${f.phosphorus}</td><td class="px-3 py-3 text-center">${f.water}</td>
     <td class="px-3 py-3 text-center">${f.is_custom?'<span class="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-600">مخصص</span>':'<span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">أساسي</span>'}</td>
-    <td class="px-3 py-3 text-center">${f.is_custom && f.created_by===user.id?`<div class="flex justify-center gap-1"><button data-edit="${esc(f.id)}" class="edit rounded-lg bg-slate-100 px-2.5 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600"><i class="fa-solid fa-pen"></i></button><button data-del="${esc(f.id)}" class="del rounded-lg bg-red-50 px-2.5 py-2 text-red-500 hover:bg-red-100"><i class="fa-solid fa-trash"></i></button></div>`:'<span class="text-slate-300">—</span>'}</td>
+    <td class="px-3 py-3 text-center">${isAdmin?`<div class="flex justify-center gap-1"><button data-edit="${esc(f.id)}" class="edit rounded-lg bg-slate-100 px-2.5 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600"><i class="fa-solid fa-pen"></i></button><button data-del="${esc(f.id)}" class="del rounded-lg bg-red-50 px-2.5 py-2 text-red-500 hover:bg-red-100"><i class="fa-solid fa-trash"></i></button></div>`:'<span class="text-slate-300">—</span>'}</td>
   </tr>`).join('');
   $('empty').classList.toggle('hidden',filtered.length>0);
   $('shownCount').textContent=`${visibleFoods.length} من ${filtered.length} معروض`;
@@ -127,7 +127,7 @@ function loadMoreFoods(){
 }
 function openModal(food=null){
   $('modal').classList.remove('hidden');$('modal').classList.add('flex');$('foodForm').reset();
-  $('editId').value=food?.id||'';$('modalTitle').textContent=food?'تعديل صنف مخصص':'إضافة صنف مخصص';
+  $('editId').value=food?.id||'';$('modalTitle').textContent=food?'تعديل بيانات الصنف':(isAdmin?'إضافة صنف أساسي':'إضافة صنف مخصص');
   $('nameAr').value=food?.name_ar||'';$('nameEn').value=food?.name_en||'';$('household').value=food?.household||'';
   ['kcal','protein','carb','fat','sodium','potassium','phosphorus','water'].forEach(k=>$(k).value=food?.[k]??'');
 }
@@ -143,7 +143,7 @@ $('foodRows').addEventListener('click',async e=>{
   if(edit){const f=foods.find(x=>x.id===edit.dataset.edit);if(f)openModal(f);}
   if(del){
     const f=foods.find(x=>x.id===del.dataset.del);
-    if(!f || !f.is_custom || f.created_by!==user.id)return;
+    if(!f || !isAdmin)return;
     openDeleteConfirm(f);
   }
 });
@@ -163,11 +163,11 @@ function openDeleteConfirm(food){
 $('cancelDeleteBtn').onclick=closeDeleteConfirm;
 $('confirmDeleteBtn').onclick=async()=>{
   const f=deleteTarget;
-  if(!f || !f.is_custom || f.created_by!==user.id)return;
+  if(!f || !isAdmin)return;
   const btn=$('confirmDeleteBtn');
   btn.disabled=true;
   btn.innerHTML='جاري الحذف...';
-  const {error}=await supabase.from('foods').delete().eq('id',f.id).eq('created_by',user.id).eq('is_custom',true);
+  const {error}=await supabase.from('foods').delete().eq('id',f.id);
   btn.disabled=false;
   btn.innerHTML='<i class="fa-solid fa-trash ml-1"></i> حذف الصنف';
   closeDeleteConfirm();
@@ -177,13 +177,13 @@ $('confirmDeleteBtn').onclick=async()=>{
 
 $('foodForm').onsubmit=async e=>{
   e.preventDefault();$('saveBtn').disabled=true;$('saveBtn').textContent='جاري الحفظ...';
-  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),is_custom:true,created_by:user.id};
+  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:!isAdmin,created_by:isAdmin?null:user.id};
   let error=null;
   const editId=$('editId').value;
   if(editId){
-    ({error}=await supabase.from('foods').update(payload).eq('id',editId).eq('created_by',user.id).eq('is_custom',true));
+    ({error}=await supabase.from('foods').update(payload).eq('id',editId));
   }else{
-    const id='food_custom_'+(crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)));
+    const id=(isAdmin?'food_base_':'food_custom_')+(crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)));
     ({error}=await supabase.from('foods').insert({id,...payload}));
   }
   $('saveBtn').disabled=false;$('saveBtn').textContent='حفظ الصنف';
