@@ -67,3 +67,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .modal-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #edf2f4;color:#173642;font-size:13px;font-weight:800}
 #closePatientModal{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:9px;background:#f1f5f7;color:#64748b;font-size:14px;cursor:pointer}
 #closePatientModal:hover{background:#e5edf1;color:#263d49}
+
+/* Explicit visibility states for edit mode */
+#saveArea.hidden{display:none!important}
+#editButton.hidden{display:none!important}
