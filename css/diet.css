@@ -127,3 +127,34 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
  #dietGrid{margin-top:8px}
  #dietGrid article .mt-5.grid{grid-template-columns:repeat(4,minmax(0,1fr)}
 }
+
+
+/* Read-only diet preview: professional presentation, no edit affordance */
+#editor.is-viewing>div{max-width:1050px!important;background:var(--dp-bg,#f7fafb)!important;border-radius:18px!important}
+#editor.is-viewing>div>div:first-child{padding:14px 18px;background:var(--dp-surface,#fff)!important}
+#editor.is-viewing #editorTitle{font-size:20px;color:var(--dp-text,#17252a)}
+#editor.is-viewing #editorTitle:before{content:"";display:inline-block;width:4px;height:22px;border-radius:4px;background:#178f84;margin-left:9px;vertical-align:middle}
+#editor.is-viewing #cancelEditor{background:#e8f3f1;color:#167b72}
+#editor.is-viewing #dietName,#editor.is-viewing #description,#editor.is-viewing #notes,#editor.is-viewing #visibility,#editor.is-viewing #dietAccess{border:0!important;background:transparent!important;box-shadow:none!important;padding:2px 0!important;color:var(--dp-text)!important;font-weight:700}
+#editor.is-viewing label>span{font-size:10px;color:var(--dp-muted)!important}
+#editor.is-viewing section.glass{border-radius:14px;padding:16px}
+#editor.is-viewing #mealsEditor>div{border:1px solid var(--dp-border,#e5edf0);border-radius:14px;margin-bottom:12px;box-shadow:none}
+#editor.is-viewing [data-meal-name]{border:0!important;background:transparent!important;padding:0!important;font-size:16px;font-weight:900;color:var(--dp-text)!important;opacity:1!important}
+#editor.is-viewing [data-meal-name]:disabled{cursor:default}
+#editor.is-viewing .diet-table{min-width:0!important}
+#editor.is-viewing .diet-table thead{background:var(--dp-surface-3,#f5f7f7)!important}
+#editor.is-viewing .diet-table th{font-size:10px;padding:10px 12px}
+#editor.is-viewing .diet-table td{padding:10px 12px}
+#editor.is-viewing [data-qty]{border:0!important;background:transparent!important;color:var(--dp-text)!important;font-weight:800;width:55px!important;padding:0!important;opacity:1!important}
+#editor.is-viewing .food-row{background:transparent}
+#editor.is-viewing .food-name-cell{cursor:default}
+#editor.is-viewing #dailySummary{gap:8px}
+@media(max-width:640px){
+ #editor.is-viewing{padding:6px!important}
+ #editor.is-viewing>div{margin:0!important;border-radius:12px!important}
+ #editor.is-viewing>div>div:first-child{padding:10px 12px}
+ #editor.is-viewing .p-4.sm\:p-6{padding:8px}
+ #editor.is-viewing section.glass{padding:10px}
+ #editor.is-viewing .diet-table th,#editor.is-viewing .diet-table td{padding:8px 6px}
+ #editor.is-viewing .diet-table{font-size:11px}
+}
