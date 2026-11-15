@@ -95,7 +95,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
   const moduleLoaders = {
     calculator: {
       src: 'js/visit-calculator.js?v=20261116-2',
-      ready: () => typeof initCalculator === 'function'
+      ready: () => typeof window.initCalculator === 'function'
     },
     dietPlan: {
       src: 'js/visit-diet-plan.js?v=20261115-1',
@@ -183,7 +183,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
       // Calculator is loaded statically by visit.html (defer, before this file).
       // Avoid injecting a second script and masking parse/runtime errors as a generic load failure.
       if (module === 'calculator') {
-        if (typeof initCalculator !== 'function') {
+        if (typeof window.initCalculator !== 'function') {
           console.error('[Visit] calculator script missing; page build/cache is stale or script failed.');
           content.classList.add('hidden');
           showError('ملف حاسبة الاحتياجات لم يعمل (نسخة الصفحة: 20261116-3). حدّث الصفحة أو أعد فتحها.');
@@ -199,7 +199,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
       if (module === 'calculator') {
         try {
-          const initialized = await initCalculator();
+          const initialized = await window.initCalculator();
           if (initialized === false) {
             content.classList.add('hidden');
             showError('تعذر تهيئة حاسبة الاحتياجات. راجع بيانات الزيارة وحاول مرة أخرى.');
