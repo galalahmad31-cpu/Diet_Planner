@@ -18,7 +18,10 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   transition:border-color .18s ease,box-shadow .18s ease;
 }
 .patient-card:hover{border-color:#b8dcd5;box-shadow:0 7px 18px rgba(20,90,80,.07)}
-.patient-card-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}
+.patient-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+.patient-identity{display:flex;align-items:center;gap:9px;min-width:0}
+.patient-identity .patient-name{margin:0;min-width:0}
+.patient-identity .patient-avatar{flex-shrink:0}
 .patient-avatar{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#e7f5f1;color:#168675;font-size:14px}
 .patient-number{font-size:10px;font-weight:800;color:#8aa0aa;background:#f3f7f9;padding:4px 8px;border-radius:20px}
 .patient-name{font-size:15px;font-weight:900;line-height:1.5;color:#193e50;margin:0 0 5px;overflow-wrap:anywhere}
