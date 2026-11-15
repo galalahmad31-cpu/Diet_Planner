@@ -178,7 +178,7 @@
 
     data.forEach((visit) => {
       const row = document.createElement('div');
-      row.className = 'flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-emerald-300 px-4 py-3 transition';
+      row.className = 'flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-emerald-300 px-4 py-3 transition' + (index === 0 ? ' latest-visit-row' : '');
 
       const visitLink = document.createElement('a');
       visitLink.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
