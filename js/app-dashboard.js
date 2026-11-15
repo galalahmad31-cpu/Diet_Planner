@@ -296,7 +296,16 @@
   // ---------------------------------------------------------
   // Initialization
   // ---------------------------------------------------------
-  function renderVisitorDashboard() {\n    document.getElementById("loginCta")?.classList.remove("hidden");\n    document.getElementById("registerCta")?.classList.remove("hidden");\n    elements.logout?.classList.add("hidden");\n    elements.accountName?.classList.add("hidden");\n    addLockStyles();\n    elements.featureCards.forEach(card => { card.dataset.visitorLocked = "true"; bindLockedCard(card); lockCard(card, true); });\n  }\n\n  async function initializeDashboard() {
+  function renderVisitorDashboard() {
+    document.getElementById("loginCta")?.classList.remove("hidden");
+    document.getElementById("registerCta")?.classList.remove("hidden");
+    elements.logout?.classList.add("hidden");
+    elements.accountName?.classList.add("hidden");
+    addLockStyles();
+    elements.featureCards.forEach(card => { card.dataset.visitorLocked = "true"; bindLockedCard(card); lockCard(card, true); });
+  }
+
+  async function initializeDashboard() {
     hideLoading();
 
     const access =
