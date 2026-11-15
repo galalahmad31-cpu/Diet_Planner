@@ -657,13 +657,13 @@ function renderDays(){
     </div>
     ${d.isCollapsed?'':`<div class="p-4 space-y-4">
      <div class="day-metrics-strip grid grid-cols-4 sm:grid-cols-7 gap-1">
-      \${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
-      \${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
-      \${metricCard('الكارب',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
-      \${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
-      \${metricCard('Na',Math.round(calc.sod),'mg',null,0,'sky')}
-      \${metricCard('K',Math.round(calc.pot),'mg',null,0,'emerald')}
-      \${metricCard('P',Math.round(calc.pho),'mg',null,0,'slate')}
+      ${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
+      ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
+      ${metricCard('الكارب',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
+      ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
+      ${metricCard('Na',Math.round(calc.sod),'mg',null,0,'sky')}
+      ${metricCard('K',Math.round(calc.pot),'mg',null,0,'emerald')}
+      ${metricCard('P',Math.round(calc.pho),'mg',null,0,'slate')}
      </div>
      <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2"><button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة وجبة</button><button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">تطبيق دايت ثابت</button></div>
