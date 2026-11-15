@@ -39,7 +39,7 @@ function calcShowToast(msg, type = 'success') {
             const schofieldBtn = document.getElementById('eqBtnSchofield');
 
             heightField.classList.toggle('hidden', selectedEnergyEquation !== 'mifflin');
-            schInfo.classList.toggle('hidden', selectedEnergyEquation !== 'schofield');
+            schInfo?.classList.toggle('hidden', selectedEnergyEquation !== 'schofield');
 
             const active = 'flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-xs font-extrabold transition bg-white text-emerald-700 shadow-sm';
             const inactive = 'flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-xs font-extrabold transition text-slate-500';
