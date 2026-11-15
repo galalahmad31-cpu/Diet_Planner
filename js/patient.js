@@ -170,10 +170,12 @@
       return `
       <article class="patient-card">
         <div class="patient-card-head">
-          <span class="patient-avatar"><i class="fa-solid fa-user"></i></span>
+          <div class="patient-identity">
+            <span class="patient-avatar"><i class="fa-solid fa-user"></i></span>
+            <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
+          </div>
           <span class="patient-number">ملف ${String(index + 1).padStart(2,'0')}</span>
         </div>
-        <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
         <div class="patient-details">${age}${diagnosis}</div>
         <div class="patient-card-actions">
           <button type="button" data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}" class="patient-open">
