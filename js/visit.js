@@ -98,7 +98,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
       ready: () => typeof initCalculator === 'function'
     },
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20260922-2',
+      src: 'js/visit-diet-plan.js?v=20261115-1',
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
