@@ -159,3 +159,16 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .measurements-card .dashboard-card-direct-link{display:flex;align-items:center;gap:12px;width:100%;text-decoration:none;cursor:pointer}
 .measurements-card .dashboard-card-arrow{font-size:20px;font-weight:900;color:#bfdbfe;transition:transform .18s}
 .measurements-card .dashboard-card-direct-link:hover .dashboard-card-arrow{transform:translateX(-4px)}
+
+/* Restore original blue measurements card appearance; retain direct click */
+.measurements-card .measurements-direct{
+ display:flex;align-items:center;gap:12px;width:100%;padding:16px;
+ border-radius:16px;text-decoration:none;cursor:pointer;
+ background:linear-gradient(135deg,#174c78,#287db2)!important;
+ border:1px solid #246c9c;min-height:92px
+}
+.measurements-card .measurements-direct .dashboard-card-head h3,
+.measurements-card .measurements-direct .dashboard-card-head p{color:#fff!important}
+.measurements-card .measurements-direct .dashboard-icon.blue{background:rgba(255,255,255,.17)!important;color:#fff!important}
+.measurements-card .measurements-direct .dashboard-card-arrow{color:#fff!important}
+.measurements-card .measurements-direct:hover{filter:brightness(1.06)}
