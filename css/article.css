@@ -44,29 +44,11 @@
 .article-reader-content img{max-width:100%;height:auto;border-radius:16px}.article-reader-content ul,.article-reader-content ol{padding-right:1.5em;margin:1em 0}.article-reader-content blockquote{margin:1.4em 0;padding:18px 22px;background:#effaf6;border-right:4px solid #178f84;border-radius:14px;color:#285b55}
 @media(max-width:640px){.article-card-cover{height:125px}.article-card-body{padding:16px}.article-card-title h3{font-size:17px}.article-reader-head{padding:18px!important}.article-reader-content{font-size:15px;line-height:2}.article-reader{border-radius:20px}}
 
-/* Compact knowledge hero: retain the visual identity with less vertical space */
-.article-hero{padding:1.15rem 1.5rem!important;min-height:190px}
-.article-hero h2{margin-top:.65rem!important;font-size:1.65rem!important;line-height:1.45!important}
-.article-hero p{margin-top:.45rem!important;line-height:1.7!important}
-.article-stats{margin-top:.75rem!important}
-.article-stats span{padding:5px 9px;font-size:11px}
-.article-hero-art{width:125px;height:145px;gap:10px;border-radius:20px}
-.article-hero-art i{font-size:40px}
-.article-hero-art span{font-size:9px;letter-spacing:1.3px}
-@media(max-width:640px){.article-hero{padding:1rem 1.1rem!important;min-height:0}.article-hero h2{font-size:1.35rem!important}.article-hero-art{width:86px;height:100px;left:4%;gap:6px}.article-hero-art i{font-size:28px}.article-hero-art span{font-size:7px}.article-hero .max-w-3xl{max-width:78%}.article-stats{gap:5px}.article-stats span{padding:4px 7px;font-size:9px}}
 
-/* Reduce the green cover area inside each article card */
-.article-card-cover{height:92px;padding:10px 13px}
-.article-category{padding:5px 9px;font-size:10px}
-.cover-symbol{width:54px;height:54px;left:22px;top:18px;border-radius:16px}
-.cover-symbol i{font-size:26px}
-.cover-label{bottom:9px;right:13px;font-size:7px;letter-spacing:1.4px}
-@media(max-width:640px){.article-card-cover{height:82px;padding:8px 10px}.cover-symbol{width:46px;height:46px;left:18px;top:17px}.cover-symbol i{font-size:22px}.cover-label{font-size:6px;bottom:7px;right:10px}}
-
-/* Extra compact article card cover */
-.article-card-cover{height:62px;padding:7px 10px}
-.article-category{padding:3px 7px;font-size:9px;gap:5px}
-.cover-symbol{width:38px;height:38px;left:16px;top:12px;border-radius:12px}
-.cover-symbol i{font-size:19px}
-.cover-label{bottom:6px;right:10px;font-size:6px;letter-spacing:1px}
-@media(max-width:640px){.article-card-cover{height:56px;padding:6px 8px}.article-category{font-size:8px;padding:2px 6px}.cover-symbol{width:32px;height:32px;left:13px;top:11px;border-radius:10px}.cover-symbol i{font-size:16px}.cover-label{font-size:5px;bottom:5px;right:8px}}
+/* Final compact card cover — consolidated overrides */
+#grid .article-card .article-card-cover{height:48px!important;min-height:48px;padding:5px 8px!important}
+#grid .article-card .article-category{padding:2px 6px;font-size:8px;gap:4px;line-height:1.3}
+#grid .article-card .cover-symbol{width:30px;height:30px;left:12px;top:8px;border-radius:9px}
+#grid .article-card .cover-symbol i{font-size:15px}
+#grid .article-card .cover-label{right:8px;bottom:4px;font-size:5px;letter-spacing:.8px}
+@media(max-width:640px){#grid .article-card .article-card-cover{height:42px!important;min-height:42px;padding:4px 6px!important}#grid .article-card .article-category{font-size:7px;padding:2px 5px}#grid .article-card .cover-symbol{width:26px;height:26px;left:10px;top:7px}#grid .article-card .cover-symbol i{font-size:13px}#grid .article-card .cover-label{font-size:4px;right:6px;bottom:3px}}
