@@ -134,7 +134,7 @@
     document.head.appendChild(style);
   }
 
-  function lockCard(card) {
+  function lockCard(card, visitor = false) {
     if (!card) return;
 
     card.classList.add("dp-feature-locked");
@@ -144,7 +144,7 @@
     );
     card.setAttribute(
       "title",
-      "هذه الخدمة غير متاحة في اشتراكك الحالي"
+      visitor ? "سجّل الدخول لاستخدام هذه الخدمة" : "هذه الخدمة غير متاحة في اشتراكك الحالي"
     );
 
     if (!card.querySelector(".dp-lock-overlay")) {
@@ -154,7 +154,7 @@
       overlay.innerHTML = `
         <span class="dp-lock-badge">
           <i class="fa-solid fa-lock"></i>
-          <span>غير متاح في خطتك الحالية</span>
+          <span>${visitor ? "سجّل الدخول للوصول" : "غير متاح في خطتك الحالية"}</span>
         </span>
       `;
 
@@ -177,11 +177,11 @@
       event.preventDefault();
       event.stopPropagation();
 
-      showLockedMessage();
+      showLockedMessage(card.dataset.visitorLocked === "true");
     });
   }
 
-  function showLockedMessage() {
+  function showLockedMessage(visitor = false) {
     let message =
       document.getElementById("dpLockedMessage");
 
@@ -211,7 +211,7 @@
     }
 
     message.textContent =
-      "هذه الخدمة غير متاحة في اشتراكك الحالي.";
+      visitor ? "للوصول إلى أدوات Diet Planner، سجّل الدخول أو أنشئ حسابًا جديدًا." : "هذه الخدمة غير متاحة في اشتراكك الحالي.";
 
     message.style.display = "block";
 
@@ -296,7 +296,7 @@
   // ---------------------------------------------------------
   // Initialization
   // ---------------------------------------------------------
-  async function initializeDashboard() {
+  function renderVisitorDashboard() {\n    document.getElementById("loginCta")?.classList.remove("hidden");\n    document.getElementById("registerCta")?.classList.remove("hidden");\n    elements.logout?.classList.add("hidden");\n    elements.accountName?.classList.add("hidden");\n    addLockStyles();\n    elements.featureCards.forEach(card => { card.dataset.visitorLocked = "true"; bindLockedCard(card); lockCard(card, true); });\n  }\n\n  async function initializeDashboard() {
     hideLoading();
 
     const access =
