@@ -177,7 +177,7 @@ $('confirmDeleteBtn').onclick=async()=>{
 
 $('foodForm').onsubmit=async e=>{
   e.preventDefault();$('saveBtn').disabled=true;$('saveBtn').textContent='جاري الحفظ...';
-  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:!isAdmin,created_by:isAdmin?null:user.id};
+  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:editId?(foods.find(f=>f.id===editId)?.is_custom??false):!isAdmin,created_by:editId?(foods.find(f=>f.id===editId)?.created_by??null):(isAdmin?null:user.id)};
   let error=null;
   const editId=$('editId').value;
   if(editId){
