@@ -166,7 +166,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
     if (!content) return;
 
     const isOpen = !content.classList.contains('hidden');
-    Object.values(contents).forEach(el => el.classList.add('hidden'));
+    Object.values(contents).forEach(el => el?.classList.add('hidden'));
     const moduleCardIds = {assessment:'assessmentCard',calculator:'calculatorCard',dietPlan:'dietPlanCard',exchangePlan:'exchangePlanCard'};
     Object.entries(moduleCardIds).forEach(([key, cardId]) => {
       const card = document.getElementById(cardId);
