@@ -109,10 +109,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-dialog .finance-summary-box{background:#eaf6f2;border-color:#cfe8df;padding:13px 15px}
 .patient-finance-dialog .finance-summary-box small{color:#56736e;font-size:11px}
 .patient-finance-dialog .finance-summary-box strong{font-size:17px;color:#12695b}
-.patient-attendance-row{margin-top:14px;padding:12px;background:#f0f6fb;border:1px solid #d9e7f3;border-radius:12px;display:flex;flex-direction:column;gap:7px}
-#markPatientAttendance{background:#2b6e9b;color:white;border:0;border-radius:9px;padding:10px 12px;font:800 12px Cairo,sans-serif;cursor:pointer}
-#markPatientAttendance:hover{background:#205a82}
-.patient-attendance-row small{font-size:10px;line-height:1.7;color:#526b7c}
 .patient-finance-actions button{font-size:12px!important;padding:11px!important}
 #savePatientFinance{background:#147565!important}#savePatientFinance:hover{background:#105d52!important}
 #cancelPatientFinance{background:#e9eff3!important;color:#415b69!important}
