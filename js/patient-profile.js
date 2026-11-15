@@ -448,6 +448,8 @@
     else $('pfInputEndPreview').textContent='—';
   }
   async function openPatientFinanceModal() {
+    if (!$('patientFinanceModal')?.classList.contains('hidden')) return;
+    closePatientModal();
     if(!patientId||!state.user){alert('تعذر تحديد المستخدم أو المريض.');return;}
     $('patientFinanceModal').classList.remove('hidden');document.body.classList.add('overflow-hidden');
     $('patientFinanceName').textContent=state.patient?.name||'';
