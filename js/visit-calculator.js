@@ -464,11 +464,15 @@ async function initCalculator(){
     calcPatientId = ctx.patient_id || urlParams.get('patient_id') || null;
     calcResolvedPatientId = calcPatientId;
 
+    // Do not mark the module initialized until patient data and saved targets
+    // have loaded successfully. Otherwise a failed first attempt is cached as
+    // initialized and every retry skips the actual initialization.
     selectEnergyEquation('mifflin');
-    calcInitialized = true;
 
     try {
-        return await loadCalculatorPatientData();
+        const loaded = await loadCalculatorPatientData();
+        calcInitialized = loaded === true;
+        return calcInitialized;
     } catch (error) {
         console.error('Calculator initialization error:', error);
         calcInitialized = false;
