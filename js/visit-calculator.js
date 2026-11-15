@@ -1,3 +1,4 @@
+(() => {
 /* =========================================================
 
  * ENERGY / MACRO CALCULATOR
@@ -480,3 +481,7 @@ async function initCalculator(){
         return false;
     }
 }
+
+// Explicitly expose the initializer to visit.js without leaking calculator variables.
+window.initCalculator = initCalculator;
+})();
