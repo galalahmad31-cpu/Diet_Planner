@@ -10,150 +10,54 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
     .visit-delete-cancel{background:transparent!important;color:#64748b!important;box-shadow:none!important;font-family:'Cairo',sans-serif!important;font-weight:700!important;font-size:.75rem!important;padding:.55rem .8rem!important}
 
 
-/* UX refresh — patient profile */
-:root{--dp-primary:#176b63;--dp-primary-soft:#eaf5f2;--dp-ink:#172b3a;--dp-muted:#718096;--dp-line:#e6edf1}
+/* Patient profile dashboard — clean consolidated styles */
+:root{--dp-primary:#176b63;--dp-ink:#172b3a;--dp-muted:#718096;--dp-line:#e6edf1}
 body{background:#f3f6f8;color:var(--dp-ink);font-family:'Cairo',sans-serif}
 main{max-width:1120px!important}
 header{background:#102a35!important;border-color:#24414b!important}
 header .h-16{min-height:68px}
 header a{border:1px solid #29434d}
+.patient-name-bar{background:#fff;border:1px solid #e4edf0;border-radius:14px;padding:14px 18px;box-shadow:0 2px 10px rgba(20,45,60,.025)}
+#patientName{font-size:clamp(1.1rem,2.2vw,1.45rem)!important;font-weight:800;letter-spacing:0;color:#102a35}
 #patientContent> .flex{padding:4px 0 12px}
-#patientName{font-size:clamp(1.35rem,3vw,1.8rem);letter-spacing:-.3px;color:#102a35}
-#patientContent .w-14.h-14{background:var(--dp-primary-soft);color:var(--dp-primary);border:1px solid #d6ebe5}
-#editButton{border-radius:12px;padding:11px 16px;font-size:13px;box-shadow:0 5px 14px #0284c71a}
-#writeAccessStatus{border-radius:12px!important;line-height:1.8;padding:10px 13px!important}
-main section.bg-white{border-color:var(--dp-line)!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(20,45,60,.035)!important}
-details summary{padding:4px 0;transition:color .15s}
-details summary:hover{color:var(--dp-primary)}
-details[open] summary{color:var(--dp-primary)}
-#patientContent input,#patientContent select,#patientContent textarea{border-radius:12px!important;border-color:#dce5ea!important;min-height:43px;transition:border-color .15s,box-shadow .15s}
-#patientContent input:focus,#patientContent select:focus,#patientContent textarea:focus{outline:none;border-color:#58a99b!important;box-shadow:0 0 0 3px #168f8414}
-#modulesSection h3{font-size:1.25rem;color:#142f3b}
-#addVisitButton{border-radius:12px!important;padding:11px 16px;box-shadow:0 5px 14px #05966918}
-#visitsList>div{border:1px solid var(--dp-line)!important;border-radius:15px!important;background:#fbfdfe!important;padding:14px 16px!important;transition:all .18s}
-#visitsList>div:hover{border-color:#b8d9d2!important;background:#fff!important;transform:translateY(-1px)}
-.module-card{border-radius:17px!important;border-color:var(--dp-line)!important}
-.module-card:hover{border-color:#b8d9d2!important;box-shadow:0 8px 22px rgba(20,45,60,.06)!important}
-#weightLink .w-12{background:#eaf4fb!important;color:#397ca8!important;border-radius:14px}
-#savePatientButton,#cancelEditButton{border-radius:12px!important;padding:11px 17px}
-@media(max-width:640px){
- main{padding-inline:12px!important;padding-top:16px!important}
- main section.bg-white{padding:16px!important;border-radius:16px!important}
- header .h-16{height:auto;min-height:64px;padding-block:8px}
- header .h-16 .h-14{width:42px;height:42px}
- header .h-16 h1{font-size:15px}
- header a{padding:8px 10px!important;font-size:11px!important}
- #patientContent> .flex{align-items:flex-start}
- #editButton{width:100%}
- #addVisitButton{padding:9px 11px;font-size:11px}
-}
-
-/* Patient hub overview */
-#patientOverview .overview-tile{display:flex;flex-direction:column;gap:7px;padding:17px 19px;background:#fff;border:1px solid #e3ecef;border-radius:16px;min-height:95px;justify-content:center}
-#patientOverview .overview-tile span{font-size:11px;font-weight:700;color:#718096}
-#patientOverview .overview-tile strong{font-size:19px;font-weight:900;color:#173642}
-#patientOverview .overview-action{background:linear-gradient(135deg,#eaf5f2,#f7fbfa);border-color:#cfe6df;text-decoration:none}
-#patientOverview .overview-action strong{font-size:14px;color:#176b63}
-#patientOverview .overview-action.is-disabled{opacity:.55;pointer-events:none}
-#visitsList .latest-visit-row{border-color:#b9d9d1!important;background:#f2faf7!important}
-
-/* Patient profile redesign */
-#modulesSection{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#patientContent .w-14.h-14{background:#eaf5f2;color:var(--dp-primary);border:1px solid #d6ebe5}
+main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!important;box-shadow:0 3px 14px rgba(20,45,60,.025)!important}
+#modulesSection{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}
 #modulesSection>div{grid-column:1/-1}
-#modulesSection .module-card{margin-top:0!important;min-height:112px;display:flex;align-items:center;transition:transform .2s,box-shadow .2s}
-#modulesSection .module-card:hover{transform:translateY(-2px)}
-#modulesSection .module-card h4{font-size:16px}
-#modulesSection .module-card p{font-size:12px}
-@media(max-width:640px){#modulesSection{grid-template-columns:1fr}#modulesSection>div{grid-column:auto}}
-
-/* Four-card patient workspace */
-.patient-name-bar{background:#fff;border:1px solid #e4edf0;border-radius:18px;padding:20px 24px;box-shadow:0 5px 20px rgba(20,45,60,.035)}
-.patient-dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:stretch}
-.dashboard-card{min-width:0;background:#fff;border:1px solid #e1eaee;border-radius:20px;padding:20px;box-shadow:0 7px 24px rgba(20,45,60,.04);text-decoration:none;color:inherit;transition:transform .18s,border-color .18s,box-shadow .18s}
-.dashboard-card:hover{transform:translateY(-3px);border-color:#b8d9d2;box-shadow:0 12px 28px rgba(20,45,60,.08)}
-.dashboard-card-head{display:flex;align-items:center;gap:12px;margin-bottom:17px}
-.dashboard-card-head h3{font-size:16px;font-weight:900;color:#163541;margin:0}
-.dashboard-card-head p{font-size:11px;color:#82919a;margin-top:4px;line-height:1.6}
-.dashboard-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:14px;font-size:20px}
-.dashboard-icon.teal{background:#e8f5f1;color:#176b63}.dashboard-icon.blue{background:#eaf3fc;color:#397ca8}.dashboard-icon.green{background:#eaf7ee;color:#16834a}.dashboard-icon.purple{background:#f1edff;color:#7654bd}
-.dashboard-primary-btn{width:100%;border:0;border-radius:12px;background:#176b63;color:#fff;padding:11px 12px;font:800 12px Cairo,sans-serif;cursor:pointer;transition:.15s}
-.dashboard-primary-btn:hover{background:#12574f}.dashboard-primary-btn:disabled{opacity:.45;cursor:not-allowed}
-.access-note{margin:12px 0;padding:9px 10px;border-radius:10px;background:#f7fafb;color:#718096;font-size:10px;line-height:1.7}
-.patient-fields summary{font-size:12px;font-weight:800;color:#60717a;cursor:pointer;padding:7px 0}
-.patient-fields label{display:block;font-size:11px;font-weight:800;color:#718096;margin-bottom:5px}
-.patient-fields input,.patient-fields select,.patient-fields textarea{width:100%;border:1px solid #dce6eb;border-radius:10px;padding:9px 10px;font:600 12px Cairo,sans-serif;background:#f8fafb;min-height:39px}
-.patient-fields input:disabled,.patient-fields select:disabled,.patient-fields textarea:disabled{opacity:.8}
-.save-actions{display:flex;gap:8px;margin-top:14px}.save-actions button{flex:1;border:0;border-radius:10px;padding:10px;font:800 11px Cairo,sans-serif;cursor:pointer}.save-actions #savePatientButton{background:#16834a;color:white}.save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
-.dashboard-link{display:flex;flex-direction:column;justify-content:space-between;min-height:190px}
-.dashboard-cta{display:block;margin-top:22px;color:#176b63;font-size:12px;font-weight:900}
-.plans-card{grid-column:auto}
-.plans-list{display:flex;flex-direction:column;gap:8px}
-#visitsList>div{padding:11px 12px!important}
-@media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.plans-card{grid-column:auto}.patient-name-bar{padding:16px}.dashboard-card{padding:16px}}
-
-/* Collapsible dashboard cards */
-.patient-dashboard{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.dashboard-card{padding:0;overflow:hidden;min-height:0}
-.dashboard-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;padding:18px 16px;min-height:104px;gap:8px;transition:background .18s}
+.dashboard-card{min-width:0;margin:0!important;padding:0!important;background:#fff;border:1px solid var(--dp-line);border-radius:14px;box-shadow:0 2px 9px rgba(20,45,60,.025);overflow:visible;transition:border-color .15s,box-shadow .15s}
+.dashboard-card:hover{border-color:#c4ddd6}
+.dashboard-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:76px;padding:12px;transition:background .15s}
 .dashboard-details>summary::-webkit-details-marker{display:none}
 .dashboard-details>summary:hover{background:#f8fbfc}
-.dashboard-card-head{margin:0!important;flex:1;min-width:0;display:flex;align-items:center;gap:11px}
+.dashboard-card-head{margin:0!important;flex:1;min-width:0;display:flex;align-items:center;gap:9px}
 .dashboard-card-head>span:last-child{min-width:0}
-.dashboard-card-head h3{font-size:14px!important;white-space:normal}
-.dashboard-card-head p{font-size:10px!important}
-.details-chevron{font-size:12px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
+.dashboard-card-head h3{font-size:12.5px!important;font-weight:800;color:#163541;line-height:1.5;margin:0}
+.dashboard-card-head p{font-size:9px!important;color:#82919a;line-height:1.45;margin:2px 0 0}
+.dashboard-icon{width:35px;height:35px;flex:0 0 35px;display:grid;place-items:center;border-radius:10px;font-size:16px}
+.dashboard-icon.teal{background:#e8f5f1;color:#176b63}.dashboard-icon.blue{background:#eaf3fc;color:#397ca8}.dashboard-icon.green{background:#eaf7ee;color:#16834a}.dashboard-icon.purple{background:#f1edff;color:#7654bd}
+.details-chevron{font-size:10px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
 .dashboard-details[open] .details-chevron{transform:rotate(180deg);color:#176b63}
-.dashboard-details[open]>summary{background:#f8fbfc;border-bottom:1px solid #edf2f4}
-.dashboard-panel{padding:16px;border-top:0;animation:panelIn .18s ease}
-@keyframes panelIn{from{opacity:.5;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.dashboard-open-link{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
-.patient-fields{min-width:0}
-.patient-fields input,.patient-fields select,.patient-fields textarea{font-size:12px}
-#writeAccessStatus,.access-note{display:none!important}
-#editButton{margin-bottom:4px}
-.plans-list{margin-top:10px}
-@media(max-width:1050px){.patient-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.patient-dashboard{grid-template-columns:1fr}.dashboard-details>summary{min-height:84px;padding:15px}.dashboard-panel{padding:13px}}
-
-/* Compact modern dashboard refinement */
-.patient-name-bar{padding:15px 20px;border-radius:14px;box-shadow:0 2px 10px rgba(20,45,60,.025)}
-#patientName{font-size:clamp(1.1rem,2.2vw,1.45rem)!important;font-weight:800;letter-spacing:0}
-.patient-dashboard{gap:10px!important}
-.dashboard-card{border-radius:14px!important;box-shadow:0 2px 9px rgba(20,45,60,.025)!important}
-.dashboard-details>summary{min-height:78px;padding:12px 13px;gap:7px}
-.dashboard-card-head{gap:9px}
-.dashboard-card-head h3{font-size:12.5px!important;font-weight:800;line-height:1.5}
-.dashboard-card-head p{font-size:9px!important;line-height:1.45;margin-top:2px}
-.dashboard-icon{width:35px;height:35px;flex-basis:35px;border-radius:10px;font-size:16px}
-.details-chevron{font-size:10px}
-.dashboard-panel{padding:12px}
-.dashboard-primary-btn{padding:9px 10px;font-size:11px;border-radius:9px}
-.patient-fields label{font-size:10px;margin-bottom:4px}
-.patient-fields input,.patient-fields select,.patient-fields textarea{font-size:11px;padding:8px 9px;min-height:35px;border-radius:8px}
-.save-actions button{font-size:10px;padding:9px;border-radius:8px}
-#visitsList>div{padding:9px 10px!important;border-radius:11px!important}
-@media(max-width:600px){.patient-dashboard{gap:8px!important}.dashboard-details>summary{min-height:72px;padding:11px 12px}.dashboard-panel{padding:10px}.patient-name-bar{padding:13px 15px}}
-
-/* Expanded patient data: full-width inline popover below its card */
-.patient-dashboard>.dashboard-card:has(.dashboard-details[open]){grid-column:1/-1!important}
-.dashboard-details[open] .dashboard-panel{background:#fbfdfd;border-top:1px solid #edf2f4;padding:16px 18px;border-radius:0 0 13px 13px}
 .dashboard-details[open]>summary{background:#f4faf8}
-@media(max-width:600px){.dashboard-details[open] .dashboard-panel{padding:12px}}
+.dashboard-panel{padding:12px}
+.dashboard-primary-btn{width:100%;border:0;border-radius:9px;background:#176b63;color:#fff;padding:9px 10px;font:800 11px Cairo,sans-serif;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
+.dashboard-primary-btn:hover{background:#12574f}.dashboard-primary-btn:disabled{opacity:.45;cursor:not-allowed}
+.patient-fields{min-width:0}
+.patient-fields label{display:block;font-size:10px;font-weight:800;color:#718096;margin:0 0 4px}
+.patient-fields input,.patient-fields select,.patient-fields textarea{width:100%;border:1px solid #dce6eb;border-radius:8px;padding:8px 9px;font:600 11px Cairo,sans-serif;background:#f8fafb;min-height:35px}
+.patient-fields input:focus,.patient-fields select:focus,.patient-fields textarea:focus{outline:none;border-color:#58a99b;box-shadow:0 0 0 3px #168f8414}
+.patient-fields input:disabled,.patient-fields select:disabled,.patient-fields textarea:disabled{opacity:.8}
+.save-actions{display:flex;gap:8px;margin-top:14px}.save-actions button{flex:1;border:0;border-radius:8px;padding:9px;font:800 10px Cairo,sans-serif;cursor:pointer}.save-actions #savePatientButton{background:#16834a;color:white}.save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
+#editButton{margin-bottom:4px;border-radius:9px}
+#addVisitButton{border-radius:9px!important}
+#visitsList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+#visitsList>div{border:1px solid var(--dp-line)!important;border-radius:11px!important;background:#fbfdfe!important;padding:9px 10px!important;transition:border-color .15s}
+#visitsList>div:hover{border-color:#b8d9d2!important}
+#writeAccessStatus,.access-note{display:none!important}
 
-/* Patient details as centered modal popup (not inline expansion) */
-.patient-dashboard>.dashboard-card:has(.dashboard-details[open]){grid-column:auto!important}
-.patient-dashboard .dashboard-details[open]::before{content:"";position:fixed;inset:0;background:rgba(12,27,38,.48);backdrop-filter:blur(3px);z-index:80}
-.patient-dashboard .dashboard-details[open] .dashboard-panel{position:fixed;z-index:81;top:50%;left:50%;transform:translate(-50%,-50%);width:min(620px,calc(100vw - 28px));max-height:calc(100vh - 36px);overflow:auto;background:#fff;border:1px solid #e3ecef;border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(8,25,35,.24);animation:patientModalIn .18s ease}
-.patient-dashboard .dashboard-details[open]>summary{position:relative;z-index:82;background:#f4faf8;border-radius:14px}
+/* Modal behavior is intentionally limited to the patient-data card */
+.patient-data-card .dashboard-details[open]::before{content:"";position:fixed;inset:0;background:rgba(12,27,38,.48);backdrop-filter:blur(3px);z-index:100}
+.patient-data-card .dashboard-details[open] .dashboard-panel{position:fixed;z-index:101;top:50%;left:50%;transform:translate(-50%,-50%);width:min(620px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border:1px solid #e3ecef;border-radius:16px;padding:18px;box-shadow:0 24px 80px rgba(8,25,35,.24);animation:patientModalIn .18s ease}
+.patient-data-card .dashboard-details[open]>summary{position:relative;z-index:102;background:#f4faf8}
 @keyframes patientModalIn{from{opacity:0;transform:translate(-50%,-48%)}to{opacity:1;transform:translate(-50%,-50%)}}
-@media(max-width:600px){.patient-dashboard .dashboard-details[open] .dashboard-panel{padding:15px;border-radius:15px;max-height:calc(100dvh - 24px)}}
-
-/* Fix modal scope: only patient data card opens a modal */
-.patient-dashboard .dashboard-details[open]::before{content:none!important;display:none!important}
-.patient-dashboard .dashboard-details[open] .dashboard-panel{position:static;z-index:auto;top:auto;left:auto;transform:none;width:auto;max-height:none;overflow:visible;background:transparent;border:0;border-radius:0;padding:12px;box-shadow:none;animation:none}
-.patient-dashboard .dashboard-details[open]>summary{position:static;z-index:auto;background:transparent;border-radius:0}
-.patient-dashboard .patient-data-card .dashboard-details[open]::before{content:""!important;display:block!important;position:fixed;inset:0;background:rgba(12,27,38,.48);backdrop-filter:blur(3px);z-index:80}
-.patient-dashboard .patient-data-card .dashboard-details[open] .dashboard-panel{position:fixed;z-index:81;top:50%;left:50%;transform:translate(-50%,-50%);width:min(620px,calc(100vw - 28px));max-height:calc(100vh - 36px);overflow:auto;background:#fff;border:1px solid #e3ecef;border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(8,25,35,.24);animation:patientModalIn .18s ease}
-.patient-dashboard .patient-data-card .dashboard-details[open]>summary{position:relative;z-index:82;background:#f4faf8;border-radius:14px}
-@media(max-width:600px){.patient-dashboard .patient-data-card .dashboard-details[open] .dashboard-panel{padding:15px;border-radius:15px;max-height:calc(100dvh - 24px)}}
+@media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}.patient-data-card .dashboard-details[open] .dashboard-panel{padding:14px}}
