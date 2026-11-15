@@ -372,7 +372,7 @@ async function initializeDietPage(){
     $('statusStat').textContent='استجابة بطيئة';
     $('statusStat').className='mt-1 text-sm font-extrabold text-amber-600';
     toast('التحميل استغرق وقتًا طويلًا. يمكنك استخدام تحديث المكتبة أو إعادة تحميل الصفحة.',false);
-  },8000);
+  },2000);
   try{
     if(!(await getSession()))return;
     await loadPageData();
