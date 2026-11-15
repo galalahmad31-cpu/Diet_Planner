@@ -279,3 +279,6 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   #exchangePlanContent th,#exchangePlanContent td{padding:8px 6px!important}
   #exchangePlanContent .day-card{border-radius:14px!important}
 }
+
+/* Assessment is intentionally excluded from the dietary-plan workflow */
+#assessmentCard,#assessmentContent{display:none!important}
