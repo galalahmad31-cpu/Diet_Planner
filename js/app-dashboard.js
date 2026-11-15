@@ -95,8 +95,8 @@
     style.textContent = `
       .dp-feature-locked {
         position: relative;
-        cursor: not-allowed !important;
-        opacity: .72;
+        cursor: pointer !important;
+        opacity: .88;
       }
 
       .dp-feature-locked:hover {
@@ -151,19 +151,7 @@
       visitor ? "سجّل الدخول لاستخدام هذه الخدمة" : "هذه الخدمة غير متاحة في اشتراكك الحالي"
     );
 
-    if (!card.querySelector(".dp-lock-overlay")) {
-      const overlay = document.createElement("div");
 
-      overlay.className = "dp-lock-overlay";
-      overlay.innerHTML = `
-        <span class="dp-lock-badge">
-          <i class="fa-solid fa-lock"></i>
-          <span>${visitor ? "سجّل الدخول للوصول" : "غير متاح في خطتك الحالية"}</span>
-        </span>
-      `;
-
-      card.appendChild(overlay);
-    }
   }
 
   function bindLockedCard(card) {
@@ -313,7 +301,6 @@
         card.classList.remove("dp-feature-locked");
         card.removeAttribute("aria-disabled");
         card.removeAttribute("title");
-        card.querySelector(".dp-lock-overlay")?.remove();
         return;
       }
       card.dataset.visitorLocked = "true";
