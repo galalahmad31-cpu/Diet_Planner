@@ -279,3 +279,28 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   #exchangePlanContent th,#exchangePlanContent td{padding:8px 6px!important}
   #exchangePlanContent .day-card{border-radius:14px!important}
 }
+
+
+/* UX refresh: visit workspace */
+:root{--visit-ink:#16313d;--visit-muted:#718391;--visit-line:#e3ebef;--visit-accent:#176b63}
+body{background:#f3f6f8;color:var(--visit-ink)}
+header{background:#102a35!important;border-color:#24414b!important}
+main{max-width:1120px!important}
+#visitContent>section{border-color:var(--visit-line)!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(20,45,60,.035)!important}
+#patientName{color:#102a35;letter-spacing:-.3px}
+.module-card{border-radius:17px!important;box-shadow:0 3px 12px rgba(20,45,60,.025);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.module-card:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(20,45,60,.07)}
+.module-card button,[data-action]{transition:background .15s,border-color .15s,transform .15s}
+.assessment-section{border-radius:16px!important;padding:clamp(14px,2vw,22px)!important;box-shadow:0 3px 12px rgba(20,45,60,.025)!important}
+.assessment-section .section-title{margin-bottom:14px}
+.assessment-section input,.assessment-section select,.assessment-section textarea,
+#visitContent input,#visitContent select,#visitContent textarea{border-radius:11px!important;border-color:#dce5ea!important;min-height:42px}
+#visitContent input:focus,#visitContent select:focus,#visitContent textarea:focus{outline:none;border-color:#58a99b!important;box-shadow:0 0 0 3px #168f8414}
+button{border-radius:11px}
+@media(max-width:640px){
+ main{padding:14px 12px!important}
+ #visitContent>section{padding:15px!important;border-radius:16px!important}
+ .assessment-section{padding:13px!important}
+ header .h-16{height:auto;min-height:64px;padding-block:8px}
+ header a,header button{padding:8px 10px!important;font-size:11px!important}
+}
