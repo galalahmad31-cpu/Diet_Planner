@@ -52,18 +52,6 @@ function calcShowToast(msg, type = 'success') {
 
         }
 
-            let group = '';
-            if (age < 3) group = '<3 سنوات';
-            else if (age < 10) group = '3–10 سنوات';
-            else if (age < 18) group = '10–18 سنة';
-            else if (age < 30) group = '18–30 سنة';
-            else if (age < 60) group = '30–60 سنة';
-            else group = '≥60 سنة';
-
-            hint.textContent = `الفئة المختارة: ${group}. المعادلة تستخدم الوزن فقط مع العمر والجنس.`;
-            result.textContent = group;
-        }
-
         function calculateSelectedEnergy() {
             const gender = document.getElementById('energyGender').value;
             const age = parseFloat(document.getElementById('energyAge').value);
