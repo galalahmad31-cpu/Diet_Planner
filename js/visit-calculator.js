@@ -472,4 +472,8 @@ async function initCalculator(){
 
 // Explicitly expose the initializer to visit.js without leaking calculator variables.
 window.initCalculator = initCalculator;
+window.selectEnergyEquation = selectEnergyEquation;
+window.calculateSelectedEnergy = calculateSelectedEnergy;
+window.updateTargetAndMacros = updateTargetAndMacros;
+window.applyCustomTargetToPatient = applyCustomTargetToPatient;
 })();
