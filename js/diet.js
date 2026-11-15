@@ -20,7 +20,7 @@ function withTimeout(promise,ms,label='الطلب'){
   let timer;
   return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(`انتهت مهلة ${label} (${Math.round(ms/1000)} ثوانٍ)`)),ms)})]).finally(()=>clearTimeout(timer));
 }
-async function getSession(){
+async async function getSession(){
   const access=window.DietPlannerAccess;
   if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
   user=await withTimeout(access.getCurrentUser(),2000,'التحقق من الجلسة');
