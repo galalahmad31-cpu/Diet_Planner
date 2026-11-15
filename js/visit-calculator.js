@@ -12,7 +12,6 @@ let calcPatientId = urlParams.get('patient_id');
 let calcResolvedPatientId = calcPatientId;
 let calcInitialized = false;
 
-let calcPatient = null;
 let selectedEnergyEquation = 'mifflin';
 let pendingSavedTargetCalories = null;
 
@@ -162,10 +161,6 @@ function calcShowToast(msg, type = 'success') {
             return { bmr, group };
         }
 
-        // Compatibility aliases for old saved UI references.
-        function calculateTDEE() { calculateSelectedEnergy(); }
-        function calculateSchofield() { selectEnergyEquation('schofield'); calculateSelectedEnergy(); }
-
         function updateTargetAndMacros() {
             const tdee = parseInt(document.getElementById('resTDEE').textContent) || 0;
             const rawAdj = document.getElementById('calcAdjustment').value;
@@ -268,10 +263,9 @@ async function loadCalculatorPatientData() {
         return false;
     }
 
-    calcPatient = data;
-    document.getElementById('energyGender').value = calcPatient.gender || 'male';
-    document.getElementById('energyAge').value = calcPatient.age ?? '';
-    document.getElementById('energyHeight').value = calcPatient.height ?? '';
+    document.getElementById('energyGender').value = data.gender || 'male';
+    document.getElementById('energyAge').value = data.age ?? '';
+    document.getElementById('energyHeight').value = data.height ?? '';
 
     const { data: weights } = await calcDb
         .from('weight_logs')
