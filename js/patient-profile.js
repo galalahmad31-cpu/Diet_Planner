@@ -427,11 +427,60 @@
     cancelEditing();
   }
 
+  function financeDate(value) {
+    if (!value) return '—';
+    const date = new Date(`${String(value).slice(0,10)}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat('ar-EG',{year:'numeric',month:'short',day:'numeric'}).format(date);
+  }
+
+  function closePatientFinanceModal() {
+    $('patientFinanceModal')?.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  }
+
+  async function openPatientFinanceModal() {
+    const modal=$('patientFinanceModal');
+    if(!modal || !patientId) return;
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    $('patientFinanceName').textContent=state.patient?.name||'';
+    $('patientFinanceLoading').classList.remove('hidden');
+    $('patientFinanceContent').classList.add('hidden');
+    $('patientFinanceEmpty').classList.add('hidden');
+
+    try {
+      const {data,error}=await supabase.from('patient_finances')
+        .select('subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid,follow_up_days,last_visit_date,next_follow_up_date')
+        .eq('patient_id',patientId).eq('user_id',state.user.id).maybeSingle();
+      if(error) throw error;
+      $('patientFinanceLoading').classList.add('hidden');
+      if(!data){$('patientFinanceEmpty').classList.remove('hidden');return;}
+      const put=(id,value)=>{const el=$(id);if(el)el.textContent=value??'—';};
+      const amount=Number(data.subscription_amount);
+      const discounted=data.discounted_amount!=null?Number(data.discounted_amount):(Number.isFinite(amount)?amount*(1-(Number(data.discount_percent)||0)/100):null);
+      put('pfAmount',data.subscription_amount!=null?amount.toLocaleString('ar-EG')+' جنيه':'—');
+      put('pfPaid',data.is_paid?'مسدد':'غير مسدد');
+      put('pfDiscounted',discounted!=null?discounted.toLocaleString('ar-EG')+' جنيه':'—');
+      put('pfStatus',data.subscription_end_date&&data.subscription_end_date<new Date().toISOString().slice(0,10)?'منتهي':data.is_paid?'مسدد':'غير مسدد');
+      put('pfStart',financeDate(data.subscription_start_date));
+      put('pfMonths',data.subscription_months?data.subscription_months+' شهر':'—');
+      put('pfEnd',financeDate(data.subscription_end_date));
+      put('pfDiscount',data.discount_percent!=null?data.discount_percent+'%':'—');
+      put('pfLastVisit',financeDate(data.last_visit_date));
+      put('pfNextFollow',financeDate(data.next_follow_up_date));
+      put('pfFollowDays',data.follow_up_days?data.follow_up_days+' يوم':'—');
+      $('patientFinanceContent').classList.remove('hidden');
+    } catch(error) {
+      console.error('Patient finance load failed:',error);
+      $('patientFinanceLoading').textContent='تعذر تحميل البيانات المالية. تحقق من صلاحيات الوصول.';
+    }
+  }
+
   function bindEvents() {
     $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', savePatient);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
-    $('addVisitButton')?.addEventListener('click', addVisit);
+    $('addVisitButton')?.addEventListener('click', addVisit);\n    $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);\n    $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);\n    $('patientFinanceCloseBottom')?.addEventListener('click', closePatientFinanceModal);\n    $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });\n    document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
 
     // Use delegation so the close control remains reliable inside the modal.
     document.addEventListener('click', (event) => {
