@@ -73,24 +73,19 @@
 
                     </div>
 
-                    <div class="flex items-center justify-between gap-3 sm:justify-end">
+                    <div class="flex flex-wrap items-center justify-between gap-3 sm:justify-end" id="headerActions">
 
-                        <div class="text-right">
+                        <div class="text-right" id="accountInfo">
                             <div id="doctorName" class="font-bold text-slate-800">
                                 حساب المستخدم
                             </div>
-
-                            <div class="text-xs text-slate-500">
-                                Clinical Nutrition
-                            </div>
+                            <div class="text-xs text-slate-500">Clinical Nutrition</div>
                         </div>
 
-                        <button
-                            id="logoutBtn"
-                            type="button"
-                            class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                            title="تسجيل الخروج"
-                        >
+                        <a id="loginCta" href="login.html" class="rounded-xl border border-brand-500 px-4 py-2 text-sm font-bold text-brand-700 transition hover:bg-brand-50">تسجيل الدخول</a>
+                        <a id="registerCta" href="login.html#register" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700">إنشاء حساب</a>
+
+                        <button id="logoutBtn" type="button" class="hidden flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600" title="تسجيل الخروج">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </button>
 
