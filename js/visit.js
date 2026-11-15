@@ -188,7 +188,19 @@ const db = window.DietPlannerAccess?.supabaseClient;
       }
 
       if (module === 'calculator') {
-        await initCalculator();
+        try {
+          const initialized = await initCalculator();
+          if (initialized === false) {
+            content.classList.add('hidden');
+            showError('تعذر تهيئة حاسبة الاحتياجات. راجع بيانات الزيارة وحاول مرة أخرى.');
+            return;
+          }
+        } catch (error) {
+          console.error('Calculator module initialization failed:', error);
+          content.classList.add('hidden');
+          showError('حدث خطأ أثناء تهيئة حاسبة الاحتياجات.');
+          return;
+        }
       }
 
       if (module === 'dietPlan') {
