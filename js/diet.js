@@ -142,6 +142,7 @@ function buildDietPreview(){
 }
 function setReadOnly(ro){
   $('editor').classList.toggle('is-viewing',ro);
+  let printBtn=$('printDietPreview');if(ro&&!printBtn){printBtn=document.createElement('button');printBtn.id='printDietPreview';printBtn.type='button';printBtn.className='rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white';printBtn.innerHTML='<i class="fa-solid fa-print ml-1"></i> طباعة';printBtn.onclick=()=>window.print();$('cancelEditor').before(printBtn)}else if(!ro&&printBtn)printBtn.remove();
   const content=$('editor').querySelector(':scope > div > .p-4');if(content){let host=content.querySelector('.diet-preview-host');if(ro){if(!host){host=document.createElement('div');host.className='diet-preview-host';content.appendChild(host)}host.innerHTML=buildDietPreview();host.classList.remove('hidden');content.querySelectorAll(':scope > section').forEach(s=>s.classList.add('hidden'))}else{host?.classList.add('hidden');content.querySelectorAll(':scope > section').forEach(s=>s.classList.remove('hidden'))}}
   ['dietName','description','notes','visibility','dietAccess','addMeal','saveDiet'].forEach(id=>{const el=$(id);if(el)el.disabled=ro});
   $('saveDiet').classList.toggle('hidden',ro);$('addMeal').classList.toggle('hidden',ro);
