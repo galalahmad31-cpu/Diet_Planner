@@ -136,3 +136,21 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-card .finance-card-trigger h3,.patient-finance-card .finance-card-trigger p,.patient-finance-card .details-chevron{color:#fff!important}
 .patient-dashboard .dashboard-details>summary:hover,.patient-finance-card .finance-card-trigger:hover{filter:brightness(1.08)}
 .patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
+
+/* FINAL card colors: patient-profile stylesheet loads after theme.css */
+#modulesSection .patient-data-card .dashboard-details>summary{background:linear-gradient(120deg,#123b50,#176b63)!important}
+#modulesSection .measurements-card .dashboard-details>summary{background:linear-gradient(120deg,#174c78,#287db2)!important}
+#modulesSection .plans-card .dashboard-details>summary{background:linear-gradient(120deg,#17633d,#26965d)!important}
+#modulesSection .patient-finance-card .finance-card-trigger{background:linear-gradient(120deg,#45266f,#7654bd)!important}
+#modulesSection .patient-data-card summary h3,#modulesSection .patient-data-card summary p,
+#modulesSection .measurements-card summary h3,#modulesSection .measurements-card summary p,
+#modulesSection .plans-card summary h3,#modulesSection .plans-card summary p,
+#modulesSection .patient-finance-card .finance-card-trigger h3,#modulesSection .patient-finance-card .finance-card-trigger p{color:#fff!important}
+#modulesSection .patient-data-card summary .dashboard-icon,
+#modulesSection .measurements-card summary .dashboard-icon,
+#modulesSection .plans-card summary .dashboard-icon,
+#modulesSection .patient-finance-card .dashboard-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
+#modulesSection .patient-data-card summary .details-chevron,
+#modulesSection .measurements-card summary .details-chevron,
+#modulesSection .plans-card summary .details-chevron,
+#modulesSection .patient-finance-card .details-chevron{color:#fff!important}
