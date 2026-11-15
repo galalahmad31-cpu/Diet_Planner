@@ -352,8 +352,7 @@ function calculateDay(day){
 }
 function metricCard(label,value,unit,target,pctv,kind){
  const bg={amber:'bg-amber-50 border-amber-200 text-amber-900',slate:'bg-slate-50 border-slate-200 text-slate-800',sky:'bg-sky-50 border-sky-200 text-sky-900',emerald:'bg-emerald-50 border-emerald-200 text-emerald-900'}[kind];
- const compactMineral=['الصوديوم (Na)','البوتاسيوم (K)','الفسفور (P)'].includes(label);
- return `<div class="${bg} border rounded-xl ${compactMineral?'p-2 sm:p-3':'p-3'}"><div class="flex ${compactMineral?'flex-col items-end gap-1':'justify-between items-center mb-1'}"><span class="${compactMineral?'text-[9px] sm:text-[11px]':'text-[11px]'} font-black leading-tight">${label}</span>${target?`<span class="text-[10px] font-bold opacity-70">الهدف: ${target}g</span>`:''}</div><div class="flex items-baseline gap-1"><span class="${compactMineral?'text-base sm:text-xl':'text-xl'} font-black">${value}</span><span class="${compactMineral?'text-[9px] sm:text-[10px]':'text-[10px]'} font-extrabold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div></div>`:''}</div>`;
+ return \`<div class="\${bg} border rounded-md px-1.5 py-1 min-w-0"><div class="flex items-center justify-center gap-1"><span class="text-[8px] sm:text-[9px] font-bold leading-tight whitespace-nowrap">\${label}</span>\${target?\`<span class="text-[8px] opacity-70">/\${target}</span>\`:''}</div><div class="flex items-baseline justify-center gap-0.5 leading-tight"><span class="text-[12px] sm:text-[14px] font-black tabular-nums">\${value}</span><span class="text-[8px] font-bold">\${unit}</span></div>\${target?\`<div class="w-full bg-white/60 h-1 rounded-full mt-1 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:\${pctv}%"></div></div>\`:''}</div>\`;
 }
 
 async function syncFixedMeals(){
@@ -657,16 +656,14 @@ function renderDays(){
      <div class="flex items-center gap-2"><button class="day-edit-btn bg-slate-900 text-white text-xs font-extrabold px-3 py-2 rounded-xl" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')">تعديل</button><button class="day-save-btn bg-emerald-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')">حفظ</button><button class="day-action-always bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-2 rounded-xl" onclick="window.dietPlan.duplicateDay('${escapeHtml(d.id)}')" title="نسخ اليوم"><i class="fa-regular fa-copy"></i> نسخ</button><button class="day-action-always text-rose-500 px-2" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')"><i class="fa-solid fa-trash"></i></button></div>
     </div>
     ${d.isCollapsed?'':`<div class="p-4 space-y-4">
-     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-      ${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
-      ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
-      ${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
-      ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
-     </div>
-     <div class="grid grid-cols-3 gap-2">
-      <div class="min-w-0">${metricCard('الصوديوم (Na)',Math.round(calc.sod),'mg',null,0,'sky')}</div>
-      <div class="min-w-0">${metricCard('البوتاسيوم (K)',Math.round(calc.pot),'mg',null,0,'emerald')}</div>
-      <div class="min-w-0">${metricCard('الفسفور (P)',Math.round(calc.pho),'mg',null,0,'slate')}</div>
+     <div class="day-metrics-strip grid grid-cols-4 sm:grid-cols-7 gap-1">
+      \${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
+      \${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
+      \${metricCard('الكارب',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
+      \${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
+      \${metricCard('Na',Math.round(calc.sod),'mg',null,0,'sky')}
+      \${metricCard('K',Math.round(calc.pot),'mg',null,0,'emerald')}
+      \${metricCard('P',Math.round(calc.pho),'mg',null,0,'slate')}
      </div>
      <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2"><button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة وجبة</button><button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">تطبيق دايت ثابت</button></div>
