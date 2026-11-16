@@ -183,15 +183,7 @@ body {
 @media(max-width:640px){.chart-shell{min-height:220px}.chart-date{font-size:9px}}\n
 
 
-/* Compact weight KPI cards: four across on mobile */
-@media(max-width:640px){
- #weightTab>.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
- #weightTab>.grid>div{min-width:0;padding:7px 5px!important;border-radius:11px!important}
- #weightTab>.grid>div>span:first-child{font-size:7px!important;line-height:1.35;min-height:25px;margin-bottom:3px!important}
- #weightTab>.grid>div .flex{gap:2px!important;flex-wrap:wrap;align-items:baseline}
- #weightTab>.grid>div .flex span:first-child{font-size:12px!important;line-height:1.2;overflow-wrap:anywhere}
- #weightTab>.grid>div .flex span:last-child{font-size:7px!important}
-}
+
 
 /* Measurement tracking: quiet, readable table and compact adherence tags */
 #weightTab table{border-collapse:separate;border-spacing:0;width:100%;min-width:0;table-layout:fixed}
