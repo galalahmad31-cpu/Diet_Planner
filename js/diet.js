@@ -263,7 +263,7 @@ $('visibilityFilter').onchange=()=>{
 async function loadPageData(){
   await loadDiets();
 }
-$('refreshBtn').onclick=loadPageData;
+
 let deleteTarget=null,confirmAction=null;
 function closeDeleteConfirm(){deleteTarget=null;confirmAction=null;$('deleteConfirmModal').classList.add('hidden');$('deleteConfirmModal').classList.remove('flex')}
 function openConfirm(title,message,action){$('confirmTitle').textContent=title;$('confirmMessage').textContent=message;$('confirmDeleteBtn').innerHTML='تأكيد';deleteTarget=null;confirmAction=action;$('deleteConfirmModal').classList.remove('hidden');$('deleteConfirmModal').classList.add('flex')}
