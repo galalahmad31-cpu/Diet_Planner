@@ -300,10 +300,10 @@
     const adherenceLabels={excellent:'ممتاز',good:'جيد',fair:'متوسط',poor:'ضعيف'};
     body.innerHTML=state.weightLogs.map((log,index)=>`
       <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
-      <td class="py-3 px-3 font-bold whitespace-nowrap">${escapeHtml(formatDate(log.date))}</td><td class="py-3 px-3 text-center font-black text-emerald-700">${log.weight.toFixed(1)}</td>
-      <td class="py-3 px-3 text-center">${log.waist==null?'—':log.waist.toFixed(1)}</td><td class="py-3 px-3 text-center">${log.hip==null?'—':log.hip.toFixed(1)}</td>
-      <td class="py-3 px-3 text-center"><span class="adherence-badge">${escapeHtml(adherenceLabels[log.adherence]||'—')}</span></td>
-      <td class="py-3 px-2 text-center no-print"><button type="button" data-action="delete-weight" data-index="${index}" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer" aria-label="حذف القياس"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+      <td data-label="التاريخ" class="py-3 px-3 font-bold whitespace-nowrap">${escapeHtml(formatDate(log.date))}</td><td data-label="الوزن (كجم)" class="py-3 px-3 text-center font-black text-emerald-700">${log.weight.toFixed(1)}</td>
+      <td data-label="محيط الوسط (سم)" class="py-3 px-3 text-center">${log.waist==null?'—':log.waist.toFixed(1)}</td><td data-label="محيط الأرداف (سم)" class="py-3 px-3 text-center">${log.hip==null?'—':log.hip.toFixed(1)}</td>
+      <td data-label="الالتزام بالدايت" class="py-3 px-3 text-center"><span class="adherence-badge">${escapeHtml(adherenceLabels[log.adherence]||'—')}</span></td>
+      <td data-label="إجراء" class="no-print py-3 px-2 text-center"><button type="button" data-action="delete-weight" data-index="${index}" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer" aria-label="حذف القياس"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
   }
 
   function getChartStep() {
