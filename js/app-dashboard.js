@@ -66,6 +66,7 @@
       document.getElementById("loginCta")?.classList.add("hidden");
       document.getElementById("registerCta")?.classList.add("hidden");
       elements.logout?.classList.remove("hidden");
+      if (elements.logout) elements.logout.style.display = "";
     } catch (error) {
       console.error("Profile name lookup failed:", error);
       elements.accountName.textContent = "حساب المستخدم";
@@ -294,6 +295,7 @@
     document.getElementById("loginCta")?.classList.remove("hidden");
     document.getElementById("registerCta")?.classList.remove("hidden");
     elements.logout?.classList.add("hidden");
+    if (elements.logout) elements.logout.style.display = "none";
     elements.accountName?.classList.add("hidden");
     if (elements.accountName) elements.accountName.textContent = "";
     document.getElementById("accountInfo")?.classList.add("hidden");
