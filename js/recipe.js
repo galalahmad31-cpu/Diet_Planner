@@ -263,18 +263,19 @@
             ['الكربوهيدرات', `${recipe.carbohydrates} g`],
             ['البروتين', `${recipe.protein} g`],
             ['الدهون', `${recipe.fat} g`],
-            ['البوتاسيوم', `${recipe.potassium} mg`],
-            ['الفسفور', `${recipe.phosphorus} mg`],
             ['الصوديوم', `${recipe.sodium} mg`],
-            ['القيم لكل', `${recipe.nutrition_basis_value} ${basisUnit}`]
+            ['البوتاسيوم', `${recipe.potassium} mg`],
+            ['الفسفور', `${recipe.phosphorus} mg`]
         ];
 
         $('viewNutrition').innerHTML = nutrition.map(([label, value]) => `
             <div class="nutrition-item">
-                <div class="text-[11px] font-semibold text-slate-400">${escapeHtml(label)}</div>
-                <div class="mt-1 font-extrabold text-slate-800">${escapeHtml(value)}</div>
+                <div class="nutrition-item-label">${escapeHtml(label)}</div>
+                <div class="nutrition-item-value">${escapeHtml(value)}</div>
             </div>
         `).join('');
+
+        $('viewNutritionBasis').textContent = `القيم الغذائية لكل ${recipe.nutrition_basis_value} ${basisUnit}`;
 
         $('viewIngredients').innerHTML = sanitizeEditorHtml(recipe.ingredients) || '<span class="text-slate-400">لم تُسجل مكونات.</span>';
         $('viewInstructions').innerHTML = sanitizeEditorHtml(recipe.instructions) || '<span class="text-slate-400">لم تُسجل طريقة التحضير.</span>';
