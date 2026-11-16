@@ -200,3 +200,15 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .nutrition-support-card .nutrition-support-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
 .nutrition-support-card .measurements-direct .dashboard-card-arrow{color:#fff!important}
 .nutrition-support-card .measurements-direct:hover{filter:brightness(1.06)}
+
+
+/* Brief, non-blocking confirmation after saving patient finances */
+.patient-finance-success-toast{
+  position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;
+  transform:translate(-50%,-12px);opacity:0;pointer-events:none;
+  width:max-content;max-width:calc(100vw - 32px);padding:11px 18px;
+  border:1px solid #cce9df;border-radius:12px;background:#eaf7f1;color:#176b57;
+  box-shadow:0 8px 28px rgba(16,42,53,.16);font:800 12px Cairo,sans-serif;
+  text-align:center;transition:opacity .2s ease,transform .2s ease;
+}
+.patient-finance-success-toast.is-visible{opacity:1;transform:translate(-50%,0)}
