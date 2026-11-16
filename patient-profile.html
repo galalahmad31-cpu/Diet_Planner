@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20260923-1"></script>
-  <script src="js/patient-profile.js?v=20261116-finance-layout1" defer></script>
+  <script src="js/patient-profile.js?v=20261116-finance-manual1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <link rel="stylesheet" href="css/patient-profile.css?v=20261115-measurements-blue">
@@ -91,7 +91,7 @@
    <div class="min-w-0"><label>نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0"></div>
    <div class="min-w-0"><label>حالة السداد</label><select id="pfInputPaid"><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
    <div class="min-w-0"><label>آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date"></div>
-   <div class="min-w-0 rounded-xl bg-sky-50 p-3"><label>موعد المتابعة القادمة (تلقائي)</label><strong id="pfInputNextFollowPreview" class="mt-2 block text-sm font-extrabold text-sky-700">—</strong></div>
+   <div class="min-w-0"><label>موعد المتابعة القادمة (يدوي)</label><input id="pfInputNextFollow" type="date"></div>
   </div>
   <div class="finance-summary-box mt-3"><small>القيمة بعد الخصم</small><strong id="pfInputDiscountedPreview">—</strong><small>نهاية الاشتراك: <span id="pfInputEndPreview">—</span></small></div>
   <div id="patientFinanceError" class="hidden text-xs text-red-600 mt-2"></div>
