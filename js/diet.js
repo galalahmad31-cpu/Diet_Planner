@@ -199,31 +199,36 @@ function buildDietPreview(){
 }
 
 function prepareDietPrint(){
- let style=document.getElementById('diet-print-styles');
- if(!style){style=document.createElement('style');style.id='diet-print-styles';document.head.appendChild(style)}
+ const host=document.querySelector('#editor .diet-preview-host');
+ const preview=host?.querySelector('.diet-preview');
+ if(!preview)return;
+ // Measure the complete rendered diet and calculate a single-page A4 fit.
+ preview.style.transform='none';preview.style.width='100%';
+ const fullHeight=preview.scrollHeight;
+ const printablePx=277*96/25.4; // A4 height minus 10mm margins
+ const scale=Math.min(1,printablePx/fullHeight);
+ const style=document.getElementById('diet-print-styles')||document.createElement('style');
+ style.id='diet-print-styles';document.head.appendChild(style);
  style.textContent=`@page{size:A4 portrait;margin:10mm}
  @media print{
- html,body{margin:0!important;padding:0!important;background:#fff!important}
+ html,body{width:190mm!important;height:277mm!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important}
  body *{visibility:hidden!important}
  #editor,.diet-preview-host,.diet-preview-host *{visibility:visible!important}
- #editor{position:static!important;display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:#fff!important}
- #editor .diet-preview-host{display:block!important;position:static!important;width:100%!important;margin:0!important;padding:0!important}
- #editor .diet-preview-host .diet-preview{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important;color:#172b38!important;font-size:10pt!important}
- #editor .diet-preview-host .dp-cover{background:#123247!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:14mm 12mm!important;margin:0 0 7mm!important;border-radius:0!important}
- #editor .diet-preview-host .dp-cover h1{font-size:23pt!important}
- #editor .diet-preview-host .dp-macros{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4mm!important}
- #editor .diet-preview-host .dp-macro{padding:4mm 2mm!important}
- #editor .diet-preview-host .dp-macro strong{font-size:17pt!important}
- #editor .diet-preview-host .dp-meal{break-inside:avoid!important;page-break-inside:avoid!important;margin-bottom:4mm!important;border:1px solid #dfe7eb!important}
- #editor .diet-preview-host .dp-meal-head{padding:3mm 4mm!important;background:#f1f6f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
- #editor .diet-preview-host .dp-food-list{padding:0 4mm!important}
- #editor .diet-preview-host .dp-food{grid-template-columns:minmax(0,1fr) 28mm 30mm!important;gap:4mm!important;padding:3mm 0!important;align-items:center!important}
- #editor .diet-preview-host .dp-food-main strong{font-size:10pt!important}
- #editor .diet-preview-host .dp-food-detail{grid-column:auto!important;grid-row:auto!important}
- #editor .diet-preview-host .dp-food-note{grid-column:1/-1!important;grid-row:auto!important;display:flex!important;flex-direction:row!important;padding:2mm 3mm!important;background:#fff9ed!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
- #editor .diet-preview-host .dp-food-note p{font-size:9pt!important}
- #editor .diet-preview-host .dp-notes{break-inside:avoid!important;page-break-inside:avoid!important}
- #editor .diet-preview-host .dp-footer{margin-top:6mm!important}
+ #editor{position:absolute!important;inset:0!important;display:block!important;width:190mm!important;height:277mm!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:#fff!important;overflow:hidden!important}
+ #editor .diet-preview-host{display:block!important;position:absolute!important;top:0!important;left:0!important;width:190mm!important;height:277mm!important;margin:0!important;padding:0!important;overflow:hidden!important}
+ #editor .diet-preview-host .diet-preview{width:${100/scale}%!important;max-width:none!important;margin:0!important;padding:0!important;transform:scale(${scale})!important;transform-origin:top left!important;background:#fff!important;color:#172b38!important;font-size:9pt!important}
+ .dp-cover{padding:7mm 8mm!important;margin:0 0 4mm!important;border-radius:0!important;background:#123247!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .dp-cover h1{font-size:18pt!important;margin:5mm 0 2mm!important}.dp-cover p{font-size:9pt!important;line-height:1.5!important}
+ .dp-summary{margin-bottom:4mm!important}.dp-section-title{font-size:11pt!important;margin-bottom:2mm!important}
+ .dp-macros{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:2mm!important}.dp-macro{padding:2mm!important}.dp-macro strong{font-size:12pt!important}
+ .dp-section-head{margin-bottom:2mm!important}.dp-meal{margin-bottom:2mm!important;border-radius:0!important;break-inside:avoid!important;page-break-inside:avoid!important}
+ .dp-meal-head{padding:2mm 3mm!important}.dp-meal-head h3{font-size:10pt!important}.dp-meal-num{height:6mm!important;flex-basis:6mm!important}
+ .dp-food-list{padding:0 3mm!important}.dp-food{grid-template-columns:minmax(0,1fr) 22mm 25mm minmax(0,1.1fr)!important;gap:2mm!important;padding:1.5mm 0!important;align-items:center!important}
+ .dp-food-main strong,.dp-food-detail b{font-size:8.5pt!important;line-height:1.25!important}.dp-food-main small,.dp-label{font-size:7pt!important}
+ .dp-food-note{grid-column:4!important;grid-row:1!important;display:flex!important;flex-direction:column!important;gap:1mm!important;padding:0!important;background:transparent!important}
+ .dp-food-note p{font-size:7.5pt!important;line-height:1.25!important}
+ .dp-notes{margin-top:3mm!important;padding:3mm!important;break-inside:avoid!important}.dp-notes p{font-size:8pt!important;line-height:1.4!important}
+ .dp-footer{margin-top:3mm!important;padding:2mm 0!important;font-size:7pt!important}
  #editor button,#editor input,#editor select,#editor textarea,#editor .editor-toolbar{display:none!important}
  }`;
 }
