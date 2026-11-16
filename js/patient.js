@@ -235,7 +235,7 @@
   }
 
   async function createPatient() {
-    if (!state.canAddPatient) {
+    if (!state.isAdmin && !state.canAddPatient) {
       showStatus(
         state.hasActiveSubscription
           ? 'لا يمكن إضافة مريض جديد لأن الحد المسموح به في الاشتراك الحالي قد تم بلوغه.'
