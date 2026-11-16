@@ -504,7 +504,7 @@
     const discount=Number($('pfInputDiscount').value)||0;
     $('pfInputDiscountedPreview').textContent=(amount*(1-discount/100)).toLocaleString('ar-EG',{maximumFractionDigits:2})+' جنيه';
     const start=$('pfInputStart').value,months=Number($('pfInputMonths').value);
-    if(start&&months>0){const d=new Date(start+'T00:00:00');d.setMonth(d.getMonth()+months);$('pfInputEndPreview').textContent=financeDate([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')).join('-'));}
+    if(start&&months>0){const d=new Date(start+'T00:00:00');d.setMonth(d.getMonth()+months);$('pfInputEndPreview').textContent=financeDate([d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-'));}
     else $('pfInputEndPreview').textContent='—';
 
   }
