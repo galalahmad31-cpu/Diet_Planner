@@ -43,3 +43,7 @@
  #logoutBtn{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;white-space:nowrap;margin:0!important;padding:9px 12px!important;line-height:1.2}
  #headerActions #loginCta,#headerActions #registerCta{flex:0 0 auto}
 }
+
+/* Keep the hidden utility authoritative for logout visibility. */
+#logoutBtn.hidden,
+#logoutBtn.hidden:hover { display: none !important; }
