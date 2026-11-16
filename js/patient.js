@@ -178,23 +178,24 @@
       const age = patient.age ? `<span class="patient-meta"><i class="fa-solid fa-cake-candles"></i> ${escapeHtml(patient.age)} سنة</span>` : '';
       const diagnosis = patient.diagnosis ? `<span class="patient-diagnosis">${escapeHtml(patient.diagnosis)}</span>` : '';
       return `
-      <article class="patient-card">
+      <article class="patient-card" role="link" tabindex="0"
+        data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}"
+        aria-label="فتح ملف المريض ${escapeHtml(patient.name || 'بدون اسم')}">
         <div class="patient-card-head">
           <div class="patient-identity">
-            <span class="patient-avatar"><i class="fa-solid fa-user"></i></span>
+            <span class="patient-avatar" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
             <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
           </div>
-          <span class="patient-number">ملف ${String(index + 1).padStart(2,'0')}</span>
+          <div class="patient-card-tools">
+            <span class="patient-number">ملف ${String(index + 1).padStart(2,'0')}</span>
+            <button type="button" data-action="ask-delete" data-patient-id="${escapeHtml(patient.id)}"
+              class="patient-delete" title="حذف المريض" aria-label="حذف المريض">
+              <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
         <div class="patient-details">${age}${diagnosis}</div>
-        <div class="patient-card-actions">
-          <button type="button" data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}" class="patient-open">
-            فتح الملف <i class="fa-solid fa-arrow-left"></i>
-          </button>
-          <button type="button" data-action="ask-delete" data-patient-id="${escapeHtml(patient.id)}" class="patient-delete" title="حذف المريض" aria-label="حذف المريض">
-            <i class="fa-regular fa-trash-can"></i>
-          </button>
-        </div>
+        <span class="patient-card-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-left"></i></span>
       </article>`;
     }).join('');
   }
@@ -277,7 +278,7 @@
 
       closeAddPatientModal();
       await loadPatients();
-      showStatus('تم حفظ المريض بنجاح. يمكنك فتح ملفه بالضغط على اسمه.', 'success');
+      showStatus('تم حفظ المريض بنجاح.', 'success');
     } catch (error) {
       console.error('Create patient failed:', error);
       showStatus('تعذر حفظ المريض في قاعدة البيانات.');
@@ -351,11 +352,26 @@
     if (action === 'create-patient') createPatient();
     if (action === 'close-delete') closeDeleteModal();
     if (action === 'open-patient') openPatient(target.dataset.patientId);
-    if (action === 'ask-delete') askDelete(target.dataset.patientId);
+    if (action === 'ask-delete') {
+      event.preventDefault();
+      event.stopPropagation();
+      askDelete(target.dataset.patientId);
+    }
+  }
+
+  function handleCardKeydown(event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    if (event.target !== event.currentTarget) return;
+    event.preventDefault();
+    openPatient(event.currentTarget.dataset.patientId);
   }
 
   function bindEvents() {
     document.addEventListener('click', handleClick);
+    $('patientsList')?.addEventListener('keydown', (event) => {
+      const card = event.target.closest('.patient-card[role="link"]');
+      if (card) handleCardKeydown({ key: event.key, target: event.target, currentTarget: card, preventDefault: () => event.preventDefault() });
+    });
     $('searchInput')?.addEventListener('input', renderPatients);
 
     $('newPatientName')?.addEventListener('keydown', (event) => {
