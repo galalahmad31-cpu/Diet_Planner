@@ -1442,6 +1442,7 @@ const gender=v=>v==='male'?'ذكر':v==='female'?'أنثى':v||'—';
    ========================================================= */
 let supportPatientId=null;
 let supportUserId=null;
+let supportIsAdmin=false;
 let supportDays=[];
 let currentSupportDayId=null;
 let dayDefaults=null;
@@ -1553,6 +1554,7 @@ function showDeleteConfirm(dayText){
   });
 }
 function canWriteSupportDays() {
+  if (supportIsAdmin) return true;
   const a = window.__dpNutritionSupportDayAccess || {};
   return a.hasActiveSubscription === true && a.hasFeature === true;
 }
@@ -1576,10 +1578,14 @@ function applySupportDayAccessUI() {
 
 async function refreshSupportDayAccess(userId) {
   try {
-    const [hasActiveSubscription, hasFeature] = await Promise.all([
-      access?.hasActiveSubscription?.(userId),
-      access?.hasFeature?.(userId, 'nutrition_support')
-    ]);
+    const role = await access?.getUserRole?.(userId);
+    supportIsAdmin = role === 'admin';
+    const [hasActiveSubscription, hasFeature] = supportIsAdmin
+      ? [true, true]
+      : await Promise.all([
+          access?.hasActiveSubscription?.(userId),
+          access?.hasFeature?.(userId, 'nutrition_support')
+        ]);
 
     window.__dpNutritionSupportDayAccess = {
       hasActiveSubscription: hasActiveSubscription === true,
@@ -1588,6 +1594,7 @@ async function refreshSupportDayAccess(userId) {
     applySupportDayAccessUI();
   } catch (error) {
     console.error('Nutrition support day access check failed:', error);
+    supportIsAdmin = false;
     window.__dpNutritionSupportDayAccess = {
       hasActiveSubscription: false,
       hasFeature: false
@@ -1603,7 +1610,7 @@ async function deleteSupportDay(id){
   if(!(await showDeleteConfirm(formatDayDate(d.day_date))))return;
   supportDayOperationBusy=true;
   const {error}=await supabaseClient.from('nutrition_support_days').delete()
-    .eq('id',id).eq('patient_id',supportPatientId).eq('user_id',supportUserId);
+    .eq('id',id).eq('patient_id',supportPatientId);
   if(error){
     console.error(error);
     supportDayOperationBusy=false;
@@ -1639,8 +1646,7 @@ async function saveCurrentSupportDay(){
     .from('nutrition_support_days')
     .update({state})
     .eq('id',d.id)
-    .eq('patient_id',supportPatientId)
-    .eq('user_id',supportUserId);
+    .eq('patient_id',supportPatientId);
 
   if(error){
     console.error('Nutrition support day save failed:',error);
@@ -1697,7 +1703,7 @@ async function initSupportDays(patientId,userId){
   dayDefaults=captureDayState();dayDefaults.__tab='en';
   const {data,error}=await supabaseClient.from('nutrition_support_days')
     .select('id,patient_id,user_id,day_date,state,created_at,updated_at')
-    .eq('patient_id',patientId).eq('user_id',userId).order('day_date',{ascending:true});
+    .eq('patient_id',patientId).order('day_date',{ascending:true});
   if(error){
     console.error('nutrition_support_days load failed:',error);
     supportDays=[];
@@ -1724,15 +1730,22 @@ async function loadPatientData(){
     const sessionUser=await access.getCurrentUser();
     if(!sessionUser){location.replace('login.html');return;}
 
-    // Patient profile sends ?patient=<patients.id>; load that context directly.
-    const id=new URLSearchParams(location.search).get('patient');
-    if(!id) throw new Error('رابط الصفحة لا يحتوي على معرف المريض (patient).');
+    // Resolve the patient ID from the canonical link parameter and legacy aliases.
+    // The session fallback is written only by the patient-profile page on an explicit click.
+    const params=new URLSearchParams(location.search);
+    const id=params.get('patient')||params.get('id')||params.get('patient_id')||params.get('patientId')||
+      sessionStorage.getItem('dpNutritionSupportPatientId');
+    if(!id) throw new Error('لم يصل معرّف المريض إلى صفحة الدعم الغذائي. افتح الصفحة من داخل ملف المريض ثم أعد المحاولة.');
 
+    // RLS is the access boundary: owners see their own patients; admins see patients
+    // permitted by the existing patients_select_admin_or_owner policy.
     const {data:p,error:pe}=await supabaseClient.from('patients')
-      .select('id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes')
-      .eq('id',id).eq('user_id',sessionUser.id).maybeSingle();
+      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes')
+      .eq('id',id).maybeSingle();
     if(pe) throw new Error('استعلام patients فشل: '+pe.message);
-    if(!p) throw new Error('المريض غير موجود بحساب المستخدم الحالي أو RLS تمنع قراءته. ID: '+id);
+    if(!p) throw new Error('المريض غير موجود أو لا تملك صلاحية الوصول إليه.');
+    supportUserId=p.user_id;
+    sessionStorage.removeItem('dpNutritionSupportPatientId');
 
     $('selectedPatientName').textContent=p.name||'—';
 
@@ -1743,7 +1756,7 @@ async function loadPatientData(){
     set('clinical-diagnosis',p.diagnosis||'');
     set('nutritional-diagnosis',p.complaints||'');
     await refreshSupportDayAccess(sessionUser.id);
-    await initSupportDays(p.id,sessionUser.id);
+    await initSupportDays(p.id,p.user_id);
   }catch(e){
     console.error('[Nutrition Support Patient] loadPatientData failed:',e);
     const notice=document.createElement('div');
