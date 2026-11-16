@@ -1718,56 +1718,49 @@ async function initSupportDays(patientId,userId){
 }
 
 async function loadPatientData(){
+  const noticeId='support-patient-load-error';
+  document.getElementById(noticeId)?.remove();
   try{
-    const sessionUser = await access.getCurrentUser();
-    if (sessionUser) await refreshSupportDayAccess(sessionUser.id);
-    if(!sessionUser){location.replace('index.html');return;}
+    const sessionUser=await access.getCurrentUser();
+    if(!sessionUser){location.replace('login.html');return;}
 
-    const supportAccess = window.__dpNutritionSupportDayAccess || {};
-    if (
-      supportAccess.hasActiveSubscription === true &&
-      supportAccess.hasFeature !== true
-    ) {
-      location.replace('nutritionsupport.html');
-      return;
-    }
-
+    // Patient profile sends ?patient=<patients.id>; load that context directly.
     const id=new URLSearchParams(location.search).get('patient');
-    if(!id){location.replace('nutritionsupport.html');return;}
+    if(!id) throw new Error('رابط الصفحة لا يحتوي على معرف المريض (patient).');
+
     const {data:p,error:pe}=await supabaseClient.from('patients')
       .select('id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes')
       .eq('id',id).eq('user_id',sessionUser.id).maybeSingle();
-    if(pe) throw pe;
-    if(!p){
-      throw new Error('لم يتم العثور على المريض أو لا توجد صلاحية لقراءة بياناته. Patient ID: '+id);
-    }
+    if(pe) throw new Error('استعلام patients فشل: '+pe.message);
+    if(!p) throw new Error('المريض غير موجود بحساب المستخدم الحالي أو RLS تمنع قراءته. ID: '+id);
 
     $('selectedPatientName').textContent=p.name||'—';
     $('pName').textContent=p.name||'—';
     $('pGender').textContent=gender(p.gender);
     $('pBirth').textContent=fmtDate(p.birth_date);
     $('pAge').textContent=p.age??'—';
-    $('pHeight').textContent=p.height?`${p.height} سم`:'—';
+    $('pHeight').textContent=p.height? p.height+' سم':'—';
     $('pDiagnosis').textContent=p.diagnosis||'—';
     $('pComplaints').textContent=p.complaints||'—';
     $('pNotes').textContent=p.clinical_notes||'—';
 
-    const set=(id,v)=>{const e=$(id);if(e)e.value=v??''};
+    const set=(fieldId,v)=>{const e=$(fieldId);if(e)e.value=v??''};
     set('patient-name',p.name||'');
     set('patient-id',p.id||'');
     set('report-date',new Date().toISOString().slice(0,10));
     set('clinical-diagnosis',p.diagnosis||'');
     set('nutritional-diagnosis',p.complaints||'');
-    await initSupportDays(p.id, sessionUser.id);
+    await refreshSupportDayAccess(sessionUser.id);
+    await initSupportDays(p.id,sessionUser.id);
   }catch(e){
-    console.error(e);
+    console.error('[Nutrition Support Patient] loadPatientData failed:',e);
     const notice=document.createElement('div');
-    notice.style.cssText='padding:16px;text-align:center;color:#b91c1c;font-family:Cairo,sans-serif';
-    notice.textContent='تعذر تحميل بيانات المريض.';
+    notice.id=noticeId;
+    notice.style.cssText='padding:16px;text-align:center;color:#b91c1c;font-family:Cairo,sans-serif;direction:rtl';
+    notice.textContent='تعذر تحميل بيانات المريض: '+(e?.message||String(e));
     document.body.prepend(notice);
   }
 }
-
 
   /* =========================================================
      DECLARATIVE EVENT BINDINGS
