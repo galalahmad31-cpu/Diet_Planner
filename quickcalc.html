@@ -8,7 +8,7 @@
 
 <link rel="stylesheet" href="css/tailwind.css">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/quickcalc.css?v=20261116-girrow1">
+  <link rel="stylesheet" href="css/quickcalc.css?v=20261116-dexrow1">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -154,58 +154,36 @@
 </svg>
 </button>
 <div class="hidden p-4 md:p-6 space-y-6 bg-white" id="qc-dextrose-content">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="qc-dex-fields">
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Calculation Basis
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Calculation Basis</label>
 <select class="bg-white font-bold text-slate-800" id="dex-mode" data-calc="dex" data-dex-toggle="true">
-<option value="conc">
-                                        Required Dextrose Conc %
-                                    </option>
-<option value="gir">
-                                        Target GIR (mg/kg/min)
-                                    </option>
+<option value="conc">Required Dextrose Conc %</option>
+<option value="gir">Target GIR (mg/kg/min)</option>
 </select>
 </div>
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Glucose Volume (mL)
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Glucose Volume (mL)</label>
 <input class="bg-white" id="dex-volume" data-calc="dex" step="1" type="number" value="100"/>
 </div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div id="dex-input-conc-container">
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Required Dextrose Conc (%)
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Required Dextrose Conc (%)</label>
 <input class="bg-white" id="dex-req-conc" data-calc="dex" step="0.1" type="number" value="12.5"/>
 </div>
 <div class="hidden" id="dex-input-weight-container">
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Weight (kg)
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Weight (kg)</label>
 <input class="bg-white" id="dex-weight" data-calc="dex" step="0.1" type="number" value="2"/>
 </div>
 <div class="hidden" id="dex-input-gir-container">
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Target GIR (mg/kg/min)
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Target GIR (mg/kg/min)</label>
 <input class="bg-white" id="dex-target-gir" data-calc="dex" step="0.1" type="number" value="6"/>
 </div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Dextrose Concentration C₁ (%)
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Dextrose Concentration C₁ (%)</label>
 <input class="bg-white" id="dex-c1" data-calc="dex" step="0.1" type="number" value="25"/>
 </div>
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                    Dextrose Concentration C₂ (%)
-                                </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Dextrose Concentration C₂ (%)</label>
 <input class="bg-white" id="dex-c2" data-calc="dex" step="0.1" type="number" value="5"/>
 </div>
 </div>
