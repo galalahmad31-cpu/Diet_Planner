@@ -182,20 +182,8 @@ body {
 .chart-tooltip strong{display:block;color:#6ee7b7;font-size:13px}
 @media(max-width:640px){.chart-shell{min-height:220px}.chart-date{font-size:9px}}\n
 
-/* Subtle mobile scale: keep the original table layout, reduce visual density */
-@media(max-width:640px){
-  #weightTab table{font-size:10px!important;min-width:620px}
-  #weightTab thead th{font-size:9px!important;padding:8px 6px!important}
-  #weightTab tbody td{font-size:10px!important;padding:8px 6px!important}
-  #weightTab .adherence-badge{font-size:8px!important;padding:3px 6px}
-  #weightTab input,#weightTab select{font-size:10px!important;min-height:34px;padding:6px!important}
-  #weightTab .inline-save,#weightTab .inline-cancel{font-size:9px!important;padding:5px 7px!important}
-  #weightTab .overflow-x-auto{overflow-x:auto!important}
-  #weightTab table{transform:scale(.96);transform-origin:top right}
-}
-
 /* Measurement tracking: quiet, readable table and compact adherence tags */
-#weightTab table{border-collapse:separate;border-spacing:0;min-width:680px}
+#weightTab table{border-collapse:separate;border-spacing:0;width:100%;min-width:0;table-layout:fixed}
 #weightTab thead th{font-size:11px;letter-spacing:.01em;white-space:nowrap;background:#f8fafc}
 #weightTab tbody td{font-size:12px;border-bottom:1px solid #f1f5f9}
 #weightTab tbody tr:last-child td{border-bottom:0}
@@ -203,7 +191,18 @@ body {
 .adherence-badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:999px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;white-space:nowrap}
 #weightTab input,#weightTab select{min-height:40px}
 #weightChartContainer{min-height:280px}
-@media(max-width:640px){#weightTab tbody td{font-size:11px;padding:10px 8px}.adherence-badge{padding:4px 8px;font-size:9px}#weightChartContainer{min-height:240px}}
+@media(max-width:640px){
+ #weightTab .overflow-x-auto{overflow-x:hidden!important}
+ #weightTab table{width:100%!important;min-width:0!important;table-layout:fixed}
+ #weightTab thead th{white-space:normal!important;overflow-wrap:anywhere;font-size:8px!important;line-height:1.35;padding:5px 2px!important}
+ #weightTab tbody td{font-size:9px!important;line-height:1.35;padding:6px 2px!important;white-space:normal!important;overflow-wrap:anywhere}
+ #weightTab .adherence-badge{font-size:7px!important;padding:3px 4px;white-space:normal}
+ #weightTab tbody td button{padding:3px!important}
+ #weightTab input,#weightTab select{font-size:9px!important;min-height:30px;padding:4px 2px!important}
+ .inline-measurement-row input,.inline-measurement-row select{min-width:0!important}
+ .inline-save,.inline-cancel{font-size:8px!important;padding:4px 3px!important}
+ #weightChartContainer{min-height:240px}
+}
 
 /* Inline table entry row */
 .inline-measurement-row{background:#f0fdfa!important}
