@@ -241,3 +241,24 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
  .dp-meal,.dp-macro,.dp-notes{break-inside:avoid}
  .dp-food{padding:7px 0}
 }
+/* Diet library compact mobile toolbar */
+.diet-library-controls{display:grid;grid-template-columns:minmax(180px,2fr) minmax(130px,1fr);gap:10px;align-items:stretch}
+.diet-search-wrap{min-width:0}
+.diet-search-wrap input{box-sizing:border-box;min-width:0;padding-right:42px!important}
+.diet-search-wrap i{right:14px!important;left:auto!important;pointer-events:none}
+.diet-visibility{min-width:0;width:100%}
+.diet-library-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.diet-library-stats>div{min-width:0;padding:12px!important}
+.diet-library-stats>div>div:first-child{font-size:11px;line-height:1.35}
+.diet-library-stats>div>div:last-child{font-size:20px;overflow-wrap:anywhere}
+@media(max-width:640px){
+ .diet-library-toolbar{padding:10px!important}
+ .diet-library-controls{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:7px}
+ .diet-search-wrap input{height:44px!important;font-size:12px!important;padding:10px 36px 10px 8px!important}
+ .diet-search-wrap i{right:11px!important;font-size:13px!important}
+ .diet-visibility{height:44px!important;padding:8px!important;font-size:12px!important}
+ .diet-library-stats{gap:6px!important;margin-top:8px!important}
+ .diet-library-stats>div{padding:9px 6px!important;border-radius:12px!important;text-align:center}
+ .diet-library-stats>div>div:first-child{font-size:9px;min-height:25px}
+ .diet-library-stats>div>div:last-child{font-size:16px;margin-top:4px!important}
+}
