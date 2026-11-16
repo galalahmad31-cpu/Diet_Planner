@@ -194,3 +194,48 @@ html[data-theme="dark"] .recipe-modal {
         height: 2rem;
     }
 }
+
+
+/* Recipe nutrition summary: seven metrics in one fixed horizontal row. */
+.nutrition-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+    align-items: stretch;
+}
+.nutrition-summary-grid .nutrition-item {
+    min-width: 0;
+    padding: 0.7rem 0.35rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.nutrition-item-label {
+    color: var(--dp-text-muted, #94a3b8);
+    font-size: clamp(0.58rem, 1.05vw, 0.72rem);
+    line-height: 1.45;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.nutrition-item-value {
+    margin-top: 0.35rem;
+    color: var(--dp-text, #17252a);
+    font-size: clamp(0.68rem, 1.25vw, 0.9rem);
+    line-height: 1.4;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+.nutrition-basis-note {
+    margin-top: 0.6rem;
+    text-align: left;
+    color: var(--dp-text-muted, #94a3b8);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+@media (max-width: 640px) {
+    .nutrition-summary-grid { gap: 0.35rem; }
+    .nutrition-summary-grid .nutrition-item { padding: 0.6rem 0.2rem; border-radius: 0.75rem; }
+    .nutrition-item-label { font-size: 0.58rem; }
+    .nutrition-item-value { font-size: 0.68rem; }
+}
