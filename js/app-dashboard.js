@@ -290,10 +290,12 @@
   // Initialization
   // ---------------------------------------------------------
   function renderVisitorDashboard() {
+    // Visitor state: never show account placeholder or logout before authentication.
     document.getElementById("loginCta")?.classList.remove("hidden");
     document.getElementById("registerCta")?.classList.remove("hidden");
     elements.logout?.classList.add("hidden");
     elements.accountName?.classList.add("hidden");
+    if (elements.accountName) elements.accountName.textContent = "";
     document.getElementById("accountInfo")?.classList.add("hidden");
     addLockStyles();
     elements.featureCards.forEach(card => {
