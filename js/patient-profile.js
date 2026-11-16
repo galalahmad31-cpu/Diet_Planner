@@ -139,7 +139,11 @@
     await refreshWriteAccess();
     setLink('weightLink', 'weight.html');
     setLink('financeLink', 'finance.html');
-    setLink('nutritionSupportLink', 'nutritionsupport-patient.html');
+    const nutritionSupportLink = $('nutritionSupportLink');
+    if (nutritionSupportLink && patientId) {
+      // The patient support page reads the patient identifier from ?patient=.
+      nutritionSupportLink.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(patientId)}`;
+    }
 
     $('loadingState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
