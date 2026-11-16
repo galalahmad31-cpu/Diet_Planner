@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-<link rel="stylesheet" href="css/food.css">
+<link rel="stylesheet" href="css/food.css?v=20261116-foodlayout1">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -54,27 +54,35 @@
       <i class="fa-solid fa-plus ml-1"></i> إضافة صنف مخصص
     </button>
   </div>
-  <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-  <div class="glass rounded-2xl p-4"><div class="text-xs font-semibold text-slate-500">إجمالي الأصناف</div><div id="totalStat" class="mt-1 text-2xl font-extrabold text-slate-800">0</div></div>
-  <div class="glass rounded-2xl p-4"><div class="text-xs font-semibold text-slate-500">المكتبة الأساسية</div><div id="baseStat" class="mt-1 text-2xl font-extrabold text-slate-800">0</div></div>
-  <div class="glass rounded-2xl p-4"><div class="text-xs font-semibold text-slate-500">أصناف مخصصة</div><div id="customStat" class="mt-1 text-2xl font-extrabold text-brand-600">0</div></div>
+  <div class="grid grid-cols-4 gap-2 sm:gap-3">
+    <div class="glass min-w-0 rounded-2xl p-2.5 text-center sm:p-4">
+      <div class="text-[10px] font-semibold leading-tight text-slate-500 sm:text-xs">إجمالي الأصناف</div>
+      <div id="totalStat" class="mt-1 text-xl font-extrabold text-slate-800 sm:text-2xl">0</div>
     </div>
-</section>
-
-<section id="foodFilters" class="glass mt-5 rounded-3xl p-4 sm:p-5">
-  <div class="flex items-center gap-3 overflow-x-auto">
-    <div class="relative min-w-[260px] flex-1">
-      <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-      <input id="search" class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-11 pl-4 text-sm" placeholder="ابحث باسم الصنف بالعربي أو الإنجليزي...">
+    <div class="glass min-w-0 rounded-2xl p-2.5 text-center sm:p-4">
+      <div class="text-[10px] font-semibold leading-tight text-slate-500 sm:text-xs">المكتبة الأساسية</div>
+      <div id="baseStat" class="mt-1 text-xl font-extrabold text-slate-800 sm:text-2xl">0</div>
     </div>
-    <select id="typeFilter" class="w-[170px] shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
-      <option value="all">كل الأصناف</option>
-      <option value="base">المكتبة الأساسية</option>
-      <option value="custom">الأصناف المخصصة</option>
-    </select>
-    <button id="refreshBtn" class="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50"><i class="fa-solid fa-rotate ml-1"></i> تحديث</button>
+    <div class="glass min-w-0 rounded-2xl p-2.5 text-center sm:p-4">
+      <div class="text-[10px] font-semibold leading-tight text-slate-500 sm:text-xs">أصناف مخصصة</div>
+      <div id="customStat" class="mt-1 text-xl font-extrabold text-brand-600 sm:text-2xl">0</div>
+    </div>
+    <div class="glass min-w-0 rounded-2xl p-2">
+      <select id="typeFilter" aria-label="تصفية الأصناف" class="h-full min-h-[58px] w-full rounded-xl border border-slate-200 bg-white px-1.5 text-center text-[10px] font-bold text-slate-700 sm:min-h-[70px] sm:px-3 sm:text-sm">
+        <option value="all">كل الأصناف</option>
+        <option value="base">المكتبة الأساسية</option>
+        <option value="custom">أصناف مخصصة</option>
+      </select>
+    </div>
   </div>
 </section>
+
+<section id="foodFilters" class="glass mt-4 rounded-3xl p-3 sm:p-4">
+  <div class="relative">
+    <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+    <input id="search" class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-11 pl-4 text-sm" placeholder="ابحث باسم الصنف بالعربي أو الإنجليزي...">
+  </div>
+
 
 <section id="foodSection" class="glass mt-5 overflow-hidden rounded-3xl">
   <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
@@ -232,7 +240,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/auth-access.js?v=20260923-1"></script>
-<script src="js/food.js?v=20261115-8"></script>
+<script src="js/food.js?v=20261116-foodlayout1"></script>
   
 </body>
 </html>
