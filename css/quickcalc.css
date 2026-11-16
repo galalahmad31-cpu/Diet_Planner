@@ -625,3 +625,75 @@ main{padding:clamp(16px,3vw,32px)!important}
   .qc-dex-fields label{font-size:.62rem!important}
   .qc-dex-fields input,.qc-dex-fields select{font-size:.7rem!important;padding:6px 5px!important}
 }
+
+
+/* Formula concentration: compact two-column layout on phones */
+#qc-formula-conc-content .fc-compact-grid,
+#qc-formula-conc-content .fc-normal-density-grid,
+#qc-formula-conc-content .fc-required-fields,
+#qc-formula-conc-content .fc-volume-fields{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  align-items:end!important;
+}
+#qc-formula-conc-content .fc-compact-grid>div,
+#qc-formula-conc-content .fc-normal-density-grid>div,
+#qc-formula-conc-content .fc-required-fields>div,
+#qc-formula-conc-content .fc-volume-fields>div{
+  min-width:0!important;
+}
+#qc-formula-conc-content .fc-compact-grid label,
+#qc-formula-conc-content .fc-normal-density-grid label,
+#qc-formula-conc-content .fc-required-fields label,
+#qc-formula-conc-content .fc-volume-fields label{
+  display:block!important;
+  min-height:2.6em;
+  line-height:1.35!important;
+  overflow-wrap:anywhere;
+}
+#qc-formula-conc-content .fc-compact-grid input,
+#qc-formula-conc-content .fc-normal-density-grid input,
+#qc-formula-conc-content .fc-normal-density-grid select,
+#qc-formula-conc-content .fc-required-fields input,
+#qc-formula-conc-content .fc-required-fields select,
+#qc-formula-conc-content .fc-volume-fields input{
+  width:100%!important;
+  min-width:0!important;
+}
+#qc-formula-conc-content .fc-normal-density-grid .grid.grid-cols-2{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:7px!important;
+}
+#qc-formula-conc-content .fc-required-fields .grid.grid-cols-2{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:7px!important;
+}
+#qc-formula-conc-content .fc-volume-fields .text-xs{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+}
+@media(max-width:360px){
+  #qc-formula-conc-content .fc-compact-grid,
+  #qc-formula-conc-content .fc-normal-density-grid,
+  #qc-formula-conc-content .fc-required-fields,
+  #qc-formula-conc-content .fc-volume-fields{
+    gap:8px 6px!important;
+  }
+  #qc-formula-conc-content .fc-compact-grid label,
+  #qc-formula-conc-content .fc-normal-density-grid label,
+  #qc-formula-conc-content .fc-required-fields label,
+  #qc-formula-conc-content .fc-volume-fields label{
+    font-size:.65rem!important;
+  }
+  #qc-formula-conc-content .fc-normal-density-grid .grid.grid-cols-2,
+  #qc-formula-conc-content .fc-required-fields .grid.grid-cols-2{
+    gap:4px!important;
+  }
+  #qc-formula-conc-content .fc-volume-fields .text-xs{
+    font-size:.62rem!important;
+    line-height:1.35!important;
+    padding:8px!important;
+  }
+}
