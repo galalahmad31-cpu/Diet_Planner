@@ -35,3 +35,11 @@
   .nav-card { padding: 10px !important; }
   .nav-card p { font-size: 9px !important; }
 }
+
+/* Mobile header account controls: align email and logout cleanly */
+@media(max-width:640px){
+ #headerActions{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%;min-width:0}
+ #doctorName{display:block!important;flex:1 1 auto;min-width:0;overflow-wrap:anywhere;line-height:1.4}
+ #logoutBtn{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;white-space:nowrap;margin:0!important;padding:9px 12px!important;line-height:1.2}
+ #headerActions #loginCta,#headerActions #registerCta{flex:0 0 auto}
+}
