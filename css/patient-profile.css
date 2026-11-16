@@ -60,7 +60,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-data-card .dashboard-details[open]>summary{position:relative;z-index:102;background:#f4faf8}
 @keyframes patientModalIn{from{opacity:0;transform:translate(-50%,-48%)}to{opacity:1;transform:translate(-50%,-50%)}}
 @media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}.patient-data-card .dashboard-details[open] .dashboard-panel{padding:14px}}
+@media(max-width:600px){.measurements-card .measurements-direct{min-height:70px;height:70px;padding:11px}main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}.patient-data-card .dashboard-details[open] .dashboard-panel{padding:14px}}
 
 /* Modal header and layering: keep dashboard card in its grid position */
 .patient-data-card .dashboard-details[open]>summary{position:static!important;z-index:auto!important;background:#f4faf8}
@@ -162,10 +162,10 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 
 /* Restore original blue measurements card appearance; retain direct click */
 .measurements-card .measurements-direct{
- display:flex;align-items:center;gap:12px;width:100%;padding:16px;
- border-radius:16px;text-decoration:none;cursor:pointer;
+ display:flex;align-items:center;gap:8px;width:100%;padding:12px;
+ border-radius:13px;text-decoration:none;cursor:pointer;
  background:linear-gradient(135deg,#174c78,#287db2)!important;
- border:1px solid #246c9c;min-height:92px
+ border:1px solid #246c9c;min-height:76px;height:76px
 }
 .measurements-card .measurements-direct .dashboard-card-head h3,
 .measurements-card .measurements-direct .dashboard-card-head p{color:#fff!important}
