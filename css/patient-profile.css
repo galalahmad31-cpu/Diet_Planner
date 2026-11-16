@@ -212,3 +212,9 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
   text-align:center;transition:opacity .2s ease,transform .2s ease;
 }
 .patient-finance-success-toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+
+/* Patient profile visibility: Tailwind utility must win over the dashboard grid rule. */
+.hidden{display:none!important}
+#modulesSection.hidden{display:none!important}
+#loadingState.hidden,#patientContent.hidden,#errorState.hidden{display:none!important}
