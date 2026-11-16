@@ -66,9 +66,38 @@
     const box = document.getElementById("authMessage");
     if (!box) return;
 
-    box.textContent = message;
-    box.className = "msg " + type;
-    box.style.display = "block";
+    const lines = String(message || "").split("\n");
+    const isVerification = lines[0]?.trim() === "التحقق من البريد الإلكتروني";
+
+    box.className = "msg " + type + (isVerification ? " email-verification" : "");
+    box.replaceChildren();
+
+    if (isVerification) {
+      const icon = document.createElement("span");
+      icon.className = "verification-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = '<i class="fa-solid fa-envelope-circle-check"></i>';
+
+      const content = document.createElement("div");
+      content.className = "verification-content";
+
+      const title = document.createElement("div");
+      title.className = "verification-title";
+      title.textContent = lines[0];
+
+      const body = document.createElement("div");
+      body.className = "verification-text";
+      body.textContent = lines.slice(1).join(" ").trim();
+
+      content.append(title, body);
+      box.append(icon, content);
+    } else {
+      box.textContent = message;
+    }
+
+    box.style.display = "flex";
+    box.setAttribute("role", type === "error" ? "alert" : "status");
+    box.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
   }
 
   function setBusy(button, busy, text) {
