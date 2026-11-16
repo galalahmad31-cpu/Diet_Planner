@@ -513,3 +513,61 @@ html[data-theme="dark"] .print-field input{
   h1{font-size:16px!important}h2{font-size:13px!important}h3,h4{font-size:11px!important}
   input,select,textarea{font-size:8px!important;padding:2px 3px!important;min-height:18px!important}
 }
+
+
+/* Clear, accessible day actions (Edit / Save) */
+.day-edit-actions .day-edit-btn{
+  min-height:42px;
+  padding:9px 17px;
+  border:1.5px solid #0f766e;
+  background:#ffffff;
+  color:#0f766e;
+  font-size:13px;
+  font-weight:800;
+  box-shadow:0 2px 5px rgba(15,118,110,.10);
+  transition:background .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.day-edit-actions .day-edit-btn:not(:disabled):hover{
+  background:#ecfdf5;
+  box-shadow:0 4px 10px rgba(15,118,110,.16);
+}
+.day-edit-actions .day-save-btn{
+  min-height:42px;
+  padding:9px 18px;
+  background:#087f73;
+  color:#fff;
+  border:1.5px solid #087f73;
+  font-size:13px;
+  font-weight:800;
+  box-shadow:0 3px 7px rgba(8,127,115,.20);
+  transition:background .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.day-edit-actions .day-save-btn:not(:disabled):hover{
+  background:#06665d;
+  box-shadow:0 5px 12px rgba(8,127,115,.24);
+}
+.day-edit-actions .day-edit-btn:disabled,
+.day-edit-actions .day-save-btn:disabled{
+  opacity:1;
+  cursor:not-allowed;
+  box-shadow:none;
+  transform:none;
+}
+.day-edit-actions .day-edit-btn:disabled{
+  background:#edf2f4;
+  border-color:#cbd5e1;
+  color:#64748b;
+}
+.day-edit-actions .day-save-btn:disabled{
+  background:#dcebe8;
+  border-color:#c5ddd8;
+  color:#466b66;
+}
+.day-edit-actions button:focus-visible{
+  outline:3px solid #f59e0b;
+  outline-offset:3px;
+}
+@media(max-width:640px){
+  .day-edit-actions .day-edit-btn,
+  .day-edit-actions .day-save-btn{min-height:46px;font-size:14px}
+}
