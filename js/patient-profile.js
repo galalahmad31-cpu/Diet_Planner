@@ -119,15 +119,40 @@
       return;
     }
 
-    const { data, error } = await supabase
-      .from('patients')
-      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
-      .eq('id', patientId)
-      .maybeSingle();
+    let result;
+    let timeoutId;
+    try {
+      const request = supabase
+        .from('patients')
+        .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
+        .eq('id', patientId)
+        .maybeSingle();
 
+      const timeout = new Promise((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new Error('انتهت مهلة الاتصال بقاعدة البيانات أثناء تحميل ملف المريض.')),
+          15000
+        );
+      });
+
+      result = await Promise.race([request, timeout]);
+    } catch (requestError) {
+      console.error('Patient record request failed or timed out:', requestError);
+      showError(requestError?.message || 'تعذر الاتصال بقاعدة البيانات أثناء تحميل ملف المريض.');
+      return;
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
+
+    const { data, error } = result;
     if (error) {
-      console.error('Load patient failed:', error);
-      showError('تعذر تحميل ملف المريض.');
+      console.error('Load patient failed:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      showError('تعذر تحميل ملف المريض. يرجى مراجعة الاتصال والصلاحيات.');
       return;
     }
 
@@ -156,7 +181,7 @@
     $('patientContent')?.classList.remove('hidden');
     $('modulesSection')?.classList.remove('hidden');
 
-    void refreshWriteAccess();
+    updateWriteControls();
     await loadVisits();
   }
 
@@ -588,13 +613,24 @@
         throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات.');
       }
 
-      // Get the authenticated session only. Role/subscription lookups are
-      // deferred until after the patient record is rendered.
-      state.user = await access.getCurrentUser?.() || null;
-      if (!state.user) {
-        showError('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
-        return;
-      }
+      // Patient data loading is not blocked by a separate session lookup.
+      // Supabase applies the existing authenticated session and RLS to the query.
+      // User/role lookup only controls write permissions after the page has started.
+      void Promise.resolve()
+        .then(() => access.getCurrentUser?.())
+        .then((user) => {
+          state.user = user || null;
+          if (state.user) {
+            void refreshWriteAccess();
+          } else {
+            updateWriteControls();
+          }
+        })
+        .catch((error) => {
+          console.error('Patient profile session lookup failed:', error);
+          state.user = null;
+          updateWriteControls();
+        });
 
       await loadPatient();
     } catch (error) {
