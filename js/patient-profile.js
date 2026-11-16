@@ -35,20 +35,21 @@
   }
 
   async function refreshWriteAccess() {
+    // Permission checks are deliberately independent from patient data loading.
+    // A delayed role/subscription RPC must never keep the profile screen in loading state.
     try {
-      const accessStatus = await access?.getAccessStatus?.();
-      state.user = accessStatus?.user || null;
-
-      if (!state.user) {
+      if (!state.user?.id) {
         state.isAdmin = false;
         state.hasActiveSubscription = false;
         updateWriteControls();
         return;
       }
 
-      state.isAdmin = accessStatus?.isAdmin === true;
-      state.hasActiveSubscription =
-        (await access?.hasActiveSubscription?.(state.user.id)) === true;
+      const role = await access?.getUserRole?.(state.user.id);
+      state.isAdmin = role === 'admin';
+      state.hasActiveSubscription = state.isAdmin
+        ? true
+        : (await access?.hasActiveSubscription?.(state.user.id)) === true;
 
       updateWriteControls();
     } catch (error) {
@@ -130,13 +131,14 @@
     }
 
     if (!data) {
-      showError('ملف المريض غير موجود.');
+      // RLS intentionally returns no row when the signed-in account is not
+      // the owner and is not an administrator. Do not weaken the policy here.
+      showError('ملف المريض غير موجود أو لا تملك صلاحية الوصول إليه.');
       return;
     }
 
     state.patient = data;
     fillPatientData();
-    await refreshWriteAccess();
     setLink('weightLink', 'weight.html');
     setLink('financeLink', 'finance.html');
     const nutritionSupportLink = $('nutritionSupportLink');
@@ -145,10 +147,14 @@
       nutritionSupportLink.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(patientId)}`;
     }
 
+    // Reveal the loaded patient immediately. Access checks and secondary modules
+    // run afterward and cannot block the main patient record.
     $('loadingState')?.classList.add('hidden');
+    $('errorState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
     $('modulesSection')?.classList.remove('hidden');
 
+    void refreshWriteAccess();
     await loadVisits();
   }
 
@@ -569,8 +575,9 @@
         throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات.');
       }
 
-      const accessStatus = await access.getAccessStatus?.();
-      state.user = accessStatus?.user || null;
+      // Get the authenticated session only. Role/subscription lookups are
+      // deferred until after the patient record is rendered.
+      state.user = await access.getCurrentUser?.() || null;
       if (!state.user) {
         showError('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
         return;
