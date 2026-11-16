@@ -49,19 +49,25 @@
 #logoutBtn.hidden:hover { display: none !important; }
 
 
-/* Quiet, compact type markers on the Notifications dashboard card */
-.notification-card-indicators{
-  display:inline-flex;align-items:center;gap:4px;margin-inline-start:auto;
+/* Quiet, aligned notification type markers on the dashboard card */
+.notification-nav-card{position:relative}
+.notification-nav-card .notification-card-indicators{
+  position:absolute;top:58px;left:24px;z-index:2;
+  display:inline-flex;align-items:center;justify-content:flex-start;
+  gap:6px;margin:0;padding:0;
 }
-.notification-card-indicator{
-  width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
-  border-radius:7px;font-size:10px;line-height:1;flex:0 0 22px;
+.notification-nav-card .notification-card-indicator{
+  width:24px;height:24px;flex:0 0 24px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.9);border-radius:8px;
+  font-size:10px;line-height:1;
+  box-shadow:0 2px 7px rgba(30,55,65,.07);
 }
-.notification-card-indicator.today{background:#e8f4fb;color:#397ca8}
-.notification-card-indicator.tomorrow{background:#efedff;color:#7654bd}
-.notification-card-indicator.subscriptions{background:#fff5df;color:#b7791f}
-.notification-card-indicators:empty{display:none}
+.notification-nav-card .notification-card-indicator.today{background:#e8f4fb;color:#397ca8}
+.notification-nav-card .notification-card-indicator.tomorrow{background:#efedff;color:#7654bd}
+.notification-nav-card .notification-card-indicator.subscriptions{background:#fff5df;color:#b7791f}
+.notification-nav-card .notification-card-indicators:empty{display:none}
 @media(max-width:600px){
-  .notification-card-indicator{width:19px;height:19px;flex-basis:19px;font-size:9px;border-radius:6px}
-  .notification-card-indicators{gap:3px}
+  .notification-nav-card .notification-card-indicators{top:54px;left:18px;gap:5px}
+  .notification-nav-card .notification-card-indicator{width:22px;height:22px;flex-basis:22px;font-size:9px;border-radius:7px}
 }
