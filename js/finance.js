@@ -134,25 +134,6 @@ function showToast(message, isError = false) {
    Subscription / follow-up calculations
    ========================================================= */
 
-function getNextFollowUpDate(lastVisitDate, followUpDays) {
-    const days = Number(followUpDays);
-
-    if (!lastVisitDate || !Number.isFinite(days) || days < 1) {
-        return null;
-    }
-
-    return addDays(lastVisitDate, days);
-}
-
-function updateFollowUpPreview() {
-    const next = getNextFollowUpDate(
-        $('lastVisit').value,
-        $('followUpDays').value
-    );
-
-    $('nextFollowUp').textContent = next ? fmt(next) : '—';
-}
-
 function updateSubscriptionPreview() {
     $('endDate').textContent = addMonths(
         $('startDate').value,
@@ -391,7 +372,7 @@ function openFinanceModal(row) {
     updatePaymentText();
 
     $('lastVisit').value = finance.last_visit_date || '';
-    updateFollowUpPreview();
+    $('nextFollowUp').value = finance.next_follow_up_date || '';
 
     $('editModal').classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
@@ -517,10 +498,7 @@ async function saveFinance() {
     try {
         const lastVisitDate = $('lastVisit').value || null;
 
-        const nextFollowUpDate = getNextFollowUpDate(
-            lastVisitDate,
-            followUpDays
-        );
+        const nextFollowUpDate = $('nextFollowUp').value || null;
 
         const payload = {
             patient_id: selected.id,
@@ -643,11 +621,7 @@ function bindEvents() {
     });
 
     $('startDate').addEventListener('input', updateSubscriptionPreview);
-    $('lastVisit').addEventListener('input', updateFollowUpPreview);
-
     $('months').addEventListener('input', updateSubscriptionPreview);
-
-    $('followUpDays').addEventListener('input', updateFollowUpPreview);
 
     $('amount').addEventListener('input', updateDiscountPreview);
     $('discount').addEventListener('input', updateDiscountPreview);
