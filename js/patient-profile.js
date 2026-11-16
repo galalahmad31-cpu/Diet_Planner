@@ -139,6 +139,7 @@
     await refreshWriteAccess();
     setLink('weightLink', 'weight.html');
     setLink('financeLink', 'finance.html');
+    setLink('nutritionSupportLink', 'nutritionsupport-patient.html');
 
     $('loadingState')?.classList.add('hidden');
     $('patientContent')?.classList.remove('hidden');
