@@ -490,11 +490,6 @@ input:focus,select:focus,textarea:focus{
   background:radial-gradient(circle at 8% 12%,rgba(255,255,255,.9),transparent 32%),linear-gradient(125deg,#edf8f6 0%,#f7fbfa 52%,#f3f6fc 100%);
   position:relative;overflow:hidden;
 }
-.qc-welcome-copy{max-width:650px;position:relative;z-index:1}
-.qc-welcome-side{position:relative;z-index:1;min-width:155px;display:flex;flex-direction:column;align-items:center;gap:7px;padding:20px 24px;border:1px solid rgba(23,143,132,.15);border-radius:18px;background:rgba(255,255,255,.68);box-shadow:0 10px 25px rgba(23,80,72,.05)}
-.qc-welcome-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#168b83;color:white;font-size:23px;box-shadow:0 8px 18px rgba(23,143,132,.18);margin-bottom:3px}
-.qc-welcome-side strong{color:#214b45;font-size:.85rem}
-.qc-welcome-side span{color:#81938f;font-size:.68rem;text-align:center}
 #sub-content-quick-calc{gap:14px!important}
 #sub-content-quick-calc>.border{border-radius:18px!important;overflow:hidden;box-shadow:0 4px 16px rgba(24,65,59,.035)!important}
 #sub-content-quick-calc>.border:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(24,65,59,.065)!important}
@@ -516,14 +511,9 @@ input:focus,select:focus,textarea:focus{
 .iv-line-row label{font-size:.68rem!important}
 .iv-line-row input,.iv-line-row select{min-height:40px!important}
 @media(max-width:760px){
- .qc-welcome-side{min-width:0;padding:13px 12px}
- .qc-welcome-mark{width:40px;height:40px;border-radius:12px}
- .qc-welcome-side strong{font-size:.72rem}
- .qc-welcome-side span{font-size:.6rem}
  #sub-content-quick-calc>[class*=border]>[id$="-content"]{padding:14px!important}
 }
 @media(max-width:480px){
- .qc-welcome-side{display:none}
 }
 
 
