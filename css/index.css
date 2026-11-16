@@ -63,3 +63,82 @@ body{min-height:100svh;display:flex;flex-direction:column;align-items:center;jus
  .field input{min-height:48px}
  .btn,.google-btn{min-height:48px}
 }
+
+
+/* Clear, compact email-verification notice */
+.msg.email-verification{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  width:100%;
+  margin:18px 0 22px;
+  padding:16px 17px;
+  border:1px solid #b9e6d8;
+  border-radius:16px;
+  background:linear-gradient(135deg,#f0fdf7 0%,#e9f8f4 100%);
+  color:#176b5b;
+  text-align:right;
+  direction:rtl;
+  font-size:13px;
+  line-height:1.9;
+  box-shadow:0 5px 16px rgba(23,143,132,.06);
+}
+.msg.email-verification .verification-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 38px;
+  width:38px;
+  height:38px;
+  margin-top:1px;
+  border-radius:12px;
+  background:#d5f3e8;
+  color:#13836f;
+  font-size:18px;
+}
+.msg.email-verification .verification-content{
+  flex:1;
+  min-width:0;
+}
+.msg.email-verification .verification-title{
+  margin:0 0 4px;
+  color:#126b5c;
+  font-size:14px;
+  font-weight:800;
+  line-height:1.6;
+}
+.msg.email-verification .verification-text{
+  color:#397768;
+  font-size:12.5px;
+  font-weight:500;
+  line-height:1.9;
+  overflow-wrap:anywhere;
+}
+.msg.email-verification.error{
+  border-color:#f2d3a2;
+  background:linear-gradient(135deg,#fffaf0 0%,#fff5e6 100%);
+  color:#875a18;
+}
+.msg.email-verification.error .verification-icon{
+  background:#ffedc9;
+  color:#a66a12;
+}
+.msg.email-verification.error .verification-title{color:#875a18}
+.msg.email-verification.error .verification-text{color:#896b3d}
+@media(max-width:600px){
+  .msg.email-verification{
+    gap:10px;
+    margin:15px 0 19px;
+    padding:13px 13px;
+    border-radius:14px;
+  }
+  .msg.email-verification .verification-icon{
+    flex-basis:34px;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    font-size:16px;
+  }
+  .msg.email-verification .verification-title{font-size:13px}
+  .msg.email-verification .verification-text{font-size:11.5px;line-height:1.85}
+}
