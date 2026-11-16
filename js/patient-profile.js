@@ -31,10 +31,6 @@
     if (errorText) errorText.textContent = message;
   }
 
-  function getUserForWrite() {
-    return state.user;
-  }
-
   async function refreshWriteAccess() {
     // Permission checks are deliberately independent from patient data loading.
     // A delayed role/subscription RPC must never keep the profile screen in loading state.
@@ -332,7 +328,7 @@
       return;
     }
 
-    const user = await getUserForWrite();
+    const user = state.user;
     if (!user) {
       alert('تعذر تحديد المستخدم الحالي.');
       return;
@@ -498,7 +494,6 @@
     document.body.classList.remove('overflow-hidden');
   }
 
-  let currentFinance = null;
   function updateFinancePreview() {
     const amount=Number($('pfInputAmount').value)||0;
     const discount=Number($('pfInputDiscount').value)||0;
@@ -518,7 +513,7 @@
     $('patientFinanceEmpty').classList.add('hidden');$('patientFinanceError').classList.add('hidden');
     try{
       const {data,error}=await supabase.from('patient_finances').select('*').eq('patient_id',patientId).eq('user_id',state.user.id).maybeSingle();
-      if(error)throw error;currentFinance=data||null;
+      if(error)throw error;
       $('pfInputStart').value=data?.subscription_start_date||'';
       $('pfInputMonths').value=data?.subscription_months??'';
       $('pfInputAmount').value=data?.subscription_amount??'';
@@ -586,7 +581,6 @@
     $('cancelPatientFinance')?.addEventListener('click', closePatientFinanceModal);
     ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount','pfInputFollowDays','pfInputLastVisit'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
     $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);
-    $('patientFinanceCloseBottom')?.addEventListener('click', closePatientFinanceModal);
     $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });
     document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
 
