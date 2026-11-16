@@ -70,6 +70,16 @@
       }
 
       state.isAdmin = accessStatus?.isAdmin === true;
+
+      // Administrators are explicitly exempt from subscription and patient-quota UI gates.
+      // The database RLS policy remains the final authorization for INSERT.
+      if (state.isAdmin) {
+        state.hasActiveSubscription = true;
+        state.canAddPatient = true;
+        updateWriteControls();
+        return;
+      }
+
       state.hasActiveSubscription =
         (await access?.hasActiveSubscription?.(state.user.id)) === true;
       state.canAddPatient =
@@ -90,10 +100,10 @@
     const accessBox = $('accessStatus');
 
     if (addButton) {
-      addButton.disabled = !state.canAddPatient;
-      addButton.classList.toggle('opacity-50', !state.canAddPatient);
-      addButton.classList.toggle('cursor-not-allowed', !state.canAddPatient);
-      addButton.title = state.canAddPatient
+      addButton.disabled = !(state.isAdmin || state.canAddPatient);
+      addButton.classList.toggle('opacity-50', !(state.isAdmin || state.canAddPatient));
+      addButton.classList.toggle('cursor-not-allowed', !(state.isAdmin || state.canAddPatient));
+      addButton.title = (state.isAdmin || state.canAddPatient)
         ? 'إضافة مريض جديد'
         : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط';
     }
@@ -195,7 +205,7 @@
   }
 
   function openAddPatientModal() {
-    if (!state.canAddPatient) {
+    if (!state.isAdmin && !state.canAddPatient) {
       showStatus(
         state.hasActiveSubscription
           ? 'لا يمكن إضافة مريض جديد لأن الحد المسموح به في الاشتراك الحالي قد تم بلوغه.'
@@ -366,8 +376,11 @@
 
   async function init() {
     bindEvents();
+
+    // Start loading the patient directory immediately; access checks run independently.
+    const patientsLoad = loadPatients();
     await refreshAccess();
-    await loadPatients();
+    await patientsLoad;
   }
 
   if (document.readyState === 'loading') {
