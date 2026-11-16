@@ -195,7 +195,7 @@
           </div>
         </div>
         <div class="patient-details">${age}${diagnosis}</div>
-        <span class="patient-card-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-left"></i></span>
+        
       </article>`;
     }).join('');
   }
