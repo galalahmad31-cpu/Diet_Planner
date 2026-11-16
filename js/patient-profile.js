@@ -486,10 +486,23 @@
     if(discount<0||discount>100||!Number.isFinite(discount)){err.textContent='الخصم يجب أن يكون بين 0 و100%.';err.classList.remove('hidden');return;}
     if(amount!==null&&(!Number.isFinite(amount)||amount<0)){err.textContent='قيمة الاشتراك غير صحيحة.';err.classList.remove('hidden');return;}
     if(follow!==null&&(!Number.isFinite(follow)||follow<1)){err.textContent='مدة المتابعة يجب أن تكون يومًا على الأقل.';err.classList.remove('hidden');return;}
-    const endDate=start&&months?(()=>{const d=new Date(start+'T00:00:00');d.setMonth(d.getMonth()+months);return d.toISOString().slice(0,10)})():null;
-    const last=$('pfInputLastVisit').value||null;
-    const next=$('pfInputNextFollow').value||null;
-    const payload={patient_id:patientId,user_id:state.user.id,subscription_start_date:start,subscription_months:months,subscription_end_date:endDate,subscription_amount:amount,discount_percent:discount,discounted_amount:amount===null?null:Number((amount*(1-discount/100)).toFixed(2)),is_paid:$('pfInputPaid').value==='true',follow_up_days:follow,last_visit_date:last,next_follow_up_date:next};
+    const last = $('pfInputLastVisit').value || null;
+    const next = $('pfInputNextFollow').value || null;
+
+    // subscription_end_date and discounted_amount are GENERATED ALWAYS columns.
+    // PostgreSQL calculates them from the source fields; never include them in writes.
+    const payload = {
+      patient_id: patientId,
+      user_id: state.user.id,
+      subscription_start_date: start,
+      subscription_months: months,
+      subscription_amount: amount,
+      discount_percent: discount,
+      is_paid: $('pfInputPaid').value === 'true',
+      follow_up_days: follow,
+      last_visit_date: last,
+      next_follow_up_date: next
+    };
     const btn=$('savePatientFinance');btn.disabled=true;btn.textContent='جارٍ الحفظ...';
     try{const {error}=await supabase.from('patient_finances').upsert(payload,{onConflict:'patient_id'});if(error)throw error;closePatientFinanceModal();alert('تم حفظ ماليات المريض بنجاح.');}
     catch(e){console.error(e);err.textContent=e.message||'تعذر حفظ البيانات. تحقق من صلاحيات الكتابة (RLS).';err.classList.remove('hidden');}
