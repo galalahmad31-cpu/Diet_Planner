@@ -3,7 +3,8 @@
 
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
-  const patientId = new URLSearchParams(window.location.search).get('id');
+  const patientParams = new URLSearchParams(window.location.search);
+  const patientId = patientParams.get('id') || patientParams.get('patient') || patientParams.get('patient_id');
 
   const state = {
     patient: null,
@@ -142,9 +143,10 @@
     setLink('weightLink', 'weight.html');
     setLink('financeLink', 'finance.html');
     const nutritionSupportLink = $('nutritionSupportLink');
-    if (nutritionSupportLink && patientId) {
-      // The patient support page reads the patient identifier from ?patient=.
-      nutritionSupportLink.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(patientId)}`;
+    if (nutritionSupportLink && data.id) {
+      // Keep the destination bound to the loaded patient, not to a stale/legacy URL.
+      nutritionSupportLink.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(data.id)}`;
+      nutritionSupportLink.dataset.patientId = data.id;
     }
 
     // Reveal the loaded patient immediately. Access checks and secondary modules
@@ -539,6 +541,17 @@
   }
 
   function bindEvents() {
+    $('nutritionSupportLink')?.addEventListener('click', (event) => {
+      const id = state.patient?.id || event.currentTarget?.dataset?.patientId || patientId;
+      if (!id) {
+        event.preventDefault();
+        alert('تعذر فتح الدعم الغذائي: لم يتم تحديد ملف المريض.');
+        return;
+      }
+      event.preventDefault();
+      try { sessionStorage.setItem('dpNutritionSupportPatientId', id); } catch (_) {}
+      window.location.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(id)}`;
+    });
     $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', savePatient);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
