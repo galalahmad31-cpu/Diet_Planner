@@ -146,7 +146,6 @@ function closeModal(){$('modal').classList.add('hidden');$('modal').classList.re
 $('addBtn').onclick=()=>openModal();$('closeModal').onclick=closeModal;$('cancelBtn').onclick=closeModal;
 $('search').oninput=()=>{visibleFoodCount=FOOD_PAGE_SIZE;render();};
 $('typeFilter').onchange=()=>{visibleFoodCount=FOOD_PAGE_SIZE;render();};
-$('refreshBtn').onclick=loadFoods;
 $('loadMoreFoods').onclick=loadMoreFoods;
 
 $('foodRows').addEventListener('click',async e=>{
