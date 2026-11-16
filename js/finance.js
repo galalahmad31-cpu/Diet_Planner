@@ -391,10 +391,7 @@ function openFinanceModal(row) {
     updatePaymentText();
 
     $('lastVisit').value = finance.last_visit_date || '';
-
-    $('nextFollowUp').textContent = finance.next_follow_up_date
-        ? fmt(finance.next_follow_up_date)
-        : '—';
+    updateFollowUpPreview();
 
     $('editModal').classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
