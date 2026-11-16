@@ -466,13 +466,27 @@
   }
 
   let currentFinance = null;
+  function financeAddDays(value, days) {
+    if (!value || !Number.isFinite(days) || days < 1) return null;
+    const parts = String(value).slice(0, 10).split('-').map(Number);
+    if (parts.length !== 3 || !parts.every(Number.isFinite)) return null;
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    date.setDate(date.getDate() + days);
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+  }
+
   function updateFinancePreview() {
     const amount=Number($('pfInputAmount').value)||0;
     const discount=Number($('pfInputDiscount').value)||0;
     $('pfInputDiscountedPreview').textContent=(amount*(1-discount/100)).toLocaleString('ar-EG',{maximumFractionDigits:2})+' جنيه';
     const start=$('pfInputStart').value,months=Number($('pfInputMonths').value);
-    if(start&&months>0){const d=new Date(start+'T00:00:00');d.setMonth(d.getMonth()+months);$('pfInputEndPreview').textContent=financeDate(d.toISOString().slice(0,10));}
+    if(start&&months>0){const d=new Date(start+'T00:00:00');d.setMonth(d.getMonth()+months);$('pfInputEndPreview').textContent=financeDate([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')).join('-'));}
     else $('pfInputEndPreview').textContent='—';
+
+    const lastVisit=$('pfInputLastVisit').value;
+    const followDays=Number($('pfInputFollowDays').value);
+    const nextFollow=financeAddDays(lastVisit,followDays);
+    $('pfInputNextFollowPreview').textContent=financeDate(nextFollow);
   }
   async function openPatientFinanceModal() {
     if (!$('patientFinanceModal')?.classList.contains('hidden')) return;
@@ -492,7 +506,6 @@
       $('pfInputPaid').value=String(Boolean(data?.is_paid));
       $('pfInputFollowDays').value=data?.follow_up_days??'';
       $('pfInputLastVisit').value=data?.last_visit_date||'';
-      $('pfInputNextFollow').value=data?.next_follow_up_date||'';
       $('patientFinanceLoading').classList.add('hidden');
       if(!data)$('patientFinanceEmpty').classList.remove('hidden');
       $('patientFinanceForm').classList.remove('hidden');updateFinancePreview();
@@ -509,7 +522,7 @@
     if(amount!==null&&(!Number.isFinite(amount)||amount<0)){err.textContent='قيمة الاشتراك غير صحيحة.';err.classList.remove('hidden');return;}
     if(follow!==null&&(!Number.isFinite(follow)||follow<1)){err.textContent='مدة المتابعة يجب أن تكون يومًا على الأقل.';err.classList.remove('hidden');return;}
     const last = $('pfInputLastVisit').value || null;
-    const next = $('pfInputNextFollow').value || null;
+    const next = financeAddDays(last, follow);
 
     // subscription_end_date and discounted_amount are GENERATED ALWAYS columns.
     // PostgreSQL calculates them from the source fields; never include them in writes.
@@ -539,7 +552,7 @@
     $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
     $('savePatientFinance')?.addEventListener('click', savePatientFinance);
     $('cancelPatientFinance')?.addEventListener('click', closePatientFinanceModal);
-    ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
+    ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount','pfInputFollowDays','pfInputLastVisit'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
     $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);
     $('patientFinanceCloseBottom')?.addEventListener('click', closePatientFinanceModal);
     $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });
