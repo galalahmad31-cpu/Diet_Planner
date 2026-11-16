@@ -284,6 +284,112 @@
   }
 
   // ---------------------------------------------------------
+  // Notification card indicators
+  // Keep this calculation aligned with js/notifications.js.
+  // Data is fetched for the signed-in user and remains protected by RLS.
+  // ---------------------------------------------------------
+  function notificationDateKey(value) {
+    const key = String(value ?? "").slice(0, 10);
+    return /^\\d{4}-\\d{2}-\\d{2}$/.test(key) ? key : "";
+  }
+
+  function notificationTodayKey() {
+    const now = new Date();
+    return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+  }
+
+  function notificationAddDays(baseDate, days) {
+    const key = notificationDateKey(baseDate);
+    if (!key || !Number.isInteger(Number(days))) return "";
+    const [year, month, day] = key.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + Number(days));
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  }
+
+  function notificationAddMonths(baseDate, months) {
+    const key = notificationDateKey(baseDate);
+    if (!key || !Number.isInteger(Number(months))) return "";
+    const [year, month, day] = key.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setMonth(date.getMonth() + Number(months));
+    if (date.getDate() !== day) date.setDate(0);
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  }
+
+  function notificationDaysUntil(targetDate, referenceDate) {
+    const target = notificationDateKey(targetDate);
+    const reference = notificationDateKey(referenceDate);
+    if (!target || !reference) return null;
+    const [ty, tm, td] = target.split("-").map(Number);
+    const [ry, rm, rd] = reference.split("-").map(Number);
+    return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(ry, rm - 1, rd)) / 86400000);
+  }
+
+  function renderNotificationIndicators(counts) {
+    const host = document.getElementById("notificationCardIndicators");
+    if (!host) return;
+
+    const types = [
+      { key: "today", icon: "fa-solid fa-calendar-check", label: "متابعات اليوم", color: "today" },
+      { key: "tomorrow", icon: "fa-solid fa-calendar-plus", label: "متابعات الغد", color: "tomorrow" },
+      { key: "subscriptions", icon: "fa-solid fa-credit-card", label: "تنبيهات الاشتراكات", color: "subscriptions" }
+    ];
+
+    host.replaceChildren();
+    types.forEach((type) => {
+      const count = counts[type.key] || 0;
+      if (!count) return;
+      const marker = document.createElement("span");
+      marker.className = `notification-card-indicator ${type.color}`;
+      marker.title = `${type.label}: ${count}`;
+      marker.setAttribute("role", "img");
+      marker.setAttribute("aria-label", `${type.label}: ${count}`);
+      marker.innerHTML = `<i class="${type.icon}" aria-hidden="true"></i>`;
+      host.appendChild(marker);
+    });
+    host.classList.toggle("has-notifications", host.childElementCount > 0);
+  }
+
+  async function loadNotificationCardIndicators(userId) {
+    const host = document.getElementById("notificationCardIndicators");
+    if (!host || !userId) return;
+
+    const supabase = window.DietPlannerAccess?.supabaseClient;
+    if (!supabase) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("patient_finances")
+        .select("subscription_end_date,next_follow_up_date,follow_up_days,last_visit_date,subscription_start_date,subscription_months")
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      const counts = { today: 0, tomorrow: 0, subscriptions: 0 };
+      const today = notificationTodayKey();
+
+      (data || []).forEach((row) => {
+        const followUp = notificationDateKey(row.next_follow_up_date) ||
+          notificationAddDays(row.last_visit_date || row.subscription_start_date, row.follow_up_days);
+        const followUpDays = followUp ? notificationDaysUntil(followUp, today) : null;
+        if (followUpDays === 0) counts.today += 1;
+        if (followUpDays === 1) counts.tomorrow += 1;
+
+        const subscriptionEnd = notificationDateKey(row.subscription_end_date) ||
+          notificationAddMonths(row.subscription_start_date, row.subscription_months);
+        const subscriptionDays = subscriptionEnd ? notificationDaysUntil(subscriptionEnd, today) : null;
+        if (subscriptionDays !== null && subscriptionDays <= 7) counts.subscriptions += 1;
+      });
+
+      renderNotificationIndicators(counts);
+    } catch (error) {
+      // Indicator failure must not block the dashboard or reveal other users' data.
+      console.warn("Notification card indicators could not be loaded:", error);
+    }
+  }
+
+  // ---------------------------------------------------------
   // Logout
   // ---------------------------------------------------------
   async function logoutUser() {
@@ -359,6 +465,9 @@
         status.user.id,
         status.isAdmin
       );
+
+      // Load subtle per-type notification markers after authentication.
+      await loadNotificationCardIndicators(status.user.id);
     } catch (error) {
       console.error(
         "Dashboard initialization failed:",
