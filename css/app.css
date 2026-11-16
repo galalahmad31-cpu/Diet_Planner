@@ -47,3 +47,21 @@
 /* Keep the hidden utility authoritative for logout visibility. */
 #logoutBtn.hidden,
 #logoutBtn.hidden:hover { display: none !important; }
+
+
+/* Quiet, compact type markers on the Notifications dashboard card */
+.notification-card-indicators{
+  display:inline-flex;align-items:center;gap:4px;margin-inline-start:auto;
+}
+.notification-card-indicator{
+  width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:7px;font-size:10px;line-height:1;flex:0 0 22px;
+}
+.notification-card-indicator.today{background:#e8f4fb;color:#397ca8}
+.notification-card-indicator.tomorrow{background:#efedff;color:#7654bd}
+.notification-card-indicator.subscriptions{background:#fff5df;color:#b7791f}
+.notification-card-indicators:empty{display:none}
+@media(max-width:600px){
+  .notification-card-indicator{width:19px;height:19px;flex-basis:19px;font-size:9px;border-radius:6px}
+  .notification-card-indicators{gap:3px}
+}
