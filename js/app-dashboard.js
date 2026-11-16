@@ -30,7 +30,7 @@
     document.documentElement.style.visibility = "visible";
   }
 
-  async function renderAccountName(user) {
+  async function renderAccountName(user, isAdmin = false) {
     if (!elements.accountName || !user?.id) return;
 
     // الاسم المعتمد في لوحة التحكم هو الاسم المحفوظ في profiles.full_name.
@@ -65,10 +65,11 @@
       document.getElementById("accountInfo")?.classList.remove("hidden");
       document.getElementById("loginCta")?.classList.add("hidden");
       document.getElementById("registerCta")?.classList.add("hidden");
-      // Reuse the single logout button already present in app.html.
+      // Logout control is restricted to administrators by product requirement.
+      // Ordinary accounts (role=user) do not receive this control.
       if (elements.logout) {
-        elements.logout.classList.remove("hidden");
-        if (elements.logout.dataset.handlerBound !== "true") {
+        elements.logout.classList.toggle("hidden", isAdmin !== true);
+        if (isAdmin === true && elements.logout.dataset.handlerBound !== "true") {
           elements.logout.addEventListener("click", logoutUser);
           elements.logout.dataset.handlerBound = "true";
         }
@@ -346,7 +347,7 @@
         return;
       }
 
-      await renderAccountName(status.user);
+      await renderAccountName(status.user, status.isAdmin === true);
       renderAdminCard(status.isAdmin);
 
       await renderFeatureCards(
