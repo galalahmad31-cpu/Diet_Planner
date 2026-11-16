@@ -197,9 +197,39 @@ function buildDietPreview(){
  h+='<footer class="dp-footer"><span>Diet Planner</span><span>خطة غذائية منظمة</span></footer></article>';
  return h;
 }
+
+function prepareDietPrint(){
+ let style=document.getElementById('diet-print-styles');
+ if(!style){style=document.createElement('style');style.id='diet-print-styles';document.head.appendChild(style)}
+ style.textContent=`@page{size:A4 portrait;margin:10mm}
+ @media print{
+ html,body{margin:0!important;padding:0!important;background:#fff!important}
+ body *{visibility:hidden!important}
+ #editor,.diet-preview-host,.diet-preview-host *{visibility:visible!important}
+ #editor{position:static!important;display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:#fff!important}
+ #editor .diet-preview-host{display:block!important;position:static!important;width:100%!important;margin:0!important;padding:0!important}
+ #editor .diet-preview-host .diet-preview{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important;color:#172b38!important;font-size:10pt!important}
+ #editor .diet-preview-host .dp-cover{background:#123247!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:14mm 12mm!important;margin:0 0 7mm!important;border-radius:0!important}
+ #editor .diet-preview-host .dp-cover h1{font-size:23pt!important}
+ #editor .diet-preview-host .dp-macros{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4mm!important}
+ #editor .diet-preview-host .dp-macro{padding:4mm 2mm!important}
+ #editor .diet-preview-host .dp-macro strong{font-size:17pt!important}
+ #editor .diet-preview-host .dp-meal{break-inside:avoid!important;page-break-inside:avoid!important;margin-bottom:4mm!important;border:1px solid #dfe7eb!important}
+ #editor .diet-preview-host .dp-meal-head{padding:3mm 4mm!important;background:#f1f6f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #editor .diet-preview-host .dp-food-list{padding:0 4mm!important}
+ #editor .diet-preview-host .dp-food{grid-template-columns:minmax(0,1fr) 28mm 30mm!important;gap:4mm!important;padding:3mm 0!important;align-items:center!important}
+ #editor .diet-preview-host .dp-food-main strong{font-size:10pt!important}
+ #editor .diet-preview-host .dp-food-detail{grid-column:auto!important;grid-row:auto!important}
+ #editor .diet-preview-host .dp-food-note{grid-column:1/-1!important;grid-row:auto!important;display:flex!important;flex-direction:row!important;padding:2mm 3mm!important;background:#fff9ed!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #editor .diet-preview-host .dp-food-note p{font-size:9pt!important}
+ #editor .diet-preview-host .dp-notes{break-inside:avoid!important;page-break-inside:avoid!important}
+ #editor .diet-preview-host .dp-footer{margin-top:6mm!important}
+ #editor button,#editor input,#editor select,#editor textarea,#editor .editor-toolbar{display:none!important}
+ }`;
+}
 function setReadOnly(ro){
   $('editor').classList.toggle('is-viewing',ro);
-  let printBtn=$('printDietPreview');if(ro&&!printBtn){printBtn=document.createElement('button');printBtn.id='printDietPreview';printBtn.type='button';printBtn.className='rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white';printBtn.innerHTML='<i class="fa-solid fa-print ml-1"></i> طباعة';printBtn.onclick=()=>window.print();$('cancelEditor').before(printBtn)}else if(!ro&&printBtn)printBtn.remove();
+  let printBtn=$('printDietPreview');if(ro&&!printBtn){printBtn=document.createElement('button');printBtn.id='printDietPreview';printBtn.type='button';printBtn.className='rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white';printBtn.innerHTML='<i class="fa-solid fa-print ml-1"></i> طباعة';printBtn.onclick=()=>{prepareDietPrint();window.print();};$('cancelEditor').before(printBtn)}else if(!ro&&printBtn)printBtn.remove();
   const content=$('editor').querySelector(':scope > div > .p-4');if(content){let host=content.querySelector('.diet-preview-host');if(ro){if(!host){host=document.createElement('div');host.className='diet-preview-host';content.appendChild(host)}host.innerHTML=buildDietPreview();host.classList.remove('hidden');content.querySelectorAll(':scope > section').forEach(s=>s.classList.add('hidden'))}else{host?.classList.add('hidden');content.querySelectorAll(':scope > section').forEach(s=>s.classList.remove('hidden'))}}
   ['dietName','description','notes','visibility','dietAccess','addMeal','saveDiet'].forEach(id=>{const el=$(id);if(el)el.disabled=ro});
   $('saveDiet').classList.toggle('hidden',ro);$('addMeal').classList.toggle('hidden',ro);
