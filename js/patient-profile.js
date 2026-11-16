@@ -438,6 +438,28 @@
     return Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat('ar-EG',{year:'numeric',month:'short',day:'numeric'}).format(date);
   }
 
+  function showPatientFinanceSuccess() {
+    let toast = $('patientFinanceSuccessToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'patientFinanceSuccessToast';
+      toast.className = 'patient-finance-success-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.textContent = 'تم حفظ ماليات المريض بنجاح';
+      document.body.appendChild(toast);
+    }
+
+    toast.classList.remove('is-visible');
+    // Restart the short entrance animation when the toast is shown again.
+    void toast.offsetWidth;
+    toast.classList.add('is-visible');
+    window.clearTimeout(toast.dismissTimer);
+    toast.dismissTimer = window.setTimeout(() => {
+      toast.classList.remove('is-visible');
+    }, 1800);
+  }
+
   function closePatientFinanceModal() {
     $('patientFinanceModal')?.classList.add('hidden');
     document.body.classList.remove('overflow-hidden');
@@ -504,7 +526,7 @@
       next_follow_up_date: next
     };
     const btn=$('savePatientFinance');btn.disabled=true;btn.textContent='جارٍ الحفظ...';
-    try{const {error}=await supabase.from('patient_finances').upsert(payload,{onConflict:'patient_id'});if(error)throw error;closePatientFinanceModal();alert('تم حفظ ماليات المريض بنجاح.');}
+    try{const {error}=await supabase.from('patient_finances').upsert(payload,{onConflict:'patient_id'});if(error)throw error;closePatientFinanceModal();showPatientFinanceSuccess();}
     catch(e){console.error(e);err.textContent=e.message||'تعذر حفظ البيانات. تحقق من صلاحيات الكتابة (RLS).';err.classList.remove('hidden');}
     finally{btn.disabled=false;btn.textContent='حفظ الماليات';}
   }
