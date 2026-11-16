@@ -125,7 +125,7 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
  main>div>section.mt-5.grid>div{padding:8px;border-radius:10px}
  main>div>section.mt-5.grid .text-2xl{font-size:18px}
  #dietGrid{margin-top:8px}
- #dietGrid article .mt-5.grid{grid-template-columns:repeat(4,minmax(0,1fr)}
+ #dietGrid article .mt-5.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 
 
