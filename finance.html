@@ -11,7 +11,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-        <link rel="stylesheet" href="css/finance.css">
+        <link rel="stylesheet" href="css/finance.css?v=20261116-finance-layout1">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
             </script>
@@ -128,39 +128,33 @@
                             </button>
                         </div>
                         <div class="p-5 sm:p-6">
-                            <div class="grid gap-4 sm:grid-cols-2">
-                                <label>
-                                    <span class="mb-2 block text-sm font-bold">
-                                        تاريخ بداية الاشتراك
-                                    </span>
-                                    <input id="startDate" type="date" class="h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-brand-400">
+                            <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                                <label class="min-w-0">
+                                    <span class="mb-2 block text-xs sm:text-sm font-bold">تاريخ بداية الاشتراك</span>
+                                    <input id="startDate" type="date" class="h-12 w-full min-w-0 rounded-xl border border-slate-200 px-2 sm:px-3 text-sm outline-none focus:border-brand-400">
                                 </label>
-                                <label>
-                                    <span class="mb-2 block text-sm font-bold">
-                                        مدة الاشتراك (بالشهر)
-                                    </span>
-                                    <input id="months" type="number" min="1" step="1" class="h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-brand-400" placeholder="مثال: 3">
+                                <label class="min-w-0">
+                                    <span class="mb-2 block text-xs sm:text-sm font-bold">مدة الاشتراك (شهر)</span>
+                                    <input id="months" type="number" min="1" step="1" class="h-12 w-full min-w-0 rounded-xl border border-slate-200 px-2 sm:px-3 text-sm outline-none focus:border-brand-400" placeholder="مثال: 3">
                                 </label>
-                                <label>
-                                    <span class="mb-2 block text-sm font-bold">
-                                        قيمة الاشتراك
-                                    </span>
-                                    <input id="amount" type="number" min="0" step="0.01" class="h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-brand-400" placeholder="مثال: 1000">
+                                <label class="min-w-0">
+                                    <span class="mb-2 block text-xs sm:text-sm font-bold">قيمة الاشتراك (جنيه)</span>
+                                    <input id="amount" type="number" min="0" step="0.01" class="h-12 w-full min-w-0 rounded-xl border border-slate-200 px-2 sm:px-3 text-sm outline-none focus:border-brand-400" placeholder="مثال: 1000">
                                 </label>
-                                <label>
-                                    <span class="mb-2 block text-sm font-bold">
-                                        مدة المتابعة (بالأيام)
-                                    </span>
-                                    <input id="followUpDays" type="number" min="1" step="1" class="h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-brand-400" placeholder="مثال: 7">
+                                <label class="min-w-0">
+                                    <span class="mb-2 block text-xs sm:text-sm font-bold">مدة المتابعة (يوم)</span>
+                                    <input id="followUpDays" type="number" min="1" step="1" class="h-12 w-full min-w-0 rounded-xl border border-slate-200 px-2 sm:px-3 text-sm outline-none focus:border-brand-400" placeholder="مثال: 7">
                                 </label>
-                                <label>
-                                    <span class="mb-2 block text-sm font-bold">
-                                        نسبة الخصم (%)
-                                    </span>
-                                    <input id="discount" type="number" min="0" max="100" step="0.01" value="0" class="h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-brand-400" placeholder="0">
+                                <label class="min-w-0">
+                                    <span class="mb-2 block text-xs sm:text-sm font-bold">نسبة الخصم (%)</span>
+                                    <input id="discount" type="number" min="0" max="100" step="0.01" value="0" class="h-12 w-full min-w-0 rounded-xl border border-slate-200 px-2 sm:px-3 text-sm outline-none focus:border-brand-400" placeholder="0">
+                                </label>
+                                <label class="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                                    <span class="text-xs sm:text-sm font-bold">حالة السداد</span>
+                                    <input id="paid" type="checkbox" class="h-5 w-5 shrink-0 accent-[#11786f]">
                                 </label>
                             </div>
-                            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                            <div class="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
                                 <div class="rounded-2xl bg-brand-50 p-4">
                                     <div class="text-xs font-semibold text-slate-500">
                                         تاريخ نهاية الاشتراك
@@ -177,13 +171,11 @@
                                         —
                                     </div>
                                 </div>
-                                <label class="rounded-2xl bg-emerald-50 p-4">
-                                    <span class="text-xs font-semibold text-slate-500">
-                                        آخر زيارة فعلية
-                                    </span>
-                                    <input id="lastVisit" type="date" class="mt-1 h-10 w-full rounded-xl border border-emerald-100 bg-white px-3 text-sm font-extrabold text-emerald-700 outline-none focus:border-brand-400">
+                                <label class="min-w-0 rounded-2xl bg-emerald-50 p-3 sm:p-4">
+                                    <span class="text-xs font-semibold text-slate-500">آخر زيارة فعلية</span>
+                                    <input id="lastVisit" type="date" class="mt-1 h-10 w-full min-w-0 rounded-xl border border-emerald-100 bg-white px-2 sm:px-3 text-sm font-extrabold text-emerald-700 outline-none focus:border-brand-400">
                                 </label>
-                                <div class="rounded-2xl bg-sky-50 p-4">
+                                <div class="min-w-0 rounded-2xl bg-sky-50 p-3 sm:p-4">
                                     <div class="text-xs font-semibold text-slate-500">
                                         موعد المتابعة القادم
                                     </div>
@@ -192,17 +184,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <label class="mt-4 flex cursor-pointer items-center justify-between rounded-2xl border bg-slate-50 p-4">
-                                <div>
-                                    <div class="font-extrabold text-sm">
-                                        حالة السداد
-                                    </div>
-                                    <div id="paidText" class="mt-1 text-xs text-slate-500">
-                                        لم يتم السداد
-                                    </div>
-                                </div>
-                                <input id="paid" type="checkbox" class="h-5 w-5 accent-[#11786f]">
-                            </label>
                             <div class="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <button id="deleteFinance" type="button" class="h-11 rounded-xl border border-red-200 bg-red-50 px-5 font-bold text-red-700 hover:bg-red-100">
                                     حذف الاشتراك
@@ -276,7 +257,7 @@
                 </script>
                 <script src="js/auth-access.js?v=20260923-1">
                     </script>
-                    <script src="js/finance.js">
+                    <script src="js/finance.js?v=20261116-finance-layout1">
                         </script>
                     </body>
                 </html>
