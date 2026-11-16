@@ -12,7 +12,7 @@
   const elements = {
     loading: document.getElementById("loadingScreen"),
     accountName: document.getElementById("doctorName"),
-    logout: null,
+    logout: document.getElementById("logoutBtn"),
     adminCard: document.getElementById("adminCard"),
     featureCards: document.querySelectorAll(
       "a.nav-card:not(#adminCard)"
@@ -65,14 +65,14 @@
       document.getElementById("accountInfo")?.classList.remove("hidden");
       document.getElementById("loginCta")?.classList.add("hidden");
       document.getElementById("registerCta")?.classList.add("hidden");
-      const logoutButton = document.createElement("button");
-      logoutButton.id = "logoutBtn";
-      logoutButton.type = "button";
-      logoutButton.className = "rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-600";
-      logoutButton.textContent = "خروج";
-      logoutButton.addEventListener("click", logoutUser);
-      document.getElementById("headerActions")?.appendChild(logoutButton);
-      elements.logout = logoutButton;
+      // Reuse the single logout button already present in app.html.
+      if (elements.logout) {
+        elements.logout.classList.remove("hidden");
+        if (elements.logout.dataset.handlerBound !== "true") {
+          elements.logout.addEventListener("click", logoutUser);
+          elements.logout.dataset.handlerBound = "true";
+        }
+      }
     } catch (error) {
       console.error("Profile name lookup failed:", error);
       elements.accountName.textContent = "حساب المستخدم";
@@ -300,8 +300,8 @@
     // Visitor state: never show account placeholder or logout before authentication.
     document.getElementById("loginCta")?.classList.remove("hidden");
     document.getElementById("registerCta")?.classList.remove("hidden");
-    elements.logout?.remove();
-    elements.logout = null;
+    // Visitors must never see or use logout; no session exists to end.
+    elements.logout?.classList.add("hidden");
     elements.accountName?.classList.add("hidden");
     if (elements.accountName) elements.accountName.textContent = "";
     document.getElementById("accountInfo")?.classList.add("hidden");
