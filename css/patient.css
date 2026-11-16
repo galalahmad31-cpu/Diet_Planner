@@ -12,13 +12,19 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   align-items:start;
 }
 .patient-card{
-  min-width:0;display:flex;flex-direction:column;
+  position:relative;min-width:0;display:flex;flex-direction:column;
   padding:14px;border:1px solid #e0e9ee;border-radius:15px;
   background:#fff;box-shadow:0 3px 12px rgba(20,55,75,.04);
-  transition:border-color .18s ease,box-shadow .18s ease;
+  cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent;
 }
-.patient-card:hover{border-color:#b8dcd5;box-shadow:0 7px 18px rgba(20,90,80,.07)}
+.patient-card:hover{border-color:#a8d5cc;box-shadow:0 7px 20px rgba(20,90,80,.08);transform:translateY(-1px)}
+.patient-card:active{transform:scale(.99);background:#fbfefd}
+.patient-card:focus-visible{outline:3px solid rgba(23,143,132,.28);outline-offset:3px;border-color:#178f84}
 .patient-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+.patient-card-tools{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.patient-card-arrow{align-self:flex-start;display:grid;place-items:center;width:25px;height:25px;margin-top:2px;border-radius:8px;background:#f0f8f6;color:#178f84;font-size:11px;transition:transform .18s ease,background .18s ease}
+.patient-card:hover .patient-card-arrow{background:#e3f3ef;transform:translateX(-2px)}
 .patient-identity{display:flex;align-items:center;gap:9px;min-width:0}
 .patient-identity .patient-name{margin:0;min-width:0}
 .patient-identity .patient-avatar{flex-shrink:0}
@@ -28,11 +34,9 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .patient-details{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px;min-height:0}
 .patient-meta{font-size:10px;font-weight:800;color:#57758a;display:inline-flex;align-items:center;gap:5px}
 .patient-diagnosis{font-size:10px;font-weight:800;color:#087568;background:#e9f6f2;padding:4px 7px;border-radius:8px;max-width:100%;overflow-wrap:anywhere}
-.patient-card-actions{display:flex;gap:7px;margin:0;padding:9px 0 0;border-top:1px solid #edf2f5}
-.patient-open{flex:1;min-height:38px;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 10px;border-radius:10px;background:#176e68;color:#fff;font-size:11px;font-weight:900;transition:background .15s}
-.patient-open:hover{background:#125a55}
-.patient-delete{width:38px;min-height:38px;flex-shrink:0;display:grid;place-items:center;border:1px solid #f5dce2;border-radius:10px;background:#fff5f7;color:#c43c5d;font-size:13px}
-.patient-delete:hover{background:#ffe8ee}
+.patient-delete{width:32px;height:32px;flex-shrink:0;display:grid;place-items:center;border:1px solid #f5dce2;border-radius:10px;background:#fff7f8;color:#bd4560;font-size:12px;cursor:pointer;transition:background .15s,border-color .15s}
+.patient-delete:hover{background:#ffe8ee;border-color:#f0c8d2}
+.patient-delete:focus-visible{outline:2px solid #d46a82;outline-offset:2px}
 
 @media(max-width:600px){
   main{padding:12px!important}
@@ -45,7 +49,6 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   .patient-name{font-size:14px;line-height:1.45;margin-bottom:4px}
   .patient-details{gap:5px;margin-bottom:8px}
   .patient-meta,.patient-diagnosis{font-size:9px}
-  .patient-card-actions{padding-top:7px;gap:6px}
-  .patient-open,.patient-delete{min-height:35px}
-  .patient-delete{width:35px}
+  .patient-card-tools{gap:6px}
+  .patient-delete{width:30px;height:30px}
 }
