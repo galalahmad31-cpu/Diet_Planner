@@ -354,6 +354,7 @@
       );
 
       renderAdminCard(false);
+      renderVisitorDashboard();
     }
   }
 
