@@ -201,3 +201,31 @@ body {
 .inline-save,.inline-cancel{border:0;border-radius:8px;padding:7px 9px;font:700 10px Cairo,sans-serif;white-space:nowrap;cursor:pointer}
 .inline-save{background:#059669;color:#fff}.inline-cancel{background:#e2e8f0;color:#475569}
 @media(max-width:640px){.inline-measurement-row input,.inline-measurement-row select{min-width:68px;padding:7px 5px}.inline-save,.inline-cancel{padding:6px}}
+
+/* Mobile measurement history: convert each record into a readable compact card */
+@media(max-width:640px){
+  #weightTab .overflow-x-auto{overflow-x:visible!important}
+  #weightTab table{display:block;width:100%;min-width:0!important;border-spacing:0}
+  #weightTab thead{display:block}
+  #weightTab thead tr:first-child{display:block}
+  #weightTab thead tr:first-child th{display:block;padding:10px!important}
+  #weightTab thead tr:first-child th>div{gap:8px;flex-wrap:wrap}
+  #weightTab thead tr:last-child{display:none}
+  #weightTab tbody{display:flex;flex-direction:column;gap:9px;padding:9px}
+  #weightTab tbody tr:not(.inline-measurement-row){display:grid;grid-template-columns:1fr 1fr;gap:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 2px 7px rgba(15,40,55,.04)}
+  #weightTab tbody tr:not(.inline-measurement-row) td{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:9px 10px!important;min-width:0;font-size:11px!important;border-bottom:1px solid #f1f5f9;text-align:right!important;white-space:normal}
+  #weightTab tbody tr:not(.inline-measurement-row) td::before{content:attr(data-label);font-size:9px;font-weight:700;color:#94a3b8;flex-shrink:0}
+  #weightTab tbody tr:not(.inline-measurement-row) td:last-child{grid-column:1/-1;justify-content:center;border-bottom:0;padding:6px!important}
+  #weightTab tbody tr:not(.inline-measurement-row) td:last-child::before{content:none}
+  #weightTab tbody tr.inline-measurement-row{display:block;border:1px solid #bfe8df;border-radius:12px;padding:8px;background:#f0fdfa}
+  #weightTab tbody tr.inline-measurement-row td{display:block;width:100%;padding:5px!important;border:0}
+  #weightTab tbody tr.inline-measurement-row td::before{display:block;font-size:9px;color:#64748b;font-weight:800;margin:0 2px 4px}
+  #weightTab tbody tr.inline-measurement-row td:nth-child(1)::before{content:"التاريخ"}
+  #weightTab tbody tr.inline-measurement-row td:nth-child(2)::before{content:"الوزن (كجم)"}
+  #weightTab tbody tr.inline-measurement-row td:nth-child(3)::before{content:"محيط الوسط (سم)"}
+  #weightTab tbody tr.inline-measurement-row td:nth-child(4)::before{content:"محيط الأرداف (سم)"}
+  #weightTab tbody tr.inline-measurement-row td:nth-child(5)::before{content:"الالتزام بالدايت"}
+  #weightTab tbody tr.inline-measurement-row td:nth-child(6)::before{content:"إجراء"}
+  #weightTab tbody tr.inline-measurement-row input,#weightTab tbody tr.inline-measurement-row select{min-width:0!important;width:100%;font-size:12px!important;min-height:38px}
+  #weightTab tbody tr.inline-measurement-row .inline-actions{justify-content:flex-start}
+}
