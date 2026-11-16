@@ -65,11 +65,10 @@
       document.getElementById("accountInfo")?.classList.remove("hidden");
       document.getElementById("loginCta")?.classList.add("hidden");
       document.getElementById("registerCta")?.classList.add("hidden");
-      // Logout control is restricted to administrators by product requirement.
-      // Ordinary accounts (role=user) do not receive this control.
+      // Logout is available to every authenticated account.
       if (elements.logout) {
-        elements.logout.classList.toggle("hidden", isAdmin !== true);
-        if (isAdmin === true && elements.logout.dataset.handlerBound !== "true") {
+        elements.logout.classList.remove("hidden");
+        if (elements.logout.dataset.handlerBound !== "true") {
           elements.logout.addEventListener("click", logoutUser);
           elements.logout.dataset.handlerBound = "true";
         }
