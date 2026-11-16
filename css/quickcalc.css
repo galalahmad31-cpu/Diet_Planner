@@ -584,3 +584,44 @@ main{padding:clamp(16px,3vw,32px)!important}
   .qc-enteral-fields input,.qc-enteral-fields select,
   .qc-iv-fields input,.qc-iv-fields select{font-size:.63rem!important}
 }
+
+
+/* Dextrose preparation: compact, readable input layout */
+.qc-dex-fields{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:end!important;
+}
+.qc-dex-fields>div{min-width:0!important}
+.qc-dex-fields label{
+  display:block!important;
+  min-height:2.7em;
+  line-height:1.4!important;
+  overflow-wrap:anywhere;
+}
+.qc-dex-fields input,.qc-dex-fields select{
+  width:100%!important;
+  min-width:0!important;
+}
+@media(max-width:760px){
+  .qc-dex-fields{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:11px 9px!important;
+  }
+  .qc-dex-fields label{
+    min-height:2.8em!important;
+    font-size:.68rem!important;
+    line-height:1.35!important;
+  }
+  .qc-dex-fields input,.qc-dex-fields select{
+    min-height:42px!important;
+    padding:7px 8px!important;
+    font-size:.76rem!important;
+  }
+}
+@media(max-width:360px){
+  .qc-dex-fields{gap:9px 6px!important}
+  .qc-dex-fields label{font-size:.62rem!important}
+  .qc-dex-fields input,.qc-dex-fields select{font-size:.7rem!important;padding:6px 5px!important}
+}
