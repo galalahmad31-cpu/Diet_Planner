@@ -8,7 +8,7 @@
 
 <link rel="stylesheet" href="css/tailwind.css">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/quickcalc.css?v=20261116-cleanheader1">
+  <link rel="stylesheet" href="css/quickcalc.css?v=20261116-girrow1">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -68,83 +68,52 @@
                                 </button>
 </div>
 <div class="space-y-3" id="iv-lines-container">
-<div class="iv-line-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
-<div class="md:col-span-3">
-<label class="block text-[10px] font-bold mb-1 text-gray-600">
-                                            Glucose conc%
-                                        </label>
+<div class="iv-line-row qc-iv-fields grid gap-3 items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
+<div>
+<label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose conc%</label>
 <input class="bg-white" id="qc-iv-conc-0" data-calc="gir" step="0.1" type="number" value="10"/>
 </div>
-<div class="md:col-span-3">
-<label class="block text-[10px] font-bold mb-1 text-gray-600">
-                                            Glucose Rate Unit
-                                        </label>
-<select class="bg-white" id="qc-iv-unit-0" data-calc="gir">
-<option value="h">
-                                                ml / h
-                                            </option>
-<option value="d">
-                                                ml / d
-                                            </option>
-</select>
-</div>
-<div class="md:col-span-5">
-<label class="block text-[10px] font-bold mb-1 text-gray-600">
-                                            Glucose Rate Value
-                                        </label>
+<div>
+<label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Value</label>
 <input class="bg-white" id="qc-iv-rate-0" data-calc="gir" step="0.1" type="number" value="10"/>
 </div>
-<div class="md:col-span-1 flex items-end justify-center"></div>
+<div>
+<label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Unit</label>
+<select class="bg-white" id="qc-iv-unit-0" data-calc="gir">
+<option value="h">ml / h</option>
+<option value="d">ml / d</option>
+</select>
+</div>
+<div class="qc-iv-remove-slot flex items-end justify-center"></div>
 </div>
 </div>
 </div>
 <div class="qc-panel">
-<h4 class="font-bold text-slate-800">
-                                3. Enteral Intake
-                            </h4>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<h4 class="font-bold text-slate-800">3. Enteral Intake</h4>
+<div class="qc-enteral-fields">
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Milk type
-                                    </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Milk type</label>
 <select class="bg-white" id="qc-milk-type" data-calc="gir">
-<option value="breast">
-                                            Breastmilk 7.1%
-                                        </option>
-<option value="term">
-                                            Term Formula 7.1%
-                                        </option>
-<option value="preterm">
-                                            Preterm Formula 8.5%
-                                        </option>
-<option value="custom">
-                                            Custom
-                                        </option> </select>
+<option value="breast">Breastmilk 7.1%</option>
+<option value="term">Term Formula 7.1%</option>
+<option value="preterm">Preterm Formula 8.5%</option>
+<option value="custom">Custom</option>
+</select>
 <div class="hidden mt-3" id="qc-custom-carb-box">
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                            Base carb (g / 100 ml)
-                                        </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Base carb (g / 100 ml)</label>
 <input class="bg-white" id="qc-custom-base-carb" min="0" data-calc="gir" step="0.1" type="number" value="7.1"/>
 </div>
 </div>
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Volume (ml / feed)
-                                    </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Volume (ml / feed)</label>
 <input class="bg-white" id="qc-ent-vol" data-calc="gir" step="0.1" type="number" value="20"/>
 </div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Frequency (Every × h)
-                                    </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Frequency (Every × h)</label>
 <input class="bg-white" id="qc-ent-freq" data-calc="gir" step="1" type="number" value="3"/>
 </div>
 <div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Daily Added carb (g)
-                                    </label>
+<label class="block text-xs font-bold mb-1 text-gray-700">Daily Added carb (g)</label>
 <input class="bg-white" id="qc-ent-carb" data-calc="gir" step="0.1" type="number" value="0"/>
 </div>
 </div>
