@@ -186,3 +186,17 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
   #patientFinanceForm input,#patientFinanceForm select{width:100%!important;min-width:0!important;box-sizing:border-box!important;font-size:12px!important;padding:8px 6px!important}
   #patientFinanceModal .finance-summary-box,#patientFinanceModal .patient-finance-actions{grid-column:1/-1!important}
 }
+
+
+/* Nutrition support direct card */
+.nutrition-support-card .measurements-direct{
+ display:flex;align-items:center;gap:8px;width:100%;padding:12px;
+ border-radius:13px;text-decoration:none;cursor:pointer;
+ background:linear-gradient(135deg,#5b2c83,#7c3aed)!important;
+ border:1px solid #6d28d9;min-height:76px;height:76px;box-sizing:border-box
+}
+.nutrition-support-card .measurements-direct .dashboard-card-head h3,
+.nutrition-support-card .measurements-direct .dashboard-card-head p{color:#fff!important}
+.nutrition-support-card .nutrition-support-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
+.nutrition-support-card .measurements-direct .dashboard-card-arrow{color:#fff!important}
+.nutrition-support-card .measurements-direct:hover{filter:brightness(1.06)}
