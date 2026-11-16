@@ -1735,14 +1735,6 @@ async function loadPatientData(){
     if(!p) throw new Error('المريض غير موجود بحساب المستخدم الحالي أو RLS تمنع قراءته. ID: '+id);
 
     $('selectedPatientName').textContent=p.name||'—';
-    $('pName').textContent=p.name||'—';
-    $('pGender').textContent=gender(p.gender);
-    $('pBirth').textContent=fmtDate(p.birth_date);
-    $('pAge').textContent=p.age??'—';
-    $('pHeight').textContent=p.height? p.height+' سم':'—';
-    $('pDiagnosis').textContent=p.diagnosis||'—';
-    $('pComplaints').textContent=p.complaints||'—';
-    $('pNotes').textContent=p.clinical_notes||'—';
 
     const set=(fieldId,v)=>{const e=$(fieldId);if(e)e.value=v??''};
     set('patient-name',p.name||'');
@@ -1877,16 +1869,6 @@ function initializePage(){
   if(reportDate) reportDate.value=new Date().toISOString().slice(0,10);
 
   // Bind page controls FIRST. A calculation error must never disable the UI.
-  $('patientDataToggle')?.addEventListener('click',()=>{
-    const content=$('patientDataContent');
-    const arrow=$('patientDataArrow');
-    if(!content||!arrow)return;
-    const isOpen=content.style.display!=='none';
-    content.style.display=isOpen?'none':'grid';
-    $('patientDataToggle').setAttribute('aria-expanded',String(!isOpen));
-    arrow.className=isOpen?'fa-solid fa-chevron-down':'fa-solid fa-chevron-up';
-  });
-
   $('addDayBtn')?.addEventListener('click',()=>{
     if (!canWriteSupportDays()) {
       alert('إضافة يوم دعم غذائي تتطلب اشتراكًا فعالًا مع خاصية الدعم الغذائي.');
