@@ -6,96 +6,37 @@
 let ivLineCount = 1;
 
 function addIVLine() {
+    const container = document.getElementById('iv-lines-container');
+    if (!container) return;
 
-        const container =
-            document.getElementById('iv-lines-container');
+    const index = ivLineCount++;
+    const row = document.createElement('div');
+    row.className = 'iv-line-row qc-iv-fields grid gap-3 items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm';
+    row.id = `iv-line-${index}`;
+    row.innerHTML = `
+        <div>
+            <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose conc%</label>
+            <input type="number" id="qc-iv-conc-${index}" value="10" step="0.1" class="bg-white" data-calc="gir">
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Value</label>
+            <input type="number" id="qc-iv-rate-${index}" value="0" step="0.1" class="bg-white" data-calc="gir">
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Unit</label>
+            <select id="qc-iv-unit-${index}" class="bg-white" data-calc="gir">
+                <option value="h">ml / h</option>
+                <option value="d">ml / d</option>
+            </select>
+        </div>
+        <div class="qc-iv-remove-slot flex items-end justify-center">
+            <button data-remove-iv="${index}" class="bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold px-2 py-1.5 rounded-lg text-xs transition-all border border-red-100" aria-label="Remove IV line">✕</button>
+        </div>
+    `;
 
-        const index = ivLineCount++;
-
-        const row = document.createElement('div');
-
-        row.className =
-            'iv-line-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm';
-
-        row.id = `iv-line-${index}`;
-
-        row.innerHTML = `
-
-            <div class="md:col-span-3">
-
-                <label class="block text-[10px] font-bold mb-1 text-gray-600">
-                    Glucose conc%
-                </label>
-
-                <input
-                    type="number"
-                    id="qc-iv-conc-${index}"
-                    value="10"
-                    step="0.1"
-                    class="bg-white"
-                    data-calc="gir"
-                >
-
-            </div>
-
-            <div class="md:col-span-3">
-
-                <label class="block text-[10px] font-bold mb-1 text-gray-600">
-                    Glucose Rate Unit
-                </label>
-
-                <select
-                    id="qc-iv-unit-${index}"
-                    class="bg-white"
-                    data-calc="gir"
-                >
-
-                    <option value="h">
-                        ml / h
-                    </option>
-
-                    <option value="d">
-                        ml / d
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="md:col-span-5">
-
-                <label class="block text-[10px] font-bold mb-1 text-gray-600">
-                    Glucose Rate Value
-                </label>
-
-                <input
-                    type="number"
-                    id="qc-iv-rate-${index}"
-                    value="0"
-                    step="0.1"
-                    class="bg-white"
-                    data-calc="gir"
-                >
-
-            </div>
-
-            <div class="md:col-span-1 flex items-end justify-center">
-
-                <button
-                    data-remove-iv="${index}"
-                    class="bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold px-2 py-1.5 rounded-lg text-xs transition-all border border-red-100"
-                >
-                    ✕
-                </button>
-
-            </div>
-
-        `;
-
-        container.appendChild(row);
-
-        calculateQuickGIR();
-    }
+    container.appendChild(row);
+    calculateQuickGIR();
+}
 
 function removeIVLine(index) {
 
