@@ -31,15 +31,39 @@
   }
 
   async function renderAccountName(user, isAdmin = false) {
-    if (!elements.accountName || !user?.id) return;
+    if (!user?.id) return;
 
-    // الاسم المعتمد في لوحة التحكم هو الاسم المحفوظ في profiles.full_name.
+    // Authentication status, not profile lookup, controls account actions.
+    // Show logout for every signed-in user before any database request.
+    document.getElementById("accountInfo")?.classList.remove("hidden");
+    document.getElementById("loginCta")?.classList.add("hidden");
+    document.getElementById("registerCta")?.classList.add("hidden");
+
+    if (elements.logout) {
+      elements.logout.classList.remove("hidden");
+      elements.logout.disabled = false;
+      if (elements.logout.dataset.handlerBound !== "true") {
+        elements.logout.addEventListener("click", logoutUser);
+        elements.logout.dataset.handlerBound = "true";
+      }
+    }
+
+    if (!elements.accountName) return;
+
+    // The name is supplementary; a profile read failure must never hide logout.
+    const fallbackName =
+      user?.user_metadata?.full_name ||
+      user?.user_metadata?.name ||
+      user?.email ||
+      "حساب المستخدم";
+
+    elements.accountName.textContent = fallbackName;
+    elements.accountName.classList.remove("hidden");
+
     try {
       const supabase = window.DietPlannerAccess?.supabaseClient;
-
       if (!supabase) {
         console.error("Supabase client is unavailable.");
-        elements.accountName.textContent = "حساب المستخدم";
         return;
       }
 
@@ -51,31 +75,13 @@
 
       if (error) {
         console.error("Profile name lookup failed:", error);
-        elements.accountName.textContent = "حساب المستخدم";
         return;
       }
 
       elements.accountName.textContent =
-        profile?.full_name?.trim() ||
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
-        user?.email ||
-        "حساب المستخدم";
-      elements.accountName.classList.remove("hidden");
-      document.getElementById("accountInfo")?.classList.remove("hidden");
-      document.getElementById("loginCta")?.classList.add("hidden");
-      document.getElementById("registerCta")?.classList.add("hidden");
-      // Logout is available to every authenticated account.
-      if (elements.logout) {
-        elements.logout.classList.remove("hidden");
-        if (elements.logout.dataset.handlerBound !== "true") {
-          elements.logout.addEventListener("click", logoutUser);
-          elements.logout.dataset.handlerBound = "true";
-        }
-      }
+        profile?.full_name?.trim() || fallbackName;
     } catch (error) {
       console.error("Profile name lookup failed:", error);
-      elements.accountName.textContent = "حساب المستخدم";
     }
   }
 
