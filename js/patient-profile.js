@@ -519,7 +519,6 @@
       $('pfInputAmount').value=data?.subscription_amount??'';
       $('pfInputDiscount').value=data?.discount_percent??0;
       $('pfInputPaid').value=String(Boolean(data?.is_paid));
-      $('pfInputFollowDays').value=data?.follow_up_days??'';
       $('pfInputLastVisit').value=data?.last_visit_date||'';
       $('pfInputNextFollow').value=data?.next_follow_up_date||'';
       $('patientFinanceLoading').classList.add('hidden');
@@ -532,11 +531,10 @@
     const err=$('patientFinanceError');err.classList.add('hidden');
     const start=$('pfInputStart').value||null,months=$('pfInputMonths').value?Number($('pfInputMonths').value):null;
     const amount=$('pfInputAmount').value!==''?Number($('pfInputAmount').value):null;
-    const discount=Number($('pfInputDiscount').value)||0,follow=$('pfInputFollowDays').value?Number($('pfInputFollowDays').value):null;
+    const discount=Number($('pfInputDiscount').value)||0;
     if((start&&!months)||(!start&&months)){err.textContent='أدخل تاريخ البداية ومدة الاشتراك معًا.';err.classList.remove('hidden');return;}
     if(discount<0||discount>100||!Number.isFinite(discount)){err.textContent='الخصم يجب أن يكون بين 0 و100%.';err.classList.remove('hidden');return;}
     if(amount!==null&&(!Number.isFinite(amount)||amount<0)){err.textContent='قيمة الاشتراك غير صحيحة.';err.classList.remove('hidden');return;}
-    if(follow!==null&&(!Number.isFinite(follow)||follow<1)){err.textContent='مدة المتابعة يجب أن تكون يومًا على الأقل.';err.classList.remove('hidden');return;}
     const last = $('pfInputLastVisit').value || null;
     const next = $('pfInputNextFollow').value || null;
 
@@ -550,7 +548,6 @@
       subscription_amount: amount,
       discount_percent: discount,
       is_paid: $('pfInputPaid').value === 'true',
-      follow_up_days: follow,
       last_visit_date: last,
       next_follow_up_date: next
     };
@@ -585,7 +582,7 @@
     $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
     $('savePatientFinance')?.addEventListener('click', savePatientFinance);
     $('cancelPatientFinance')?.addEventListener('click', closePatientFinanceModal);
-    ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount','pfInputFollowDays','pfInputLastVisit'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
+    ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount','pfInputLastVisit'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
     $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);
     $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });
     document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
