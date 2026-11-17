@@ -49,13 +49,11 @@
 #logoutBtn.hidden:hover { display: none !important; }
 
 
-/* Notification counts sit in their own row below the card description. */
+/* Notification counters: one balanced row on desktop and mobile. */
 .notification-card-indicators{
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:flex-start;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:stretch;
   gap:8px;
   width:100%;
   margin-top:16px;
@@ -66,28 +64,29 @@
   align-items:center;
   justify-content:center;
   gap:7px;
-  min-width:58px;
-  min-height:34px;
-  padding:5px 9px;
+  min-width:0;
+  min-height:36px;
+  padding:6px 8px;
   border:1px solid currentColor;
   border-radius:11px;
   font-size:13px;
   font-weight:800;
   line-height:1;
   direction:ltr;
+  white-space:nowrap;
   box-shadow:0 2px 7px rgba(15,23,42,.04);
 }
-.notification-card-indicator i{display:block;font-size:14px;line-height:1}
+.notification-card-indicator i{display:block;font-size:14px;line-height:1;flex:0 0 auto}
 .notification-card-indicator .notification-count{
-  display:inline-flex;align-items:center;justify-content:center;min-width:16px;
+  display:inline-flex;align-items:center;justify-content:center;min-width:12px;
   font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;
 }
 .notification-card-indicator.today{color:#397ca8;background:#e8f4fb;border-color:#cfe5f2}
 .notification-card-indicator.tomorrow{color:#7654bd;background:#efedff;border-color:#ded7ff}
 .notification-card-indicator.subscriptions{color:#b7791f;background:#fff5df;border-color:#f5e3bd}
 @media(max-width:600px){
-  .notification-card-indicators{gap:6px;margin-top:14px}
-  .notification-card-indicator{min-width:54px;min-height:32px;gap:6px;padding:5px 8px;border-radius:10px;font-size:12px}
-  .notification-card-indicator i{font-size:13px}
-  .notification-card-indicator .notification-count{font-size:12px}
+  .notification-card-indicators{gap:5px;margin-top:12px}
+  .notification-card-indicator{min-height:32px;gap:5px;padding:5px 4px;border-radius:9px;font-size:11px}
+  .notification-card-indicator i{font-size:12px}
+  .notification-card-indicator .notification-count{font-size:12px;min-width:10px}
 }
