@@ -28,7 +28,7 @@
     >
 
     <link rel="stylesheet" href="css/tailwind.css?v=20260923-1">
-    <link rel="stylesheet" href="css/app.css?v=20261117-notification-markers-restored2">
+    <link rel="stylesheet" href="css/app.css?v=20261117-notification-counts1">
     <link rel="stylesheet" href="css/theme.css?v=20260921-3">
 
     <script src="js/theme.js?v=20260921-3"></script>
@@ -268,7 +268,6 @@
                                 <i class="fa-solid fa-bell text-xl"></i>
                             </div>
 
-                            <span id="notificationCardIndicators" class="notification-card-indicators" aria-label="أنواع الإشعارات"></span>
                             <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
                         </div>
 
@@ -279,6 +278,9 @@
                         <p class="mt-2 text-sm leading-6 text-slate-500">
                             تنبيهات الاشتراكات ومواعيد المتابعة القادمة.
                         </p>
+
+                        <div class="notification-card-indicators" id="notificationCardIndicators"
+                             aria-label="أعداد الإشعارات حسب النوع"></div>
                     </a>
 
                     <a href="article.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
@@ -396,7 +398,7 @@
     </main>
 
     <script src="js/auth-access.js?v=20261116-auth-v1"></script>
-    <script src="js/app-dashboard.js?v=20261117-manual-followup1"></script>
+    <script src="js/app-dashboard.js?v=20261117-notification-counts1"></script>
 
 </body>
 
