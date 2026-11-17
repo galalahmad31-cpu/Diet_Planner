@@ -639,7 +639,7 @@ async function init() {
 
         $('loading').innerHTML = `
             <div class="rounded-2xl bg-white p-6 text-center">
-                <div class="text-red-600 font-bold">تعذر تحميل ماليات المرضى</div>
+                <div class="text-red-600 font-bold">تعذر تحميل بيانات اشتراكات المرضى</div>
                 <div class="mt-2 text-xs text-slate-400">${esc(error.message)}</div>
             </div>
         `;
