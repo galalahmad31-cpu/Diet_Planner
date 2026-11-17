@@ -357,3 +357,53 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
   #modulesSection .patient-data-actions .patient-save-actions {gap:4px!important}
   #modulesSection .patient-data-actions button {padding-inline:6px!important;font-size:9px!important}
 }
+
+
+/* Patient controls are part of the collapsible summary row, not a sibling column. */
+#modulesSection .patient-data-heading {display:block!important;margin:0!important;padding:0!important;border:0!important}
+#modulesSection .patient-data-details {width:100%;min-width:0}
+#modulesSection .patient-data-summary {
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  width:100%;
+  gap:9px!important;
+}
+#modulesSection .patient-data-summary .patient-data-title {flex:0 1 auto}
+#modulesSection .patient-data-summary .patient-data-actions {
+  position:static!important;
+  align-self:center!important;
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:5px!important;
+  margin-inline-start:auto!important;
+  padding:0!important;
+}
+#modulesSection .patient-data-summary .patient-data-chevron {
+  flex:0 0 auto;
+  margin-inline-start:0!important;
+}
+#modulesSection .patient-data-summary .patient-data-actions button {
+  min-height:29px;
+  padding:5px 8px;
+  font-size:9px;
+}
+#modulesSection #saveArea[hidden],
+#modulesSection #editButton[hidden] {display:none!important}
+#modulesSection .patient-data-actions .patient-save-actions {
+  display:inline-flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  gap:5px!important;
+  margin:0!important;
+}
+@media(max-width:520px) {
+  #modulesSection .patient-data-summary {gap:5px!important}
+  #modulesSection .patient-data-title strong {font-size:10px}
+  #modulesSection .patient-data-title small {font-size:7px}
+  #modulesSection .patient-data-summary .patient-data-actions {gap:3px!important}
+  #modulesSection .patient-data-summary .patient-data-actions button {padding:4px 6px;font-size:8px}
+}
