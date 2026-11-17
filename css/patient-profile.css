@@ -54,19 +54,8 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #visitsList>div:hover{border-color:#b8d9d2!important}
 #writeAccessStatus,.access-note{display:none!important}
 
-/* Modal behavior is intentionally limited to the patient-data card */
-.patient-data-card .dashboard-details[open]::before{content:"";position:fixed;inset:0;background:rgba(12,27,38,.48);backdrop-filter:blur(3px);z-index:100}
-.patient-data-card .dashboard-details[open] .dashboard-panel{position:fixed;z-index:101;top:50%;left:50%;transform:translate(-50%,-50%);width:min(620px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border:1px solid #e3ecef;border-radius:16px;padding:18px;box-shadow:0 24px 80px rgba(8,25,35,.24);animation:patientModalIn .18s ease}
-.patient-data-card .dashboard-details[open]>summary{position:relative;z-index:102;background:#f4faf8}
-@keyframes patientModalIn{from{opacity:0;transform:translate(-50%,-48%)}to{opacity:1;transform:translate(-50%,-50%)}}
 @media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.measurements-card .measurements-direct{min-height:70px;height:70px;padding:11px}main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}.patient-data-card .dashboard-details[open] .dashboard-panel{padding:14px}}
-
-/* Modal header and layering: keep dashboard card in its grid position */
-.patient-data-card .dashboard-details[open]>summary{position:static!important;z-index:auto!important;background:#f4faf8}
-.modal-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #edf2f4;color:#173642;font-size:13px;font-weight:800}
-#closePatientModal{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:9px;background:#f1f5f7;color:#64748b;font-size:14px;cursor:pointer}
-#closePatientModal:hover{background:#e5edf1;color:#263d49}
 
 /* Explicit visibility states for edit mode */
 #saveArea.hidden{display:none!important}
@@ -142,15 +131,12 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #modulesSection .measurements-card .dashboard-details>summary{background:linear-gradient(120deg,#174c78,#287db2)!important}
 #modulesSection .plans-card .dashboard-details>summary{background:linear-gradient(120deg,#17633d,#26965d)!important}
 #modulesSection .patient-finance-card .finance-card-trigger{background:linear-gradient(120deg,#45266f,#7654bd)!important}
-#modulesSection .patient-data-card summary h3,#modulesSection .patient-data-card summary p,
 #modulesSection .measurements-card summary h3,#modulesSection .measurements-card summary p,
 #modulesSection .plans-card summary h3,#modulesSection .plans-card summary p,
 #modulesSection .patient-finance-card .finance-card-trigger h3,#modulesSection .patient-finance-card .finance-card-trigger p{color:#fff!important}
-#modulesSection .patient-data-card summary .dashboard-icon,
 #modulesSection .measurements-card summary .dashboard-icon,
 #modulesSection .plans-card summary .dashboard-icon,
 #modulesSection .patient-finance-card .dashboard-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
-#modulesSection .patient-data-card summary .details-chevron,
 #modulesSection .measurements-card summary .details-chevron,
 #modulesSection .plans-card summary .details-chevron,
 #modulesSection .patient-finance-card .details-chevron{color:#fff!important}
@@ -218,3 +204,47 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .hidden{display:none!important}
 #modulesSection.hidden{display:none!important}
 #loadingState.hidden,#patientContent.hidden,#errorState.hidden{display:none!important}
+
+
+/* Patient information is now permanently visible in the page, not a popup. */
+#modulesSection .patient-data-card {
+  grid-column: 1 / -1;
+  padding: 18px !important;
+  overflow: visible;
+  border-color: #dce8eb;
+}
+.patient-data-heading {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:14px; margin-bottom:16px; padding-bottom:13px;
+  border-bottom:1px solid var(--dp-line);
+}
+.patient-data-title {display:flex;align-items:center;gap:10px;min-width:0}
+.patient-data-title h3 {margin:0;color:#163541;font-size:15px;font-weight:900}
+.patient-data-title p {margin:3px 0 0;color:#82919a;font-size:10px}
+.patient-edit-button {
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-height:36px;padding:8px 13px;border:0;border-radius:9px;
+  background:#eaf5f2;color:#176b63;font:800 11px Cairo,sans-serif;cursor:pointer;
+}
+.patient-edit-button:hover {background:#dcefe9}
+.patient-edit-button:disabled {opacity:.45;cursor:not-allowed}
+.patient-data-fields {
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;
+}
+.patient-data-fields>div {min-width:0}
+.patient-data-fields>div:nth-child(n+6) {grid-column:span 2}
+.patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea {
+  min-height:39px;background:#f8fbfc;border-color:#e0e9ed;font-size:12px;
+}
+.patient-data-fields textarea {min-height:66px;resize:vertical}
+@media(max-width:800px) {
+  .patient-data-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .patient-data-fields>div:nth-child(n+6) {grid-column:1/-1}
+}
+@media(max-width:480px) {
+  #modulesSection .patient-data-card {padding:13px!important}
+  .patient-data-heading {align-items:flex-start;gap:8px}
+  .patient-data-title h3 {font-size:13px}
+  .patient-edit-button {min-height:33px;padding:7px 9px;font-size:10px}
+  .patient-data-fields {gap:9px}
+}
