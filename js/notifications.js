@@ -66,21 +66,6 @@ function todayKey() {
 }
 
 
-function addDaysToDateKey(baseDate, days) {
-  const key = dateKey(baseDate);
-  if (!key || !Number.isInteger(Number(days))) return '';
-
-  const [year, month, day] = key.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-  date.setDate(date.getDate() + Number(days));
-
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0')
-  ].join('-');
-}
-
 function addMonthsToDateKey(baseDate, months) {
   const key = dateKey(baseDate);
   if (!key || !Number.isInteger(Number(months))) return '';
@@ -139,8 +124,7 @@ function buildNotifications(rows) {
   const today = todayKey();
 
   (rows || []).forEach((row) => {
-    const nextFollowUp = dateKey(row.next_follow_up_date) ||
-      addDaysToDateKey(row.last_visit_date || row.subscription_start_date, row.follow_up_days);
+    const nextFollowUp = dateKey(row.next_follow_up_date);
 
     const subscriptionEnd = dateKey(row.subscription_end_date) ||
       addMonthsToDateKey(row.subscription_start_date, row.subscription_months);
@@ -346,8 +330,6 @@ async function loadNotifications() {
       patient_id,
       subscription_end_date,
       next_follow_up_date,
-      follow_up_days,
-      last_visit_date,
       subscription_start_date,
       subscription_months,
       patients(name)
