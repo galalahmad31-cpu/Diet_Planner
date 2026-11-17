@@ -49,25 +49,66 @@
 #logoutBtn.hidden:hover { display: none !important; }
 
 
-/* Quiet, aligned notification type markers on the dashboard card */
+/* Notification type indicators: distinct colors, consistent icon size and spacing. */
 .notification-nav-card{position:relative}
 .notification-nav-card .notification-card-indicators{
-  position:absolute;top:58px;left:24px;z-index:2;
-  display:inline-flex;align-items:center;justify-content:flex-start;
-  gap:6px;margin:0;padding:0;
+  position:absolute;
+  top:58px;
+  left:24px;
+  z-index:2;
+  display:inline-flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-start;
+  gap:9px;
+  margin:0;
+  padding:0;
 }
 .notification-nav-card .notification-card-indicator{
-  width:24px;height:24px;flex:0 0 24px;
-  display:inline-flex;align-items:center;justify-content:center;
-  border:1px solid rgba(255,255,255,.9);border-radius:8px;
-  font-size:10px;line-height:1;
-  box-shadow:0 2px 7px rgba(30,55,65,.07);
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid transparent;
+  border-radius:10px;
+  font-size:14px;
+  line-height:1;
+  box-shadow:0 2px 8px rgba(30,55,65,.10);
 }
-.notification-nav-card .notification-card-indicator.today{background:#e8f4fb;color:#397ca8}
-.notification-nav-card .notification-card-indicator.tomorrow{background:#efedff;color:#7654bd}
-.notification-nav-card .notification-card-indicator.subscriptions{background:#fff5df;color:#b7791f}
+.notification-nav-card .notification-card-indicator i{
+  display:block;
+  font-size:14px;
+  line-height:1;
+}
+.notification-nav-card .notification-card-indicator.today{
+  background:#d9f4e8;
+  border-color:#b8e8d2;
+  color:#087a52;
+}
+.notification-nav-card .notification-card-indicator.tomorrow{
+  background:#e1efff;
+  border-color:#c5ddfb;
+  color:#2563a6;
+}
+.notification-nav-card .notification-card-indicator.subscriptions{
+  background:#fff0d5;
+  border-color:#f6d89f;
+  color:#a85b08;
+}
 .notification-nav-card .notification-card-indicators:empty{display:none}
 @media(max-width:600px){
-  .notification-nav-card .notification-card-indicators{top:54px;left:18px;gap:5px}
-  .notification-nav-card .notification-card-indicator{width:22px;height:22px;flex-basis:22px;font-size:9px;border-radius:7px}
+  .notification-nav-card .notification-card-indicators{
+    top:52px;
+    left:18px;
+    gap:7px;
+  }
+  .notification-nav-card .notification-card-indicator{
+    width:27px;
+    height:27px;
+    flex-basis:27px;
+    border-radius:9px;
+  }
+  .notification-nav-card .notification-card-indicator i{font-size:12px}
 }
