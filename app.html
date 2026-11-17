@@ -280,7 +280,17 @@
                         </p>
 
                         <div class="notification-card-indicators" id="notificationCardIndicators"
-                             aria-label="أعداد الإشعارات حسب النوع"></div>
+                             aria-label="أعداد الإشعارات حسب النوع">
+                            <span class="notification-card-indicator today" title="متابعات اليوم: 0" aria-label="متابعات اليوم: 0">
+                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i><span class="notification-count">0</span>
+                            </span>
+                            <span class="notification-card-indicator tomorrow" title="متابعات الغد: 0" aria-label="متابعات الغد: 0">
+                                <i class="fa-solid fa-calendar-plus" aria-hidden="true"></i><span class="notification-count">0</span>
+                            </span>
+                            <span class="notification-card-indicator subscriptions" title="تنبيهات الاشتراكات: 0" aria-label="تنبيهات الاشتراكات: 0">
+                                <i class="fa-solid fa-credit-card" aria-hidden="true"></i><span class="notification-count">0</span>
+                            </span>
+                        </div>
                     </a>
 
                     <a href="article.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
@@ -398,7 +408,7 @@
     </main>
 
     <script src="js/auth-access.js?v=20261116-auth-v1"></script>
-    <script src="js/app-dashboard.js?v=20261117-notification-counts1"></script>
+    <script src="js/app-dashboard.js?v=20261117-notification-counts2"></script>
 
 </body>
 
