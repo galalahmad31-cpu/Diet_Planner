@@ -12,10 +12,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261116-auth-v1"></script>
-  <script src="js/patient-profile.js?v=20261117-patient-collapse1" defer></script>
+  <script src="js/patient-profile.js?v=20261117-actions-inside-summary1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261117-patient-actions-top2">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261117-actions-inside-summary1">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -68,6 +68,13 @@
           <summary class="patient-data-summary">
             <span class="dashboard-icon teal" aria-hidden="true">👤</span>
             <span class="patient-data-title"><strong>بيانات المريض</strong><small>البيانات الأساسية والتشخيص</small></span>
+            <span class="patient-data-actions" id="patientDataActions">
+              <button type="button" id="editButton" class="patient-edit-button">✏️ تعديل</button>
+              <span id="saveArea" class="patient-save-actions" hidden>
+                <button type="button" id="savePatientButton">حفظ التعديلات</button>
+                <button type="button" id="cancelEditButton">إلغاء</button>
+              </span>
+            </span>
             <i class="fa-solid fa-chevron-down patient-data-chevron" aria-hidden="true"></i>
           </summary>
           <div class="patient-data-content">
@@ -83,13 +90,6 @@
             </div>
           </div>
         </details>
-        <div class="patient-data-actions">
-          <button type="button" id="editButton" class="patient-edit-button">✏️ تعديل</button>
-          <div id="saveArea" class="hidden save-actions patient-save-actions">
-            <button type="button" id="savePatientButton">حفظ</button>
-            <button type="button" id="cancelEditButton">إلغاء</button>
-          </div>
-        </div>
       </div>
     </article>
     <article class="dashboard-card measurements-card"><a id="weightLink" class="dashboard-details measurements-direct"><span class="dashboard-card-head"><span class="dashboard-icon blue">📈</span><span><h3>متابعة القياسات</h3><p>الوزن والقياسات عبر الوقت</p></span><span class="dashboard-card-arrow">←</span></a></article>
