@@ -412,12 +412,16 @@
       return;
     }
 
+    const details = $('patientDataDetails');
+    if (details) details.open = true;
     setEditing(true);
   }
 
   function cancelEditing() {
     fillPatientData();
     setEditing(false);
+    const details = $('patientDataDetails');
+    if (details) details.open = false;
   }
 
   async function savePatient() {
