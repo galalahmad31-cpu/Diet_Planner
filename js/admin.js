@@ -2,7 +2,7 @@
 'use strict';
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
-const state={plans:[],subs:[],profiles:[],patients:[],activeTab:'requests'};
+const state={plans:[],subs:[],profiles:[],patients:[],activeTab:'requests',requestSearch:'',requestStatus:'all'};
 let confirmAction=null;
 
 const $=id=>document.getElementById(id);
@@ -43,9 +43,22 @@ async function loadAll(){
   renderRequests();renderPlans();renderDoctors();
 }
 function renderRequests(){
- const body=$('requestsBody');$('totalCount').textContent=state.subs.length;$('pendingCount').textContent=state.subs.filter(s=>s.status==='pending').length;$('paidCount').textContent=state.subs.filter(s=>s.status==='paid').length;$('canceledCount').textContent=state.subs.filter(s=>s.status==='canceled').length;
- if(!state.subs.length){setState('request','لا توجد طلبات اشتراك حاليًا.');return}
- body.innerHTML=state.subs.map(s=>`<tr>
+ const body=$('requestsBody');
+ const counts={all:state.subs.length,pending:state.subs.filter(s=>s.status==='pending').length,paid:state.subs.filter(s=>s.status==='paid').length,canceled:state.subs.filter(s=>s.status==='canceled').length};
+ $('totalCount').textContent=counts.all;$('pendingCount').textContent=counts.pending;$('paidCount').textContent=counts.paid;$('canceledCount').textContent=counts.canceled;
+ document.querySelectorAll('[data-request-filter]').forEach(b=>{
+  const active=b.dataset.requestFilter===state.requestStatus;
+  b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));
+ });
+ const q=state.requestSearch.trim().toLocaleLowerCase();
+ const filtered=state.subs.filter(s=>{
+  if(state.requestStatus!=='all'&&s.status!==state.requestStatus)return false;
+  if(!q)return true;
+  const profile=state.profiles.find(p=>p.id===s.user_id);
+  return [s.full_name,profile?.full_name,profile?.email,profile?.phone,planName(s.plan_id),s.status].some(v=>String(v||'').toLocaleLowerCase().includes(q));
+ });
+ if(!filtered.length){setState('request',state.subs.length?'لا توجد نتائج مطابقة للبحث أو الحالة المحددة.':'لا توجد طلبات اشتراك حاليًا.');return}
+ body.innerHTML=filtered.map(s=>`<tr>
  <td><span class="name">${esc(s.full_name||'بدون اسم')}</span><span class="meta">${esc(state.profiles.find(p=>p.id===s.user_id)?.email||'')}</span></td>
  <td>${esc(planName(s.plan_id))}</td><td>${money(state.plans.find(p=>p.id===s.plan_id)?.price)}</td><td>${dateTime(s.created_at)}</td>
  <td>${date(s.start_date)}<br>${date(s.expiry_date)}</td><td>${statusBadge(s.status,s.expiry_date)}</td>
@@ -169,6 +182,8 @@ function switchTab(tab){
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 $('newPlanBtn').onclick=()=>openPlan(null);$('refreshBtn').onclick=()=>loadAll();$('refreshDoctorsBtn').onclick=()=>loadAll();$('doctorSearch').oninput=renderDoctors;
+ $('requestSearch').oninput=e=>{state.requestSearch=e.target.value;renderRequests()};
+ document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;renderRequests()});
 $('dashboardBtn').onclick=()=>location.href='app.html';$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.replace('index.html')};
 $('modalClose').onclick=closeModal;$('modalBg').onclick=e=>{if(e.target===e.currentTarget)closeModal()};
 $('confirmClose').onclick=closeConfirm;$('confirmNo').onclick=closeConfirm;$('confirmYes').onclick=async()=>{const a=confirmAction;if(!a)return;confirmAction=null;$('confirmBg').style.display='none';await a()};
