@@ -210,11 +210,38 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 }
 .patient-data-heading {
   display:flex;
-  align-items:center;
+  flex-direction:row;
+  align-items:flex-start;
   justify-content:space-between;
   gap:12px;
 }
-.patient-data-details {flex:1 1 auto;min-width:0}
+.patient-data-details {
+  display:block;
+  flex:1 1 auto;
+  min-width:0;
+}
+.patient-data-details > .patient-data-summary {align-items:center}
+.patient-data-actions {
+  align-self:flex-start;
+  flex:0 0 auto;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+  margin:0!important;
+  padding:0!important;
+}
+.patient-data-actions #editButton {
+  margin:0!important;
+}
+.patient-data-actions .patient-save-actions {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:6px;
+  margin:0!important;
+}
 .patient-data-summary {
   list-style:none;
   display:flex;
@@ -297,6 +324,36 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 }
 @media(max-width:350px) {
   .patient-data-heading {align-items:flex-start}
-  .patient-data-actions {flex-direction:column;align-items:stretch}
-  .patient-save-actions {flex-direction:column}
+  .patient-data-actions {flex-direction:row;align-items:flex-start}
+  .patient-save-actions {flex-direction:row}
+}
+
+
+/* Keep patient edit controls anchored beside the heading, even when details expand. */
+#modulesSection .patient-data-heading {
+  align-items:flex-start !important;
+}
+#modulesSection .patient-data-actions,
+#modulesSection .patient-data-actions .patient-save-actions {
+  align-self:flex-start !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  margin:0 !important;
+  padding:0 !important;
+  gap:6px !important;
+}
+#modulesSection .patient-data-actions #editButton {
+  margin:0 !important;
+}
+#modulesSection .patient-data-actions button {
+  flex:0 0 auto !important;
+  white-space:nowrap;
+}
+@media(max-width:520px) {
+  #modulesSection .patient-data-heading {gap:6px}
+  #modulesSection .patient-data-actions,
+  #modulesSection .patient-data-actions .patient-save-actions {gap:4px!important}
+  #modulesSection .patient-data-actions button {padding-inline:6px!important;font-size:9px!important}
 }
