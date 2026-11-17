@@ -298,15 +298,6 @@
     return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
   }
 
-  function notificationAddDays(baseDate, days) {
-    const key = notificationDateKey(baseDate);
-    if (!key || !Number.isInteger(Number(days))) return "";
-    const [year, month, day] = key.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    date.setDate(date.getDate() + Number(days));
-    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
-  }
-
   function notificationAddMonths(baseDate, months) {
     const key = notificationDateKey(baseDate);
     if (!key || !Number.isInteger(Number(months))) return "";
@@ -361,7 +352,7 @@
     try {
       const { data, error } = await supabase
         .from("patient_finances")
-        .select("subscription_end_date,next_follow_up_date,follow_up_days,last_visit_date,subscription_start_date,subscription_months")
+        .select("subscription_end_date,next_follow_up_date,subscription_start_date,subscription_months")
         .eq("user_id", userId);
 
       if (error) throw error;
@@ -370,8 +361,7 @@
       const today = notificationTodayKey();
 
       (data || []).forEach((row) => {
-        const followUp = notificationDateKey(row.next_follow_up_date) ||
-          notificationAddDays(row.last_visit_date || row.subscription_start_date, row.follow_up_days);
+        const followUp = notificationDateKey(row.next_follow_up_date);
         const followUpDays = followUp ? notificationDaysUntil(followUp, today) : null;
         if (followUpDays === 0) counts.today += 1;
         if (followUpDays === 1) counts.tomorrow += 1;
