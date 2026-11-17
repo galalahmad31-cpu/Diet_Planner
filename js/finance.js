@@ -67,17 +67,6 @@ function formatISODate(date) {
     return `${y}-${m}-${d}`;
 }
 
-function addDays(dateValue, days) {
-    if (!dateValue || !days) return null;
-
-    const [y, m, d] = String(dateValue).slice(0, 10).split('-').map(Number);
-    if (![y, m, d].every(Number.isFinite)) return null;
-
-    const date = new Date(y, m - 1, d);
-    date.setDate(date.getDate() + Number(days));
-    return formatISODate(date);
-}
-
 function addMonths(dateValue, months) {
     if (!dateValue || !months) return null;
 
@@ -202,7 +191,6 @@ async function loadData() {
             discount_percent,
             discounted_amount,
             is_paid,
-            follow_up_days,
             last_visit_date,
             next_follow_up_date
         `)
@@ -315,12 +303,6 @@ function renderPatients() {
                     <div class="mt-1 text-sm font-bold">${finance.is_paid ? 'نعم' : 'لا'}</div>
                 </div>
 
-                <div>
-                    <div class="text-[11px] text-slate-400">مدة المتابعة</div>
-                    <div class="mt-1 text-sm font-bold">
-                        ${finance.follow_up_days ? `${esc(finance.follow_up_days)} يوم` : '—'}
-                    </div>
-                </div>
 
                 <div>
                     <div class="text-[11px] text-slate-400">المتابعة القادمة</div>
@@ -363,7 +345,6 @@ function openFinanceModal(row) {
     $('startDate').value = finance.subscription_start_date || '';
     $('months').value = finance.subscription_months || '';
     $('amount').value = finance.subscription_amount ?? '';
-    $('followUpDays').value = finance.follow_up_days ?? '';
     $('discount').value = finance.discount_percent ?? 0;
     $('paid').checked = Boolean(finance.is_paid);
 
@@ -393,11 +374,6 @@ function openFollowUpConfirmation(patientId) {
 
     if (!row) return;
 
-    if (!row.finance.follow_up_days) {
-        showToast('حدد مدة المتابعة أولًا من بيانات الاشتراك.', true);
-        return;
-    }
-
     pendingFollowUpPatient = patientId;
     $('followVisitDate').value = todayISO();
 
@@ -419,21 +395,12 @@ async function recordAttendance(patientId, actualVisitDate) {
 
     if (!row) return;
 
-    const followUpDays = Number(row.finance.follow_up_days);
-
-    if (!Number.isFinite(followUpDays) || followUpDays < 1) {
-        showToast('حدد مدة المتابعة أولًا من بيانات الاشتراك.', true);
-        return;
-    }
-
     const visitDate = actualVisitDate || todayISO();
-    const nextDate = addDays(visitDate, followUpDays);
 
     const { error } = await supabase
         .from('patient_finances')
         .update({
-            last_visit_date: visitDate,
-            next_follow_up_date: nextDate
+            last_visit_date: visitDate
         })
         .eq('patient_id', patientId)
         .eq('user_id', user.id);
@@ -444,7 +411,7 @@ async function recordAttendance(patientId, actualVisitDate) {
         return;
     }
 
-    showToast('تم تسجيل الحضور وتحديد موعد المتابعة القادم.');
+    showToast('تم تسجيل الحضور. أدخل موعد المتابعة القادم يدويًا من بيانات الاشتراك.');
     await loadData();
 }
 
@@ -458,9 +425,6 @@ async function saveFinance() {
 
     const startDate = $('startDate').value || null;
     const months = $('months').value ? Number($('months').value) : null;
-    const followUpDays = $('followUpDays').value
-        ? Number($('followUpDays').value)
-        : null;
     const amount = $('amount').value !== ''
         ? Number($('amount').value)
         : null;
@@ -475,11 +439,6 @@ async function saveFinance() {
 
     if (months && !startDate) {
         showToast('أدخل تاريخ بداية الاشتراك.', true);
-        return;
-    }
-
-    if (followUpDays !== null && (!Number.isFinite(followUpDays) || followUpDays < 1)) {
-        showToast('مدة المتابعة يجب أن تكون يومًا واحدًا على الأقل.', true);
         return;
     }
 
@@ -508,7 +467,6 @@ async function saveFinance() {
             subscription_amount: amount,
             discount_percent: discount,
             is_paid: $('paid').checked,
-            follow_up_days: followUpDays,
             last_visit_date: lastVisitDate,
             next_follow_up_date: nextFollowUpDate
         };
