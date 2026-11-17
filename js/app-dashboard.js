@@ -343,11 +343,18 @@
 
   async function loadNotificationCardIndicators(userId) {
     const host = document.getElementById("notificationCardIndicators");
-    if (!host || !userId) return;
+    if (!host) return;
+
+    // Keep visible zero-count indicators in place while data is loading.
+    renderNotificationIndicators({ today: 0, tomorrow: 0, subscriptions: 0 });
 
     const supabase = window.DietPlannerAccess?.supabaseClient;
-    if (!supabase) return;
+    if (!supabase || !userId) {
+      host.dataset.loadState = "unavailable";
+      return;
+    }
 
+    host.dataset.loadState = "loading";
     try {
       const { data, error } = await supabase
         .from("patient_finances")
@@ -372,8 +379,10 @@
       });
 
       renderNotificationIndicators(counts);
+      host.dataset.loadState = "loaded";
     } catch (error) {
-      // Indicator failure must not block the dashboard or reveal other users' data.
+      // Keep the zero-count indicators visible if the data request fails.
+      host.dataset.loadState = "error";
       console.warn("Notification card indicators could not be loaded:", error);
     }
   }
