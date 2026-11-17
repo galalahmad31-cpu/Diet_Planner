@@ -330,13 +330,12 @@
     host.replaceChildren();
     types.forEach((type) => {
       const count = counts[type.key] || 0;
-      if (!count) return;
       const marker = document.createElement("span");
       marker.className = `notification-card-indicator ${type.color}`;
       marker.title = `${type.label}: ${count}`;
       marker.setAttribute("role", "img");
       marker.setAttribute("aria-label", `${type.label}: ${count}`);
-      marker.innerHTML = `<i class="${type.icon}" aria-hidden="true"></i>`;
+      marker.innerHTML = `<i class="${type.icon}" aria-hidden="true"></i><span class="notification-count">${count}</span>`;
       host.appendChild(marker);
     });
     host.classList.toggle("has-notifications", host.childElementCount > 0);
