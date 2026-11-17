@@ -455,12 +455,6 @@
     cancelEditing();
   }
 
-  function closePatientModal() {
-    const details = document.querySelector('.patient-data-card .dashboard-details');
-    if (details) details.open = false;
-    cancelEditing();
-  }
-
   function financeDate(value) {
     if (!value) return '—';
     const date = new Date(`${String(value).slice(0,10)}T00:00:00`);
@@ -505,7 +499,7 @@
   }
   async function openPatientFinanceModal() {
     if (!$('patientFinanceModal')?.classList.contains('hidden')) return;
-    closePatientModal();
+    cancelEditing();
     if(!patientId||!state.user){alert('تعذر تحديد المستخدم أو المريض.');return;}
     $('patientFinanceModal').classList.remove('hidden');document.body.classList.add('overflow-hidden');
     $('patientFinanceName').textContent=state.patient?.name||'';
@@ -584,19 +578,6 @@
     $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });
     document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
 
-    // Use delegation so the close control remains reliable inside the modal.
-    document.addEventListener('click', (event) => {
-      const closeButton = event.target.closest('#closePatientModal');
-      if (closeButton) {
-        event.preventDefault();
-        event.stopPropagation();
-        closePatientModal();
-      }
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closePatientModal();
-    });
   }
 
   async function init() {
