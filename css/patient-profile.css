@@ -55,7 +55,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #writeAccessStatus,.access-note{display:none!important}
 
 @media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.measurements-card .measurements-direct{min-height:70px;height:70px;padding:11px}main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}.patient-data-card .dashboard-details[open] .dashboard-panel{padding:14px}}
+@media(max-width:600px){.measurements-card .measurements-direct{min-height:70px;height:70px;padding:11px}main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}}
 
 /* Explicit visibility states for edit mode */
 #saveArea.hidden{display:none!important}
@@ -109,10 +109,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 
 /* Dashboard palette — explicit card classes, unified contrast */
 .patient-dashboard .dashboard-details>summary{border-radius:13px!important;color:#fff!important}
-.patient-data-card .dashboard-details>summary{background:linear-gradient(135deg,#123b50,#176b63)!important}
-.patient-data-card .dashboard-card-head h3,.patient-data-card .dashboard-card-head p{color:#fff!important}
-.patient-data-card .dashboard-icon.teal{background:rgba(255,255,255,.17)!important;color:#fff!important}
-.patient-data-card .dashboard-details>summary .details-chevron{color:#fff!important}
 .measurements-card .dashboard-details>summary{background:linear-gradient(135deg,#174c78,#287db2)!important}
 .measurements-card .dashboard-card-head h3,.measurements-card .dashboard-card-head p{color:#fff!important}
 .measurements-card .dashboard-icon.blue{background:rgba(255,255,255,.17)!important;color:#fff!important}
@@ -127,7 +123,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
 
 /* FINAL card colors: patient-profile stylesheet loads after theme.css */
-#modulesSection .patient-data-card .dashboard-details>summary{background:linear-gradient(120deg,#123b50,#176b63)!important}
 #modulesSection .measurements-card .dashboard-details>summary{background:linear-gradient(120deg,#174c78,#287db2)!important}
 #modulesSection .plans-card .dashboard-details>summary{background:linear-gradient(120deg,#17633d,#26965d)!important}
 #modulesSection .patient-finance-card .finance-card-trigger{background:linear-gradient(120deg,#45266f,#7654bd)!important}
@@ -206,45 +201,102 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #loadingState.hidden,#patientContent.hidden,#errorState.hidden{display:none!important}
 
 
-/* Patient information is now permanently visible in the page, not a popup. */
+/* Patient data: closed collapsible panel with compact actions in its heading. */
 #modulesSection .patient-data-card {
-  grid-column: 1 / -1;
-  padding: 18px !important;
-  overflow: visible;
-  border-color: #dce8eb;
+  grid-column:1 / -1;
+  padding:14px 16px !important;
+  overflow:visible;
+  border-color:#dce8eb;
 }
 .patient-data-heading {
-  display:flex; align-items:center; justify-content:space-between;
-  gap:14px; margin-bottom:16px; padding-bottom:13px;
-  border-bottom:1px solid var(--dp-line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 }
-.patient-data-title {display:flex;align-items:center;gap:10px;min-width:0}
-.patient-data-title h3 {margin:0;color:#163541;font-size:15px;font-weight:900}
-.patient-data-title p {margin:3px 0 0;color:#82919a;font-size:10px}
+.patient-data-details {flex:1 1 auto;min-width:0}
+.patient-data-summary {
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:48px;
+  cursor:pointer;
+  user-select:none;
+}
+.patient-data-summary::-webkit-details-marker {display:none}
+.patient-data-summary .dashboard-icon {
+  width:36px;height:36px;flex:0 0 36px;
+  background:#e8f5f1!important;color:#176b63!important;
+}
+.patient-data-title {
+  display:flex;flex-direction:column;gap:2px;min-width:0;
+}
+.patient-data-title strong {color:#163541;font-size:13px;font-weight:900}
+.patient-data-title small {color:#82919a;font-size:9px}
+.patient-data-chevron {
+  margin-inline-start:auto;
+  color:#80939b;font-size:11px;
+  transition:transform .18s ease;
+}
+.patient-data-details[open] .patient-data-chevron {transform:rotate(180deg);color:#176b63}
+.patient-data-content {
+  padding:14px 2px 2px;
+  margin-top:8px;
+  border-top:1px solid var(--dp-line);
+}
+.patient-data-actions {
+  display:flex;align-items:center;justify-content:flex-end;
+  flex:0 0 auto;gap:6px;
+}
 .patient-edit-button {
-  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
-  min-height:36px;padding:8px 13px;border:0;border-radius:9px;
-  background:#eaf5f2;color:#176b63;font:800 11px Cairo,sans-serif;cursor:pointer;
+  min-height:31px;padding:6px 10px;
+  border:1px solid #d7e9e3;border-radius:8px;
+  background:#eaf5f2;color:#176b63;
+  font:800 10px Cairo,sans-serif;white-space:nowrap;cursor:pointer;
 }
 .patient-edit-button:hover {background:#dcefe9}
 .patient-edit-button:disabled {opacity:.45;cursor:not-allowed}
+.patient-save-actions {
+  display:flex;align-items:center;gap:6px;
+  margin:0!important;
+}
+.patient-save-actions button {
+  min-height:31px;padding:6px 10px;
+  border:0;border-radius:8px;
+  font:800 10px Cairo,sans-serif;white-space:nowrap;
+}
+.patient-save-actions #savePatientButton {background:#16834a;color:#fff}
+.patient-save-actions #cancelEditButton {background:#edf2f5;color:#53636d}
 .patient-data-fields {
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
 }
 .patient-data-fields>div {min-width:0}
-.patient-data-fields>div:nth-child(n+6) {grid-column:span 2}
-.patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea {
-  min-height:39px;background:#f8fbfc;border-color:#e0e9ed;font-size:12px;
+.patient-data-fields input,
+.patient-data-fields select,
+.patient-data-fields textarea {
+  width:100%;min-width:0;box-sizing:border-box;
+  min-height:39px;padding:8px 10px;
+  background:#f8fbfc;border-color:#e0e9ed;font-size:12px;
 }
-.patient-data-fields textarea {min-height:66px;resize:vertical}
-@media(max-width:800px) {
-  .patient-data-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .patient-data-fields>div:nth-child(n+6) {grid-column:1/-1}
-}
-@media(max-width:480px) {
-  #modulesSection .patient-data-card {padding:13px!important}
-  .patient-data-heading {align-items:flex-start;gap:8px}
-  .patient-data-title h3 {font-size:13px}
-  .patient-edit-button {min-height:33px;padding:7px 9px;font-size:10px}
+.patient-data-fields textarea {min-height:68px;resize:vertical}
+@media(max-width:520px) {
+  #modulesSection .patient-data-card {padding:11px!important}
+  .patient-data-heading {gap:7px}
+  .patient-data-summary {gap:7px;min-height:42px}
+  .patient-data-summary .dashboard-icon {width:31px;height:31px;flex-basis:31px;font-size:14px}
+  .patient-data-title strong {font-size:11px}
+  .patient-data-title small {font-size:8px}
+  .patient-data-actions {gap:4px}
+  .patient-edit-button,.patient-save-actions button {min-height:29px;padding:5px 7px;font-size:9px}
   .patient-data-fields {gap:9px}
+  .patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea {font-size:11px;padding:7px}
+  .patient-data-fields textarea {min-height:64px}
+}
+@media(max-width:350px) {
+  .patient-data-heading {align-items:flex-start}
+  .patient-data-actions {flex-direction:column;align-items:stretch}
+  .patient-save-actions {flex-direction:column}
 }
