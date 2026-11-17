@@ -49,66 +49,55 @@
 #logoutBtn.hidden:hover { display: none !important; }
 
 
-/* Notification type indicators: distinct colors, consistent icon size and spacing. */
-.notification-nav-card{position:relative}
-.notification-nav-card .notification-card-indicators{
-  position:absolute;
-  top:58px;
-  left:24px;
-  z-index:2;
+/* Notification card indicators — restore the original inline layout and compact colored markers. */
+.notification-card-indicators{
   display:inline-flex;
   flex-direction:row;
   align-items:center;
   justify-content:flex-start;
-  gap:9px;
-  margin:0;
+  gap:4px;
+  margin-inline-start:auto;
   padding:0;
 }
-.notification-nav-card .notification-card-indicator{
-  width:30px;
-  height:30px;
-  flex:0 0 30px;
+.notification-card-indicator{
+  width:22px;
+  height:22px;
+  flex:0 0 22px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  border:1px solid transparent;
-  border-radius:10px;
-  font-size:14px;
+  border:0;
+  border-radius:7px;
+  font-size:10px;
   line-height:1;
-  box-shadow:0 2px 8px rgba(30,55,65,.10);
+  box-shadow:none;
 }
-.notification-nav-card .notification-card-indicator i{
+.notification-card-indicator i{
   display:block;
-  font-size:14px;
+  font-size:10px;
   line-height:1;
 }
-.notification-nav-card .notification-card-indicator.today{
-  background:#d9f4e8;
-  border-color:#b8e8d2;
-  color:#087a52;
+.notification-card-indicator.today{
+  background:#e8f4fb;
+  color:#397ca8;
 }
-.notification-nav-card .notification-card-indicator.tomorrow{
-  background:#e1efff;
-  border-color:#c5ddfb;
-  color:#2563a6;
+.notification-card-indicator.tomorrow{
+  background:#efedff;
+  color:#7654bd;
 }
-.notification-nav-card .notification-card-indicator.subscriptions{
-  background:#fff0d5;
-  border-color:#f6d89f;
-  color:#a85b08;
+.notification-card-indicator.subscriptions{
+  background:#fff5df;
+  color:#b7791f;
 }
-.notification-nav-card .notification-card-indicators:empty{display:none}
+.notification-card-indicators:empty{display:none}
 @media(max-width:600px){
-  .notification-nav-card .notification-card-indicators{
-    top:52px;
-    left:18px;
-    gap:7px;
+  .notification-card-indicators{gap:3px}
+  .notification-card-indicator{
+    width:19px;
+    height:19px;
+    flex-basis:19px;
+    border-radius:6px;
+    font-size:9px;
   }
-  .notification-nav-card .notification-card-indicator{
-    width:27px;
-    height:27px;
-    flex-basis:27px;
-    border-radius:9px;
-  }
-  .notification-nav-card .notification-card-indicator i{font-size:12px}
+  .notification-card-indicator i{font-size:9px}
 }
