@@ -402,8 +402,10 @@
       if (field) field.disabled = !enabled;
     });
 
-    $('saveArea')?.classList.toggle('hidden', !enabled);
-    $('editButton')?.classList.toggle('hidden', enabled);
+    const saveArea = $('saveArea');
+    const editButton = $('editButton');
+    if (saveArea) saveArea.hidden = !enabled;
+    if (editButton) editButton.hidden = enabled;
   }
 
   function enableEditing() {
@@ -570,9 +572,15 @@
       try { sessionStorage.setItem('dpNutritionSupportPatientId', id); } catch (_) {}
       window.location.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(id)}`;
     });
+    // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
+    $('patientDataActions')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', savePatient);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
+    setEditing(false);
     $('addVisitButton')?.addEventListener('click', addVisit);
     $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
     $('savePatientFinance')?.addEventListener('click', savePatientFinance);
