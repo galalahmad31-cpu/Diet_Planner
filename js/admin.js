@@ -66,12 +66,20 @@ function renderPlans(){
  <td class="actions-cell"><button class="icon-btn" title="تعديل" data-edit-plan="${esc(p.id)}"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف" data-del-plan="${esc(p.id)}"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
  setState('plan','',true)
 }
-function latestSub(userId){return state.subs.filter(s=>s.user_id===userId).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0]||null}
+function isActivePaidSub(s){
+  const today=new Date().toISOString().slice(0,10);
+  return s?.status==='paid' && !!s.start_date && !!s.expiry_date && s.start_date<=today && s.expiry_date>=today;
+ }
+ function latestSub(userId){
+  const userSubs=state.subs.filter(s=>s.user_id===userId).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  // The current plan is the valid paid subscription, not a newer canceled request.
+  return userSubs.find(isActivePaidSub)||userSubs.find(s=>s.status==='pending')||userSubs[0]||null;
+ }
 function patientCountForSub(sub){return sub?state.patients.filter(p=>p.subscription_id===sub.id).length:state.patients.filter(p=>p.user_id===sub?.user_id).length}
 function renderDoctors(){
  const q=($('doctorSearch').value||'').trim().toLowerCase();
  const doctors=state.profiles.filter(p=>!q||[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q)));
- $('doctorCount').textContent=state.profiles.length;$('doctorActiveCount').textContent=state.profiles.filter(p=>{const s=latestSub(p.id);return s?.status==='paid'&&s.expiry_date>=new Date().toISOString().slice(0,10)}).length;
+ $('doctorCount').textContent=state.profiles.length;$('doctorActiveCount').textContent=state.profiles.filter(p=>isActivePaidSub(latestSub(p.id))).length;
  const body=$('doctorsBody');if(!doctors.length){setState('doctor','لا توجد نتائج.');return}
  body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);const max=s?.max_patients_snapshot;
  return `<tr><td><span class="name">${esc(p.full_name||'بدون اسم')}</span><span class="meta">${esc(p.email||'')}</span></td>
