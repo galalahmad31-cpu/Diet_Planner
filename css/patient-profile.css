@@ -169,18 +169,19 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 }
 
 
-/* Nutrition support direct card */
+/* Nutrition support direct card — warm amber palette, distinct from other modules. */
 .nutrition-support-card .measurements-direct{
  display:flex;align-items:center;gap:8px;width:100%;padding:12px;
  border-radius:13px;text-decoration:none;cursor:pointer;
- background:linear-gradient(135deg,#5b2c83,#7c3aed)!important;
- border:1px solid #6d28d9;min-height:76px;height:76px;box-sizing:border-box
+ background:linear-gradient(120deg,#9a4d12,#d97706)!important;
+ border:1px solid #b45309;min-height:76px;height:76px;box-sizing:border-box;
+ transition:filter .15s,box-shadow .15s
 }
 .nutrition-support-card .measurements-direct .dashboard-card-head h3,
 .nutrition-support-card .measurements-direct .dashboard-card-head p{color:#fff!important}
-.nutrition-support-card .nutrition-support-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
+.nutrition-support-card .nutrition-support-icon{background:rgba(255,255,255,.2)!important;color:#fff!important}
 .nutrition-support-card .measurements-direct .dashboard-card-arrow{color:#fff!important}
-.nutrition-support-card .measurements-direct:hover{filter:brightness(1.06)}
+.nutrition-support-card .measurements-direct:hover{filter:brightness(1.07);box-shadow:0 5px 16px rgba(154,77,18,.18)}
 
 
 /* Brief, non-blocking confirmation after saving patient finances */
