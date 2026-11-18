@@ -11,7 +11,8 @@
     user: null,
     isAdmin: false,
     hasActiveSubscription: false,
-    canAddPatient: false
+    canAddPatient: false,
+    activeSubscriptionId: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -65,6 +66,7 @@
         state.isAdmin = false;
         state.hasActiveSubscription = false;
         state.canAddPatient = false;
+        state.activeSubscriptionId = null;
         updateWriteControls();
         return;
       }
@@ -76,12 +78,29 @@
       if (state.isAdmin) {
         state.hasActiveSubscription = true;
         state.canAddPatient = true;
+        state.activeSubscriptionId = null;
         updateWriteControls();
         return;
       }
 
       state.hasActiveSubscription =
         (await access?.hasActiveSubscription?.(state.user.id)) === true;
+      state.activeSubscriptionId = null;
+      if (state.hasActiveSubscription) {
+        const today = new Date().toISOString().slice(0, 10);
+        const { data: activeSub, error: subError } = await supabase
+          .from('subscriptions')
+          .select('id')
+          .eq('user_id', state.user.id)
+          .eq('status', 'paid')
+          .lte('start_date', today)
+          .gte('expiry_date', today)
+          .order('start_date', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (subError) throw subError;
+        state.activeSubscriptionId = activeSub?.id || null;
+      }
       state.canAddPatient =
         (await access?.canAddPatient?.(state.user.id)) === true;
 
@@ -269,7 +288,8 @@
           height: null,
           diagnosis: null,
           complaints: null,
-          clinical_notes: null
+          clinical_notes: null,
+          subscription_id: state.isAdmin ? null : state.activeSubscriptionId
         })
         .select('id')
         .single();
