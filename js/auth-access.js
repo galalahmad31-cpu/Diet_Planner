@@ -185,26 +185,10 @@
 
     if (!error) return data === true;
 
-    console.error("Subscription RPC failed; using read-only fallback:", error);
-
-    // UI fallback only. Database RLS remains the final write authorization layer.
-    const today = getToday();
-    const { data: subscription, error: fallbackError } = await supabaseClient
-      .from("subscriptions")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("status", "paid")
-      .lte("start_date", today)
-      .gte("expiry_date", today)
-      .limit(1)
-      .maybeSingle();
-
-    if (fallbackError) {
-      console.error("Subscription fallback check failed:", fallbackError);
-      return null;
-    }
-
-    return !!subscription;
+    // Fail closed: never grant access through a client-side fallback.
+    // A transient RPC failure must not be interpreted as an active subscription.
+    console.error("Subscription RPC failed; access denied until verification succeeds:", error);
+    return null;
   }
 
   async function canAddPatient(userId) {
@@ -272,12 +256,17 @@
     }
 
     const role = await getUserRole(user.id);
+    const activeSubscription = role === "admin"
+      ? true
+      : await hasActiveSubscription(user.id);
 
     return {
       authenticated: true,
       user,
       role,
-      isAdmin: role === "admin"
+      isAdmin: role === "admin",
+      hasActiveSubscription: activeSubscription === true,
+      accessVerificationFailed: role === null || activeSubscription === null
     };
   }
 
@@ -291,35 +280,24 @@
     const role = await getUserRole(userId);
 
     if (role === null) {
-      showAuthMessage(
-        "تعذر التحقق من صلاحية الحساب حاليًا. حاول مرة أخرى."
-      );
+      window.location.replace("subscription_plans_index.html?access_check=failed");
       return false;
     }
 
     if (role === "admin") {
-      window.location.replace("index.html");
+      window.location.replace("app.html");
       return true;
     }
 
     const active = await hasActiveSubscription(userId);
 
-    if (active === null) {
-      showAuthMessage(
-        "تعذر التحقق من حالة الاشتراك حاليًا. حاول مرة أخرى."
-      );
-      return false;
-    }
-
-    if (active) {
-      window.location.replace("index.html");
+    if (active === true) {
+      window.location.replace("app.html");
       return true;
     }
 
-    window.location.replace(
-      "subscription_plans_index.html"
-    );
-
+    // No subscription OR verification failure: direct user to the plan chooser.
+    window.location.replace("subscription_plans_index.html");
     return false;
   }
 
