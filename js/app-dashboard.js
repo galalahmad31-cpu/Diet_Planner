@@ -448,11 +448,16 @@
       const status =
         await access.getAccessStatus();
 
-      // app.html itself does not redirect.
-      // The central auth layer is responsible for auth routing.
       if (!status.authenticated || !status.user) {
         renderAdminCard(false);
         renderVisitorDashboard();
+        return;
+      }
+
+      // This dashboard is an entitled workspace, not an email-confirmation landing page.
+      // A normal account must have an active paid/free-trial subscription.
+      if (status.isAdmin !== true && status.hasActiveSubscription !== true) {
+        window.location.replace("subscription_plans_index.html");
         return;
       }
 
@@ -467,13 +472,9 @@
       // Load subtle per-type notification markers after authentication.
       await loadNotificationCardIndicators(status.user.id);
     } catch (error) {
-      console.error(
-        "Dashboard initialization failed:",
-        error
-      );
-
-      renderAdminCard(false);
-      renderVisitorDashboard();
+      console.error("Dashboard access verification failed:", error);
+      // Fail closed rather than rendering an entitled dashboard on an error.
+      window.location.replace("subscription_plans_index.html?access_check=failed");
     }
   }
 
