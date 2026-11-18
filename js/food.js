@@ -219,6 +219,10 @@ async function init(){
   const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
   if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return;}
   user=accessStatus.user;isAdmin=accessStatus.isAdmin===true;
+  if(!isAdmin && accessStatus.hasActiveSubscription!==true){
+    location.replace('subscription_plans_index.html');
+    return;
+  }
   try{await Promise.all([loadFoods(),loadExchanges()]);}
   catch(error){console.error('Food library initialization failed:',error);toast('حدث خطأ أثناء تحميل المكتبة: '+(error?.message||'خطأ غير معروف'),false);}
   finally{$('loading').style.display='none';}
