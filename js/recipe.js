@@ -309,7 +309,7 @@
         $('grid').innerHTML = filtered.map((recipe) => {
             const owner = recipe.created_by === currentUser.id;
             const canDelete = isAdmin || (owner && hasActiveSubscription);
-            const canEdit = isAdmin || owner;
+            const canEdit = isAdmin || (owner && hasActiveSubscription);
             const ingredientPreview = editorText(recipe.ingredients) || 'بدون مكونات مسجلة';
 
             return `
@@ -541,7 +541,18 @@
         currentUser = accessStatus.user;
         isAdmin = Boolean(accessStatus.isAdmin || accessStatus.profile?.role === 'admin');
 
-        await Promise.all([loadSubscriptionStatus(), loadRecipes()]);
+        if (!isAdmin) {
+            const active = await window.DietPlannerAccess.hasActiveSubscription(currentUser.id);
+            if (active !== true) {
+                location.replace('subscription_plans_index.html');
+                return;
+            }
+            hasActiveSubscription = true;
+        } else {
+            hasActiveSubscription = true;
+        }
+
+        await loadRecipes();
         $('loading').style.display = 'none';
     }
 
