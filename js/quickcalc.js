@@ -789,9 +789,13 @@ async function initializeQuickCalculatorAccess() {
     return;
   }
   const user = accessStatus.user;
+  if (accessStatus.isAdmin !== true &&
+      (await access.hasActiveSubscription(user.id)) !== true) {
+    window.location.replace('subscription_plans_index.html');
+    return;
+  }
 
-  // The calculator itself is a client-side tool. Authentication is required;
-  // subscription/feature authorization remains centralized in the app's access layer.
+  // The calculator is visible only to an active subscriber or administrator.
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
