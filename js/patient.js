@@ -117,33 +117,19 @@
   function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
+    const canAdd = state.isAdmin || state.canAddPatient;
 
+    // Do not show subscription/quota warnings on the patient directory.
+    // The add action itself is controlled solely by the authoritative quota RPC.
     if (addButton) {
-      addButton.disabled = !(state.isAdmin || state.canAddPatient);
-      addButton.classList.toggle('opacity-50', !(state.isAdmin || state.canAddPatient));
-      addButton.classList.toggle('cursor-not-allowed', !(state.isAdmin || state.canAddPatient));
-      addButton.title = (state.isAdmin || state.canAddPatient)
-        ? 'إضافة مريض جديد'
-        : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط';
+      addButton.disabled = !canAdd;
+      addButton.classList.toggle('opacity-50', !canAdd);
+      addButton.classList.toggle('cursor-not-allowed', !canAdd);
+      addButton.title = canAdd ? 'إضافة مريض جديد' : '';
     }
-
     if (accessBox) {
-      if (state.isAdmin) {
-        accessBox.textContent = 'وضع المدير: جميع الصلاحيات متاحة';
-        accessBox.className =
-          'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else if (state.hasActiveSubscription) {
-        accessBox.textContent = state.canAddPatient
-          ? 'الاشتراك فعال — يمكنك إضافة مرضى جدد.'
-          : 'الاشتراك فعال، لكن تم بلوغ حد المرضى المسموح به في الاشتراك الحالي.';
-        accessBox.className =
-          'mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else {
-        accessBox.textContent =
-          'الاشتراك غير فعال — يمكنك عرض وحذف ملفاتك الحالية، لكن لا يمكنك إضافة مرضى جدد.';
-        accessBox.className =
-          'mt-3 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
-      }
+      accessBox.textContent = '';
+      accessBox.className = 'hidden';
     }
   }
 
@@ -225,14 +211,7 @@
   }
 
   function openAddPatientModal() {
-    if (!state.isAdmin && !state.canAddPatient) {
-      showStatus(
-        state.hasActiveSubscription
-          ? 'لا يمكن إضافة مريض جديد لأن الحد المسموح به في الاشتراك الحالي قد تم بلوغه.'
-          : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط.'
-      );
-      return;
-    }
+    if (!state.isAdmin && !state.canAddPatient) return;
 
     const modal = $('addPatientModal');
     if (!modal) return;
@@ -255,14 +234,7 @@
   }
 
   async function createPatient() {
-    if (!state.isAdmin && !state.canAddPatient) {
-      showStatus(
-        state.hasActiveSubscription
-          ? 'لا يمكن إضافة مريض جديد لأن الحد المسموح به في الاشتراك الحالي قد تم بلوغه.'
-          : 'إضافة المرضى متاحة أثناء الاشتراك المدفوع فقط.'
-      );
-      return;
-    }
+    if (!state.isAdmin && !state.canAddPatient) return;
 
     const input = $('newPatientName');
     const name = input?.value.trim();
