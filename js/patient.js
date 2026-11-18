@@ -12,7 +12,10 @@
     isAdmin: false,
     hasActiveSubscription: false,
     canAddPatient: false,
-    activeSubscriptionId: null
+    activeSubscriptionId: null,
+    accessReady: false,
+    accessPromise: null,
+    openingAddModal: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -58,6 +61,7 @@
   }
 
   async function refreshAccess() {
+    state.accessReady = false;
     try {
       const accessStatus = await access?.getAccessStatus?.();
       state.user = accessStatus?.user || null;
@@ -111,6 +115,8 @@
       state.hasActiveSubscription = false;
       state.canAddPatient = false;
       updateWriteControls();
+    } finally {
+      state.accessReady = true;
     }
   }
 
@@ -210,16 +216,28 @@
     window.location.href = `patient-profile.html?id=${encodeURIComponent(id)}`;
   }
 
-  function openAddPatientModal() {
-    if (!state.isAdmin && !state.canAddPatient) return;
+  async function openAddPatientModal() {
+    // If access/quota is still being checked on initial page load, wait for
+    // that same request rather than dropping the first tap.
+    if (state.openingAddModal) return;
+    state.openingAddModal = true;
 
-    const modal = $('addPatientModal');
-    if (!modal) return;
+    try {
+      if (!state.accessReady) {
+        state.accessPromise = state.accessPromise || refreshAccess();
+        await state.accessPromise;
+      }
+      if (!state.isAdmin && !state.canAddPatient) return;
 
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+      const modal = $('addPatientModal');
+      if (!modal) return;
 
-    setTimeout(() => $('newPatientName')?.focus(), 50);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => $('newPatientName')?.focus(), 50);
+    } finally {
+      state.openingAddModal = false;
+    }
   }
 
   function closeAddPatientModal() {
@@ -339,7 +357,10 @@
 
     const action = target.dataset.action;
 
-    if (action === 'open-add-patient') openAddPatientModal();
+    if (action === 'open-add-patient') {
+      event.preventDefault();
+      void openAddPatientModal();
+    }
     if (action === 'close-add-patient') closeAddPatientModal();
     if (action === 'create-patient') createPatient();
     if (action === 'close-delete') closeDeleteModal();
@@ -387,7 +408,8 @@
 
     // Start loading the patient directory immediately; access checks run independently.
     const patientsLoad = loadPatients();
-    await refreshAccess();
+    state.accessPromise = refreshAccess();
+    await state.accessPromise;
     await patientsLoad;
   }
 
