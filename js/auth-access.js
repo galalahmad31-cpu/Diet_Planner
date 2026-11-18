@@ -280,7 +280,7 @@
     const role = await getUserRole(userId);
 
     if (role === null) {
-      window.location.replace("subscription_plans_index.html?access_check=failed");
+      showAuthMessage("تعذر التحقق من صلاحية الحساب حاليًا. حاول مرة أخرى.");
       return false;
     }
 
@@ -291,12 +291,16 @@
 
     const active = await hasActiveSubscription(userId);
 
+    if (active === null) {
+      showAuthMessage("تعذر التحقق من الاشتراك حاليًا. لم يتم منح الوصول. حاول مرة أخرى.");
+      return false;
+    }
+
     if (active === true) {
       window.location.replace("app.html");
       return true;
     }
 
-    // No subscription OR verification failure: direct user to the plan chooser.
     window.location.replace("subscription_plans_index.html");
     return false;
   }
