@@ -23,10 +23,15 @@ function withTimeout(promise,ms,label='الطلب'){
 async function getSession(){
   const access=window.DietPlannerAccess;
   if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
-  user=await withTimeout(access.getCurrentUser(),2000,'التحقق من الجلسة');
+  user=await withTimeout(access.getCurrentUser(),5000,'التحقق من الجلسة');
   if(!user){location.replace('index.html');return false;}
-  isAdmin=false;
-  access.getUserRole?.(user.id).then(role=>{isAdmin=role==='admin';if(diets.length)renderDiets();}).catch(error=>console.warn('Role lookup deferred:',error));
+  const accessStatus=await withTimeout(access.getAccessStatus(),5000,'التحقق من الاشتراك');
+  if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return false;}
+  if(accessStatus.isAdmin!==true && accessStatus.hasActiveSubscription!==true){
+    location.replace('subscription_plans_index.html');
+    return false;
+  }
+  isAdmin=accessStatus.isAdmin===true;
   return true;
 }
 const CACHE_TTL=5*60*1000;
