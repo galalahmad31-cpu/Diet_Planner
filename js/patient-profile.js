@@ -475,7 +475,7 @@
       toast.className = 'patient-finance-success-toast';
       toast.setAttribute('role', 'status');
       toast.setAttribute('aria-live', 'polite');
-      toast.textContent = 'تم حفظ ماليات المريض بنجاح';
+      toast.textContent = 'تم حفظ بيانات الاشتراك والمواعيد بنجاح';
       document.body.appendChild(toast);
     }
 
@@ -524,7 +524,7 @@
       $('patientFinanceLoading').classList.add('hidden');
       if(!data)$('patientFinanceEmpty').classList.remove('hidden');
       $('patientFinanceForm').classList.remove('hidden');updateFinancePreview();
-    }catch(e){console.error('Finance load error',e);$('patientFinanceLoading').textContent='تعذر تحميل الماليات: '+(e.message||'تحقق من صلاحيات قاعدة البيانات');}
+    }catch(e){console.error('Finance load error',e);$('patientFinanceLoading').textContent='تعذر تحميل بيانات الاشتراك والمواعيد: '+(e.message||'تحقق من صلاحيات قاعدة البيانات');}
   }
   async function savePatientFinance() {
     if(!state.user||!patientId)return;
