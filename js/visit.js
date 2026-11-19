@@ -64,10 +64,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     visit = { patient_id: data.id, patients: data };
     window.currentPatientId = data.id;
-    window.visitContext = {
-      patient_id: data.id,
-      energyRequirements: data
-    };
+    window.currentPatientEnergy = data;
 
     const patientName = document.getElementById('patientName');
     if (patientName) patientName.textContent = data.name || 'بدون اسم';
@@ -78,6 +75,13 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     document.getElementById('loadingState')?.classList.add('hidden');
     document.getElementById('visitContent')?.classList.remove('hidden');
+    const params = new URLSearchParams(window.location.search);
+    const planType = params.get('plan_type') || '';
+    if (params.get('new_plan') === '1' || planType.includes('الجرامات')) {
+      void toggleModule('dietPlan');
+    } else if (planType.includes('البدائل')) {
+      void toggleModule('exchangePlan');
+    }
   }
 
   const moduleLoaders = {
