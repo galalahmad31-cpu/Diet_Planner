@@ -306,3 +306,12 @@ html,body{max-width:100%;overflow-x:hidden}
 .inline-measurement-row td{padding:6px 4px}
 .inline-measurement-row input,.inline-measurement-row select{width:100%;min-width:75px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px 5px;font:700 10px Cairo,sans-serif}
 @media(max-width:640px){.measurements-panel{padding:11px 9px}.measurements-toolbar{align-items:flex-start;flex-direction:column}.measurements-add-button{width:100%}.measurements-table{min-width:610px}}
+
+/* Keep the measurements summary visually consistent with its former blue card. */
+.measurements-card .measurements-summary{background:linear-gradient(135deg,#174c78,#287db2)!important;border:1px solid #246c9c;border-radius:13px;min-height:76px}
+.measurements-card .measurements-summary .dashboard-card-head h3,
+.measurements-card .measurements-summary .dashboard-card-head p,
+.measurements-card .measurements-summary .measurements-chevron{color:#fff!important}
+.measurements-card .measurements-summary .dashboard-icon.blue{background:rgba(255,255,255,.17)!important;color:#fff!important}
+.measurements-card .measurements-summary:hover{filter:brightness(1.06)}
+.measurements-card .measurements-details[open]>summary{background:linear-gradient(135deg,#174c78,#287db2)!important}
