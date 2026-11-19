@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="css/index.css?v=20261116-emailnotice2">
+<link rel="stylesheet" href="css/index.css?v=20261119-email-otp-v1">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -41,17 +41,29 @@
 </div>
 </form>
 <form id="registerForm" class="auth-form" style="display:none">
+<div id="registerFields">
 <div class="field"><label for="registerName">الاسم بالكامل</label><input id="registerName" name="name" type="text" autocomplete="name" placeholder="اسمك" required></div>
 <div class="field"><label for="registerEmail">البريد الإلكتروني</label><input id="registerEmail" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required></div>
 <div class="field"><label for="registerPassword">كلمة المرور</label><div class="password-wrap"><input id="registerPassword" name="new-password" type="password" autocomplete="new-password" placeholder="8 أحرف على الأقل" required><button type="button" class="show-password" data-toggle-password="registerPassword" aria-label="إظهار كلمة المرور"><i class="fa-regular fa-eye"></i></button></div><p class="field-hint">استخدم كلمة مرور قوية تحتوي على أحرف وأرقام ورمز.</p></div>
 <button id="registerButton" type="button" class="btn">إنشاء الحساب</button>
+</div>
+<div id="signupOtpPanel" hidden>
+  <div class="field">
+    <label for="signupOtp">رمز التحقق المرسل إلى بريدك الإلكتروني</label>
+    <input id="signupOtp" name="one-time-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" aria-describedby="signupOtpEmail" style="text-align:center;direction:ltr;letter-spacing:8px;font-size:24px;font-weight:800;">
+    <p id="signupOtpEmail" class="field-hint" style="direction:ltr;text-align:center;"></p>
+  </div>
+  <button id="verifySignupOtpButton" type="button" class="btn">تأكيد البريد الإلكتروني</button>
+  <button id="resendSignupOtpButton" type="button" class="google-btn" style="margin-top:10px;">إعادة إرسال الرمز</button>
+  <button id="backToRegisterButton" type="button" class="google-btn" style="margin-top:10px;">العودة لبيانات التسجيل</button>
+</div>
 </form>
 <div class="auth-bottom-note">بياناتك وحسابك في مكان واحد — Diet Planner</div>
 </div>
 <script>
 document.querySelectorAll("[data-toggle-password]").forEach(button=>button.addEventListener("click",()=>{const input=document.getElementById(button.dataset.togglePassword);const visible=input.type==="password";input.type=visible?"text":"password";button.innerHTML=visible?'<i class="fa-regular fa-eye-slash"></i>':'<i class="fa-regular fa-eye"></i>';button.setAttribute("aria-label",visible?"إخفاء كلمة المرور":"إظهار كلمة المرور")}));
 </script>
-<script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
+<script src="js/auth-access.js?v=20261119-email-otp-v1"></script>
 
   
 </body>
