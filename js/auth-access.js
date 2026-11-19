@@ -73,11 +73,6 @@
     box.replaceChildren();
 
     if (isVerification) {
-      const icon = document.createElement("span");
-      icon.className = "verification-icon";
-      icon.setAttribute("aria-hidden", "true");
-      icon.innerHTML = '<i class="fa-solid fa-envelope-circle-check"></i>';
-
       const content = document.createElement("div");
       content.className = "verification-content";
 
@@ -104,8 +99,8 @@
         spamNote.append(spamLabel, spamText);
         content.append(spamNote);
       }
-      box.append(icon, content);
-    } else {
+      box.append(content);
+    } else {{
       box.textContent = message;
     }
 
