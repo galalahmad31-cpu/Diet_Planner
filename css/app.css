@@ -336,7 +336,7 @@
 }
 @media(prefers-reduced-motion:reduce){
   .dashboard-services-strip{scroll-behavior:auto}
-  .dashboard-service-card,.dashboard-strip-arrow,.dashboard-notification-item{transition:none}
+  .dashboard-service-card,.dashboard-strip-arrow{transition:none}
 }
 
 
