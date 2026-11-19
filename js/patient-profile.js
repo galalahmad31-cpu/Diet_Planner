@@ -1019,6 +1019,7 @@
     const id = state.patient?.id || patientId;
     if (!frame || !id || frame.dataset.loaded === 'true') return;
     try { sessionStorage.setItem('dpNutritionSupportPatientId', id); } catch (_) {}
+    frame.style.height = '1px';
     frame.src = `nutritionsupport-patient.html?patient=${encodeURIComponent(id)}&embed=1`;
     frame.dataset.loaded = 'true';
   }
