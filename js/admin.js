@@ -285,7 +285,6 @@ $('announcementList').onclick=e=>{
 };
  $('requestSearch').oninput=e=>{state.requestSearch=e.target.value;renderRequests()};
  document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;renderRequests()});
-$('dashboardBtn').onclick=()=>location.href='app.html';$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.replace('index.html')};
 $('modalClose').onclick=closeModal;$('modalBg').onclick=e=>{if(e.target===e.currentTarget)closeModal()};
 $('confirmClose').onclick=closeConfirm;$('confirmNo').onclick=closeConfirm;$('confirmYes').onclick=async()=>{const a=confirmAction;if(!a)return;confirmAction=null;$('confirmBg').style.display='none';await a()};
 $('confirmBg').onclick=e=>{if(e.target===e.currentTarget)closeConfirm()};$('proofClose').onclick=()=>{$('proofBg').style.display='none'};$('proofBg').onclick=e=>{if(e.target===e.currentTarget)$('proofBg').style.display='none'};
