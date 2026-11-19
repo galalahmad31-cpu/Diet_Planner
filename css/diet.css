@@ -263,43 +263,6 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
 }
 
 
-/* Compact horizontal quick navigation — shared with patient and products pages */
-.quick-access-nav{
-  display:block!important;position:relative;z-index:5;width:100%;max-width:1200px;
-  margin:12px auto 0;padding:9px 14px!important;background:#f4f8f9!important;
-  border:1px solid #e2ebee;border-radius:14px;overflow:hidden;box-sizing:border-box;
-}
-.quick-access-track{
-  display:flex!important;flex-flow:row nowrap!important;align-items:center!important;
-  justify-content:flex-start!important;gap:9px!important;width:100%;
-  overflow-x:auto!important;overflow-y:hidden!important;padding:2px 2px 5px!important;
-  direction:rtl;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  scroll-snap-type:x proximity;
-}
-.quick-access-track::-webkit-scrollbar{display:none!important}
-.quick-access-card{
-  display:inline-flex!important;flex:0 0 auto!important;flex-direction:row!important;
-  align-items:center!important;justify-content:center!important;gap:7px!important;
-  min-width:max-content!important;min-height:39px!important;padding:7px 13px!important;
-  margin:0!important;border:1px solid #e1e9ed!important;border-radius:12px!important;
-  background:#fff!important;color:#365568!important;box-shadow:0 2px 7px rgba(24,58,72,.06)!important;
-  font-family:'Cairo',sans-serif!important;font-size:11px!important;font-weight:800!important;
-  line-height:1.3!important;text-decoration:none!important;white-space:nowrap!important;
-  scroll-snap-align:start;transition:background .16s ease,border-color .16s ease,transform .16s ease;
-}
-.quick-access-card i{display:inline-block!important;flex:0 0 auto!important;font-size:13px!important;line-height:1!important;color:#168879!important}
-.quick-access-card span{display:inline-block!important;font-size:inherit!important;line-height:inherit!important;white-space:nowrap!important}
-.quick-access-card:hover{background:#f0f8f6!important;border-color:#b9ddd5!important;color:#117e73!important}
-.quick-access-card.active{background:#e5f4f0!important;border-color:#9ed2c7!important;color:#08796e!important;box-shadow:0 2px 8px rgba(17,126,115,.10)!important}
-.quick-access-card.active i{color:#08796e!important}
-.quick-access-card:focus-visible{outline:2px solid #178f84;outline-offset:2px}
-@media(max-width:600px){
-  .quick-access-nav{padding:7px 9px!important}
-  .quick-access-track{gap:7px!important}
-  .quick-access-card{min-height:35px!important;padding:6px 10px!important;border-radius:10px!important;font-size:10px!important;gap:6px!important}
-  .quick-access-card i{font-size:12px!important}
-}
-
 
 /* Diet library: calm, compact list presentation */
 #dietGrid{display:flex!important;flex-direction:column!important;gap:10px!important}
@@ -348,4 +311,50 @@ html[data-theme="dark"] .diet-list-icon-btn{background:#302222;border-color:#563
  .diet-list-actions{width:100%;justify-content:flex-start;gap:6px}
  .diet-list-btn{min-height:33px;padding:6px 9px;font-size:10px}
  .diet-list-icon-btn{width:33px;min-height:33px}
+}
+
+
+/* Diet Library: branded green header and integrated quick navigation */
+.diet-page-header{
+  position:relative;isolation:isolate;overflow:hidden;color:#fff;
+  background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);
+  border:0!important;border-radius:24px!important;
+  box-shadow:0 16px 36px rgba(15,90,85,.18)!important;
+}
+.diet-page-header:after{
+  content:"";position:absolute;z-index:-1;width:230px;height:230px;left:-65px;top:-125px;
+  border:35px solid rgba(255,255,255,.07);border-radius:50%;pointer-events:none;
+}
+.diet-header-inner{position:relative;z-index:1;padding:12px 16px 10px}
+.diet-brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
+.diet-brand{display:flex;align-items:center;gap:13px;min-width:0}
+.diet-brand-logo{display:grid;place-items:center;width:52px;height:52px;flex:0 0 52px;border-radius:15px;color:#fff;background:rgba(255,255,255,.16);box-shadow:0 8px 22px rgba(0,0,0,.12);font-size:22px}
+.diet-brand-copy h1{margin:0!important;color:#fff!important;font-size:20px!important;font-weight:900;line-height:1.3}
+.diet-brand-copy p{margin:3px 0 0!important;color:#bcebe0!important;font-size:11px;font-weight:800}
+.diet-header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.diet-page-label{flex:0 0 auto;padding:6px 11px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.11);color:#e7fff8;font-size:11px;font-weight:800;white-space:nowrap}
+.diet-create-btn{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:6px 12px;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:#fff;color:#126b5d;font:800 11px Cairo,sans-serif;white-space:nowrap}
+.diet-page-header .quick-access-nav{display:block!important;position:relative;z-index:2;width:100%;max-width:none;margin:8px 0 0;padding:8px 0 3px!important;background:transparent!important;border:0;border-top:1px solid rgba(255,255,255,.16);border-radius:0;overflow:hidden;box-sizing:border-box}
+.diet-page-header .quick-access-track{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 1px 5px!important;direction:rtl;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.diet-page-header .quick-access-track::-webkit-scrollbar{display:none!important}
+.diet-page-header .quick-access-card{display:inline-flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-width:max-content!important;min-height:36px!important;padding:6px 12px!important;margin:0!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:11px!important;background:rgba(255,255,255,.10)!important;color:#e9fffa!important;box-shadow:none!important;font-family:'Cairo',sans-serif!important;font-size:10px!important;font-weight:800!important;line-height:1.3!important;text-decoration:none!important;white-space:nowrap!important;scroll-snap-align:start}
+.diet-page-header .quick-access-card i{display:inline-block!important;flex:0 0 auto!important;font-size:12px!important;line-height:1!important;color:#a9e7d9!important}
+.diet-page-header .quick-access-card span{display:inline-block!important;font-size:inherit!important;line-height:inherit!important;white-space:nowrap!important}
+.diet-page-header .quick-access-card:hover{background:rgba(255,255,255,.19)!important;border-color:rgba(255,255,255,.34)!important;color:#fff!important}
+.diet-page-header .quick-access-card.active{background:#fff!important;border-color:#fff!important;color:#126b5d!important;box-shadow:0 3px 10px rgba(0,0,0,.10)!important}
+.diet-page-header .quick-access-card.active i{color:#168879!important}
+.diet-page-header .quick-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:600px){
+ .diet-header-inner{padding:9px 10px 7px}
+ .diet-brand-row{min-height:48px}
+ .diet-brand{gap:10px}
+ .diet-brand-logo{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:18px}
+ .diet-brand-copy h1{font-size:18px!important}
+ .diet-brand-copy p{font-size:10px}
+ .diet-page-label{font-size:9px;padding:4px 8px}
+ .diet-create-btn{min-height:30px;padding:5px 8px;font-size:9px}
+ .diet-page-header .quick-access-nav{margin-top:7px;padding:7px 0 2px!important}
+ .diet-page-header .quick-access-track{gap:7px!important}
+ .diet-page-header .quick-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
+ .diet-page-header .quick-access-card i{font-size:11px!important}
 }
