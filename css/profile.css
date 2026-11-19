@@ -71,3 +71,43 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
   .profile-content-grid{padding:0 10px;gap:12px}
   .profile-content-grid>.glass{padding:16px!important;border-radius:16px!important}
 }
+
+
+/* Compact subscription plans on the profile page */
+.profile-plans-section{margin:18px clamp(12px,2vw,28px) 0;padding:18px 20px 20px;border:1px solid #e1ece8;border-radius:20px;background:rgba(255,255,255,.78);box-shadow:0 8px 26px rgba(15,71,67,.045)}
+.profile-plans-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.profile-plans-heading h2{margin:0;color:#176b5e;font-size:17px;font-weight:900}
+.profile-plans-heading h2 i{margin-left:7px;color:#26947f}
+.profile-plans-heading p{margin:4px 0 0;color:#84938f;font-size:11px;font-weight:600}
+.profile-plans-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
+.profile-plan-tile{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;padding:11px 12px;border:1px solid #dcebe5;border-radius:13px;background:#fff;box-shadow:0 3px 10px rgba(20,90,75,.035)}
+.profile-plan-name{min-width:0;color:#244a43;font-size:12px;font-weight:900;line-height:1.6;overflow-wrap:anywhere}
+.profile-plan-details{flex:0 0 auto;border:0;border-radius:9px;background:#e7f5ef;color:#14745d;padding:7px 9px;font:800 10px Cairo,sans-serif;cursor:pointer;transition:background .15s ease}
+.profile-plan-details:hover{background:#d2eee2}
+.profile-plans-loading,.profile-plans-empty{grid-column:1/-1;padding:14px;text-align:center;color:#84938f;font-size:12px}
+.plan-details-backdrop{position:fixed;inset:0;z-index:1500;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(11,39,35,.55);backdrop-filter:blur(5px)}
+.plan-details-backdrop[hidden]{display:none!important}
+.plan-details-dialog{position:relative;width:min(100%,460px);max-height:min(85vh,680px);overflow:auto;padding:24px;border:1px solid #e2eee9;border-radius:22px;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.2);direction:rtl}
+.plan-details-close{position:absolute;top:13px;left:13px;display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:10px;background:#f1f6f4;color:#58716a;cursor:pointer}
+.plan-details-kicker{display:inline-flex;align-items:center;gap:7px;margin-bottom:9px;color:#16816d;font-size:11px;font-weight:900}
+.plan-details-dialog h2{margin:0 36px 15px 0;color:#173e37;font-size:21px;font-weight:900}
+.plan-details-body{display:grid;gap:10px}
+.plan-detail-line{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:10px 12px;border-radius:11px;background:#f5faf7;font-size:12px;line-height:1.8}
+.plan-detail-line strong{flex:0 0 auto;color:#648078;font-weight:800}
+.plan-detail-line span{color:#234b42;font-weight:800;text-align:left;white-space:pre-line}
+.plan-detail-description{display:block!important}
+.plan-detail-description span{display:block;margin-top:5px;text-align:right!important;font-weight:600}
+.plan-details-actions{display:flex;gap:9px;margin-top:18px}
+.plan-details-actions button{flex:1;min-height:42px;border:0;border-radius:11px;font:800 12px Cairo,sans-serif;cursor:pointer}
+.plan-details-subscribe{background:#16866d;color:#fff}
+.plan-details-subscribe:hover{background:#116d59}
+.plan-details-cancel{background:#eef3f1;color:#60736d}
+@media(max-width:600px){
+ .profile-plans-section{margin:12px 10px 0;padding:14px 12px 15px;border-radius:16px}
+ .profile-plans-heading h2{font-size:15px}
+ .profile-plans-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .profile-plan-tile{align-items:flex-start;flex-direction:column;padding:10px}
+ .profile-plan-details{width:100%;padding:7px 5px}
+ .plan-details-dialog{padding:21px 16px;border-radius:18px}
+ .plan-details-dialog h2{font-size:19px}
+}
