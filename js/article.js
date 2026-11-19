@@ -149,7 +149,7 @@ function articleIdFromLocation(){
 }
 function openArticle(id,updateHistory=true){
  const a=articles.find(x=>x.id===id&& (isAdmin||x.visibility==='public'));
- if(!a)return;
+ if(!a)return false;
  selectedArticleId=a.id;
  $('readerPlaceholder').hidden=true;
  $('readerContent').hidden=false;
@@ -171,7 +171,35 @@ function openArticle(id,updateHistory=true){
   const url=new URL(location.href);url.searchParams.set('id',a.id);url.hash='';
   history.replaceState({articleId:a.id},'',url);
  }
+ return true;
 }
+
+// Resolve direct article URLs even when the article is not in the first list response.
+async function openArticleFromLocation(id){
+ if(!id)return false;
+ let article=articles.find(x=>x.id===id);
+ if(!article){
+  const {data,error}=await supabase
+   .from('articles')
+   .select('id,created_by,title,author_name,content,visibility,published_at,created_at,updated_at')
+   .eq('id',id)
+   .maybeSingle();
+  if(error)throw error;
+  if(!data||( !isAdmin && data.visibility!=='public')){
+   toast('المقال غير متاح أو لم يعد منشورًا.','error');
+   return false;
+  }
+  article=data;
+  articles.unshift(article);
+  render();
+ }
+ if(!isAdmin&&article.visibility!=='public'){
+  toast('هذا المقال غير متاح للعرض العام.','error');
+  return false;
+ }
+ return openArticle(id,false);
+}
+
 function closeArticle(updateHistory=true){
  selectedArticleId=null;
  $('readerContent').hidden=true;
@@ -281,9 +309,10 @@ $('grid').onclick=e=>{
  openArticle(link.dataset.openArticle,true);
 };
 $('backToArticles').onclick=()=>closeArticle(true);
-window.addEventListener('popstate',()=>{
+window.addEventListener('popstate',async()=>{
  const id=articleIdFromLocation();
- if(id)openArticle(id,false);else closeArticle(false);
+ try{if(id)await openArticleFromLocation(id);else closeArticle(false);}
+ catch(error){console.error('Article route resolution failed:',error);toast('تعذر تحميل المقال. تحقق من الاتصال ثم حاول مرة أخرى.','error');}
 });
 $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.onkeydown=e=>{if(e.key==='Escape')closeEditor()};
 (async()=>{try{
@@ -296,8 +325,10 @@ $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.
   await load();
   $('loading').style.display='none';
   const initialId=articleIdFromLocation();
-  if(initialId)openArticle(initialId,false);
-  else resetArticleSeo();
+  if(initialId){
+   try{await openArticleFromLocation(initialId);}
+   catch(routeError){console.error('Initial article route failed:',routeError);toast('تعذر تحميل المقال. تحقق من الاتصال ثم حاول مرة أخرى.','error');}
+  }else resetArticleSeo();
 }catch(e){
   console.error(e);
   $('loading').innerHTML='<div class="rounded-2xl bg-white p-6 text-center"><div class="text-red-600 font-bold">تعذر تحميل المقالات</div><div class="mt-2 text-xs text-slate-400">'+esc(e.message)+'</div></div>';
