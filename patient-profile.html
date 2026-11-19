@@ -16,7 +16,7 @@
   <script src="js/patient-profile.js?v=20261119-energy-tab-v1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-energy-tab-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-followup-horizontal-v1">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -219,16 +219,21 @@
     <section id="plansPanel" class="patient-module-panel" role="tabpanel" aria-labelledby="plansTab" hidden>
       <div class="dashboard-panel">
         <section class="followup-days-card" aria-labelledby="followupDaysTitle">
-          <div class="followup-days-heading">
-            <div>
-              <h3 id="followupDaysTitle">أيام المتابعة</h3>
-              <p>اختر الخطة لعرض تفاصيلها داخل ملف المريض</p>
-            </div>
+          <div class="followup-days-toolbar">
+            <details id="followupDaysDetails" class="followup-days-details" open>
+              <summary class="followup-days-summary">
+                <span class="followup-days-summary-copy">
+                  <strong id="followupDaysTitle">أيام المتابعة</strong>
+                  <small>عرض الخطط المسجلة وإخفاؤها</small>
+                </span>
+                <i class="fa-solid fa-chevron-down followup-days-toggle-icon" aria-hidden="true"></i>
+              </summary>
+              <div id="visitsLoading" class="followup-state">جاري تحميل أيام المتابعة...</div>
+              <div id="visitsEmpty" class="followup-state" hidden>لا توجد أيام متابعة مسجلة لهذا المريض.</div>
+              <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
+            </details>
             <button type="button" id="addVisitButton" class="followup-add-button">＋ إضافة يوم</button>
           </div>
-          <div id="visitsLoading" class="followup-state">جاري تحميل أيام المتابعة...</div>
-          <div id="visitsEmpty" class="followup-state" hidden>لا توجد أيام متابعة مسجلة لهذا المريض.</div>
-          <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
         </section>
         <section id="visitEmbeddedPanel" class="visit-embedded-panel" aria-label="تفاصيل الخطة المحددة" hidden>
           <div class="visit-embedded-heading">
