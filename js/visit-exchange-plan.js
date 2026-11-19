@@ -6,6 +6,8 @@
 
 (function(){
 const G=[{k:'fruit',n:'الفاكهة',m:1,kcal:60,carb:15,pro:0,fat:0},{k:'veg',n:'الخضروات غير النشوية',m:1,kcal:25,carb:5,pro:2,fat:0},{k:'milk',n:'اللبن والزبادي',m:1,subs:['خالى الدسم','متوسط الدسم','غني الدسم'],v:{'خالى الدسم':[100,12,8,2],'متوسط الدسم':[120,12,8,5],'غني الدسم':[160,12,8,8]}},{k:'legumes',n:'البقوليات',m:1,kcal:115,carb:15,pro:7,fat:0},{k:'starch',n:'النشويات',m:0,kcal:80,carb:15,pro:2,fat:0},{k:'meat',n:'اللحوم',m:0,subs:['خالية الدهون','متوسطة الدهون','غنية الدهون'],v:{'خالية الدهون':[45,0,7,3],'متوسطة الدهون':[75,0,7,5],'غنية الدهون':[100,0,7,8]}},{k:'fat',n:'الدهون',m:0,kcal:45,carb:0,pro:0,fat:5}];
+const exchangeParams=new URLSearchParams(location.search);
+const requestedExchangePlanId=exchangeParams.get('plan_id');
 const S={ready:false,plan:null,saved:false,editing:false,t:{cal:0,pro:0,carb:0,fat:0},r:{},days:[],savedDays:[],dayEditing:{},itemContext:null,confirm:null};
 G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
 const dbx=window.DietPlannerAccess?.supabaseClient;
@@ -374,7 +376,7 @@ async function init(){
  setupExchangePlanEvents();
 
  const plans=await findPlans();
- const ex=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام البدائل');
+ const ex=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام البدائل' && (!requestedExchangePlanId || String(p.id)===String(requestedExchangePlanId)));
  const gram=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام الجرامات');
 
  /*
