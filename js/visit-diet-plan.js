@@ -143,12 +143,7 @@ async function loadPlan(shouldRender=true){
   if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;activePlanName=null;updateTargets();if(shouldRender)renderDays();return;}
   activeCloudPlanId=plan.id; activePlanStartDate=plan.start_date||null;
   activePlanName=plan.plan_name||'الخطة الغذائية باستخدام الجرامات';
-  if(/^الخطة\s+\d+\s+-/.test(activePlanName) && !activePlanName.includes('الجرامات') && !activePlanName.includes('بالجرامات')){
-    const typedName=activePlanName+' - بالجرامات';
-    const {error:renameError}=await sb.from('nutrition_plans').update({plan_name:typedName}).eq('id',plan.id).eq('patient_id',window.currentPatientId||patientId);
-    if(renameError)throw renameError;
-    activePlanName=typedName;
-  }else if(activePlanName.includes('البدائل')||activePlanName.includes('بالبدائل')){
+  if(activePlanName.includes('البدائل')){
     throw new Error('هذه الخطة مخصصة للبدائل وليست خطة الجرامات.');
   }
   patientInfo.targetCal=patientInfo.energy_target_calories??'';
