@@ -236,18 +236,14 @@
       <div class="dashboard-panel">
         <section class="followup-days-card" aria-labelledby="followupDaysTitle">
           <div class="followup-days-toolbar">
-            <details id="followupDaysDetails" class="followup-days-details" open>
-              <summary class="followup-days-summary">
-                <span class="followup-days-summary-copy">
-                  <strong id="followupDaysTitle">الخطط الغذائية</strong>
-                  <small>عرض الخطط الغذائية المسجلة</small>
-                </span>
-                <i class="fa-solid fa-chevron-down followup-days-toggle-icon" aria-hidden="true"></i>
-              </summary>
+            <div id="followupDaysDetails" class="followup-days-details">
+              <div class="followup-days-heading">
+                <strong id="followupDaysTitle">الخطط الغذائية</strong>
+              </div>
               <div id="visitsLoading" class="followup-state">جاري تحميل الخطط الغذائية...</div>
               <div id="visitsEmpty" class="followup-state" hidden>لا توجد خطط غذائية مسجلة لهذا المريض.</div>
               <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
-            </details>
+            </div>
             <button type="button" id="addPlanButton" class="followup-add-button">＋ إضافة خطة</button>
           </div>
         </section>
