@@ -178,12 +178,28 @@ function setDayEditMode(id,editing){
 function editDay(id){if(daysData.find(d=>String(d.id)===String(id)))setDayEditMode(id,true);}
 async function saveDay(id){
  if(!(window.currentPatientId||patientId))return;
- if(!isDayEditing(id))return; const committed=cloneDays(savedDaysData),idx=committed.findIndex(d=>String(d.id)===String(id)),day=daysData.find(d=>String(d.id)===String(id)); if(!day)return;
- if(idx>=0)committed[idx]=cloneDays([day])[0];else committed.push(cloneDays([day])[0]);
- const old=cloneDays(savedDaysData);savedDaysData=committed;daysData=cloneDays(committed);
+ if(!isDayEditing(id))return;
+ if(!daysData.some(day=>String(day.id)===String(id)))return;
+
+ // Save the complete in-memory plan, not only the day whose button was clicked.
+ // This includes every newly added day and any other edits currently in the plan.
+ const planSnapshot=cloneDays(daysData);
+ const previousSavedDays=cloneDays(savedDaysData);
+ savedDaysData=planSnapshot;
+
  const ok=await savePlan();
- if(!ok){savedDaysData=old;showToast('تعذر حفظ اليوم في قاعدة البيانات','error');daysData=cloneDays(old);renderDays();return;}
- dayEditModes[String(id)]=false;renderDays();showToast('تم حفظ بيانات اليوم بنجاح');
+ if(!ok){
+  // Keep the user's edits on screen so they can correct the issue and retry.
+  savedDaysData=previousSavedDays;
+  showToast('تعذر حفظ الخطة بالكامل؛ لم يتم اعتماد التغييرات','error');
+  return;
+ }
+
+ savedDaysData=cloneDays(planSnapshot);
+ daysData=cloneDays(planSnapshot);
+ dayEditModes={};
+ renderDays();
+ showToast('تم حفظ جميع أيام الخطة بنجاح');
 }
 async function addNewDay(){
  // The tab initializes asynchronously. Waiting here prevents the first click
