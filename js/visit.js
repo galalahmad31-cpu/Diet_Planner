@@ -56,12 +56,13 @@ const db = window.DietPlannerAccess?.supabaseClient;
     document.getElementById('visitContent')?.classList.remove('hidden');
     const params = new URLSearchParams(window.location.search);
     const planType = params.get('plan_type') || '';
-    if (planType.includes('الجرامات')) {
+    const autoOpenGrams = params.get('auto_open_grams') === '1';
+    if (planType.includes('الجرامات') || autoOpenGrams) {
       void toggleModule('dietPlan');
     } else if (planType.includes('البدائل')) {
       void toggleModule('exchangePlan');
     }
-    // With no plan_type, keep both module choices visible for manual selection.
+    // Without an explicit plan type, both module choices remain available.
   }
 
   const moduleLoaders = {
