@@ -327,11 +327,11 @@ body.support-delete-modal-open{overflow:hidden}
 
 /* Patient follow-up days and the embedded visit workspace. */
 .followup-days-card{padding:10px;border:1px solid #e3ece8;border-radius:13px;background:#fff}
-.followup-days-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-width:0}
-.followup-days-details{display:block;width:100%;min-width:0}
-.followup-days-heading{display:flex;align-items:center;min-height:25px;padding:0 2px}
+.followup-days-toolbar{display:flex;flex-direction:row;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;direction:rtl}
+.followup-days-details{display:block;flex:1 1 auto;width:0;min-width:0}
+.followup-days-heading{display:flex;align-items:center;min-height:29px;padding:0 2px}
 .followup-days-heading strong{color:#52645b;font-size:10px;font-weight:800}
-.followup-add-button{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-height:29px;padding:0 10px;border:0;border-radius:8px;background:#26765a;color:#fff;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
+.followup-add-button{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-height:29px;margin-top:0;padding:0 10px;border:0;border-radius:8px;background:#26765a;color:#fff;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
 .followup-add-button:hover:not(:disabled){background:#1d6249}
 .followup-add-button:disabled{opacity:.5;cursor:not-allowed}
 .followup-state{padding:8px;text-align:center;color:#8a9891;font-size:9px;font-weight:700}
@@ -339,12 +339,11 @@ body.support-delete-modal-open{overflow:hidden}
   display:flex;flex-flow:row nowrap;align-items:center;gap:6px;width:100%;min-width:0;
   margin-top:3px;padding:2px 1px 7px;overflow-x:auto;overflow-y:hidden;
   overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;scrollbar-color:#b8d2c4 transparent;scroll-snap-type:x proximity;
+  scrollbar-width:thin;scrollbar-color:#b8d2c4 transparent;
 }
 .followup-day-row{
   display:flex;align-items:center;gap:6px;flex:0 0 auto;width:auto;max-width:190px;min-width:112px;
   box-sizing:border-box;padding:5px 7px;border:1px solid #e8eeea;border-radius:9px;background:#fbfcfb;
-  scroll-snap-align:start;
 }
 .followup-day-open{display:flex;align-items:center;gap:5px;flex:1 1 auto;width:auto;min-width:0;max-width:145px;padding:0;border:0;background:transparent;text-align:right;cursor:pointer;overflow:hidden}
 .followup-day-open::before,.followup-day-open::after{content:none!important;display:none!important}
@@ -361,12 +360,14 @@ body.support-delete-modal-open{overflow:hidden}
 .followup-day-delete:active{transform:scale(.96)}
 @media(max-width:640px){
   .followup-days-card{padding:8px}
+  .followup-days-toolbar{gap:7px}
+  .followup-days-heading{min-height:28px}
   .followup-days-list{gap:5px;padding-bottom:6px}
   .followup-day-row{min-width:105px;max-width:165px;padding:5px 6px;gap:5px}
   .followup-day-open{max-width:125px;gap:4px}
   .followup-day-title{font-size:9px}
   .followup-day-delete{width:22px;height:22px;flex-basis:22px}
-  .followup-add-button{min-height:28px;font-size:9px}
+  .followup-add-button{min-height:28px;padding:0 8px;font-size:9px}
 }
 .visit-embedded-panel{margin-top:13px;border:1px solid #e1e9e5;border-radius:12px;background:#f7faf8;overflow:hidden}
 .visit-embedded-panel[hidden]{display:none!important}
