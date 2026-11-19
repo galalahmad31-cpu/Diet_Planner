@@ -17,14 +17,15 @@
         </script>
         <script src="js/visit-calculator.js?v=20261116-7" defer>
         </script>
-        <script src="js/visit.js?v=20261116-5" defer>
+        <script src="js/visit.js?v=20261119-embedded-view-v1" defer>
         </script>
-        <link rel="stylesheet" href="css/visit.css?v=20261119-rollback-visit-stable">
+        <link rel="stylesheet" href="css/visit.css?v=20261119-embedded-view-v1">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
         </script>
     </head>
     <body class="min-h-screen">
+        <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('visit-embedded');</script>
         <header class="visit-page-header no-print">
   <div class="visit-header-inner">
     <div class="visit-brand-row">
