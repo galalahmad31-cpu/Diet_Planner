@@ -237,9 +237,34 @@
     state.selectedPlan = null;
   }
 
-  function continueToSubscription() {
-    if (!state.selectedPlan) return;
-    window.location.href = 'subscription_plans.html?plan=' + encodeURIComponent(state.selectedPlan.id);
+  async function continueToSubscription() {
+    const selectedPlan = state.selectedPlan;
+    if (!selectedPlan) return;
+
+    if (typeof window.openSubscribeModal !== 'function') {
+      showToast('تعذر فتح نموذج الاشتراك. حدّث الصفحة وحاول مرة أخرى.');
+      return;
+    }
+
+    const button = $('planDetailsSubscribe');
+    if (button) {
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+    }
+
+    try {
+      const opened = await window.openSubscribeModal(String(selectedPlan.id));
+      if (opened) closePlanDetails();
+      else showToast('تعذر فتح نموذج الاشتراك لهذه الخطة. حاول مرة أخرى.');
+    } catch (error) {
+      console.error('Opening subscription form failed:', error);
+      showToast('حدث خطأ أثناء فتح نموذج الاشتراك.');
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+      }
+    }
   }
 
   function openProfileEditor() {
