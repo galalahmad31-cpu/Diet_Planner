@@ -276,26 +276,30 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
 .diet-list-title-row{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
 .diet-list-logo{display:inline-flex;align-items:center;justify-content:center;flex:0 0 25px;width:25px;height:25px;border-radius:8px;background:#e8f5f2;color:#138779}
 .diet-list-logo i{font-size:12px;line-height:1}
-.diet-list-title{margin:0;color:#243746;font-size:13px;font-weight:900;line-height:1.65;overflow-wrap:anywhere}
+.diet-list-title{margin:0;color:#243746;font-size:12px;font-weight:900;line-height:1.55;overflow-wrap:anywhere}
 .diet-list-status{flex:0 0 auto;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:800}
 .diet-list-status.is-public{background:#eef2ff;color:#5559b7}
 .diet-list-status.is-private{background:#e9f7f3;color:#168477}
-.diet-list-publisher{margin:5px 0 0;color:#87949b;font-size:11px;line-height:1.6}
+.diet-list-publisher{margin:4px 0 0;color:#87949b;font-size:10px;line-height:1.5}
 .diet-list-publisher strong{color:#52636b;font-weight:800}
 .diet-list-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto;flex-wrap:wrap}
 .diet-list-btn,.diet-list-icon-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   min-height:35px;padding:7px 11px;border:1px solid #e3ebee;border-radius:10px;
-  background:#fff;color:#52636b;font:800 11px Cairo,sans-serif;text-decoration:none;
+  background:#fff;color:#52636b;font:800 10px Cairo,sans-serif;text-decoration:none;
   white-space:nowrap;cursor:pointer;transition:background .15s,border-color .15s;
 }
-.diet-list-btn i,.diet-list-icon-btn i{font-size:11px}
+.diet-list-btn i,.diet-list-icon-btn i{font-size:10px}
 .diet-list-view{background:#eaf6f3;border-color:#d5ece5;color:#117c70}
 .diet-list-copy{background:#f8fafb;color:#52636b}
 .diet-list-edit{background:#f1f5f9;color:#475569}
 .diet-list-icon-btn{width:35px;padding:0;color:#c65c5c;background:#fffafa;border-color:#f3e1e1}
 .diet-list-btn:hover,.diet-list-icon-btn:hover{filter:brightness(.97);border-color:#bfd8d2}
+#dietGrid .diet-list-item:nth-child(odd){background:#fff}
+#dietGrid .diet-list-item:nth-child(even){background:#eff8f4}
 html[data-theme="dark"] .diet-list-item{background:#17211f;border-color:var(--dp-border);box-shadow:0 3px 12px rgba(0,0,0,.15)}
+html[data-theme="dark"] #dietGrid .diet-list-item:nth-child(odd){background:#17211f}
+html[data-theme="dark"] #dietGrid .diet-list-item:nth-child(even){background:#1d302b}
 html[data-theme="dark"] .diet-list-title{color:var(--dp-text)}
 html[data-theme="dark"] .diet-list-logo{background:#203a35;color:#75c9b8}
 html[data-theme="dark"] .diet-list-publisher{color:var(--dp-muted)}
@@ -304,13 +308,13 @@ html[data-theme="dark"] .diet-list-copy,html[data-theme="dark"] .diet-list-edit{
 html[data-theme="dark"] .diet-list-icon-btn{background:#302222;border-color:#563737;color:#f1a0a0}
 @media(max-width:640px){
  .diet-list-item{align-items:flex-start;flex-direction:column;gap:10px;padding:12px}
- .diet-list-title{font-size:12px}
+ .diet-list-title{font-size:11px}
  .diet-list-logo{flex-basis:23px;width:23px;height:23px;border-radius:7px}
  .diet-list-logo i{font-size:11px}
  .diet-list-publisher{font-size:10px}
  .diet-list-actions{width:100%;justify-content:flex-start;gap:6px}
- .diet-list-btn{min-height:33px;padding:6px 9px;font-size:10px}
- .diet-list-icon-btn{width:33px;min-height:33px}
+ .diet-list-btn{min-height:31px;padding:5px 8px;font-size:9px}
+ .diet-list-icon-btn{width:31px;min-height:31px}
 }
 
 
