@@ -63,6 +63,7 @@
     const editButton = $('editButton');
     const addVisitButton = $('addVisitButton');
     updateMeasurementWriteAccess();
+    updatePatientFinanceWriteAccess();
 
     if (editButton) {
       editButton.disabled = !canWrite;
@@ -641,10 +642,182 @@
     cancelEditing();
   }
 
-  function financeDate(value) {
-    if (!value) return '—';
-    const date = new Date(`${String(value).slice(0,10)}T00:00:00`);
-    return Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat('ar-EG',{year:'numeric',month:'short',day:'numeric'}).format(date);
+  const patientFinanceState = { loaded: false, loading: false };
+
+  function updateFinancePreview() {
+    const amountRaw = $('pfInputAmount')?.value ?? '';
+    const discountRaw = $('pfInputDiscount')?.value ?? '0';
+    const amount = amountRaw === '' ? null : Number(amountRaw);
+    const discount = discountRaw === '' ? 0 : Number(discountRaw);
+    const output = $('pfInputDiscountedPreview');
+    if (!output) return;
+    output.textContent = amount !== null && Number.isFinite(amount) && amount >= 0 &&
+      Number.isFinite(discount) && discount >= 0 && discount <= 100
+      ? (amount * (1 - discount / 100)).toLocaleString('ar-EG', { maximumFractionDigits: 2 }) + ' جنيه'
+      : '—';
+  }
+
+  function updatePatientFinanceWriteAccess() {
+    const allowed = canWrite();
+    [
+      'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
+      'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollow'
+    ].forEach((id) => {
+      const field = $(id);
+      if (field) field.disabled = !allowed;
+    });
+    const saveButton = $('savePatientFinance');
+    if (saveButton) {
+      saveButton.disabled = !allowed || patientFinanceState.loading;
+      saveButton.title = allowed
+        ? 'حفظ بيانات الاشتراك والمواعيد'
+        : 'تعديل البيانات المالية متاح أثناء الاشتراك المدفوع فقط';
+    }
+    const note = $('patientFinanceAccessNote');
+    if (note) {
+      note.textContent = state.isAdmin
+        ? 'وضع المدير: يمكنك تعديل بيانات الاشتراك والمواعيد.'
+        : state.hasActiveSubscription
+          ? 'الاشتراك فعال — يمكنك تعديل بيانات الاشتراك والمواعيد.'
+          : 'عرض البيانات متاح؛ التعديل والحفظ متاحان أثناء الاشتراك المدفوع فقط.';
+    }
+  }
+
+  async function loadPatientFinance(force = false) {
+    if (patientFinanceState.loading || (patientFinanceState.loaded && !force)) return;
+    if (!patientId || !supabase) return;
+
+    if (!state.user) {
+      state.user = await access?.getCurrentUser?.();
+      if (state.user) void refreshWriteAccess();
+    }
+    if (!state.user?.id) {
+      const errorBox = $('patientFinanceError');
+      if (errorBox) {
+        errorBox.textContent = 'يجب تسجيل الدخول لعرض بيانات الاشتراك.';
+        errorBox.hidden = false;
+      }
+      return;
+    }
+
+    patientFinanceState.loading = true;
+    const loading = $('patientFinanceLoading');
+    const form = $('patientFinanceForm');
+    const empty = $('patientFinanceEmpty');
+    const errorBox = $('patientFinanceError');
+    if (loading) { loading.hidden = false; loading.textContent = 'جاري تحميل بيانات الاشتراك والمواعيد...'; }
+    if (form) form.hidden = true;
+    if (empty) empty.hidden = true;
+    if (errorBox) { errorBox.hidden = true; errorBox.textContent = ''; }
+    updatePatientFinanceWriteAccess();
+
+    try {
+      const { data, error } = await supabase
+        .from('patient_finances')
+        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid,last_visit_date,next_follow_up_date')
+        .eq('patient_id', patientId)
+        .eq('user_id', state.user.id)
+        .maybeSingle();
+      if (error) throw error;
+
+      $('pfInputStart').value = data?.subscription_start_date || '';
+      $('pfInputMonths').value = data?.subscription_months ?? '';
+      $('pfInputAmount').value = data?.subscription_amount ?? '';
+      $('pfInputDiscount').value = data?.discount_percent ?? 0;
+      $('pfInputPaid').value = String(Boolean(data?.is_paid));
+      $('pfInputLastVisit').value = data?.last_visit_date || '';
+      $('pfInputNextFollow').value = data?.next_follow_up_date || '';
+
+      if (empty) empty.hidden = Boolean(data);
+      if (form) form.hidden = false;
+      patientFinanceState.loaded = true;
+      updateFinancePreview();
+    } catch (error) {
+      console.error('Patient finance load failed:', error);
+      if (errorBox) {
+        errorBox.textContent = 'تعذر تحميل بيانات الاشتراك والمواعيد. ' + (error.message || 'تحقق من الاتصال وصلاحيات قاعدة البيانات.');
+        errorBox.hidden = false;
+      }
+    } finally {
+      patientFinanceState.loading = false;
+      if (loading) loading.hidden = true;
+      updatePatientFinanceWriteAccess();
+    }
+  }
+
+  async function savePatientFinance() {
+    if (!canWrite()) {
+      alert('تعديل بيانات الاشتراك والمواعيد متاح أثناء الاشتراك المدفوع فقط.');
+      return;
+    }
+    if (!state.user?.id || !patientId) return;
+
+    const errorBox = $('patientFinanceError');
+    if (errorBox) { errorBox.hidden = true; errorBox.textContent = ''; }
+
+    const start = $('pfInputStart').value || null;
+    const monthsRaw = $('pfInputMonths').value;
+    const months = monthsRaw === '' ? null : Number(monthsRaw);
+    const amountRaw = $('pfInputAmount').value;
+    const amount = amountRaw === '' ? null : Number(amountRaw);
+    const discountRaw = $('pfInputDiscount').value;
+    const discount = discountRaw === '' ? 0 : Number(discountRaw);
+
+    if ((start && !months) || (!start && months)) {
+      errorBox.textContent = 'أدخل تاريخ بداية الاشتراك ومدة الاشتراك معًا.';
+      errorBox.hidden = false;
+      return;
+    }
+    if (months !== null && (!Number.isInteger(months) || months < 1)) {
+      errorBox.textContent = 'مدة الاشتراك يجب أن تكون عددًا صحيحًا يبدأ من شهر واحد.';
+      errorBox.hidden = false;
+      return;
+    }
+    if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
+      errorBox.textContent = 'قيمة الاشتراك غير صحيحة.';
+      errorBox.hidden = false;
+      return;
+    }
+    if (!Number.isFinite(discount) || discount < 0 || discount > 100) {
+      errorBox.textContent = 'نسبة الخصم يجب أن تكون بين 0 و100%.';
+      errorBox.hidden = false;
+      return;
+    }
+
+    const payload = {
+      patient_id: patientId,
+      user_id: state.user.id,
+      subscription_start_date: start,
+      subscription_months: months,
+      subscription_amount: amount,
+      discount_percent: discount,
+      is_paid: $('pfInputPaid').value === 'true',
+      last_visit_date: $('pfInputLastVisit').value || null,
+      next_follow_up_date: $('pfInputNextFollow').value || null
+    };
+
+    const button = $('savePatientFinance');
+    if (button) { button.disabled = true; button.textContent = 'جارٍ الحفظ...'; }
+    try {
+      // subscription_end_date and discounted_amount are generated by PostgreSQL.
+      // Only source columns are written here.
+      const { error } = await supabase
+        .from('patient_finances')
+        .upsert(payload, { onConflict: 'patient_id' });
+      if (error) throw error;
+      patientFinanceState.loaded = false;
+      await loadPatientFinance(true);
+      showPatientFinanceSuccess();
+    } catch (error) {
+      console.error('Patient finance save failed:', error);
+      if (errorBox) {
+        errorBox.textContent = error.message || 'تعذر حفظ البيانات. تحقق من صلاحيات الكتابة (RLS).';
+        errorBox.hidden = false;
+      }
+    } finally {
+      if (button) button.textContent = 'حفظ بيانات الاشتراك';
+      updatePatientFinanceWriteAccess();
+    }
   }
 
   function showPatientFinanceSuccess() {
@@ -658,83 +831,11 @@
       toast.textContent = 'تم حفظ بيانات الاشتراك والمواعيد بنجاح';
       document.body.appendChild(toast);
     }
-
     toast.classList.remove('is-visible');
-    // Restart the short entrance animation when the toast is shown again.
     void toast.offsetWidth;
     toast.classList.add('is-visible');
     window.clearTimeout(toast.dismissTimer);
-    toast.dismissTimer = window.setTimeout(() => {
-      toast.classList.remove('is-visible');
-    }, 1800);
-  }
-
-  function closePatientFinanceModal() {
-    $('patientFinanceModal')?.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-  }
-
-  function updateFinancePreview() {
-    const amount=Number($('pfInputAmount').value)||0;
-    const discount=Number($('pfInputDiscount').value)||0;
-    $('pfInputDiscountedPreview').textContent=(amount*(1-discount/100)).toLocaleString('ar-EG',{maximumFractionDigits:2})+' جنيه';
-    const start=$('pfInputStart').value,months=Number($('pfInputMonths').value);
-    if(start&&months>0){const d=new Date(start+'T00:00:00');d.setMonth(d.getMonth()+months);$('pfInputEndPreview').textContent=financeDate([d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-'));}
-    else $('pfInputEndPreview').textContent='—';
-
-  }
-  async function openPatientFinanceModal() {
-    if (!$('patientFinanceModal')?.classList.contains('hidden')) return;
-    cancelEditing();
-    if(!patientId||!state.user){alert('تعذر تحديد المستخدم أو المريض.');return;}
-    $('patientFinanceModal').classList.remove('hidden');document.body.classList.add('overflow-hidden');
-    $('patientFinanceName').textContent=state.patient?.name||'';
-    $('patientFinanceLoading').classList.remove('hidden');$('patientFinanceForm').classList.add('hidden');
-    $('patientFinanceEmpty').classList.add('hidden');$('patientFinanceError').classList.add('hidden');
-    try{
-      const {data,error}=await supabase.from('patient_finances').select('*').eq('patient_id',patientId).eq('user_id',state.user.id).maybeSingle();
-      if(error)throw error;
-      $('pfInputStart').value=data?.subscription_start_date||'';
-      $('pfInputMonths').value=data?.subscription_months??'';
-      $('pfInputAmount').value=data?.subscription_amount??'';
-      $('pfInputDiscount').value=data?.discount_percent??0;
-      $('pfInputPaid').value=String(Boolean(data?.is_paid));
-      $('pfInputLastVisit').value=data?.last_visit_date||'';
-      $('pfInputNextFollow').value=data?.next_follow_up_date||'';
-      $('patientFinanceLoading').classList.add('hidden');
-      if(!data)$('patientFinanceEmpty').classList.remove('hidden');
-      $('patientFinanceForm').classList.remove('hidden');updateFinancePreview();
-    }catch(e){console.error('Finance load error',e);$('patientFinanceLoading').textContent='تعذر تحميل بيانات الاشتراك والمواعيد: '+(e.message||'تحقق من صلاحيات قاعدة البيانات');}
-  }
-  async function savePatientFinance() {
-    if(!state.user||!patientId)return;
-    const err=$('patientFinanceError');err.classList.add('hidden');
-    const start=$('pfInputStart').value||null,months=$('pfInputMonths').value?Number($('pfInputMonths').value):null;
-    const amount=$('pfInputAmount').value!==''?Number($('pfInputAmount').value):null;
-    const discount=Number($('pfInputDiscount').value)||0;
-    if((start&&!months)||(!start&&months)){err.textContent='أدخل تاريخ البداية ومدة الاشتراك معًا.';err.classList.remove('hidden');return;}
-    if(discount<0||discount>100||!Number.isFinite(discount)){err.textContent='الخصم يجب أن يكون بين 0 و100%.';err.classList.remove('hidden');return;}
-    if(amount!==null&&(!Number.isFinite(amount)||amount<0)){err.textContent='قيمة الاشتراك غير صحيحة.';err.classList.remove('hidden');return;}
-    const last = $('pfInputLastVisit').value || null;
-    const next = $('pfInputNextFollow').value || null;
-
-    // subscription_end_date and discounted_amount are GENERATED ALWAYS columns.
-    // PostgreSQL calculates them from the source fields; never include them in writes.
-    const payload = {
-      patient_id: patientId,
-      user_id: state.user.id,
-      subscription_start_date: start,
-      subscription_months: months,
-      subscription_amount: amount,
-      discount_percent: discount,
-      is_paid: $('pfInputPaid').value === 'true',
-      last_visit_date: last,
-      next_follow_up_date: next
-    };
-    const btn=$('savePatientFinance');btn.disabled=true;btn.textContent='جارٍ الحفظ...';
-    try{const {error}=await supabase.from('patient_finances').upsert(payload,{onConflict:'patient_id'});if(error)throw error;closePatientFinanceModal();showPatientFinanceSuccess();}
-    catch(e){console.error(e);err.textContent=e.message||'تعذر حفظ البيانات. تحقق من صلاحيات الكتابة (RLS).';err.classList.remove('hidden');}
-    finally{btn.disabled=false;btn.textContent='حفظ الماليات';}
+    toast.dismissTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1800);
   }
 
   function bindEvents() {
@@ -771,13 +872,13 @@
       else if (cancel) $('inlineMeasurementRow')?.remove();
       else if (remove) void deleteMeasurement(Number(remove.dataset.measurementDelete));
     });
-    $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
+    $('patientFinanceDetails')?.addEventListener('toggle', (event) => {
+      if (event.currentTarget.open) void loadPatientFinance();
+    });
     $('savePatientFinance')?.addEventListener('click', savePatientFinance);
-    $('cancelPatientFinance')?.addEventListener('click', closePatientFinanceModal);
-    ['pfInputStart','pfInputMonths','pfInputAmount','pfInputDiscount','pfInputLastVisit'].forEach(id=>$(id)?.addEventListener('input',updateFinancePreview));
-    $('closePatientFinance')?.addEventListener('click', closePatientFinanceModal);
-    $('patientFinanceModal')?.addEventListener('click', (event) => { if (event.target.matches('[data-close-finance]')) closePatientFinanceModal(); });
-    document.addEventListener('keydown', (event) => { if(event.key==='Escape') closePatientFinanceModal(); });
+    ['pfInputAmount', 'pfInputDiscount'].forEach((id) => {
+      $(id)?.addEventListener('input', updateFinancePreview);
+    });
 
   }
 
