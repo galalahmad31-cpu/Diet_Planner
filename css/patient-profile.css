@@ -277,3 +277,32 @@ html,body{max-width:100%;overflow-x:hidden}
   .patient-profile-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
   .patient-profile-access-card i{font-size:11px!important}
 }
+
+
+/* Inline measurements panel on the patient profile */
+.measurements-details{width:100%}
+.measurements-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none}
+.measurements-summary::-webkit-details-marker{display:none}
+.measurements-chevron{transition:transform .2s ease}
+.measurements-details[open] .measurements-chevron{transform:rotate(180deg)}
+.measurements-panel{padding:14px 16px 16px;border-top:1px solid #e8eef0}
+.measurements-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.measurements-access-status{margin:0;color:#64748b;font-size:11px;font-weight:700}
+.measurements-add-button{flex:0 0 auto;border:0;border-radius:10px;background:#059669;color:#fff;padding:9px 14px;font:800 11px Cairo,sans-serif;cursor:pointer}
+.measurements-add-button:hover{background:#047857}
+.measurements-add-button.is-disabled{opacity:.45;cursor:not-allowed}
+.measurements-state{padding:16px;text-align:center;color:#94a3b8;font-size:12px;font-weight:700}
+.measurements-error{color:#be123c}
+.measurements-table-wrap{width:100%;overflow-x:auto;border:1px solid #edf1f3;border-radius:12px}
+.measurements-table{width:100%;min-width:650px;border-collapse:collapse;text-align:center;font-family:Cairo,sans-serif}
+.measurements-table th{padding:10px 8px;background:#f8fafc;color:#64748b;font-size:10px;font-weight:900;white-space:nowrap}
+.measurements-table td{padding:10px 8px;border-top:1px solid #f1f5f9;color:#475569;font-size:11px;font-weight:700}
+.measurements-table .measurement-weight{color:#047857;font-weight:900}
+.measurement-delete-button{border:0;background:transparent;color:#f43f5e;padding:5px;cursor:pointer}
+.measurement-inline-actions{display:flex;gap:5px}
+.measurement-inline-actions button{border:0;border-radius:7px;padding:7px 8px;font:800 10px Cairo,sans-serif;cursor:pointer}
+.measurement-save{background:#059669;color:#fff}
+.measurement-cancel{background:#f1f5f9;color:#475569}
+.inline-measurement-row td{padding:6px 4px}
+.inline-measurement-row input,.inline-measurement-row select{width:100%;min-width:75px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px 5px;font:700 10px Cairo,sans-serif}
+@media(max-width:640px){.measurements-panel{padding:11px 9px}.measurements-toolbar{align-items:flex-start;flex-direction:column}.measurements-add-button{width:100%}.measurements-table{min-width:610px}}
