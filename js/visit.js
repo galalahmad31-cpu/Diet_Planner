@@ -163,7 +163,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   function backToPatient() {
     if (new URLSearchParams(window.location.search).get('embed') === '1' && window.parent !== window) {
-      window.parent.postMessage({ type: 'dp-visit-close' }, window.location.origin);
+      window.parent.postMessage({ type: 'dp-plan-close' }, window.location.origin);
       return;
     }
 
@@ -267,7 +267,7 @@ bindPrintLifecycle();
   const notifyHeight = () => {
     const height = getContentHeight();
     if (height > 0) {
-      window.parent.postMessage({ type: 'dp-visit-embed-height', height }, window.location.origin);
+      window.parent.postMessage({ type: 'dp-plan-embed-height', height }, window.location.origin);
     }
   };
 
