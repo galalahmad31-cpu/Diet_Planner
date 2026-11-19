@@ -85,11 +85,25 @@
       title.className = "verification-title";
       title.textContent = lines[0];
 
-      const body = document.createElement("div");
+      const body = document.createElement("p");
       body.className = "verification-text";
-      body.textContent = lines.slice(1).join(" ").trim();
+      body.textContent = lines[1] || "";
 
       content.append(title, body);
+
+      if (lines[2]) {
+        const spamNote = document.createElement("div");
+        spamNote.className = "verification-spam-note";
+
+        const spamLabel = document.createElement("strong");
+        spamLabel.textContent = "ملحوظة:";
+
+        const spamText = document.createElement("span");
+        spamText.textContent = lines[2];
+
+        spamNote.append(spamLabel, spamText);
+        content.append(spamNote);
+      }
       box.append(icon, content);
     } else {
       box.textContent = message;
