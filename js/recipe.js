@@ -319,19 +319,18 @@
 
             return `
                 <article class="recipe-list-row">
-                    <div class="recipe-list-main">
-                        <div class="recipe-list-logo" aria-hidden="true">
-                            <i class="fa-solid fa-bowl-food"></i>
-                        </div>
-                        <div class="recipe-list-name">
-                            <h2>${escapeHtml(recipe.name)}</h2>
-                            <span>نشر بواسطة: ${escapeHtml(recipe.authorName || 'متخصص تغذية')}</span>
-                        </div>
+                    <div class="recipe-list-logo" aria-hidden="true">
+                        <i class="fa-solid fa-bowl-food"></i>
                     </div>
-                    <div class="recipe-list-meta">
-                        <span class="recipe-list-calories"><i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i> ${recipe.calories} kcal</span>
-                        <span class="recipe-list-basis">${escapeHtml(basisText)}</span>
+                    <div class="recipe-list-name">
+                        <h2>${escapeHtml(recipe.name)}</h2>
                     </div>
+                    <div class="recipe-list-calories">
+                        <i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i>
+                        <span>${recipe.calories} kcal</span>
+                    </div>
+                    <div class="recipe-list-basis">${escapeHtml(basisText)}</div>
+                    <div class="recipe-list-author">نشر بواسطة: ${escapeHtml(recipe.authorName || 'متخصص تغذية')}</div>
                     <div class="recipe-list-actions">
                         <button data-view="${escapeHtml(recipe.id)}" type="button" class="recipe-list-view">عرض الوصفة</button>
                         ${canEdit ? `
