@@ -3,5 +3,6 @@ Allow: /
 Disallow: /login.html
 Disallow: /app.html
 Disallow: /admin.html
+Disallow: /article-view.html
 
 Sitemap: https://nutrition-3.vercel.app/sitemap.xml
