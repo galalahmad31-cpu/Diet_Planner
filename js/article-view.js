@@ -46,6 +46,12 @@ function setArticleSchema(a,url){
   $('articleGuestCta')?.remove();
  }
  const id=new URLSearchParams(location.search).get('id');
+ if(id&&/^[0-9a-f-]{36}$/i.test(id)){
+  const target=new URL('article.html',location.href);
+  target.searchParams.set('id',id);
+  location.replace(target.pathname+target.search);
+  return;
+ }
  if(!client||!id||!/^[0-9a-f-]{36}$/i.test(id)){ $('articleLoading').hidden=true;$('articleError').hidden=false;setMeta('robots','noindex,follow');return}
  try{
   const {data,error}=await client.from('articles').select('id,title,author_name,content,published_at,created_at,updated_at,visibility').eq('id',id).eq('visibility','public').maybeSingle();
