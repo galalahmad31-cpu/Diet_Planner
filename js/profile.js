@@ -9,6 +9,7 @@
     user: null,
     profile: { full_name: '', profession: '', phone: '' },
     subscription: null,
+    subscriptions: [],
     planName: '',
     plans: [],
     selectedPlan: null,
@@ -159,6 +160,7 @@
     if (error) throw new Error(`تعذر قراءة بيانات الاشتراك: ${error.message}`);
 
     const subscriptions = Array.isArray(data) ? data : [];
+    state.subscriptions = subscriptions;
     state.subscription = chooseSubscription(subscriptions);
 
     const plan = state.subscription?.subscription_plans;
@@ -167,6 +169,12 @@
     renderSubscription();
   }
 
+
+  function pendingSubscriptionForPlan(planId) {
+    return state.subscriptions
+      .filter((item) => item.status === 'pending' && String(item.plan_id) === String(planId))
+      .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))[0] || null;
+  }
 
   function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -216,8 +224,7 @@
     if (!modal || !title || !body) return;
 
     title.textContent = plan.name || 'تفاصيل الخطة';
-    const pendingForPlan = state.subscription?.status === 'pending'
-      && String(state.subscription.plan_id) === String(plan.id);
+    const pendingForPlan = Boolean(pendingSubscriptionForPlan(plan.id));
     const price = Number(plan.price || 0).toLocaleString('ar-EG');
     const rows = [
       '<div class="plan-detail-line"><strong>السعر</strong><span>' + price + ' جنيه</span></div>',
@@ -250,8 +257,7 @@
     const selectedPlan = state.selectedPlan;
     if (!selectedPlan) return;
 
-    const isPending = state.subscription?.status === 'pending'
-      && String(state.subscription.plan_id) === String(selectedPlan.id);
+    const isPending = Boolean(pendingSubscriptionForPlan(selectedPlan.id));
     const button = $('planDetailsSubscribe');
     if (button) {
       button.disabled = true;
