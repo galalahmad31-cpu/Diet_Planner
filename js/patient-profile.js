@@ -626,9 +626,11 @@
     if (!result.isConfirmed) return;
 
     try {
-      const { error: exchangeError } = await supabase
-        .from('exchange_values').delete().eq('plan_id', plan.id);
-      if (exchangeError) throw exchangeError;
+      if (plan.plan_name === 'الخطة الغذائية باستخدام البدائل') {
+        const { error: exchangeError } = await supabase
+          .from('exchange_values').delete().eq('plan_id', plan.id);
+        if (exchangeError) throw exchangeError;
+      }
 
       const { error } = await supabase
         .from('nutrition_plans').delete()
