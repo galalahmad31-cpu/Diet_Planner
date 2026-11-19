@@ -108,11 +108,31 @@ body{min-height:100svh;display:flex;flex-direction:column;align-items:center;jus
   line-height:1.6;
 }
 .msg.email-verification .verification-text{
-  color:#397768;
-  font-size:12.5px;
+  margin:0;
+  color:#315f55;
+  font-size:13px;
   font-weight:500;
-  line-height:1.9;
+  line-height:1.85;
   overflow-wrap:anywhere;
+}
+.msg.email-verification .verification-spam-note{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:4px;
+  margin-top:10px;
+  padding:9px 11px;
+  border:1px solid #cce9df;
+  border-radius:10px;
+  background:rgba(255,255,255,.72);
+  color:#315f55;
+  font-size:12px;
+  line-height:1.8;
+}
+.msg.email-verification .verification-spam-note strong{
+  flex:0 0 auto;
+  color:#126b5c;
+  font-weight:800;
 }
 .msg.email-verification.error{
   border-color:#f2d3a2;
@@ -140,5 +160,6 @@ body{min-height:100svh;display:flex;flex-direction:column;align-items:center;jus
     font-size:16px;
   }
   .msg.email-verification .verification-title{font-size:13px}
-  .msg.email-verification .verification-text{font-size:11.5px;line-height:1.85}
+  .msg.email-verification .verification-text{font-size:12px;line-height:1.8}
+  .msg.email-verification .verification-spam-note{font-size:11.5px;padding:8px 9px}
 }
