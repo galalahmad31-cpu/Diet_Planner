@@ -310,8 +310,10 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
   box-shadow:0 3px 12px rgba(15,71,67,.035);
 }
 .diet-list-main{flex:1;min-width:0}
-.diet-list-title-row{display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap}
-.diet-list-title{margin:0;color:#243746;font-size:15px;font-weight:900;line-height:1.65;overflow-wrap:anywhere}
+.diet-list-title-row{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.diet-list-logo{display:inline-flex;align-items:center;justify-content:center;flex:0 0 25px;width:25px;height:25px;border-radius:8px;background:#e8f5f2;color:#138779}
+.diet-list-logo i{font-size:12px;line-height:1}
+.diet-list-title{margin:0;color:#243746;font-size:13px;font-weight:900;line-height:1.65;overflow-wrap:anywhere}
 .diet-list-status{flex:0 0 auto;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:800}
 .diet-list-status.is-public{background:#eef2ff;color:#5559b7}
 .diet-list-status.is-private{background:#e9f7f3;color:#168477}
@@ -332,13 +334,16 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
 .diet-list-btn:hover,.diet-list-icon-btn:hover{filter:brightness(.97);border-color:#bfd8d2}
 html[data-theme="dark"] .diet-list-item{background:#17211f;border-color:var(--dp-border);box-shadow:0 3px 12px rgba(0,0,0,.15)}
 html[data-theme="dark"] .diet-list-title{color:var(--dp-text)}
+html[data-theme="dark"] .diet-list-logo{background:#203a35;color:#75c9b8}
 html[data-theme="dark"] .diet-list-publisher{color:var(--dp-muted)}
 html[data-theme="dark"] .diet-list-publisher strong{color:#d0ddd8}
 html[data-theme="dark"] .diet-list-copy,html[data-theme="dark"] .diet-list-edit{background:#24312e;color:var(--dp-text);border-color:var(--dp-border)}
 html[data-theme="dark"] .diet-list-icon-btn{background:#302222;border-color:#563737;color:#f1a0a0}
 @media(max-width:640px){
  .diet-list-item{align-items:flex-start;flex-direction:column;gap:10px;padding:12px}
- .diet-list-title{font-size:13px}
+ .diet-list-title{font-size:12px}
+ .diet-list-logo{flex-basis:23px;width:23px;height:23px;border-radius:7px}
+ .diet-list-logo i{font-size:11px}
  .diet-list-publisher{font-size:10px}
  .diet-list-actions{width:100%;justify-content:flex-start;gap:6px}
  .diet-list-btn{min-height:33px;padding:6px 9px;font-size:10px}
