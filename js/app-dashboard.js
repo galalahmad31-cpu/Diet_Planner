@@ -379,12 +379,88 @@
       });
 
       renderNotificationIndicators(counts);
+      renderDashboardNotifications(counts, "loaded");
       host.dataset.loadState = "loaded";
     } catch (error) {
       // Keep the zero-count indicators visible if the data request fails.
       host.dataset.loadState = "error";
+      renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "error");
       console.warn("Notification card indicators could not be loaded:", error);
     }
+  }
+
+
+  // ---------------------------------------------------------
+  // Dashboard services ribbon
+  // ---------------------------------------------------------
+  function bindDashboardServiceRibbon() {
+    const strip = document.getElementById("dashboardServicesStrip");
+    if (!strip || strip.dataset.scrollControlsBound === "true") return;
+    strip.dataset.scrollControlsBound = "true";
+
+    document.querySelectorAll("[data-dashboard-scroll]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const direction = button.dataset.dashboardScroll === "next" ? 1 : -1;
+        const distance = Math.max(220, Math.round(strip.clientWidth * 0.72));
+        strip.scrollBy({ left: direction * distance, behavior: "smooth" });
+      });
+    });
+  }
+
+  function renderDashboardNotifications(counts, loadState = "loaded") {
+    const host = document.getElementById("dashboardNotificationsContent");
+    if (!host) return;
+
+    const definitions = [
+      {
+        key: "today",
+        href: "notifications.html",
+        type: "today",
+        icon: "fa-solid fa-calendar-check",
+        title: "مواعيد اليوم",
+        description: "مواعيد المتابعة المستحقة اليوم"
+      },
+      {
+        key: "tomorrow",
+        href: "notifications.html",
+        type: "tomorrow",
+        icon: "fa-solid fa-calendar-plus",
+        title: "مواعيد الغد",
+        description: "مواعيد المتابعة المقررة غدًا"
+      },
+      {
+        key: "subscriptions",
+        href: "notifications.html",
+        type: "subscription",
+        icon: "fa-solid fa-credit-card",
+        title: "الاشتراكات",
+        description: "اشتراكات تنتهي خلال 7 أيام"
+      }
+    ];
+
+    host.replaceChildren();
+    definitions.forEach((item) => {
+      const value = Number(counts?.[item.key]) || 0;
+      const link = document.createElement("a");
+      link.className = `dashboard-notification-item ${item.type}`;
+      link.href = item.href;
+      link.innerHTML = `
+        <span class="dashboard-notification-icon"><i class="${item.icon}" aria-hidden="true"></i></span>
+        <span class="dashboard-notification-copy">
+          <strong>${item.title}</strong>
+          <span>${item.description}</span>
+        </span>
+        <span class="dashboard-notification-count">${value}</span>
+      `;
+      host.appendChild(link);
+    });
+
+    host.dataset.loadState = loadState;
+  }
+
+  function bindDashboardServiceRibbonAndNotifications() {
+    bindDashboardServiceRibbon();
+    renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "loading");
   }
 
   // ---------------------------------------------------------
@@ -482,6 +558,7 @@
   // Start
   // ---------------------------------------------------------
   function start() {
+    bindDashboardServiceRibbonAndNotifications();
     initializeDashboard();
   }
 
