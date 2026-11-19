@@ -732,6 +732,10 @@
       if (form) form.hidden = false;
       patientFinanceState.loaded = true;
       updateFinancePreview();
+      if (data?.discounted_amount != null) {
+        $('pfInputDiscountedPreview').textContent =
+          Number(data.discounted_amount).toLocaleString('ar-EG', { maximumFractionDigits: 2 }) + ' جنيه';
+      }
     } catch (error) {
       console.error('Patient finance load failed:', error);
       if (errorBox) {
