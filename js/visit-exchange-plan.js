@@ -63,12 +63,6 @@ async function ensureExchangePlan(skipAuth=false){
 
  const {data:createdPlanId,error:createError}=await dbx.rpc('create_nutrition_plan',{p_patient_id:c.patient_id});
  if(createError||!createdPlanId){status('تعذر إنشاء خطة البدائل: '+(createError?.message||'لم يتم استلام معرّف الخطة'),true);return null;}
- const {data:createdPlan,error:loadError}=await dbx.from('nutrition_plans').select('plan_name').eq('id',createdPlanId).eq('patient_id',c.patient_id).single();
- if(loadError)throw loadError;
- const baseName=String(createdPlan.plan_name||'الخطة الغذائية').replace(/\s*-\s*بال(?:جرامات|بدائل)$/,'');
- const typedName=baseName+' - بالبدائل';
- const {error:renameError}=await dbx.from('nutrition_plans').update({plan_name:typedName}).eq('id',createdPlanId).eq('patient_id',c.patient_id);
- if(renameError)throw renameError;
  S.plan=createdPlanId;
  return S.plan;
 }
@@ -358,19 +352,14 @@ async function init(){
   if(!c.patient_id)throw new Error('لم يتم تحديد المريض.');
   const plans=await findPlans();
   const selectedPlan=requestedExchangePlanId ? plans.find(p=>String(p.id)===String(requestedExchangePlanId))
-   : plans.find(p=>String(p.plan_name||'').includes('البدائل')||String(p.plan_name||'').includes('بالبدائل'));
+   : plans.find(p=>String(p.plan_name||'').includes('البدائل'));
   if(requestedExchangePlanId&&!selectedPlan)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
   const patientEnergy=window.currentPatientEnergy||{};
   S.t={cal:n(patientEnergy.energy_target_calories),pro:n(patientEnergy.energy_target_protein),carb:n(patientEnergy.energy_target_carb),fat:n(patientEnergy.energy_target_fat)};
   if(selectedPlan&&isUuid(selectedPlan.id)){
    const selectedName=String(selectedPlan.plan_name||'');
-   if(selectedName.includes('الجرامات')||selectedName.includes('بالجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
+   if(selectedName.includes('الجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
    const isFreshNumberedPlan=/^الخطة\s+\d+\s+-/.test(selectedName);
-   if(isFreshNumberedPlan){
-    const typedName=selectedName+' - بالبدائل';
-    const {error:renameError}=await dbx.from('nutrition_plans').update({plan_name:typedName}).eq('id',selectedPlan.id).eq('patient_id',c.patient_id);
-    if(renameError)throw renameError;
-   }
    S.plan=selectedPlan.id; S.editing=isFreshNumberedPlan;
    await loadExchangeValues(); await loadDays();
   }else{S.plan=null;S.editing=true;}
