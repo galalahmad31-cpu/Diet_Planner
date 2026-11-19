@@ -513,7 +513,14 @@
       return;
     }
 
-    data.forEach((plan, index) => {
+    const planNumberById = new Map(
+      [...data]
+        .sort((a, b) => String(a.created_at || a.start_date || '').localeCompare(String(b.created_at || b.start_date || '')))
+        .map((plan, index) => [String(plan.id), index + 1])
+    );
+
+    data.forEach((plan) => {
+      const planNumber = planNumberById.get(String(plan.id)) || 1;
       const row = document.createElement('article');
       row.className = 'followup-day-row';
 
@@ -526,8 +533,8 @@
 
       const number = document.createElement('span');
       number.className = 'followup-day-number';
-      number.textContent = String(index + 1);
-      number.setAttribute('aria-label', 'الخطة رقم ' + (index + 1));
+      number.textContent = String(planNumber);
+      number.setAttribute('aria-label', 'الخطة رقم ' + planNumber);
 
       const details = document.createElement('span');
       details.className = 'followup-day-details';
