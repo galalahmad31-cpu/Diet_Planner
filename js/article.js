@@ -120,6 +120,7 @@ function openArticle(id,updateHistory=true){
  $('openStandaloneArticle').href='article-view.html?id='+encodeURIComponent(a.id);
  document.querySelectorAll('.article-list-item').forEach(el=>el.classList.toggle('is-selected',el.querySelector('[data-open-article]')?.dataset.openArticle===a.id));
  $('articleReaderPane').classList.add('has-article');
+ $('articleWorkspace').classList.add('is-reading');
  if(updateHistory){
   const url=new URL(location.href);url.hash='article-'+a.id;
   history.pushState({articleId:a.id},'',url);
@@ -130,6 +131,7 @@ function closeArticle(updateHistory=true){
  $('readerContent').hidden=true;
  $('readerPlaceholder').hidden=false;
  $('articleReaderPane').classList.remove('has-article');
+ $('articleWorkspace').classList.remove('is-reading');
  document.querySelectorAll('.article-list-item').forEach(el=>el.classList.remove('is-selected'));
  if(updateHistory&&location.hash.startsWith('#article-'))history.pushState({},'',location.pathname+location.search);
 }
