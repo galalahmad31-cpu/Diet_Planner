@@ -50,3 +50,62 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   .patient-card-tools{gap:6px}
   .patient-delete{width:30px;height:30px}
 }
+
+
+/* Compact horizontal quick navigation for the patient directory */
+.page-quick-nav{
+  position:relative;
+  z-index:20;
+  width:100%;
+  padding:8px max(12px,calc((100% - 1024px)/2));
+  background:rgba(248,250,252,.96);
+  border-bottom:1px solid #e5edf0;
+}
+.page-quick-nav-track{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:1px 1px 4px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;
+}
+.page-quick-nav-track::-webkit-scrollbar{display:none}
+.page-quick-nav-item{
+  display:inline-flex;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:34px;
+  padding:6px 11px;
+  border:1px solid #e1e9ed;
+  border-radius:10px;
+  background:#fff;
+  color:#476273;
+  font-family:'Cairo',sans-serif;
+  font-size:11px;
+  font-weight:800;
+  line-height:1;
+  text-decoration:none;
+  white-space:nowrap;
+  scroll-snap-align:start;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.page-quick-nav-item i{font-size:12px}
+.page-quick-nav-item:hover{border-color:#9acfc5;color:#117e73}
+.page-quick-nav-item.is-active{
+  background:#e8f5f2;
+  border-color:#b8ded6;
+  color:#117e73;
+}
+.page-quick-nav-item:focus-visible{outline:2px solid #178f84;outline-offset:2px}
+@media(max-width:600px){
+  .page-quick-nav{padding:6px 10px}
+  .page-quick-nav-track{gap:6px}
+  .page-quick-nav-item{min-height:32px;padding:6px 9px;font-size:10px}
+  .page-quick-nav-item i{font-size:11px}
+}
