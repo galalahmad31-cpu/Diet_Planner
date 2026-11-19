@@ -19,7 +19,7 @@ async function canWriteExchangePlan(){
   return (await window.DietPlannerAccess?.canWrite?.(user.id))===true;
 }
 
-function ctx(){return window.visitContext||{patient_id:window.currentPatientId||new URLSearchParams(location.search).get('patient_id')||new URLSearchParams(location.search).get('id')}}
+function ctx(){return {patient_id:window.currentPatientId||new URLSearchParams(location.search).get('patient_id')||new URLSearchParams(location.search).get('id')}}
 function status(s,e=false){const x=document.getElementById('exchangePlanStatus');if(x){x.textContent=s;x.className='text-[10px] font-bold '+(e?'text-rose-600':'text-emerald-600')}}
 function vals(g){const a=S.r[g.k];if(g.v){const x=g.v[a.sub]||Object.values(g.v)[0];return{kcal:x[0],carb:x[1],pro:x[2],fat:x[3]}}return{kcal:g.kcal,carb:g.carb,pro:g.pro,fat:g.fat}}
 function manual(){return ['fruit','veg','milk','legumes'].reduce((a,k)=>{const g=G.find(x=>x.k===k),r=S.r[k],v=vals(g),c=n(r.count);a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;a.kcal+=c*v.kcal;return a},{kcal:0,carb:0,pro:0,fat:0})}
@@ -399,7 +399,7 @@ async function init(){
   S.t={cal:0,pro:0,carb:0,fat:0};
  }
 
- const approved=ctx().energyRequirements||{};
+ const approved=window.currentPatientEnergy||{};
  if(approved.energy_approved_at && n(approved.energy_target_calories)>0){
   S.t={
    cal:n(approved.energy_target_calories),
