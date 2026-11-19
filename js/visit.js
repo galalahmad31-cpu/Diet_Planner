@@ -86,7 +86,12 @@ const db = window.DietPlannerAccess?.supabaseClient;
     document.getElementById('visitDate').textContent =
       formatVisitDate(data.visit_date);
 
-    window.visitContext = { id: data.id, patient_id: data.patient_id };
+    window.visitContext = {
+      id: data.id,
+      patient_id: data.patient_id,
+      visit_number: data.visit_number ?? null,
+      visit_date: data.visit_date ?? null
+    };
 
     document.getElementById('loadingState').classList.add('hidden');
     document.getElementById('visitContent').classList.remove('hidden');
@@ -478,6 +483,11 @@ function setAssessmentEditMode(editing){
   }
 
   function backToPatient() {
+    if (new URLSearchParams(window.location.search).get('embed') === '1' && window.parent !== window) {
+      window.parent.postMessage({ type: 'dp-visit-close' }, window.location.origin);
+      return;
+    }
+
     if (visit?.patient_id) {
       window.location.href =
         'patient-profile.html?id=' + encodeURIComponent(visit.patient_id);
@@ -566,6 +576,33 @@ function bindStaticActions() {
 
 bindStaticActions();
 bindPrintLifecycle();
+
+/* Embedded visit view: report the rendered document height to the patient-profile host. */
+(function bindVisitEmbedSizing() {
+  if (new URLSearchParams(window.location.search).get('embed') !== '1' || window.parent === window) return;
+
+  const notifyHeight = () => {
+    const height = Math.max(
+      document.documentElement?.scrollHeight || 0,
+      document.body?.scrollHeight || 0,
+      document.documentElement?.getBoundingClientRect?.().height || 0,
+      document.body?.getBoundingClientRect?.().height || 0
+    );
+    if (height > 0) {
+      window.parent.postMessage({ type: 'dp-visit-embed-height', height }, window.location.origin);
+    }
+  };
+
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(notifyHeight);
+    if (document.documentElement) observer.observe(document.documentElement);
+    if (document.body) observer.observe(document.body);
+  }
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
+  if (document.fonts?.ready) document.fonts.ready.then(notifyHeight).catch(() => {});
+  notifyHeight();
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('heightCm').addEventListener('input', calculateBMI);
