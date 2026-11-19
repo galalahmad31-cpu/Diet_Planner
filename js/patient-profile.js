@@ -486,14 +486,12 @@
       const details = document.createElement('span');
       details.className = 'followup-day-details';
       const title = document.createElement('strong');
-      title.textContent = `الخطة رقم ${visit.visit_number ?? '—'}`;
+      title.textContent = `الخطة ${visit.visit_number ?? '—'}`;
       const date = document.createElement('small');
+      date.className = 'followup-day-date';
       date.textContent = formatVisitDate(visit.visit_date);
       details.append(title, date);
-      const arrow = document.createElement('i');
-      arrow.className = 'fa-solid fa-chevron-left followup-day-arrow';
-      arrow.setAttribute('aria-hidden', 'true');
-      openButton.append(number, details, arrow);
+      openButton.append(number, details);
 
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
@@ -529,6 +527,8 @@
       title.textContent = `الخطة رقم ${visit.visit_number ?? '—'} · ${formatVisitDate(visit.visit_date)}`;
     }
     panel.hidden = false;
+    const followupDetails = $('followupDaysDetails');
+    if (followupDetails) followupDetails.open = false;
     document.querySelectorAll('[data-open-visit]').forEach(button => {
       button.classList.toggle('is-active', button.dataset.openVisit === String(visit.id));
     });
@@ -546,6 +546,8 @@
     const panel = $('visitEmbeddedPanel');
     const frame = $('visitFrame');
     if (panel) panel.hidden = true;
+    const followupDetails = $('followupDaysDetails');
+    if (followupDetails) followupDetails.open = true;
     document.querySelectorAll('[data-open-visit]').forEach(button => button.classList.remove('is-active'));
     if (frame) frame.dataset.visitId = '';
   }
