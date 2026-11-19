@@ -118,6 +118,43 @@
 
 <div id="toast" class="fixed bottom-5 left-5 z-[100] hidden max-w-sm rounded-2xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
 
+<!-- Subscription request modal: reuses the existing subscription workflow without leaving the profile page. -->
+<div id="subscribeModal" class="profile-subscribe-backdrop" aria-hidden="true">
+  <section class="profile-subscribe-dialog" role="dialog" aria-modal="true" aria-labelledby="profileSubscribeTitle">
+    <h2 id="profileSubscribeTitle">الاشتراك في الخطة</h2>
+    <div id="selectedPlanInfo" class="profile-selected-plan-info"></div>
+    <div class="profile-subscribe-field form-group">
+      <label for="paymentProof">صورة التحويل</label>
+      <input id="paymentProof" type="file" accept="image/jpeg,image/png,image/webp">
+      <div class="profile-subscribe-help">يفضل أن تكون الصورة واضحة. الحد الأقصى 5 ميجابايت.</div>
+    </div>
+    <div class="profile-subscribe-field form-group">
+      <label for="paymentNote">ملاحظات (اختياري)</label>
+      <textarea id="paymentNote" placeholder="أي ملاحظات خاصة بالتحويل"></textarea>
+    </div>
+    <div id="pendingActions" class="profile-pending-actions">
+      <button id="replaceProofBtn" class="profile-subscribe-btn profile-subscribe-secondary" type="button" data-action="replace-proof"><i class="fa-solid fa-image"></i> تعديل إثبات الدفع</button>
+      <button id="cancelSubscriptionBtn" class="profile-subscribe-btn profile-subscribe-danger" type="button" data-action="cancel-pending"><i class="fa-solid fa-ban"></i> إلغاء الطلب</button>
+    </div>
+    <div class="profile-subscribe-actions">
+      <button class="profile-subscribe-btn profile-subscribe-secondary" type="button" data-action="close-modal">إغلاق</button>
+      <button id="submitSubscriptionBtn" class="profile-subscribe-btn profile-subscribe-primary" type="button" data-action="submit-subscription">إرسال طلب الاشتراك</button>
+    </div>
+  </section>
+</div>
+<div id="confirmOverlay" class="profile-subscription-confirm-backdrop">
+  <section class="profile-subscription-confirm" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="profile-confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h3 id="confirmTitle">تأكيد العملية</h3>
+    <p id="confirmMessage" class="profile-confirm-message"></p>
+    <div class="profile-confirm-actions">
+      <button class="profile-subscribe-btn profile-subscribe-secondary" type="button" data-action="confirm-no">إلغاء</button>
+      <button class="profile-subscribe-btn profile-subscribe-danger" type="button" data-action="confirm-yes">تأكيد</button>
+    </div>
+  </section>
+</div>
+<div id="subscriptionToast" class="profile-subscription-toast" role="status" aria-live="polite"></div>
+
 <!-- EDIT PROFILE MODAL -->
 <div id="editProfileModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
   <div class="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl sm:p-6">
@@ -165,7 +202,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
-<script src="js/profile.js?v=20261119-profile-plans-modal1" defer></script>
+<script src="js/subscription_plans.js?v=20261119-profile-inline-subscribe1" defer></script>
+<script src="js/profile.js?v=20261119-profile-inline-subscribe1" defer></script>
   
 </body>
 </html>
