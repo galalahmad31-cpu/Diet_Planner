@@ -666,6 +666,8 @@
       cancelButtonText: 'إلغاء',
       confirmButtonColor: '#26765a',
       reverseButtons: true,
+      showClass: { popup: '', backdrop: '' },
+      hideClass: { popup: '', backdrop: '' },
       inputValidator: value => value ? undefined : 'اختر نوع الخطة أولاً'
     });
     if (!choice.isConfirmed || !choice.value) return;
