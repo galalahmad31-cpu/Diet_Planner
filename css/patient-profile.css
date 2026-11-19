@@ -353,6 +353,47 @@ html,body{max-width:100%;overflow-x:hidden}
 .patient-measurement-swal-confirm.swal2-styled:focus{
   box-shadow:0 0 0 3px rgba(15,159,130,.2);
 }
+.patient-measurement-swal-actions.swal2-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:9px;
+  width:100%;
+  margin:20px 0 0;
+}
+.patient-measurement-swal-danger.swal2-styled,
+.patient-measurement-swal-cancel.swal2-styled{
+  min-width:116px;
+  margin:0;
+  padding:10px 18px;
+  border:0;
+  border-radius:11px;
+  font-family:'Cairo',sans-serif;
+  font-size:12px;
+  font-weight:800;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.patient-measurement-swal-danger.swal2-styled{
+  background:linear-gradient(135deg,#e34b5f,#c92d48);
+  color:#fff;
+  box-shadow:0 7px 16px rgba(201,45,72,.18);
+}
+.patient-measurement-swal-danger.swal2-styled:hover{
+  background:linear-gradient(135deg,#d83d53,#b91f3a);
+  transform:translateY(-1px);
+}
+.patient-measurement-swal-cancel.swal2-styled{
+  background:#eef3f5;
+  color:#52636c;
+}
+.patient-measurement-swal-cancel.swal2-styled:hover{
+  background:#e2eaed;
+}
+.patient-measurement-swal-danger.swal2-styled:focus,
+.patient-measurement-swal-cancel.swal2-styled:focus{
+  box-shadow:0 0 0 3px rgba(15,159,130,.16);
+}
+
 @media(max-width:480px){
   .patient-measurement-swal.swal2-popup{padding:24px 18px 20px;border-radius:18px}
   .patient-measurement-swal-title.swal2-title{font-size:17px}
