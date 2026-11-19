@@ -1,4 +1,10 @@
 {
   "buildCommand": "npm run build:css",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    }
+  ]
 }
