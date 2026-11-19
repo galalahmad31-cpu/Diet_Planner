@@ -810,3 +810,18 @@ html,body{max-width:100%;overflow-x:hidden}
   .visit-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
   .visit-access-card i{font-size:11px!important}
 }
+
+
+/* Visit page embedded in patient-profile: remove the standalone site chrome only. */
+html.visit-embedded,html.visit-embedded body{min-height:0!important;background:#f8fafc!important}
+html.visit-embedded body>header{display:none!important}
+html.visit-embedded body>main{width:100%!important;max-width:none!important;margin:0!important;padding:10px!important;box-sizing:border-box}
+html.visit-embedded #visitContent>section:first-child{padding:12px!important;border-radius:12px!important;box-shadow:none!important}
+html.visit-embedded #patientName{display:none!important}
+html.visit-embedded #visitContent [data-action="backToPatient"]{display:none!important}
+html.visit-embedded #visitContent>section.mt-6{margin-top:12px!important}
+html.visit-embedded #moduleContent{margin-top:12px!important}
+@media(max-width:640px){
+ html.visit-embedded body>main{padding:7px!important}
+ html.visit-embedded #visitContent>section:first-child{padding:10px!important}
+}
