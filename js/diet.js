@@ -133,6 +133,7 @@ function renderDiets(){
     return `<article class="diet-list-item">
       <div class="diet-list-main">
         <div class="diet-list-title-row">
+          <span class="diet-list-logo" aria-hidden="true"><i class="fa-solid fa-utensils"></i></span>
           <h3 class="diet-list-title">${esc(d.name)}</h3>
           <span class="diet-list-status ${pub?'is-public':'is-private'}">${pub?'منشور':'خاص'}</span>
         </div>
