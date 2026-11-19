@@ -10,7 +10,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-        <link rel="stylesheet" href="css/diet.css?v=20261119-diet-list3">
+        <link rel="stylesheet" href="css/diet.css?v=20261119-branded-header1">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
         </script>
@@ -25,48 +25,39 @@
         </div>
         <main class="min-h-screen p-4 sm:p-6">
             <div class="mx-auto max-w-[1550px]">
-                <header class="glass rounded-3xl p-5 sm:p-6">
-                    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg shadow-brand-500/20">
-                                <i class="fa-solid fa-utensils text-2xl"></i>
-                            </div>
-                            <div>
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <h1 class="text-2xl font-extrabold text-slate-800">
-                                        مكتبة الدايت
-                                    </h1>
-                                    <span id="countBadge" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">0 دايت</span>
-                                </div>
-                                <p class="mt-1 text-sm text-slate-500">
-                                    قوالب يومية جاهزة يمكن استخدامها وإعادة استخدامها في الخطط الغذائية
-                                </p>
-                            </div>
+                <header class="diet-page-header">
+                  <div class="diet-header-inner">
+                    <div class="diet-brand-row">
+                      <div class="diet-brand">
+                        <div class="diet-brand-logo"><i class="fa-solid fa-leaf" aria-hidden="true"></i></div>
+                        <div class="diet-brand-copy">
+                          <h1>Diet Planner</h1>
+                          <p>د. أحمد جلال</p>
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                            
-                            <button id="newBtn" class="rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">
-                                <i class="fa-solid fa-plus ml-1"></i>إنشاء دايت جديد
-                            </button>
-                        </div>
+                      </div>
+                      <div class="diet-header-actions">
+                        <span class="diet-page-label">مكتبة الدايت</span>
+                        <button id="newBtn" class="diet-create-btn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> إنشاء دايت جديد</button>
+                      </div>
                     </div>
-                </header>
-                <nav class="quick-access-nav" dir="rtl" aria-label="التنقل السريع">
-                    <div class="quick-access-track">
-                        <a href="app.html" class="quick-access-card"><i class="fa-solid fa-house" aria-hidden="true"></i><span>الرئيسية</span></a>
-                        <a href="patient.html" class="quick-access-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><span>قائمة المرضى</span></a>
-                        <a href="food.html" class="quick-access-card"><i class="fa-solid fa-apple-whole" aria-hidden="true"></i><span>مكتبة الأغذية</span></a>
-                        <a href="products.html" class="quick-access-card"><i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i><span>المنتجات الغذائية</span></a>
-                        <a href="diet.html" class="quick-access-card active" aria-current="page"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>مكتبة الدايت</span></a>
-                        <a href="recipe.html" class="quick-access-card"><i class="fa-solid fa-bowl-food" aria-hidden="true"></i><span>الوصفات الصحية</span></a>
-                        <a href="quickcalc.html" class="quick-access-card"><i class="fa-solid fa-calculator" aria-hidden="true"></i><span>الحاسبة السريعة</span></a>
-                        <a href="finance.html" class="quick-access-card"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span>اشتراكات المرضى</span></a>
-                        <a href="article.html" class="quick-access-card"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>المقالات</span></a>
-                        <a href="profile.html" class="quick-access-card"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i><span>الصفحة الشخصية وخطط الاشتراك</span></a>
-                        <a href="feedback.html" class="quick-access-card"><i class="fa-solid fa-star" aria-hidden="true"></i><span>شاركنا رأيك</span></a>
-                        <a href="about.html" class="quick-access-card"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>عن التطبيق</span></a>
-                    </div>
-                </nav>
+                        <nav class="quick-access-nav" dir="rtl" aria-label="التنقل السريع">
+        <div class="quick-access-track">
+            <a href="app.html" class="quick-access-card"><i class="fa-solid fa-house" aria-hidden="true"></i><span>الرئيسية</span></a>
+            <a href="patient.html" class="quick-access-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><span>قائمة المرضى</span></a>
+            <a href="food.html" class="quick-access-card"><i class="fa-solid fa-apple-whole" aria-hidden="true"></i><span>مكتبة الأغذية</span></a>
+            <a href="products.html" class="quick-access-card"><i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i><span>المنتجات الغذائية</span></a>
+            <a href="diet.html" class="quick-access-card active" aria-current="page"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>مكتبة الدايت</span></a>
+            <a href="recipe.html" class="quick-access-card"><i class="fa-solid fa-bowl-food" aria-hidden="true"></i><span>الوصفات الصحية</span></a>
+            <a href="quickcalc.html" class="quick-access-card"><i class="fa-solid fa-calculator" aria-hidden="true"></i><span>الحاسبة السريعة</span></a>
+            <a href="finance.html" class="quick-access-card"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span>اشتراكات المرضى</span></a>
+            <a href="article.html" class="quick-access-card"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>المقالات</span></a>
+            <a href="profile.html" class="quick-access-card"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i><span>الصفحة الشخصية وخطط الاشتراك</span></a>
+            <a href="feedback.html" class="quick-access-card"><i class="fa-solid fa-star" aria-hidden="true"></i><span>شاركنا رأيك</span></a>
+            <a href="about.html" class="quick-access-card"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>عن التطبيق</span></a>
+        </div>
+      
+                  </div>
+                </header>          </nav>
 
                 <section class="mt-5 glass rounded-3xl p-2 sm:p-3 diet-library-toolbar">
                     <div class="diet-library-controls">
