@@ -7,15 +7,16 @@
 - `js/theme.js` manages theme behavior. CSS assets live in `css/`; `npm run build:css` builds Tailwind CSS.
 
 ## Page/script map
-- Auth/routing: `index.html` → `js/auth-access.js`
-- Dashboard/admin: `app.html` → `js/app-dashboard.js`; `admin.html` → `js/admin.js`, `js/admin-roles.js`
+- Public entry/auth routing: `index.html` → `js/auth-access.js`; authenticated dashboard routing is handled by `js/auth-access.js`.
+- Main dashboard: `app.html` → `js/auth-access.js`, `js/app-dashboard.js`; `index.html` also contains a public-facing dashboard/entry layout and loads the dashboard script. Keep their routing and access behavior distinct unless regression-tested.
+- Admin: `admin.html` → `js/admin.js`, `js/admin-roles.js`
 - Patient records: `patient.html` → `js/patient.js`; `patient-profile.html` → `js/patient-profile.js`
 - Visits: `visit.html` → `js/visit.js`, `js/visit-calculator.js`, `js/visit-diet-plan.js`, `js/visit-exchange-plan.js`
 - Diet/calculation: `diet.html` → `js/diet.js`; `quickcalc.html` → `js/quickcalc.js`
 - Food/recipes/products: `food.html` → `js/food.js`; `recipe.html` → `js/recipe.js`; `products.html` → `js/products.js`
-- Finance/weight: `finance.html` → `js/finance.js`; `weight.html` → `js/weight.js`
+- Finance/weight: `finance.html` → `js/finance.js`; the repository's standalone weight page uses the Arabic-named `weightم.html`, `css/weightم.css`, and `js/weightم.js`.
 - Nutrition support: `nutritionsupport.html` → `js/nutritionsupport.js`; `nutritionsupport-patient.html` → `js/nutritionsupport-patient.js`
-- Subscriptions: `subscription_plans_index.html` → `js/subscription_plans_index.js`; `subscription_plans.html` → `js/subscription_plans.js`
+- Subscriptions: `subscription_plans_index.html` → `js/subscription_plans_index.js`; `subscription_plansم.html` → `js/subscription_plansم.js`.
 - Other modules include profile, articles, feedback, notifications, about, and password recovery/update pages.
 
 ## Subscription/security flow
