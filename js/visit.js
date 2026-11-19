@@ -581,13 +581,18 @@ bindPrintLifecycle();
 (function bindVisitEmbedSizing() {
   if (new URLSearchParams(window.location.search).get('embed') !== '1' || window.parent === window) return;
 
+  const getContentHeight = () => {
+    const main = document.querySelector('body > main');
+    if (!main) return 0;
+
+    // Measure the real content wrapper, not the iframe viewport or document canvas.
+    // Fixed-position dialogs and unused viewport space must not enlarge the embed.
+    const height = Math.ceil(main.getBoundingClientRect().height);
+    return Number.isFinite(height) && height > 0 ? height : 0;
+  };
+
   const notifyHeight = () => {
-    const height = Math.max(
-      document.documentElement?.scrollHeight || 0,
-      document.body?.scrollHeight || 0,
-      document.documentElement?.getBoundingClientRect?.().height || 0,
-      document.body?.getBoundingClientRect?.().height || 0
-    );
+    const height = getContentHeight();
     if (height > 0) {
       window.parent.postMessage({ type: 'dp-visit-embed-height', height }, window.location.origin);
     }
@@ -595,8 +600,8 @@ bindPrintLifecycle();
 
   if ('ResizeObserver' in window) {
     window.__dpVisitEmbedResizeObserver = new ResizeObserver(notifyHeight);
-    if (document.documentElement) window.__dpVisitEmbedResizeObserver.observe(document.documentElement);
-    if (document.body) window.__dpVisitEmbedResizeObserver.observe(document.body);
+    const main = document.querySelector('body > main');
+    if (main) window.__dpVisitEmbedResizeObserver.observe(main);
   }
   window.addEventListener('load', notifyHeight);
   window.addEventListener('resize', notifyHeight);
