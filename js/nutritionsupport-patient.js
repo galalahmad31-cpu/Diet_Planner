@@ -1531,13 +1531,32 @@ function renderSupportDays(){
 }
 function showDeleteConfirm(dayText){
   return new Promise(resolve=>{
+    const message='هل أنت متأكد من حذف يوم '+dayText+'؟\\nسيتم حذف جميع بيانات Enteral و Parenteral المحفوظة لهذا اليوم نهائيًا.';
+
+    if (document.documentElement.classList.contains('nsp-embedded') && window.parent !== window) {
+      const requestId = 'delete-day-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      const onResult = event => {
+        if (event.origin !== window.location.origin || event.source !== window.parent) return;
+        if (event.data?.type !== 'dp-nsp-delete-modal-result') return;
+        window.removeEventListener('message', onResult);
+        resolve(event.data.approved === true);
+      };
+      window.addEventListener('message', onResult);
+      window.parent.postMessage({type:'dp-nsp-open-delete-modal',requestId,message}, window.location.origin);
+      window.setTimeout(()=>{
+        window.removeEventListener('message', onResult);
+        resolve(false);
+      }, 120000);
+      return;
+    }
+
     const overlay=$('deleteConfirmOverlay');
     const text=$('deleteConfirmText');
     const ok=$('deleteConfirmOk');
     const cancel=$('deleteConfirmCancel');
     if(!overlay||!text||!ok||!cancel){resolve(false);return;}
 
-    text.textContent='هل أنت متأكد من حذف يوم '+dayText+'؟\nسيتم حذف جميع بيانات Enteral و Parenteral المحفوظة لهذا اليوم نهائيًا.';
+    text.textContent=message;
     overlay.classList.add('show');
 
     const close=value=>{
@@ -1551,8 +1570,10 @@ function showDeleteConfirm(dayText){
     ok.onclick=()=>close(true);
     cancel.onclick=()=>close(false);
     overlay.onclick=e=>{if(e.target===overlay)close(false);};
+    cancel.focus();
   });
 }
+
 function canWriteSupportDays() {
   if (supportIsAdmin) return true;
   const a = window.__dpNutritionSupportDayAccess || {};
