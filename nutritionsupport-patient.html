@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/tailwind.css">
-  <link rel="stylesheet" href="css/nutritionsupport-patient.css?v=20261119-embed-fit-modal-v2">
+  <link rel="stylesheet" href="css/nutritionsupport-patient.css?v=20261119-embed-fit-top-modal-v3">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -1120,9 +1120,9 @@
   const measureHeight = () => {
     const root = document.querySelector('.container-main');
     if (!root) return;
+    // Use the rendered layout box, not scrollHeight (which can include overflow/hidden content).
     const rect = root.getBoundingClientRect();
-    const pageTop = rect.top + window.scrollY;
-    const height = Math.ceil(pageTop + root.scrollHeight);
+    const height = Math.ceil(rect.bottom + window.scrollY);
     if (!Number.isFinite(height) || height <= 0 || Math.abs(height - lastHeight) < 2) return;
     lastHeight = height;
     parent.postMessage({ type: 'dp-nsp-embed-height', height }, location.origin);
