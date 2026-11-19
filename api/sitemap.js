@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
       base + '/',
       base + '/about.html',
       base + '/article.html',
-      ...articles.map(a => base + '/article-view.html?id=' + encodeURIComponent(a.id))
+      ...articles.map(a => base + '/article.html?id=' + encodeURIComponent(a.id))
     ];
     const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
