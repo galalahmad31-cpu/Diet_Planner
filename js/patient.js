@@ -272,6 +272,7 @@
         .insert({
           user_id: user.id,
           name,
+          phone: null,
           gender: null,
           birth_date: null,
           age: null,
