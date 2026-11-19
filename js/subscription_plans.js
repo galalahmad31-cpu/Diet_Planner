@@ -8,12 +8,16 @@
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[c]));
 
   function toast(message) {
-    const el = $('toast');
+    const el = $('subscriptionToast') || $('toast');
     if (!el) return;
     el.textContent = message;
+    el.classList.remove('hidden');
     el.classList.add('show');
     clearTimeout(state.toastTimer);
-    state.toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+    state.toastTimer = setTimeout(() => {
+      el.classList.remove('show');
+      if (el.id === 'subscriptionToast') el.classList.add('hidden');
+    }, 3000);
   }
 
   function errorMessage(error, trial = false) {
@@ -263,10 +267,13 @@
     else if (action === 'confirm-no') { $('confirmOverlay').style.display = 'none'; state.confirm?.(false); state.confirm = null; }
   });
 
+  let subscriptionDataPromise = null;
+
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       if (!(await loadUser())) return;
-      await loadData();
+      subscriptionDataPromise = loadData();
+      await subscriptionDataPromise;
     } catch (error) {
       console.error('subscription page initialization failed:', error);
       const c = $('plans');
@@ -274,7 +281,20 @@
     }
   });
 
-  window.openSubscribeModal = openSubscribe;
+  // Public entry point for profile-page plan details. Wait for the same
+  // authenticated plan/subscription data used by the dedicated plans page.
+  window.openSubscribeModal = async (planId) => {
+    try {
+      if (!state.user && !(await loadUser())) return false;
+      if (!subscriptionDataPromise) subscriptionDataPromise = loadData();
+      await subscriptionDataPromise;
+      openSubscribe(String(planId));
+      return state.selectedPlanId != null;
+    } catch (error) {
+      showError('opening inline subscription form failed', error);
+      return false;
+    }
+  };
   window.closeSubscribeModal = closeModal;
   window.submitSubscription = submitSubscription;
   window.replacePendingProof = replacePendingProof;
