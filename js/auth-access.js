@@ -310,7 +310,7 @@
       return true;
     }
 
-    window.location.replace("subscription_plans_index.html");
+    window.location.replace("profile.html");
     return false;
   }
 
