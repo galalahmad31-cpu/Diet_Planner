@@ -766,3 +766,8 @@ html[data-theme="dark"] .print-field input{
   .nsp-access-card i{font-size:11px!important}
 }
 @media print{.nsp-page-header{display:none!important}}
+
+/* Nutrition Support Patient: swap brand and page label sides */
+.nsp-brand-row{direction:ltr!important}
+.nsp-brand{order:2!important}
+.nsp-page-label{order:1!important}
