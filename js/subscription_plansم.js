@@ -269,9 +269,9 @@
 
   async function cancelPending() {
     const sub = state.currentSubscription;
-    if (!sub || sub.status !== 'pending') return;
+    if (!sub || sub.status !== 'pending') return false;
     const ok = await new Promise(resolve => { state.confirm = resolve; $('confirmTitle').textContent = 'تأكيد الإلغاء'; $('confirmMessage').textContent = 'هل أنت متأكد من إلغاء طلب الاشتراك؟'; $('confirmOverlay').style.display = 'flex'; });
-    if (!ok) return;
+    if (!ok) return false;
     try {
       const { data, error } = await sb.rpc('cancel_pending_subscription', { p_subscription_id: sub.id });
       if (error) throw error;
@@ -280,7 +280,11 @@
       closeModal();
       toast('تم إلغاء طلب الاشتراك.');
       await loadData();
-    } catch (error) { showError('cancel subscription failed', error); }
+      return true;
+    } catch (error) {
+      showError('cancel subscription failed', error);
+      return false;
+    }
   }
 
   document.addEventListener('click', (e) => {
@@ -334,6 +338,13 @@
       showError('opening inline subscription form failed', error);
       return false;
     }
+  };
+  window.cancelPendingSubscriptionForPlan = async (planId) => {
+    const pending = state.subscriptions.find(s => s.status === 'pending' && String(s.plan_id) === String(planId));
+    if (!pending) return false;
+    state.currentSubscription = pending;
+    state.selectedPlanId = pending.plan_id;
+    return await cancelPending();
   };
   window.closeSubscribeModal = closeModal;
   window.submitSubscription = submitSubscription;
