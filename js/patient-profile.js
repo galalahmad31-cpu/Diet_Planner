@@ -64,7 +64,7 @@
     const canWrite = state.isAdmin || state.hasActiveSubscription;
 
     const editButton = $('editButton');
-    const addVisitButton = $('addVisitButton');
+    const addVisitButton = $('addPlanButton');
     updateMeasurementWriteAccess();
     updatePatientFinanceWriteAccess();
 
@@ -82,8 +82,8 @@
       addVisitButton.classList.toggle('opacity-50', !canWrite);
       addVisitButton.classList.toggle('cursor-not-allowed', !canWrite);
       addVisitButton.title = canWrite
-        ? 'إضافة خطة جديدة'
-        : 'إضافة الخطة متاحة أثناء الاشتراك المدفوع فقط';
+        ? 'إضافة خطة غذائية'
+        : 'إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط';
     }
 
     const accessBox = $('writeAccessStatus');
@@ -98,7 +98,7 @@
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
       } else {
         accessBox.textContent =
-          'الاشتراك غير فعال — يمكنك عرض بيانات المريض والزيارات فقط. التعديل وإضافة الزيارات غير متاحين.';
+          'الاشتراك غير فعال — يمكنك عرض بيانات المريض والبيانات والخطط للعرض فقط. التعديل وإضافة الخطط غير متاحين.';
         accessBox.className =
           'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
       }
@@ -176,7 +176,7 @@
     $('modulesSection')?.classList.remove('hidden');
 
     updateWriteControls();
-    await loadVisits();
+    await loadNutritionPlans();
   }
 
 
@@ -483,60 +483,60 @@
     });
   }
 
-  async function loadVisits() {
+  async function loadNutritionPlans() {
     const loading = $('visitsLoading');
     const empty = $('visitsEmpty');
     const list = $('visitsList');
     if (!loading || !empty || !list) return;
 
     loading.hidden = false;
-    loading.textContent = 'جاري تحميل أيام المتابعة...';
+    loading.textContent = 'جاري تحميل الخطط الغذائية...';
     empty.hidden = true;
     list.replaceChildren();
 
     const { data, error } = await supabase
-      .from('patient_visits')
-      .select('id,visit_number,visit_date')
+      .from('nutrition_plans')
+      .select('id,patient_id,plan_name,start_date,target_calories,updated_at,created_at')
       .eq('patient_id', patientId)
-      .order('visit_number', { ascending: false });
+      .order('updated_at', { ascending: false })
+      .order('created_at', { ascending: false });
 
     loading.hidden = true;
-
     if (error) {
-      console.error('Load visits failed:', error);
+      console.error('Load nutrition plans failed:', error);
       loading.hidden = false;
-      loading.textContent = 'تعذر تحميل أيام المتابعة.';
+      loading.textContent = 'تعذر تحميل الخطط الغذائية.';
       return;
     }
-
     if (!data?.length) {
       empty.hidden = false;
       return;
     }
 
-    data.forEach((visit) => {
+    data.forEach((plan) => {
       const row = document.createElement('article');
       row.className = 'followup-day-row';
 
       const openButton = document.createElement('button');
       openButton.type = 'button';
       openButton.className = 'followup-day-open';
-      openButton.dataset.openVisit = visit.id;
-      openButton.dataset.visitNumber = String(visit.visit_number ?? '');
-      openButton.dataset.visitDate = String(visit.visit_date ?? '');
-      openButton.setAttribute('aria-label', `فتح الخطة رقم ${visit.visit_number}`);
+      openButton.dataset.openPlan = plan.id;
+      openButton.dataset.planType = plan.plan_name || '';
+      openButton.setAttribute('aria-label', 'فتح ' + (plan.plan_name || 'الخطة الغذائية'));
 
       const number = document.createElement('span');
       number.className = 'followup-day-number';
-      number.textContent = String(visit.visit_number ?? '—');
+      number.innerHTML = '<i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>';
 
       const details = document.createElement('span');
       details.className = 'followup-day-details';
       const title = document.createElement('strong');
-      title.textContent = `الخطة ${visit.visit_number ?? '—'}`;
+      title.textContent = plan.plan_name || 'خطة غذائية';
       const date = document.createElement('small');
       date.className = 'followup-day-date';
-      date.textContent = formatVisitDate(visit.visit_date);
+      date.textContent = plan.start_date
+        ? formatVisitDate(plan.start_date)
+        : 'بدون تاريخ محدد';
       details.append(title, date);
       openButton.append(number, details);
 
@@ -544,44 +544,49 @@
       deleteButton.type = 'button';
       deleteButton.className = 'followup-day-delete';
       deleteButton.title = 'حذف الخطة';
-      deleteButton.setAttribute('aria-label', `حذف الخطة رقم ${visit.visit_number}`);
+      deleteButton.setAttribute('aria-label', 'حذف الخطة');
       deleteButton.innerHTML = '<i class="fa-solid fa-trash" aria-hidden="true"></i>';
-      deleteButton.addEventListener('click', () => void deleteVisit(visit));
+      deleteButton.addEventListener('click', () => void deleteNutritionPlan(plan));
 
       row.append(openButton, deleteButton);
       list.appendChild(row);
     });
 
     const activeFrame = $('visitFrame');
-    if (activeFrame?.dataset.visitId) {
-      const stillExists = data.some(item => String(item.id) === String(activeFrame.dataset.visitId));
+    if (activeFrame?.dataset.planId) {
+      const stillExists = data.some(item => String(item.id) === String(activeFrame.dataset.planId));
       if (!stillExists) closeVisitEmbedded();
-      else {
-        list.querySelectorAll('[data-open-visit]').forEach(button => {
-          button.classList.toggle('is-active', button.dataset.openVisit === activeFrame.dataset.visitId);
-        });
-      }
+      else list.querySelectorAll('[data-open-plan]').forEach(button => {
+        button.classList.toggle('is-active', button.dataset.openPlan === activeFrame.dataset.planId);
+      });
     }
   }
 
-  function openVisitEmbedded(visit) {
+  function openPlanEmbedded(planId = null, planType = '') {
     const panel = $('visitEmbeddedPanel');
     const frame = $('visitFrame');
-    if (!panel || !frame || !visit?.id) return;
+    if (!panel || !frame || !patientId) return;
 
     panel.hidden = false;
-    const followupDetails = $('followupDaysDetails');
-    if (followupDetails) followupDetails.open = false;
-    document.querySelectorAll('[data-open-visit]').forEach(button => {
-      button.classList.toggle('is-active', button.dataset.openVisit === String(visit.id));
+    const details = $('followupDaysDetails');
+    if (details) details.open = false;
+    document.querySelectorAll('[data-open-plan]').forEach(button => {
+      button.classList.toggle('is-active', button.dataset.openPlan === String(planId || ''));
     });
 
-    if (frame.dataset.visitId !== String(visit.id)) {
-      frame.dataset.visitId = String(visit.id);
-      frame.style.height = '1px';
-      frame.src = `visit.html?id=${encodeURIComponent(visit.id)}&embed=1`;
-    }
+    const url = new URL('visit.html', window.location.href);
+    url.searchParams.set('patient_id', patientId);
+    url.searchParams.set('embed', '1');
+    if (planId) url.searchParams.set('plan_id', planId);
+    if (planType) url.searchParams.set('plan_type', planType);
+    else url.searchParams.set('new_plan', '1');
 
+    const key = planId || 'new';
+    if (frame.dataset.planId !== key) {
+      frame.dataset.planId = key;
+      frame.style.height = '1px';
+      frame.src = url.toString();
+    }
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -589,152 +594,61 @@
     const panel = $('visitEmbeddedPanel');
     const frame = $('visitFrame');
     if (panel) panel.hidden = true;
-    const followupDetails = $('followupDaysDetails');
-    if (followupDetails) followupDetails.open = true;
-    document.querySelectorAll('[data-open-visit]').forEach(button => button.classList.remove('is-active'));
-    if (frame) frame.dataset.visitId = '';
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[char]));
+    const details = $('followupDaysDetails');
+    if (details) details.open = true;
+    document.querySelectorAll('[data-open-plan]').forEach(button => button.classList.remove('is-active'));
+    if (frame) frame.dataset.planId = '';
   }
 
   function formatVisitDate(date) {
     if (!date) return 'بدون تاريخ';
     const value = new Date(`${date}T00:00:00`);
     return new Intl.DateTimeFormat('ar-EG', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      year: 'numeric', month: 'long', day: 'numeric'
     }).format(value);
   }
 
-  async function deleteVisit(visit) {
-    if (!state.user) {
-      state.user = await access?.getCurrentUser?.();
-    }
-
-    if (!state.user) {
-      await Swal.fire({
-        title: 'تسجيل الدخول مطلوب',
-        text: 'يجب تسجيل الدخول أولاً.',
-        icon: 'warning',
-        confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#178f84'
-      });
+  async function deleteNutritionPlan(plan) {
+    if (!canWrite()) {
+      alert('حذف الخطط متاح أثناء الاشتراك المدفوع فقط.');
       return;
     }
-
     const result = await Swal.fire({
-      title: 'حذف الخطة',
-      text: `هل أنت متأكد من حذف الخطة رقم ${visit.visit_number}؟`,
+      title: 'حذف الخطة الغذائية',
+      text: `هل تريد حذف "${plan.plan_name || 'الخطة'}"؟ سيتم حذف الأيام والوجبات والأصناف التابعة لها.`,
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'حذف',
+      confirmButtonText: 'حذف الخطة',
       cancelButtonText: 'إلغاء',
       confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#ffffff',
-      reverseButtons: true,
-      width: '290px',
-      padding: '.85rem 1rem .7rem',
-      customClass: {
-        popup: 'visit-delete-popup',
-        title: 'visit-delete-title',
-        htmlContainer: 'visit-delete-text',
-        confirmButton: 'visit-delete-confirm',
-        cancelButton: 'visit-delete-cancel'
-      },
-      buttonsStyling: true
+      reverseButtons: true
     });
-
     if (!result.isConfirmed) return;
 
-    const { error } = await supabase
-      .from('patient_visits')
-      .delete()
-      .eq('id', visit.id)
-      .eq('patient_id', patientId);
+    try {
+      const { error: exchangeError } = await supabase
+        .from('exchange_values').delete().eq('plan_id', plan.id);
+      if (exchangeError) throw exchangeError;
 
-    if (error) {
-      console.error('Delete visit failed:', error);
-      await Swal.fire({
-        title: 'تعذر الحذف',
-        text: 'حدث خطأ أثناء حذف الزيارة.',
-        icon: 'error',
-        confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#178f84'
-      });
-      return;
+      const { error } = await supabase
+        .from('nutrition_plans').delete()
+        .eq('id', plan.id).eq('patient_id', patientId);
+      if (error) throw error;
+
+      if (String($('visitFrame')?.dataset.planId || '') === String(plan.id)) closeVisitEmbedded();
+      await loadNutritionPlans();
+    } catch (error) {
+      console.error('Delete nutrition plan failed:', error);
+      await Swal.fire('تعذر الحذف', error.message || 'حدث خطأ أثناء حذف الخطة.', 'error');
     }
-
-    if (String($('visitFrame')?.dataset.visitId || '') === String(visit.id)) closeVisitEmbedded();
-    await loadVisits();
   }
 
-  async function addVisit() {
+  function addNutritionPlan() {
     if (!canWrite()) {
-      alert('إضافة يوم متابعة متاحة أثناء الاشتراك المدفوع فقط.');
+      alert('إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط.');
       return;
     }
-    if (state.isCreatingVisit) return;
-
-    state.isCreatingVisit = true;
-    const button = $('addVisitButton');
-    if (button) button.disabled = true;
-
-    try {
-      const user = state.user || await access?.getCurrentUser?.();
-      if (!user?.id) {
-        alert('تعذر تحديد المستخدم الحالي.');
-        return;
-      }
-
-      const { data: lastVisit, error: lastError } = await supabase
-        .from('patient_visits')
-        .select('visit_number')
-        .eq('patient_id', patientId)
-        .order('visit_number', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (lastError) {
-        console.error('Get last visit failed:', lastError);
-        alert('تعذر معرفة رقم الخطة التالية.');
-        return;
-      }
-
-      const nextNumber = (Number(lastVisit?.visit_number) || 0) + 1;
-      const { data: visit, error } = await supabase
-        .from('patient_visits')
-        .insert({
-          patient_id: patientId,
-          user_id: user.id,
-          visit_number: nextNumber,
-          visit_date: new Date().toISOString().slice(0, 10)
-        })
-        .select('id,visit_number,visit_date')
-        .single();
-
-      if (error || !visit) {
-        console.error('Create visit failed:', error);
-        alert(error?.code === '23505'
-          ? 'تم إنشاء خطة متابعة أخرى في الوقت نفسه. حدّث القائمة وحاول مرة أخرى.'
-          : 'تعذر إنشاء يوم المتابعة.');
-        await loadVisits();
-        return;
-      }
-
-      await loadVisits();
-      openVisitEmbedded(visit);
-    } finally {
-      state.isCreatingVisit = false;
-      if (button) button.disabled = !canWrite();
-    }
+    openPlanEmbedded();
   }
 
   function fillPatientData() {
@@ -1221,16 +1135,11 @@
     $('savePatientButton')?.addEventListener('click', saveAllPatientData);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
-    $('addVisitButton')?.addEventListener('click', addVisit);
+    $('addPlanButton')?.addEventListener('click', addNutritionPlan);
     $('visitsList')?.addEventListener('click', (event) => {
-      const button = event.target.closest('[data-open-visit]');
+      const button = event.target.closest('[data-open-plan]');
       if (!button) return;
-      const visit = {
-        id: button.dataset.openVisit,
-        visit_number: button.dataset.visitNumber,
-        visit_date: button.dataset.visitDate
-      };
-      openVisitEmbedded(visit);
+      openPlanEmbedded(button.dataset.openPlan, button.dataset.planType);
     });
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableBody')?.addEventListener('click', (event) => {
