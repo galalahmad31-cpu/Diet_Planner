@@ -489,57 +489,6 @@
     });
   }
 
-  function renderDashboardNotifications(counts, loadState = "loaded") {
-    const host = document.getElementById("dashboardNotificationsContent");
-    if (!host) return;
-
-    const definitions = [
-      {
-        key: "today",
-        href: "notifications.html",
-        type: "today",
-        icon: "fa-solid fa-calendar-check",
-        title: "مواعيد اليوم",
-        description: "مواعيد المتابعة المستحقة اليوم"
-      },
-      {
-        key: "tomorrow",
-        href: "notifications.html",
-        type: "tomorrow",
-        icon: "fa-solid fa-calendar-plus",
-        title: "مواعيد الغد",
-        description: "مواعيد المتابعة المقررة غدًا"
-      },
-      {
-        key: "subscriptions",
-        href: "notifications.html",
-        type: "subscription",
-        icon: "fa-solid fa-credit-card",
-        title: "الاشتراكات",
-        description: "اشتراكات تنتهي خلال 7 أيام"
-      }
-    ];
-
-    host.replaceChildren();
-    definitions.forEach((item) => {
-      const value = Number(counts?.[item.key]) || 0;
-      const link = document.createElement("a");
-      link.className = `dashboard-notification-item ${item.type}`;
-      link.href = item.href;
-      link.innerHTML = `
-        <span class="dashboard-notification-icon"><i class="${item.icon}" aria-hidden="true"></i></span>
-        <span class="dashboard-notification-copy">
-          <strong>${item.title}</strong>
-          <span>${item.description}</span>
-        </span>
-        <span class="dashboard-notification-count">${value}</span>
-      `;
-      host.appendChild(link);
-    });
-
-    host.dataset.loadState = loadState;
-  }
-
   function bindDashboardServiceRibbonAndNotifications() {
     bindDashboardServiceRibbon();
     renderDashboardNotifications([], "loading");
