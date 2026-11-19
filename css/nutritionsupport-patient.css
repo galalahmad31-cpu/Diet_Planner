@@ -758,9 +758,17 @@ html[data-theme="dark"] .print-field input{
 }
 .nsp-page-header .nsp-brand-copy{direction:rtl!important;text-align:right!important}
 
-/* Embedded mode: render the complete nutrition-support workspace inside patient profile. */
-html.nsp-embedded,html.nsp-embedded body{width:100%;max-width:100%;margin:0!important;padding:0!important;overflow-x:hidden;background:#f5f8f8!important}
+/* Embedded mode: iframe height follows the actual support content. */
+html.nsp-embedded,html.nsp-embedded body{display:flow-root;width:100%;max-width:100%;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;overflow-x:hidden;overflow-y:hidden;background:#f5f8f8!important}
+html.nsp-embedded body{padding-bottom:0!important}
 html.nsp-embedded .nsp-page-header{display:none!important}
-html.nsp-embedded .container-main{width:100%!important;max-width:none!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
-html.nsp-embedded .detail-patient-area{padding-inline:14px}
-html.nsp-embedded .support-content{padding-inline:10px}
+html.nsp-embedded .container-main{display:flow-root;width:100%!important;max-width:none!important;min-height:0!important;height:auto!important;margin:0!important;padding-bottom:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+html.nsp-embedded .detail-patient-area{padding:0 14px!important;margin:0!important}
+html.nsp-embedded .support-days{margin-bottom:8px!important}
+html.nsp-embedded .support-content{padding:9px 10px 8px!important;margin-bottom:0!important}
+html.nsp-embedded .tab-content:last-child,
+html.nsp-embedded #section-en,
+html.nsp-embedded #section-tpn{margin-bottom:0!important;padding-bottom:0!important}
+html.nsp-embedded .monitoring-container-shared-tpn{display:none!important}
+html.nsp-embedded .delete-confirm-overlay{position:fixed;inset:0;z-index:2147483000}
+html.nsp-embedded .delete-confirm-overlay.show{display:none!important}
