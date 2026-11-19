@@ -41,24 +41,22 @@
   </div>
 
   <main id="feedbackPage" class="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl">
-      <div class="mb-5 flex items-center justify-between gap-3">
-        <a href="app.html" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:border-brand-100 hover:bg-brand-50 hover:text-brand-700">
-          <i class="fa-solid fa-arrow-right"></i>
-          <span>الرئيسية</span>
-        </a>
-      </div>
-
-      <section class="glass overflow-hidden rounded-3xl shadow-sm">
-        <div class="bg-gradient-to-l from-brand-700 to-brand-500 px-6 py-8 text-white sm:px-8">
-          <div class="flex items-center gap-4">
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-              <i class="fa-solid fa-star text-2xl"></i>
+    <div class="feedback-layout">
+      <section class="feedback-main-card glass overflow-hidden rounded-3xl shadow-sm">
+        <div class="feedback-header bg-gradient-to-l from-brand-700 to-brand-500 px-5 py-5 text-white sm:px-7">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex min-w-0 items-center gap-3">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+                <i class="fa-solid fa-star text-xl"></i>
+              </div>
+              <div class="min-w-0">
+                <h1 class="text-xl font-extrabold">شاركنا رأيك</h1>
+                <p class="mt-1 text-xs leading-6 text-white/85">رأيك يساعدنا على تطوير Diet Planner وتحسين تجربتك.</p>
+              </div>
             </div>
-            <div>
-              <h1 class="text-2xl font-extrabold sm:text-3xl">شاركنا رأيك</h1>
-              <p class="mt-1 text-sm leading-6 text-white/85">رأيك يساعدنا على تطوير Diet Planner وتحسين تجربتك.</p>
-            </div>
+            <a href="app.html" class="feedback-home-link inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/25 bg-white/15 px-4 text-sm font-bold text-white transition hover:bg-white/25">
+              <i class="fa-solid fa-house"></i><span>الرئيسية</span>
+            </a>
           </div>
         </div>
 
@@ -105,7 +103,9 @@
         </div>
       </section>
 
-      <section class="mt-6 glass overflow-hidden rounded-3xl shadow-sm">
+      </section>
+
+      <section class="feedback-reviews-card mt-5 glass overflow-hidden rounded-3xl shadow-sm">
         <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
           <div class="flex items-center gap-3">
             <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-500"><i class="fa-solid fa-comments"></i></div>
