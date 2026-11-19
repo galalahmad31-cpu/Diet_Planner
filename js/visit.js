@@ -56,7 +56,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
     document.getElementById('visitContent')?.classList.remove('hidden');
     const params = new URLSearchParams(window.location.search);
     const planType = params.get('plan_type') || '';
-    if (params.get('new_plan') === '1' || planType.includes('الجرامات')) {
+    if (planType.includes('الجرامات') || (params.get('new_plan') === '1' && !planType)) {
       void toggleModule('dietPlan');
     } else if (planType.includes('البدائل')) {
       void toggleModule('exchangePlan');
