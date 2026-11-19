@@ -514,3 +514,24 @@ body{
  .feedback-branded-header .feedback-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
  .feedback-branded-header .feedback-access-card i{font-size:11px!important}
 }
+
+/* Stars-only feedback row: no display-name field or rating heading. */
+.feedback-form-topline{display:flex!important;flex-direction:row!important;direction:rtl!important;align-items:center!important;justify-content:space-between!important;gap:1rem!important}
+.feedback-rating-panel{display:flex!important;flex:1 1 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;min-width:0!important;min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
+.feedback-rating-panel .feedback-stars{display:flex!important;flex:1 1 auto!important;width:auto!important;max-width:none!important;min-width:0!important;justify-content:flex-start!important;align-items:center!important;gap:.35rem!important;margin:0!important;overflow:visible!important}
+.feedback-rating-panel .star-button{flex:0 0 42px!important;width:42px!important;max-width:42px!important;min-width:42px!important;min-height:42px!important;padding:0!important}
+.feedback-rating-panel .star-button i{font-size:1.35rem!important}
+.feedback-actions{flex:0 0 auto!important;min-width:180px!important}
+@media(max-width:600px){
+ .feedback-form-topline{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:.55rem!important}
+ .feedback-rating-panel{flex:1 1 0!important;min-width:0!important;overflow:visible!important}
+ .feedback-rating-panel .feedback-stars{flex:1 1 auto!important;min-width:0!important;justify-content:flex-start!important;gap:0!important}
+ .feedback-rating-panel .star-button{flex:1 1 20%!important;width:20%!important;max-width:20%!important;min-width:0!important;min-height:38px!important}
+ .feedback-rating-panel .star-button i{font-size:1.05rem!important}
+ .feedback-actions{flex:0 0 125px!important;min-width:125px!important}
+}
+@media(max-width:360px){
+ .feedback-form-topline{gap:.35rem!important}
+ .feedback-actions{flex-basis:112px!important;min-width:112px!important}
+ .feedback-rating-panel .star-button i{font-size:.95rem!important}
+}
