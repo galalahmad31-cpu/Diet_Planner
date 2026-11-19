@@ -292,6 +292,7 @@
       measurementState.logs = (data || []).map(item => ({
         id: item.id,
         date: item.measurement_date,
+        createdAt: item.created_at || '',
         weight: Number(item.weight),
         waist: item.waist_cm == null ? null : Number(item.waist_cm),
         hip: item.hip_cm == null ? null : Number(item.hip_cm),
@@ -391,12 +392,12 @@
       }).select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
       if (error) throw error;
       measurementState.logs.push({
-        id: data.id, date: data.measurement_date, weight: Number(data.weight),
+        id: data.id, date: data.measurement_date, createdAt: data.created_at || '', weight: Number(data.weight),
         waist: data.waist_cm == null ? null : Number(data.waist_cm),
         hip: data.hip_cm == null ? null : Number(data.hip_cm),
         adherence: data.diet_adherence || '', notes: data.notes || ''
       });
-      measurementState.logs.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.id).localeCompare(String(b.id)));
+      measurementState.logs.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.createdAt).localeCompare(String(b.createdAt)));
       renderMeasurements();
     } catch (error) {
       console.error('Save patient measurement failed:', error);
