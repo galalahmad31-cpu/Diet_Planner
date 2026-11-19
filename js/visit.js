@@ -21,25 +21,6 @@ const db = window.DietPlannerAccess?.supabaseClient;
     document.getElementById('errorText').textContent = message;
   }
 
-  async function refreshVisitWriteAccess() {
-    const accessStatus = await window.DietPlannerAccess?.getAccessStatus?.();
-    if (!accessStatus?.authenticated) return false;
-    if (accessStatus.isAdmin === true) return true;
-    return (await window.DietPlannerAccess?.hasActiveSubscription?.(
-      accessStatus.user.id
-    )) === true;
-  }
-
-  function formatVisitDate(date) {
-    if (!date) return 'بدون تاريخ';
-    const d = new Date(date + 'T00:00:00');
-    return new Intl.DateTimeFormat('ar-EG', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(d);
-  }
-
   async function loadVisit() {
     const patientId = new URLSearchParams(window.location.search).get('patient_id')
       || new URLSearchParams(window.location.search).get('id');
