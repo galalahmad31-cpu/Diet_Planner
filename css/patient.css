@@ -54,10 +54,12 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 
 /* Patient page: unified green brand header with navigation inside */
 .patient-page-header{
-  position:sticky;
-  top:0;
+  position:relative;
   z-index:30;
+  width:min(calc(100% - 24px),64rem);
+  margin:12px auto 20px;
   overflow:hidden;
+  border-radius:24px;
   color:#fff;
   background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);
   box-shadow:0 14px 32px rgba(15,90,85,.16);
@@ -158,6 +160,7 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .quick-access-card.active i{color:#168879!important}
 .quick-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @media(max-width:600px){
+  .patient-page-header{width:calc(100% - 20px);margin:10px auto 16px;border-radius:22px}
   .patient-header-inner{padding:9px 10px 7px}
   .patient-brand-row{min-height:48px}
   .patient-brand{gap:10px}
