@@ -216,6 +216,8 @@
     if (!modal || !title || !body) return;
 
     title.textContent = plan.name || 'تفاصيل الخطة';
+    const pendingForPlan = state.subscription?.status === 'pending'
+      && String(state.subscription.plan_id) === String(plan.id);
     const price = Number(plan.price || 0).toLocaleString('ar-EG');
     const rows = [
       '<div class="plan-detail-line"><strong>السعر</strong><span>' + price + ' جنيه</span></div>',
@@ -225,6 +227,13 @@
     if (plan.payment_method) rows.push('<div class="plan-detail-line"><strong>طريقة الدفع</strong><span>' + escapeHTML(plan.payment_method) + '</span></div>');
     if (plan.description) rows.push('<div class="plan-detail-line plan-detail-description"><strong>تفاصيل ومميزات الخطة</strong><span>' + escapeHTML(plan.description) + '</span></div>');
     body.innerHTML = rows.join('');
+    const actionButton = $('planDetailsSubscribe');
+    if (actionButton) {
+      actionButton.innerHTML = pendingForPlan
+        ? '<i class="fa-solid fa-xmark"></i> إلغاء طلب الاشتراك'
+        : '<i class="fa-solid fa-check"></i> الاشتراك الآن';
+      actionButton.setAttribute('aria-label', pendingForPlan ? 'إلغاء طلب الاشتراك لهذه الخطة' : 'الاشتراك في هذه الخطة');
+    }
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
     $('planDetailsSubscribe')?.focus();
@@ -241,11 +250,8 @@
     const selectedPlan = state.selectedPlan;
     if (!selectedPlan) return;
 
-    if (typeof window.openSubscribeModal !== 'function') {
-      showToast('تعذر فتح نموذج الاشتراك. حدّث الصفحة وحاول مرة أخرى.');
-      return;
-    }
-
+    const isPending = state.subscription?.status === 'pending'
+      && String(state.subscription.plan_id) === String(selectedPlan.id);
     const button = $('planDetailsSubscribe');
     if (button) {
       button.disabled = true;
@@ -253,6 +259,24 @@
     }
 
     try {
+      if (isPending) {
+        if (typeof window.cancelPendingSubscriptionForPlan !== 'function') {
+          showToast('تعذر إلغاء طلب الاشتراك. حدّث الصفحة وحاول مرة أخرى.');
+          return;
+        }
+        const cancelled = await window.cancelPendingSubscriptionForPlan(String(selectedPlan.id));
+        if (cancelled) {
+          closePlanDetails();
+          await loadSubscription();
+          renderPlans();
+        }
+        return;
+      }
+
+      if (typeof window.openSubscribeModal !== 'function') {
+        showToast('تعذر فتح نموذج الاشتراك. حدّث الصفحة وحاول مرة أخرى.');
+        return;
+      }
       const opened = await window.openSubscribeModal(String(selectedPlan.id));
       if (opened) {
         closePlanDetails();
@@ -261,8 +285,8 @@
         showToast('تعذر فتح نموذج الاشتراك لهذه الخطة. حاول مرة أخرى.');
       }
     } catch (error) {
-      console.error('Opening subscription form failed:', error);
-      showToast('حدث خطأ أثناء فتح نموذج الاشتراك.');
+      console.error('Plan subscription action failed:', error);
+      showToast('حدث خطأ أثناء تنفيذ العملية.');
     } finally {
       if (button) {
         button.disabled = false;
