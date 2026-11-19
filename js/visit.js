@@ -65,11 +65,11 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20261119-fixed-diet-button-v1',
+      src: 'js/visit-diet-plan.js?v=20261119-plan-open-fix-v2',
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
-      src: 'js/visit-exchange-plan.js?v=20260923-1',
+      src: 'js/visit-exchange-plan.js?v=20261119-plan-open-fix-v2',
       ready: () => !!window.exchangePlan?.init
     }
   };
