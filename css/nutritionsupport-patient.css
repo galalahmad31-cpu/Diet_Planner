@@ -767,7 +767,23 @@ html[data-theme="dark"] .print-field input{
 }
 @media print{.nsp-page-header{display:none!important}}
 
-/* Nutrition Support Patient: swap brand and page label sides */
-.nsp-brand-row{direction:ltr!important}
-.nsp-brand{order:2!important}
-.nsp-page-label{order:1!important}
+
+/* Nutrition Support Patient header alignment — explicit RTL placement */
+.nsp-brand-row{
+  display:flex!important;
+  flex-direction:row!important;
+  direction:rtl!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+}
+.nsp-brand{
+  order:0!important;
+  margin-inline-start:auto!important;
+  margin-inline-end:0!important;
+  flex-direction:row!important;
+}
+.nsp-page-label{
+  order:0!important;
+  margin-inline-start:0!important;
+  margin-inline-end:auto!important;
+}
