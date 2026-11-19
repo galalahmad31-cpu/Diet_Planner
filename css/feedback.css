@@ -42,75 +42,173 @@ body{
 
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Keep the page width/space similar to the original layout */
+/* Feedback page layout — full-width, balanced and responsive */
 #feedbackPage{
-  padding:1.5rem 1rem 2rem;
-}
-
-#feedbackPage > div{
   width:100%;
-  max-width:42rem;
+  min-height:100vh;
+  padding:1.25rem clamp(1rem,3vw,2.75rem) 2.5rem;
 }
-
-#feedbackPage section{border-radius:1.25rem}
-
-/* Slightly smaller typography/controls without shrinking the layout */
-#feedbackPage h1{
-  font-size:1.55rem;
-  line-height:1.4;
+.feedback-layout{
+  width:100%;
+  max-width:1440px;
+  margin-inline:auto;
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);
+  align-items:start;
+  gap:1.25rem;
 }
-
-#feedbackPage h2{font-size:1.1rem}
-
-#feedbackPage textarea{
-  min-height:6.5rem;
-  max-height:14rem;
+.feedback-main-card,
+.feedback-reviews-card{
+  min-width:0;
+  border-radius:1.5rem;
 }
-
-#feedbackPage .star-button{padding:.05rem}
-#feedbackPage .star-button i{font-size:1.45rem}
-
+.feedback-header{
+  min-height:104px;
+  display:flex;
+  align-items:center;
+}
+.feedback-home-link{
+  text-decoration:none;
+  white-space:nowrap;
+}
+#feedbackComposerContent,
+#feedbackLoginPrompt{
+  padding:1.5rem clamp(1rem,2.4vw,2rem);
+}
+#feedbackName{
+  overflow-wrap:anywhere;
+  font-size:.95rem;
+}
+#feedbackForm{
+  margin-top:1.25rem;
+}
+#feedbackForm>div:first-of-type{
+  border-radius:1.15rem;
+  padding:1rem;
+  background:linear-gradient(180deg,#f8fbfb 0%,#fff 100%);
+  border:1px solid #e7eeee;
+}
+#feedbackForm label{
+  display:block;
+  font-size:.9rem;
+}
+#feedbackForm [role="radiogroup"]{
+  min-height:66px;
+  padding:.75rem 1rem;
+  background:#fff;
+  border:1px solid #e5eded;
+  border-radius:1rem;
+}
+#feedbackComment{
+  min-height:150px;
+  max-height:360px;
+  resize:vertical;
+  border-radius:1rem;
+  line-height:1.9;
+}
+#feedbackForm .grid{
+  gap:.75rem;
+}
 #feedbackPage #saveFeedbackBtn,
 #feedbackPage #deleteFeedbackBtn{
-  height:2.75rem;
-  padding-left:1.1rem;
-  padding-right:1.1rem;
+  min-height:46px;
+  height:46px;
+  border-radius:.85rem;
+  font-size:.88rem;
 }
+.feedback-reviews-card>div:first-child{
+  padding:1.15rem 1.35rem;
+}
+.feedback-reviews-card>div:last-child{
+  padding:1.25rem;
+}
+#feedbackList{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:.85rem;
+}
+#feedbackList>article{
+  min-width:0;
+  border-radius:1.15rem;
+  padding:1.1rem;
+  box-shadow:0 4px 15px rgba(25,65,70,.04);
+}
+#feedbackEmpty{
+  padding:1.5rem;
+  border-radius:1rem;
+}
+#feedbackStatus{
+  line-height:1.8;
+}
+#feedbackPage h1{
+  font-size:1.35rem;
+  line-height:1.4;
+}
+#feedbackPage h2{
+  font-size:1.05rem;
+  line-height:1.5;
+}
+#feedbackPage p{
+  overflow-wrap:anywhere;
+}
+.star-button{
+  display:inline-flex;
+  min-width:40px;
+  min-height:40px;
+  align-items:center;
+  justify-content:center;
+  border-radius:.75rem;
+}
+#feedbackPage .star-button i{
+  font-size:1.45rem;
+}
+#feedbackPage .mt-6{margin-top:1.1rem}
+#feedbackPage .mt-5{margin-top:1rem}
 
-#feedbackPage .mt-6{margin-top:1rem}
-#feedbackPage .mt-5{margin-top:.85rem}
-
-@media (min-width:768px){
-  #feedbackPage{
-    padding:1.5rem 1.5rem 2rem;
+@media(max-width:900px){
+  .feedback-layout{
+    grid-template-columns:minmax(0,1fr);
+    max-width:760px;
   }
-
-  #feedbackPage > div{max-width:42rem}
+  .feedback-reviews-card{margin-top:0!important}
 }
-
-@media (min-width:1024px){
-  #feedbackPage{padding-top:1.75rem}
-  #feedbackPage > div{max-width:42rem}
-}
-
-@media (max-width:480px){
-  #feedbackPage{
-    padding:.8rem .7rem 1.25rem!important;
+@media(min-width:901px){
+  .feedback-reviews-card{
+    position:sticky;
+    top:1rem;
+    max-height:calc(100vh - 2rem);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
   }
-
-  #feedbackPage > div{max-width:100%}
-
-  #feedbackPage section{border-radius:1.05rem}
-
-  #feedbackPage h1{font-size:1.3rem}
+  .feedback-reviews-card>div:last-child{
+    min-height:0;
+    overflow-y:auto;
+  }
+}
+@media(max-width:600px){
+  #feedbackPage{
+    padding:.75rem .65rem 1.5rem!important;
+  }
+  .feedback-layout{gap:.85rem}
+  .feedback-main-card,.feedback-reviews-card{border-radius:1.15rem}
+  .feedback-header{min-height:88px;padding:1rem!important}
+  #feedbackPage h1{font-size:1.2rem}
   #feedbackPage h2{font-size:1rem}
-
-  #feedbackPage .star-button i{font-size:1.3rem}
-
-  #feedbackPage #saveFeedbackBtn,
-  #feedbackPage #deleteFeedbackBtn{
-    height:2.6rem;
-    padding-left:.9rem;
-    padding-right:.9rem;
-  }
+  #feedbackComposerContent,#feedbackLoginPrompt{padding:1rem}
+  #feedbackForm>div:first-of-type{padding:.8rem}
+  #feedbackForm [role="radiogroup"]{gap:.35rem;padding:.65rem .5rem}
+  #feedbackPage .star-button{min-width:36px;min-height:36px}
+  #feedbackPage .star-button i{font-size:1.25rem}
+  #feedbackComment{min-height:125px}
+  #feedbackPage #saveFeedbackBtn,#feedbackPage #deleteFeedbackBtn{height:44px}
+  .feedback-reviews-card>div:first-child{padding:1rem}
+  .feedback-reviews-card>div:last-child{padding:.85rem}
+}
+@media(max-width:380px){
+  .feedback-header{align-items:flex-start}
+  .feedback-home-link{height:36px;padding-inline:.7rem;font-size:.75rem}
+  #feedbackPage h1{font-size:1.1rem}
+  #feedbackPage .star-button{min-width:32px}
+  #feedbackPage .star-button i{font-size:1.1rem}
 }
