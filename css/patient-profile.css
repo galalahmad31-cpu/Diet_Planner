@@ -247,7 +247,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .patient-module-panel[hidden]{display:none!important}
 .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:16px}
 .patient-support-panel{padding:0}
-#nutritionSupportFrame{display:block;width:100%;height:900px;border:0;background:#f5f8f8}
+#nutritionSupportFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:#f5f8f8}
 @media(max-width:680px){
  .patient-module-tabs{gap:6px;margin-bottom:9px}
  .patient-module-tab{min-height:66px;padding:8px 7px;gap:6px;justify-content:center;flex-direction:column;text-align:center;border-radius:11px}
@@ -256,7 +256,7 @@ html,body{max-width:100%;overflow-x:hidden}
  .patient-module-tab-copy strong{font-size:9px;line-height:1.4}
  .patient-module-tab-copy small{font-size:7px;line-height:1.3}
  .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:11px 9px}
- #nutritionSupportFrame{min-height:760px}
+
 }
 @media(max-width:360px){.patient-module-tab{padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
 
@@ -308,8 +308,8 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* Host-level confirmation for actions initiated inside the nutrition-support iframe. */
 .support-day-delete-modal[hidden]{display:none!important}
-.support-day-delete-modal{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.52);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
-.support-day-delete-box{width:min(290px,calc(100vw - 32px));padding:16px 17px 13px;border-radius:17px;background:#fff;box-shadow:0 20px 60px rgba(15,23,42,.24);text-align:center;font-family:'Cairo',sans-serif}
+.support-day-delete-modal{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;z-index:2147483000!important;display:flex;align-items:flex-start!important;justify-content:center!important;box-sizing:border-box;overflow-y:auto;padding:clamp(12px,2.5vh,24px) 16px 16px!important;background:rgba(15,23,42,.52);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.support-day-delete-box{width:min(290px,calc(100vw - 32px));margin:0!important;padding:16px 17px 13px;border-radius:17px;background:#fff;box-shadow:0 20px 60px rgba(15,23,42,.24);text-align:center;font-family:'Cairo',sans-serif}
 .support-day-delete-icon{width:36px;height:36px;margin:0 auto 7px;border-radius:50%;display:grid;place-items:center;background:#fff1f2;color:#dc2626;font-size:15px}
 .support-day-delete-box h3{margin:0 0 6px;color:#243b43;font-size:15px;font-weight:900}
 .support-day-delete-box p{margin:0 0 14px;color:#687981;font-size:10px;font-weight:600;line-height:1.8;white-space:pre-line}
