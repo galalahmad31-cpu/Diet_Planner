@@ -86,6 +86,33 @@
               <div><label>شكوى / أعراض</label><textarea id="complaintsInput" rows="2" disabled></textarea></div>
               <div><label>ملاحظات سريرية</label><textarea id="notesInput" rows="2" disabled></textarea></div>
             </div>
+
+            <details id="patientFinanceDetails" class="patient-finance-details">
+              <summary class="patient-finance-summary">
+                <span class="dashboard-icon purple" aria-hidden="true"><i class="fa-solid fa-credit-card"></i></span>
+                <span class="patient-finance-heading"><strong>اشتراك ومواعيد المريض</strong><small>بيانات الاشتراك والسداد والمتابعة</small></span>
+                <i class="fa-solid fa-chevron-down patient-finance-chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="patient-finance-content">
+                <div id="patientFinanceLoading" class="finance-state" hidden>جاري تحميل بيانات الاشتراك والمواعيد...</div>
+                <div id="patientFinanceEmpty" class="patient-finance-empty" hidden>لا توجد بيانات اشتراك محفوظة لهذا المريض. يمكنك إدخالها أدناه.</div>
+                <div id="patientFinanceForm" class="patient-fields patient-finance-fields">
+                  <div><label for="pfInputStart">بداية الاشتراك</label><input id="pfInputStart" type="date" disabled></div>
+                  <div><label for="pfInputMonths">مدة الاشتراك (شهر)</label><input id="pfInputMonths" type="number" min="1" step="1" disabled></div>
+                  <div><label for="pfInputAmount">قيمة الاشتراك (جنيه)</label><input id="pfInputAmount" type="number" min="0" step="0.01" disabled></div>
+                  <div><label for="pfInputDiscount">نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0" disabled></div>
+                  <div class="patient-finance-discounted"><label>قيمة الاشتراك بعد الخصم</label><output id="pfInputDiscountedPreview">—</output></div>
+                  <div><label for="pfInputPaid">حالة السداد</label><select id="pfInputPaid" disabled><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
+                  <div><label for="pfInputLastVisit">آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date" disabled></div>
+                  <div><label for="pfInputNextFollow">موعد المتابعة القادمة</label><input id="pfInputNextFollow" type="date" disabled></div>
+                </div>
+                <div id="patientFinanceError" class="patient-finance-error" role="alert" hidden></div>
+                <div class="patient-finance-footer">
+                  <span id="patientFinanceAccessNote" class="patient-finance-access-note"></span>
+                  <button type="button" id="savePatientFinance" class="patient-finance-save-button" disabled>حفظ بيانات الاشتراك</button>
+                </div>
+              </div>
+            </details>
           </div>
         </details>
       </div>
@@ -121,37 +148,10 @@
         </div>
       </details>
     </article>
-    <article class="dashboard-card patient-finance-card"><button type="button" id="openPatientFinance" class="finance-card-trigger"><span class="dashboard-card-head"><span class="dashboard-icon purple">💳</span><span><h3>اشتراك ومواعيد المريض</h3><p>إدارة الاشتراك ومواعيد المتابعة</p></span><i class="fa-solid fa-arrow-up-left-from-square details-chevron"></i></button></article>
     <article class="dashboard-card plans-card"><details class="dashboard-details"><summary><span class="dashboard-card-head"><span class="dashboard-icon green">🍽️</span><span><h3>الخطة الغذائية</h3><p>إدارة الخطط المسجلة للمريض</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary><div class="dashboard-panel"><button type="button" id="addVisitButton" class="dashboard-primary-btn">＋ إضافة خطة جديدة</button><div id="visitsLoading" class="text-center py-4 text-xs text-slate-400">جاري تحميل الخطط...</div><div id="visitsEmpty" class="hidden text-center py-4 text-xs text-slate-400">لا توجد خطط غذائية مسجلة.</div><div id="visitsList" class="plans-list"></div></div></details></article>
     <article class="dashboard-card nutrition-support-card"><a id="nutritionSupportLink" class="dashboard-details measurements-direct" href="nutritionsupport-patient.html"><span class="dashboard-card-head"><span class="dashboard-icon nutrition-support-icon">🩺</span><span><h3>الدعم الغذائي</h3><p>التغذية الأنبوبية والوريدية بالمستشفى</p></span><span class="dashboard-card-arrow">←</span></a></article>
   </section>
 </main>
 
-<div id="patientFinanceModal" class="patient-finance-modal hidden" role="dialog" aria-modal="true" aria-labelledby="patientFinanceTitle">
- <div class="patient-finance-backdrop" data-close-finance></div>
- <section class="patient-finance-dialog">
-  <header class="patient-finance-modal-head"><div><h2 id="patientFinanceTitle">اشتراك ومواعيد المريض</h2><p id="patientFinanceName"></p></div><button type="button" id="closePatientFinance">✕</button></header>
-  <div id="patientFinanceLoading" class="finance-state">جاري تحميل البيانات المالية...</div>
-  <div id="patientFinanceEmpty" class="hidden finance-state">لا توجد بيانات اشتراك ومواعيد مسجلة. يمكنك إدخال البيانات أدناه.</div>
-  <div id="patientFinanceForm" class="patient-fields grid grid-cols-2 gap-3">
-   <div class="min-w-0"><label>بداية الاشتراك</label><input id="pfInputStart" type="date"></div>
-   <div class="min-w-0"><label>مدة الاشتراك (شهر)</label><input id="pfInputMonths" type="number" min="1"></div>
-   <div class="min-w-0"><label>قيمة الاشتراك (جنيه)</label><input id="pfInputAmount" type="number" min="0" step="0.01"></div>
-
-   <div class="min-w-0"><label>نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0"></div>
-   <div class="min-w-0"><label>حالة السداد</label><select id="pfInputPaid"><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
-   <div class="min-w-0"><label>آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date"></div>
-   <div class="min-w-0"><label>موعد المتابعة القادمة (يدوي)</label><input id="pfInputNextFollow" type="date"></div>
-  </div>
-  <div class="finance-summary-box mt-3"><small>القيمة بعد الخصم</small><strong id="pfInputDiscountedPreview">—</strong><small>نهاية الاشتراك: <span id="pfInputEndPreview">—</span></small></div>
-  <div id="patientFinanceError" class="hidden text-xs text-red-600 mt-2"></div>
-  <footer class="patient-finance-actions"><button type="button" id="savePatientFinance">حفظ الماليات</button><button type="button" id="cancelPatientFinance">إلغاء</button></footer>
- </section>
-</div>
-
-
-
-
-  
 </body>
 </html>
