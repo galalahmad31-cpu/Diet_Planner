@@ -2,3 +2,46 @@
 @media(max-width:650px){.header{padding:11px 12px}.brand-sub{display:none}.actions .btn{font-size:11px;padding:8px}.container{padding:18px 9px 35px}.title h1{font-size:22px}.tabs{overflow:auto}.tab{min-width:125px}.toolbar{flex-direction:column;align-items:stretch}.search{width:100%}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.modal{padding:15px}.check-grid{grid-template-columns:1fr}}
 
 .stat-filter{cursor:pointer;font-family:inherit;color:inherit;transition:background .15s,border-color .15s}.stat-filter:hover,.stat-filter.selected{background:#e7f5f2;border-color:#178f84}.stat-filter:focus-visible{outline:2px solid #178f84;outline-offset:2px}.requests-toolbar .search{min-width:220px;flex:1;max-width:340px}
+
+
+/* Admin page branded green header and horizontal navigation */
+body{padding-top:0}
+.header.admin-branded-header{position:relative;top:auto;z-index:30;display:block;width:calc(100% - 28px);max-width:1250px;margin:14px auto 0;padding:12px 16px 10px;border:0;border-radius:24px;background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);color:#fff;box-shadow:0 10px 28px rgba(18,61,70,.13);overflow:hidden;isolation:isolate}
+.header.admin-branded-header:after{content:"";position:absolute;z-index:-1;width:230px;height:230px;left:-65px;top:-125px;border:35px solid rgba(255,255,255,.07);border-radius:50%;pointer-events:none}
+.admin-brand-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px}
+.header.admin-branded-header .brand{gap:12px;min-width:0}
+.header.admin-branded-header .logo{width:48px;height:48px;flex:0 0 48px;border-radius:15px;background:rgba(255,255,255,.16);color:#fff;font-size:21px;box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.header.admin-branded-header .brand-title{color:#fff;font-size:19px;font-weight:900;line-height:1.3}
+.header.admin-branded-header .brand-sub{display:block;color:#bcebe0;font-size:10px;font-weight:800;margin-top:3px}
+.admin-page-label{padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.11);color:#e7fff8;font-size:11px;font-weight:800;white-space:nowrap}
+.header.admin-branded-header .actions{flex:0 0 auto;gap:6px}
+.header.admin-branded-header .actions .btn{min-height:36px;padding:7px 10px;border:1px solid rgba(255,255,255,.25);border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:10px;white-space:nowrap;box-shadow:none}
+.header.admin-branded-header .actions .btn:hover{background:rgba(255,255,255,.22);transform:none}
+.admin-access-nav{display:block;width:100%;margin:8px 0 0;padding:8px 0 3px;border:0;border-top:1px solid rgba(255,255,255,.16);overflow:hidden;box-sizing:border-box}
+.admin-access-track{display:flex;flex-flow:row nowrap;align-items:center;justify-content:flex-start;gap:8px;width:100%;overflow-x:auto;overflow-y:hidden;padding:2px 1px 5px;direction:rtl;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.admin-access-track::-webkit-scrollbar{display:none}
+.admin-access-card{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;gap:7px;min-width:max-content;min-height:36px;padding:6px 12px;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:rgba(255,255,255,.10);color:#e9fffa;text-decoration:none;font-family:Cairo,sans-serif;font-size:10px;font-weight:800;line-height:1.3;white-space:nowrap;scroll-snap-align:start;transition:background .16s ease,border-color .16s ease}
+.admin-access-card i{font-size:12px;line-height:1;color:#a9e7d9}
+.admin-access-card:hover{background:rgba(255,255,255,.19);border-color:rgba(255,255,255,.34);color:#fff}
+.admin-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:650px){
+ .header.admin-branded-header{width:calc(100% - 16px);margin:8px auto 0;padding:9px 10px 7px;border-radius:19px}
+ .admin-brand-top{min-height:45px;gap:7px}
+ .header.admin-branded-header .brand{gap:8px}
+ .header.admin-branded-header .logo{width:40px;height:40px;flex-basis:40px;border-radius:12px;font-size:17px}
+ .header.admin-branded-header .brand-title{font-size:16px}
+ .header.admin-branded-header .brand-sub{font-size:9px}
+ .admin-page-label{padding:5px 8px;font-size:9px}
+ .header.admin-branded-header .actions{gap:4px}
+ .header.admin-branded-header .actions .btn{min-height:32px;padding:5px 7px;font-size:9px}
+ .header.admin-branded-header .actions .btn i{font-size:10px}
+ .admin-access-nav{margin-top:7px;padding:7px 0 2px}
+ .admin-access-track{gap:7px}
+ .admin-access-card{min-height:33px;padding:5px 9px;border-radius:9px;font-size:9px;gap:5px}
+ .admin-access-card i{font-size:11px}
+}
+@media(max-width:390px){
+ .admin-brand-top{flex-wrap:wrap}
+ .admin-page-label{margin-inline-start:auto}
+ .header.admin-branded-header .actions{margin-inline-start:auto}
+}
