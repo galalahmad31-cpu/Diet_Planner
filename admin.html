@@ -2,10 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>إدارة الاشتراكات و الخطط - Diet Planner</title>
+<title>إدارة Diet Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=20261119-green-header-nav1">
+<link rel="stylesheet" href="css/admin.css?v=20261119-announcements-admin1">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -41,7 +41,7 @@
 </header>
 <main class="container" id="adminContent" style="display:none">
 <div class="title"><h1>إدارة الاشتراكات</h1><p>إدارة الطلبات والخطط والأطباء من مكان واحد</p></div>
-<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button></nav>
 <section id="tab-requests">
 <div class="toolbar requests-toolbar"><div class="stats"><button type="button" class="stat stat-filter selected" data-request-filter="all" aria-pressed="true">كل الطلبات <b id="totalCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="pending" aria-pressed="false">قيد المراجعة <b id="pendingCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="paid" aria-pressed="false">مفعّلة <b id="paidCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="canceled" aria-pressed="false">ملغاة <b id="canceledCount">0</b></button></div><input id="requestSearch" class="search" type="search" placeholder="ابحث بالاسم أو البريد أو الخطة..." aria-label="البحث في طلبات الاشتراك"><button class="btn btn-outline" id="refreshBtn"><i class="fa-solid fa-rotate"></i> تحديث</button></div>
 <div class="card"><div id="requestState" class="state">جاري التحميل...</div><div class="wrap" id="requestWrap" style="display:none"><table><thead><tr><th>الطبيب</th><th>الخطة</th><th>السعر</th><th>تاريخ الطلب</th><th>البداية / النهاية</th><th>الحالة</th><th>إثبات الدفع</th><th>إجراءات</th></tr></thead><tbody id="requestsBody"></tbody></table></div></div>
@@ -58,11 +58,24 @@
 <div class="wrap"><table><thead><tr><th>المستخدم</th><th>البريد الإلكتروني</th><th>الدور الحالي</th><th>تغيير الدور</th></tr></thead><tbody id="adminRolesBody"></tbody></table></div>
 </section>
 </section>
+<section id="tab-announcements" style="display:none">
+ <div class="toolbar announcements-toolbar">
+  <div class="stats"><div class="stat">كل الإعلانات <b id="announcementCount">0</b></div><div class="stat">منشورة <b id="announcementActiveCount">0</b></div></div>
+  <div class="announcement-toolbar-actions">
+   <button class="btn btn-outline" id="refreshAnnouncementsBtn" type="button"><i class="fa-solid fa-rotate"></i> تحديث</button>
+   <button class="btn btn-primary" id="newAnnouncementBtn" type="button"><i class="fa-solid fa-plus"></i> إضافة إعلان</button>
+  </div>
+ </div>
+ <div class="card announcement-admin-card">
+  <div id="announcementState" class="state">جاري تحميل الإعلانات...</div>
+  <div id="announcementList" class="announcement-admin-list" style="display:none"></div>
+ </div>
+</section>
 </main>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"><div class="modal-head"><h2 id="modalTitle"></h2><button class="close" id="modalClose"><i class="fa-solid fa-xmark"></i></button></div><div id="modalBody"></div></div></div>
 <div class="modal-bg" id="confirmBg"><div class="modal small"><div class="modal-head"><h2 id="confirmTitle">تأكيد العملية</h2><button class="close" id="confirmClose"><i class="fa-solid fa-xmark"></i></button></div><div id="confirmText" class="confirm-text"></div><div class="modal-foot"><button class="btn btn-danger" id="confirmYes">تأكيد</button><button class="btn btn-outline" id="confirmNo">إلغاء</button></div></div></div>
 <div class="modal-bg" id="proofBg"><div class="modal"><div class="modal-head"><h2>إثبات الدفع</h2><button class="close" id="proofClose"><i class="fa-solid fa-xmark"></i></button></div><div id="proofBody"></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261117-current-paid-plan-fix1"></script><script src="js/admin-roles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261119-announcements-admin1"></script><script src="js/admin-roles.js"></script>
   
 </body></html>
