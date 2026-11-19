@@ -123,7 +123,12 @@
   }
 
   function closeModal() {
-    if ($('subscribeModal')) $('subscribeModal').style.display = 'none';
+    const modal = $('subscribeModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
     state.selectedPlanId = null;
     state.currentSubscription = null;
     resetModal();
@@ -141,6 +146,8 @@
     $('selectedPlanInfo').innerHTML = `<strong>${esc(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${esc(plan.payment_method)}`;
     setTrialMode(plan.is_free_trial === true);
     $('subscribeModal').style.display = 'flex';
+    $('subscribeModal').setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
   }
 
   function openPending(id) {
@@ -155,6 +162,8 @@
     $('submitSubscriptionBtn').style.display = 'none';
     $('pendingActions').style.display = 'flex';
     $('subscribeModal').style.display = 'flex';
+    $('subscribeModal').setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
   }
 
   async function submitSubscription() {
