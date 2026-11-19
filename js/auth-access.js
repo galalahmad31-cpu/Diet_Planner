@@ -457,7 +457,7 @@
       showRegistrationStep();
       return;
     }
-    if (!/^\\d{6}$/.test(otp || "")) {
+    if (!/^\d{6}$/.test(otp || "")) {
       showAuthMessage("أدخل رمز التحقق المكوّن من 6 أرقام.");
       return;
     }
@@ -608,7 +608,7 @@
     document
       .getElementById("signupOtp")
       ?.addEventListener("input", (event) => {
-        event.target.value = event.target.value.replace(/\\D/g, "").slice(0, 6);
+        event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
       });
 
     document
