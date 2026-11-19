@@ -730,6 +730,9 @@ main{padding:clamp(16px,3vw,32px)!important}
 /* Desktop Dextrose workspace: keep every active field on one row. */
 @media (min-width: 761px) {
   #qc-dextrose-content:not(.hidden) .qc-dex-fields {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     align-items: end !important;
     gap: 12px !important;
