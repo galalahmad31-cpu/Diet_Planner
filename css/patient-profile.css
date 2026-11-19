@@ -20,7 +20,8 @@ header a{border:1px solid #29434d}
 .patient-name-bar{background:#fff;border:1px solid #e4edf0;border-radius:14px;padding:13px 17px;box-shadow:0 2px 10px rgba(20,45,60,.025)}
 #patientName{font-size:clamp(1.1rem,2.2vw,1.45rem)!important;font-weight:800;letter-spacing:0;color:#102a35;margin:0 0 5px!important;line-height:1.45}
 main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!important;box-shadow:0 3px 14px rgba(20,45,60,.025)!important}
-#modulesSection{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}
+#modulesSection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+#modulesSection .measurements-card{grid-column:1/-1}
 .dashboard-card{min-width:0;margin:0!important;padding:0!important;background:#fff;border:1px solid var(--dp-line);border-radius:14px;box-shadow:0 2px 9px rgba(20,45,60,.025);overflow:visible;transition:border-color .15s,box-shadow .15s}
 .dashboard-card:hover{border-color:#c4ddd6}
 .dashboard-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:76px;padding:12px;transition:background .15s}
