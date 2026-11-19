@@ -9,6 +9,7 @@ if (!calcDb) console.error("Diet Planner access layer is unavailable to the calc
 const urlParams = new URLSearchParams(window.location.search);
 let calcResolvedPatientId = urlParams.get('id') || urlParams.get('patient') || urlParams.get('patient_id');
 let calcInitialized = false;
+let calcEventsBound = false;
 let lastEnergyCalculation = null;
 let selectedEnergyEquation = 'mifflin';
 
@@ -50,6 +51,9 @@ function calcShowToast(msg, type = 'success') {
         }
 
         function calculateSelectedEnergy() {
+            lastEnergyCalculation = null;
+            const pendingButton = document.getElementById('approveEnergyTargetsBtn');
+            if (pendingButton) pendingButton.disabled = true;
             const gender = document.getElementById('energyGender').value;
             const age = parseFloat(document.getElementById('energyAge').value);
             const weight = parseFloat(document.getElementById('energyWeight').value);
@@ -363,6 +367,8 @@ async function applyCustomTargetToPatient() {
 }
 
 function bindPatientEnergyCalculator() {
+    if (calcEventsBound) return;
+    calcEventsBound = true;
     document.getElementById('eqBtnMifflin')?.addEventListener('click', () => {
         selectEnergyEquation('mifflin');
         markEnergyCalculationStale();
