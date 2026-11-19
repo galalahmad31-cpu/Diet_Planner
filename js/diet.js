@@ -69,6 +69,41 @@ async function loadFoods(force=false){
   writeCache('foods',foods);
   return true;
 }
+async function fetchDietTemplates(){
+  const columns='id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at';
+  const pageSize=50;
+  const rows=[];
+  for(let from=0; ; from+=pageSize){
+    let pageData=null,lastError=null;
+    for(let attempt=0;attempt<3;attempt++){
+      try{
+        const result=await withTimeout(
+          supabase.from('diet_templates')
+            .select(columns)
+            .order('updated_at',{ascending:false})
+            .range(from,from+pageSize-1),
+          7000,
+          'تحميل قوالب الدايت'
+        );
+        if(result.error)throw result.error;
+        pageData=result.data||[];
+        lastError=null;
+        break;
+      }catch(error){
+        lastError=error;
+        const message=String(error?.message||error||'');
+        const permanent=error?.status===400||error?.status===401||error?.status===403||error?.status===404;
+        if(permanent||attempt===2)break;
+        console.warn('Diet templates read retry', {page:from/pageSize+1,attempt:attempt+1,message});
+        await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)));
+      }
+    }
+    if(lastError)throw lastError;
+    rows.push(...pageData);
+    if(pageData.length<pageSize)break;
+  }
+  return rows;
+}
 async function loadDiets(force=false){
   $('statusStat').textContent='جاري التحميل...';
 
@@ -77,42 +112,38 @@ async function loadDiets(force=false){
     if(cached?.diets){
       diets=cached.diets;
       authors=cached.authors||{};
-      $('statusStat').textContent='متصل';
+      $('statusStat').textContent='بيانات محفوظة — جاري التحديث';
       $('statusStat').className='mt-1 text-sm font-extrabold text-brand-600';
       renderDiets();
     }
   }
 
-  let response;
+  let freshDiets;
   try{
-    response=await withTimeout(supabase.from('diet_templates').select('id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at').order('updated_at',{ascending:false}),3500,'تحميل الدايت');
+    freshDiets=await fetchDietTemplates();
   }catch(error){
-    $('statusStat').textContent=diets.length?'بيانات محفوظة — تعذر التحديث':'انتهت مهلة تحميل الدايت';
+    console.error('Diet templates could not be read after retries:',error);
+    $('statusStat').textContent=diets.length?'بيانات محفوظة — تعذر التحديث':'تعذر تحميل البيانات';
     $('statusStat').className='mt-1 text-sm font-extrabold text-amber-600';
-    if(!diets.length)toast(error.message,false);
-    return false;
-  }
-  const {data,error}=response;
-  if(error){
-    if(!diets.length){
-      $('statusStat').textContent='خطأ';
-      $('statusStat').className='mt-1 text-sm font-extrabold text-red-600';
-      toast('تعذر تحميل مكتبة الدايت: '+error.message,false);
-    }
+    if(!diets.length)toast('تعذر قراءة بيانات مكتبة الدايت بعد عدة محاولات. تحقق من الاتصال ثم أعد المحاولة.',false);
     return false;
   }
 
-  diets=data||[];
+  diets=freshDiets;
   authors={};
   const ids=[...new Set([...diets.filter(d=>d.visibility==='public').map(d=>d.created_by).filter(Boolean),user.id].filter(Boolean))];
   if(ids.length){
-    withTimeout(supabase.from('profiles').select('id,full_name').in('id',ids),1800,'تحميل أسماء الناشرين').then(pr=>{
-      if(!pr.error){
-        (pr.data||[]).forEach(p=>{authors[p.id]=p.full_name||''});
-        writeCache('diets',{diets,authors});
-        renderDiets();
-      }
-    }).catch(error=>console.warn('Publisher names skipped:',error.message));
+    try{
+      const pr=await withTimeout(
+        supabase.from('profiles').select('id,full_name').in('id',ids),
+        5000,
+        'تحميل أسماء الناشرين'
+      );
+      if(!pr.error)(pr.data||[]).forEach(p=>{authors[p.id]=p.full_name||''});
+      else console.warn('Publisher names query failed:',pr.error);
+    }catch(error){
+      console.warn('Publisher names skipped:',error?.message||error);
+    }
   }
   if(!authors[user.id])authors[user.id]=user.user_metadata?.full_name||user.user_metadata?.name||'';
   diets.forEach(d=>{if(d.publisher_name)authors[d.created_by]=d.publisher_name});
