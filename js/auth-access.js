@@ -100,7 +100,7 @@
         content.append(spamNote);
       }
       box.append(content);
-    } else {{
+    } else {
       box.textContent = message;
     }
 
