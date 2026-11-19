@@ -795,3 +795,45 @@ html[data-theme="dark"] .print-field input{
 @media(max-width:700px){
   .nsp-brand-row{column-gap:8px!important}
 }
+
+
+/* Final header alignment: page title left, brand/logo right on every viewport */
+.nsp-page-header .nsp-header-inner > .nsp-brand-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-areas:"page-label brand"!important;
+  direction:ltr!important;
+  align-items:center!important;
+  justify-content:initial!important;
+  justify-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  column-gap:12px!important;
+}
+.nsp-page-header .nsp-brand-row > .nsp-page-label{
+  grid-area:page-label!important;
+  justify-self:start!important;
+  align-self:center!important;
+  order:0!important;
+  margin:0!important;
+  text-align:center!important;
+}
+.nsp-page-header .nsp-brand-row > .nsp-brand{
+  grid-area:brand!important;
+  justify-self:end!important;
+  align-self:center!important;
+  order:0!important;
+  direction:rtl!important;
+  text-align:right!important;
+  margin:0!important;
+  min-width:0!important;
+}
+.nsp-page-header .nsp-brand-copy{direction:rtl!important;text-align:right!important}
+@media(max-width:700px){
+  .nsp-page-header .nsp-header-inner > .nsp-brand-row{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    column-gap:8px!important;
+  }
+  .nsp-page-header .nsp-brand{gap:8px!important}
+  .nsp-page-header .nsp-page-label{max-width:fit-content!important}
+}
