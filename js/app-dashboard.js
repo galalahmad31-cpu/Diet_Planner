@@ -86,13 +86,25 @@
   }
 
   function renderAdminCard(isAdmin) {
-    if (!elements.adminCard) return;
+    const card = elements.adminCard;
+    if (!card) return;
 
-    // يظهر فقط عندما تكون القيمة true صراحةً.
-    elements.adminCard.classList.toggle(
-      "hidden",
-      isAdmin !== true
-    );
+    // Fail closed: hide the card unless the verified role is exactly admin.
+    const canViewAdminCard = isAdmin === true;
+
+    if (!canViewAdminCard) {
+      card.hidden = true;
+      card.setAttribute("aria-hidden", "true");
+      card.setAttribute("tabindex", "-1");
+      card.style.setProperty("display", "none", "important");
+      return;
+    }
+
+    // Reveal only after getAccessStatus() confirms role === "admin".
+    card.hidden = false;
+    card.removeAttribute("aria-hidden");
+    card.removeAttribute("tabindex");
+    card.style.removeProperty("display");
   }
 
   // ---------------------------------------------------------
