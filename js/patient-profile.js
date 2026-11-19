@@ -1060,6 +1060,7 @@
   function activatePatientModule(moduleName) {
     const modules = {
       measurements: { tab: 'measurementsTab', panel: 'measurementsPanel' },
+      energy: { tab: 'energyTab', panel: 'patientEnergyPanel' },
       plans: { tab: 'plansTab', panel: 'plansPanel' },
       'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' }
     };
@@ -1078,6 +1079,13 @@
     });
 
     if (moduleName === 'measurements') void loadMeasurements();
+    if (moduleName === 'energy') {
+      if (typeof window.initCalculator === 'function') void window.initCalculator();
+      else {
+        const status = $('energyApprovalStatus');
+        if (status) status.textContent = 'تعذر تحميل حاسبة الطاقة. حدّث الصفحة وحاول مرة أخرى.';
+      }
+    }
     if (moduleName === 'plans') void loadVisits();
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
   }
