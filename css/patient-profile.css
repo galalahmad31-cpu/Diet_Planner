@@ -351,6 +351,8 @@ body.support-delete-modal-open{overflow:hidden}
   padding:6px 7px;border:1px solid #e8eeea;border-radius:9px;background:#fbfcfb;
 }
 .followup-day-open{display:flex;align-items:center;gap:6px;flex:0 0 auto;min-width:0;padding:0;border:0;background:transparent;text-align:right;cursor:pointer}
+.followup-day-open::before,.followup-day-open::after{content:none!important;display:none!important}
+.followup-day-open i,.followup-day-open svg{display:none!important}
 .followup-day-number{display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border-radius:7px;background:#eaf4ee;color:#287153;font-size:11px;font-weight:900}
 .followup-day-details{display:flex;flex-direction:row;align-items:center;gap:5px;white-space:nowrap;min-width:0}
 .followup-day-details strong{color:#35483e;font-size:10px;font-weight:900;white-space:nowrap}
