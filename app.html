@@ -28,7 +28,7 @@
     >
 
     <link rel="stylesheet" href="css/tailwind.css?v=20260923-1">
-    <link rel="stylesheet" href="css/app.css?v=20261119-admin-card-match2">
+    <link rel="stylesheet" href="css/app.css?v=20261119-announcements-feed1">
     <link rel="stylesheet" href="css/theme.css?v=20260921-3">
 
     <script src="js/theme.js?v=20260921-3"></script>
@@ -355,6 +355,26 @@
                 </div>
             </section>
 
+            <section id="dashboardAnnouncementsSection" class="dashboard-announcements-section mt-5" aria-labelledby="dashboardAnnouncementsTitle" hidden>
+                <div class="dashboard-announcements-header">
+                    <div>
+                        <h3 id="dashboardAnnouncementsTitle" class="text-base font-extrabold text-slate-800">مركز الإعلانات والتحديثات</h3>
+                        <p class="mt-1 text-[11px] text-slate-500">آخر المستجدات والإعلانات المهمة من Diet Planner</p>
+                    </div>
+                    <span class="dashboard-announcements-mark"><i class="fa-solid fa-bullhorn"></i> المستجدات</span>
+                </div>
+                <div id="dashboardAnnouncementsList" class="dashboard-announcements-list" aria-live="polite"></div>
+            </section>
+            <dialog id="dashboardAnnouncementDialog" class="dp-announcement-dialog" aria-labelledby="dashboardAnnouncementDialogTitle">
+                <div class="dp-announcement-dialog-head">
+                    <span class="dashboard-announcement-type" id="dashboardAnnouncementDialogType"></span>
+                    <button type="button" id="dashboardAnnouncementDialogClose" class="dp-announcement-close" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <h3 id="dashboardAnnouncementDialogTitle"></h3>
+                <p id="dashboardAnnouncementDialogContent"></p>
+                <div id="dashboardAnnouncementDialogDate" class="dp-announcement-dialog-date"></div>
+            </dialog>
+
             <footer class="py-8 text-center">
 
                 <div class="text-sm font-semibold text-slate-500">
@@ -372,7 +392,7 @@
     </main>
 
     <script src="js/auth-access.js?v=20261116-auth-v1"></script>
-    <script src="js/app-dashboard.js?v=20261119-dashboard-ribbon4"></script>
+    <script src="js/app-dashboard.js?v=20261119-announcements-feed1"></script>
 
 </body>
 
