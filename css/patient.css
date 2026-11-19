@@ -36,9 +36,10 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .patient-delete:hover{background:#ffe8ee;border-color:#f0c8d2}
 .patient-delete:focus-visible{outline:2px solid #d46a82;outline-offset:2px}
 
+main{width:100%;max-width:none;margin:0;padding:12px!important;box-sizing:border-box}
+main>section{width:100%;max-width:none;border-radius:16px}
 @media(max-width:600px){
-  main{padding:12px!important}
-  main>section{border-radius:16px}
+  main{padding:10px!important}
   main>section>div:first-child{padding:14px!important}
   #patientsList{grid-template-columns:1fr;gap:9px;padding:10px!important}
   .patient-card{padding:11px 12px;border-radius:13px}
@@ -56,8 +57,8 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .patient-page-header{
   position:relative;
   z-index:30;
-  width:min(calc(100% - 24px),64rem);
-  margin:12px auto 20px;
+  width:calc(100% - 24px);
+  margin:12px auto 16px;
   overflow:hidden;
   border-radius:24px;
   color:#fff;
@@ -160,7 +161,7 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .quick-access-card.active i{color:#168879!important}
 .quick-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @media(max-width:600px){
-  .patient-page-header{width:calc(100% - 20px);margin:10px auto 16px;border-radius:22px}
+  .patient-page-header{width:calc(100% - 16px);margin:8px auto 12px;border-radius:20px}
   .patient-header-inner{padding:9px 10px 7px}
   .patient-brand-row{min-height:48px}
   .patient-brand{gap:10px}
