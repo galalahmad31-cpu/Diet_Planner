@@ -87,7 +87,8 @@ input:focus,textarea:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3p
 
 /* Food library: green brand header with the shared horizontal navigation inside */
 .food-page-header{
-  position:sticky;top:0;z-index:30;overflow:hidden;color:#fff;
+  position:relative;z-index:30;display:block;width:100%;
+  margin:0 auto 20px;overflow:hidden;border-radius:24px;color:#fff;
   background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);
   box-shadow:0 14px 32px rgba(15,90,85,.16);
 }
@@ -152,6 +153,7 @@ input:focus,textarea:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3p
 .food-page-header .quick-access-card.active i{color:#168879!important}
 .food-page-header .quick-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @media(max-width:600px){
+  .food-page-header{border-radius:22px;margin-bottom:16px}
   .food-header-inner{padding:9px 10px 7px}
   .food-brand-row{min-height:48px}
   .food-brand{gap:10px}
