@@ -607,14 +607,15 @@
     const details = $('patientDataDetails');
     const financeDetails = $('patientFinanceDetails');
     if (details) details.open = true;
-    if (financeDetails) financeDetails.open = true;
 
-    // Ensure the existing finance record is loaded before enabling the shared editor.
+    // Load finance before opening its disclosure to avoid a duplicate toggle-triggered request.
     const financeReady = await loadPatientFinance();
     if (!financeReady) {
       alert('تعذر تحميل بيانات الاشتراك. لم يتم تفعيل التعديل لتجنب استبدال بيانات محفوظة.');
       return;
     }
+
+    if (financeDetails) financeDetails.open = true;
     setEditing(true);
   }
 
