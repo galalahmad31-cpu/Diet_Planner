@@ -179,7 +179,6 @@ $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.
   isAdmin=accessStatus?.isAdmin===true;
   if(isAdmin&&user){const{data:p,error:profileError}=await supabase.from('profiles').select('full_name').eq('id',user.id).maybeSingle();if(profileError)throw profileError;profile=p||{};}
   $('addBtn').classList.toggle('hidden',!isAdmin);
-  $('adminHomeLink').classList.toggle('hidden',!user);
   await load();
   $('loading').style.display='none';
 }catch(e){
