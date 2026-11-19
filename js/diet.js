@@ -208,6 +208,10 @@ function buildDietPreview(){
 function prepareDietPrint(){
   const preview=document.querySelector('#editor .diet-preview-host .diet-preview');
   if(!preview)return;
+  const itemCount=preview.querySelectorAll('.dp-food').length;
+  const mealCount=preview.querySelectorAll('.dp-meal').length;
+  const printZoom=Math.max(.72,Math.min(.9,.9-Math.max(0,itemCount-22)*.012-Math.max(0,mealCount-5)*.015));
+  const printWidth=(198/printZoom).toFixed(2);
   const style=document.getElementById('diet-print-styles')||document.createElement('style');
   style.id='diet-print-styles';
   document.head.appendChild(style);
@@ -217,11 +221,11 @@ function prepareDietPrint(){
     body *{visibility:hidden!important}
     #editor,#editor .diet-preview-host,#editor .diet-preview-host .diet-preview,
     #editor .diet-preview-host .diet-preview *{visibility:visible!important}
-    #editor{position:absolute!important;top:0!important;left:0!important;width:220mm!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:#fff!important;overflow:visible!important}
-    #editor .diet-preview-host{display:block!important;position:static!important;width:220mm!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important}
+    #editor{position:absolute!important;top:0!important;left:0!important;width:${printWidth}mm!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:#fff!important;overflow:visible!important}
+    #editor .diet-preview-host{display:block!important;position:static!important;width:${printWidth}mm!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important}
     #editor .diet-preview-host .diet-preview{
-      display:block!important;position:static!important;width:220mm!important;max-width:none!important;min-height:0!important;height:auto!important;
-      margin:0!important;padding:0!important;transform:none!important;zoom:.9!important;overflow:visible!important;
+      display:block!important;position:static!important;width:${printWidth}mm!important;max-width:none!important;min-height:0!important;height:auto!important;
+      margin:0!important;padding:0!important;transform:none!important;zoom:${printZoom}!important;overflow:visible!important;
       background:#fff!important;color:#263640!important;font:7.5pt Cairo,sans-serif!important;line-height:1.25!important;
       direction:rtl!important;text-align:right!important;box-shadow:none!important
     }
