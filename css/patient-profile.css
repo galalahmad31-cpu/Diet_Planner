@@ -305,3 +305,56 @@ html,body{max-width:100%;overflow-x:hidden}
  .measurements-table-heading{align-items:flex-start}
  .measurements-table{min-width:680px}
 }
+
+
+/* Patient measurements: branded SweetAlert validation dialog */
+.patient-measurement-swal.swal2-popup{
+  width:min( calc(100% - 32px), 430px);
+  padding:28px 26px 24px;
+  border:1px solid #e4eeeb;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(15,45,52,.22);
+  font-family:'Cairo',sans-serif;
+}
+.patient-measurement-swal .swal2-icon{
+  margin:0 auto 14px;
+  border-width:3px;
+}
+.patient-measurement-swal-title.swal2-title{
+  margin:0;
+  padding:0;
+  color:#173c3b;
+  font-family:'Cairo',sans-serif;
+  font-size:19px;
+  font-weight:900;
+}
+.patient-measurement-swal-text.swal2-html-container{
+  margin:10px 0 0;
+  color:#64748b;
+  font-family:'Cairo',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.9;
+}
+.patient-measurement-swal-confirm.swal2-styled{
+  min-width:116px;
+  margin:20px 0 0;
+  padding:10px 24px;
+  border:0;
+  border-radius:11px;
+  background:linear-gradient(135deg,#0f9f82,#087b69);
+  color:#fff;
+  font-family:'Cairo',sans-serif;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 7px 16px rgba(8,123,105,.2);
+}
+.patient-measurement-swal-confirm.swal2-styled:focus{
+  box-shadow:0 0 0 3px rgba(15,159,130,.2);
+}
+@media(max-width:480px){
+  .patient-measurement-swal.swal2-popup{padding:24px 18px 20px;border-radius:18px}
+  .patient-measurement-swal-title.swal2-title{font-size:17px}
+  .patient-measurement-swal-text.swal2-html-container{font-size:12px}
+}
