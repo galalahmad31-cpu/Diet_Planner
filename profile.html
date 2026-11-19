@@ -95,10 +95,29 @@
   </div>
 </section>
 
+<section class="profile-plans-section" aria-labelledby="profilePlansTitle">
+  <div class="profile-plans-heading">
+    <div><h2 id="profilePlansTitle"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> خطط الاشتراك</h2><p>اضغط على أي خطة لمعرفة تفاصيلها ومزاياها</p></div>
+  </div>
+  <div id="profilePlansList" class="profile-plans-list" aria-live="polite"><div class="profile-plans-loading"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الخطط...</div></div>
+</section>
 
 <footer class="py-7 text-center text-xs text-slate-400">Developed by <span class="font-bold text-brand-600">Dr. Ahmed Galal</span></footer>
 </div>
 </main>
+
+<div id="planDetailsModal" class="plan-details-backdrop" hidden>
+  <section class="plan-details-dialog" role="dialog" aria-modal="true" aria-labelledby="planDetailsTitle">
+    <button type="button" class="plan-details-close" data-plan-action="close" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+    <div class="plan-details-kicker"><i class="fa-solid fa-leaf"></i> تفاصيل الخطة</div>
+    <h2 id="planDetailsTitle"></h2>
+    <div id="planDetailsBody" class="plan-details-body"></div>
+    <div class="plan-details-actions">
+      <button type="button" class="plan-details-subscribe" id="planDetailsSubscribe"><i class="fa-solid fa-check"></i> الاشتراك الآن</button>
+      <button type="button" class="plan-details-cancel" data-plan-action="close">إغلاق</button>
+    </div>
+  </section>
+</div>
 
 <div id="toast" class="fixed bottom-5 left-5 z-[100] hidden max-w-sm rounded-2xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
 
