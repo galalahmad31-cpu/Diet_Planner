@@ -594,9 +594,9 @@ bindPrintLifecycle();
   };
 
   if ('ResizeObserver' in window) {
-    const observer = new ResizeObserver(notifyHeight);
-    if (document.documentElement) observer.observe(document.documentElement);
-    if (document.body) observer.observe(document.body);
+    window.__dpVisitEmbedResizeObserver = new ResizeObserver(notifyHeight);
+    if (document.documentElement) window.__dpVisitEmbedResizeObserver.observe(document.documentElement);
+    if (document.body) window.__dpVisitEmbedResizeObserver.observe(document.body);
   }
   window.addEventListener('load', notifyHeight);
   window.addEventListener('resize', notifyHeight);
