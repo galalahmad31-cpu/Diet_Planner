@@ -16,7 +16,7 @@
   <script src="js/patient-profile.js?v=20261119-plan-open-fix-v2" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-plan-horizontal-v4">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-plan-toolbar-v5">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -236,7 +236,6 @@
       <div class="dashboard-panel">
         <section class="followup-days-card" aria-labelledby="followupDaysTitle">
           <div class="followup-days-toolbar">
-            <button type="button" id="addPlanButton" class="followup-add-button">＋ إضافة خطة</button>
             <div id="followupDaysDetails" class="followup-days-details">
               <div class="followup-days-heading">
                 <strong id="followupDaysTitle">الخطط الغذائية</strong>
@@ -245,6 +244,7 @@
               <div id="visitsEmpty" class="followup-state" hidden>لا توجد خطط غذائية مسجلة لهذا المريض.</div>
               <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
             </div>
+            <button type="button" id="addPlanButton" class="followup-add-button">＋ إضافة خطة</button>
           </div>
         </section>
         <section id="planEmbeddedPanel" class="visit-embedded-panel" aria-label="محرر الخطة الغذائية المحددة" hidden>
