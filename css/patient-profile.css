@@ -326,52 +326,51 @@ body.support-delete-modal-open{overflow:hidden}
 
 
 /* Patient follow-up days and the embedded visit workspace. */
-.followup-days-card{padding:12px;border:1px solid #e3ece8;border-radius:13px;background:#fff}
-.followup-days-toolbar{display:flex;align-items:center;gap:10px;min-width:0}
-.followup-days-details{flex:1 1 0;min-width:0}
-.followup-days-heading{display:flex;align-items:center;min-height:42px;padding:3px 2px}
-.followup-days-heading strong{color:#24443a;font-size:13px;font-weight:900}
-.followup-add-button{flex:0 0 auto;min-height:35px;padding:0 12px;border:0;border-radius:9px;background:#26765a;color:#fff;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
+.followup-days-card{padding:10px;border:1px solid #e3ece8;border-radius:13px;background:#fff}
+.followup-days-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-width:0}
+.followup-days-details{display:block;width:100%;min-width:0}
+.followup-days-heading{display:flex;align-items:center;min-height:25px;padding:0 2px}
+.followup-days-heading strong{color:#52645b;font-size:10px;font-weight:800}
+.followup-add-button{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-height:29px;padding:0 10px;border:0;border-radius:8px;background:#26765a;color:#fff;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
 .followup-add-button:hover:not(:disabled){background:#1d6249}
 .followup-add-button:disabled{opacity:.5;cursor:not-allowed}
-.followup-state{padding:11px 8px;text-align:center;color:#8a9891;font-size:10px;font-weight:700}
+.followup-state{padding:8px;text-align:center;color:#8a9891;font-size:9px;font-weight:700}
 .followup-days-list{
-  display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:8px;width:100%;
-  margin-top:10px;padding:2px 1px 4px;overflow:visible;min-width:0;
+  display:flex;flex-flow:row nowrap;align-items:center;gap:6px;width:100%;min-width:0;
+  margin-top:3px;padding:2px 1px 7px;overflow-x:auto;overflow-y:hidden;
+  overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:#b8d2c4 transparent;scroll-snap-type:x proximity;
 }
 .followup-day-row{
-  display:flex;align-items:center;gap:10px;min-width:0;width:100%;max-width:100%;box-sizing:border-box;
-  padding:9px 10px;border:1px solid #e8eeea;border-radius:11px;background:#fbfcfb;
+  display:flex;align-items:center;gap:6px;flex:0 0 auto;width:auto;max-width:190px;min-width:112px;
+  box-sizing:border-box;padding:5px 7px;border:1px solid #e8eeea;border-radius:9px;background:#fbfcfb;
+  scroll-snap-align:start;
 }
-.followup-day-open{display:flex;align-items:center;gap:9px;flex:1 1 0;width:0;min-width:0;max-width:100%;padding:0;border:0;background:transparent;text-align:right;cursor:pointer;overflow:hidden}
+.followup-day-open{display:flex;align-items:center;gap:5px;flex:1 1 auto;width:auto;min-width:0;max-width:145px;padding:0;border:0;background:transparent;text-align:right;cursor:pointer;overflow:hidden}
 .followup-day-open::before,.followup-day-open::after{content:none!important;display:none!important}
 .followup-day-open i,.followup-day-open svg{display:none!important}
-.followup-day-number{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:9px;background:#eaf4ee;color:#287153;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums;border:1px solid #dcebe2}
-.followup-day-title{display:block;flex:1 1 0;min-width:0;overflow-wrap:anywhere;word-break:normal;color:#35483e;font-size:11px;font-weight:900;line-height:1.6;text-align:right}
+.followup-day-number{display:grid;place-items:center;width:21px;height:21px;flex:0 0 21px;border-radius:6px;background:#eaf4ee;color:#287153;font-size:9px;font-weight:900;font-variant-numeric:tabular-nums;border:1px solid #dcebe2}
+.followup-day-title{display:block;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#35483e;font-size:9px;font-weight:800;line-height:1.4;text-align:right}
 .followup-day-open.is-active .followup-day-number{background:#26765a;color:#fff}
-.followup-day-delete{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;margin-inline-start:auto;padding:0;border:1px solid #f1dada;border-radius:9px;background:#fff7f7;color:#b94b55;font-size:12px;line-height:1;cursor:pointer;position:relative;z-index:1;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease}
+.followup-day-open.is-active .followup-day-title{color:#26765a}
+.followup-day-row:has(.followup-day-open.is-active){border-color:#8bbda4;background:#f2f8f4}
+.followup-day-delete{display:grid;place-items:center;width:23px;height:23px;flex:0 0 23px;margin:0;padding:0;border:1px solid #f1dada;border-radius:6px;background:#fff7f7;color:#b94b55;font-size:9px;line-height:1;cursor:pointer;position:relative;z-index:1}
 .followup-day-delete i{display:block;line-height:1}
-.followup-day-delete:hover{background:#b94b55;border-color:#b94b55;color:#fff;transform:translateY(-1px)}
-.followup-day-delete:focus-visible{outline:3px solid #f3c4c7;outline-offset:2px}
+.followup-day-delete:hover{background:#b94b55;border-color:#b94b55;color:#fff}
+.followup-day-delete:focus-visible{outline:2px solid #f3c4c7;outline-offset:2px}
 .followup-day-delete:active{transform:scale(.96)}
-@media(max-width:540px){
-  .followup-days-toolbar{align-items:stretch;flex-direction:column;gap:6px}
-  .followup-days-details{width:100%;flex:1 1 auto}
-  .followup-add-button{align-self:flex-start}
-  .followup-days-card{padding:10px}
-  .followup-day-row{gap:8px;padding:8px}
+@media(max-width:640px){
+  .followup-days-card{padding:8px}
+  .followup-days-list{gap:5px;padding-bottom:6px}
+  .followup-day-row{min-width:105px;max-width:165px;padding:5px 6px;gap:5px}
+  .followup-day-open{max-width:125px;gap:4px}
+  .followup-day-title{font-size:9px}
+  .followup-day-delete{width:22px;height:22px;flex-basis:22px}
+  .followup-add-button{min-height:28px;font-size:9px}
 }
 .visit-embedded-panel{margin-top:13px;border:1px solid #e1e9e5;border-radius:12px;background:#f7faf8;overflow:hidden}
 .visit-embedded-panel[hidden]{display:none!important}
 #planFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:#f8fafc}
-@media(max-width:640px){
- .followup-days-card{padding:9px}
- .followup-days-toolbar{gap:7px}
- .followup-add-button{min-height:32px;padding:0 9px;font-size:9px}
- .followup-days-list{grid-template-columns:minmax(0,1fr);gap:7px}
- .followup-day-row{padding:8px}
-
-}
 
 /* Patient-level energy and macro calculator — scoped to its own tab. */
 #patientEnergyPanel{
