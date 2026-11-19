@@ -13,6 +13,7 @@
     hasActiveSubscription: false,
     isEditing: false,
     isSaving: false,
+    isCreatingPlan: false,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -77,7 +78,7 @@
     }
 
     if (addPlanButton) {
-      addPlanButton.disabled = !canWrite;
+      addPlanButton.disabled = !canWrite || state.isCreatingPlan;
       addPlanButton.classList.toggle('opacity-50', !canWrite);
       addPlanButton.classList.toggle('cursor-not-allowed', !canWrite);
       addPlanButton.title = canWrite
@@ -512,7 +513,7 @@
       return;
     }
 
-    data.forEach((plan) => {
+    data.forEach((plan, index) => {
       const row = document.createElement('article');
       row.className = 'followup-day-row';
 
@@ -525,7 +526,8 @@
 
       const number = document.createElement('span');
       number.className = 'followup-day-number';
-      number.innerHTML = '<i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>';
+      number.textContent = String(index + 1);
+      number.setAttribute('aria-label', 'الخطة رقم ' + (index + 1));
 
       const details = document.createElement('span');
       details.className = 'followup-day-details';
@@ -533,9 +535,8 @@
       title.textContent = plan.plan_name || 'خطة غذائية';
       const date = document.createElement('small');
       date.className = 'followup-day-date';
-      date.textContent = plan.start_date
-        ? formatPlanDate(plan.start_date)
-        : 'بدون تاريخ محدد';
+      const planDate = plan.start_date || (plan.created_at ? String(plan.created_at).slice(0, 10) : null);
+      date.textContent = 'الخطة رقم ' + (index + 1) + ' · ' + (planDate ? formatPlanDate(planDate) : 'بدون تاريخ');
       details.append(title, date);
       openButton.append(number, details);
 
@@ -644,12 +645,67 @@
     }
   }
 
-  function addNutritionPlan() {
+  async function addNutritionPlan() {
     if (!canWrite()) {
       alert('إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط.');
       return;
     }
-    openPlanEmbedded();
+    if (state.isCreatingPlan || !patientId) return;
+
+    const choice = await Swal.fire({
+      title: 'إنشاء خطة غذائية جديدة',
+      input: 'select',
+      inputOptions: {
+        'الخطة الغذائية باستخدام الجرامات': 'خطة بالجرامات',
+        'الخطة الغذائية باستخدام البدائل': 'خطة بالبدائل'
+      },
+      inputPlaceholder: 'اختر نوع الخطة',
+      showCancelButton: true,
+      confirmButtonText: 'إنشاء الخطة',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#26765a',
+      reverseButtons: true,
+      inputValidator: value => value ? undefined : 'اختر نوع الخطة أولاً'
+    });
+    if (!choice.isConfirmed || !choice.value) return;
+
+    state.isCreatingPlan = true;
+    updateWriteControls();
+    try {
+      const today = new Date();
+      const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+        .toISOString().slice(0, 10);
+      const { data: created, error } = await supabase
+        .from('nutrition_plans')
+        .insert({
+          patient_id: patientId,
+          plan_name: choice.value,
+          start_date: localDate
+        })
+        .select('id,patient_id,plan_name,start_date,created_at')
+        .single();
+      if (error) throw error;
+      if (!created?.id) throw new Error('لم يتم استلام رقم الخطة بعد إنشائها.');
+
+      await loadNutritionPlans();
+      openPlanEmbedded(created.id, created.plan_name);
+      await Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'success',
+        title: 'تم إنشاء الخطة رقم ' + (document.querySelectorAll('[data-open-plan]').length),
+        text: 'تاريخ الخطة: ' + formatPlanDate(created.start_date || localDate),
+        showConfirmButton: false,
+        timer: 2200,
+        heightAuto: false
+      });
+    } catch (error) {
+      console.error('Create nutrition plan failed:', error);
+      await Swal.fire('تعذر إنشاء الخطة', error?.message || 'حدث خطأ أثناء إنشاء الخطة.', 'error');
+    } finally {
+      state.isCreatingPlan = false;
+      updateWriteControls();
+    }
   }
 
   function fillPatientData() {
