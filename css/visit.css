@@ -719,7 +719,6 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
   #calculatorContent #calcTab .energy-results{gap:7px}
 }
 
-
 /* Visit module cards: clear color identity + full-row layout */
 .visit-module-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .visit-module-grid #assessmentCard{grid-column:1/-1}
@@ -745,7 +744,6 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
  .visit-module-grid .module-card{min-height:76px;padding:13px!important}
  .visit-module-grid .module-card h4{font-size:13px!important}
 }
-
 
 /* Visit page: Food Library-style green card and swipe navigation */
 html,body{max-width:100%;overflow-x:hidden}
