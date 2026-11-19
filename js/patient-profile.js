@@ -1045,7 +1045,7 @@
         if (status) status.textContent = 'تعذر تحميل حاسبة الطاقة. حدّث الصفحة وحاول مرة أخرى.';
       }
     }
-    if (moduleName === 'plans') void loadVisits();
+    if (moduleName === 'plans') void loadNutritionPlans();
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
   }
 
