@@ -1,6 +1,6 @@
 /* =========================================================
  * VISIT PAGE — CORE
- * Patient/visit context, assessment, module navigation,
+ * Patient context and nutrition-plan module navigation,
  * and page-level confirmation handling.
  *
  * Dependencies:
@@ -12,9 +12,7 @@
 const db = window.DietPlannerAccess?.supabaseClient;
   if (!db) console.error("Diet Planner access layer is unavailable.");
 
-  const visitId = new URLSearchParams(window.location.search).get('id');
-
-  let visit = null;
+  let patientContext = null;
 
   function showError(message) {
     document.getElementById('loadingState').classList.add('hidden');
@@ -62,7 +60,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
       return;
     }
 
-    visit = { patient_id: data.id, patients: data };
+    patientContext = { patient_id: data.id, patients: data };
     window.currentPatientId = data.id;
     window.currentPatientEnergy = data;
 
@@ -188,9 +186,9 @@ const db = window.DietPlannerAccess?.supabaseClient;
       return;
     }
 
-    if (visit?.patient_id) {
+    if (patientContext?.patient_id) {
       window.location.href =
-        'patient-profile.html?id=' + encodeURIComponent(visit.patient_id);
+        'patient-profile.html?id=' + encodeURIComponent(patientContext.patient_id);
       return;
     }
 
