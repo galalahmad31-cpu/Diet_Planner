@@ -310,42 +310,40 @@
             const owner = recipe.created_by === currentUser.id;
             const canDelete = isAdmin || (owner && hasActiveSubscription);
             const canEdit = isAdmin || (owner && hasActiveSubscription);
-            const ingredientPreview = editorText(recipe.ingredients) || 'بدون مكونات مسجلة';
+            const basisUnit = recipe.nutrition_basis_unit === 'serving'
+                ? 'حصة'
+                : recipe.nutrition_basis_unit === 'ml'
+                    ? 'مل'
+                    : 'جرام';
+            const basisText = `لكل ${recipe.nutrition_basis_value} ${basisUnit}`;
 
             return `
-                <article class="recipe-card glass rounded-3xl p-5 shadow-sm">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-                            <i class="fa-solid fa-bowl-food text-xl"></i>
+                <article class="recipe-list-row">
+                    <div class="recipe-list-main">
+                        <div class="recipe-list-logo" aria-hidden="true">
+                            <i class="fa-solid fa-bowl-food"></i>
                         </div>
-
-                        <div class="flex gap-1">
-                            ${canEdit ? `
-                                <button data-edit="${escapeHtml(recipe.id)}" type="button" class="h-9 w-9 rounded-xl bg-slate-100 text-slate-600 hover:bg-brand-50 hover:text-brand-600" title="تعديل">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                            ` : ''}
-                            ${canDelete ? `
-                                <button data-delete="${escapeHtml(recipe.id)}" type="button" class="h-9 w-9 rounded-xl bg-red-50 text-red-500 hover:bg-red-100" title="حذف">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            ` : ''}
+                        <div class="recipe-list-name">
+                            <h2>${escapeHtml(recipe.name)}</h2>
+                            <span>نشر بواسطة: ${escapeHtml(recipe.authorName || 'متخصص تغذية')}</span>
                         </div>
                     </div>
-
-                    <h2 class="mt-5 text-lg font-extrabold text-slate-800">${escapeHtml(recipe.name)}</h2>
-
-                    <p class="mt-2 line-clamp-3 text-sm leading-7 text-slate-500">${escapeHtml(ingredientPreview)}</p>
-
-                    <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">${recipe.calories} kcal</span>
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">${recipe.protein} g بروتين</span>
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">${recipe.servings} حصة</span>
+                    <div class="recipe-list-meta">
+                        <span class="recipe-list-calories"><i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i> ${recipe.calories} kcal</span>
+                        <span class="recipe-list-basis">${escapeHtml(basisText)}</span>
                     </div>
-
-                    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-                        <span class="text-xs text-slate-400">${escapeHtml(recipe.authorName || 'متخصص تغذية')}</span>
-                        <button data-view="${escapeHtml(recipe.id)}" type="button" class="rounded-xl bg-brand-600 px-4 py-2 text-xs font-extrabold text-white hover:bg-brand-700">عرض الوصفة</button>
+                    <div class="recipe-list-actions">
+                        <button data-view="${escapeHtml(recipe.id)}" type="button" class="recipe-list-view">عرض الوصفة</button>
+                        ${canEdit ? `
+                            <button data-edit="${escapeHtml(recipe.id)}" type="button" class="recipe-list-icon-btn" title="تعديل" aria-label="تعديل الوصفة">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        ` : ''}
+                        ${canDelete ? `
+                            <button data-delete="${escapeHtml(recipe.id)}" type="button" class="recipe-list-icon-btn recipe-list-delete" title="حذف" aria-label="حذف الوصفة">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        ` : ''}
                     </div>
                 </article>
             `;
