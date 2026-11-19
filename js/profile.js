@@ -10,6 +10,8 @@
     profile: { full_name: '', profession: '', phone: '' },
     subscription: null,
     planName: '',
+    plans: [],
+    selectedPlan: null,
     toastTimer: null
   };
 
@@ -165,6 +167,81 @@
     renderSubscription();
   }
 
+
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char]);
+  }
+
+  async function loadPlans() {
+    const container = $('profilePlansList');
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('id,name,price,duration_days,description,payment_method,is_free_trial')
+        .eq('is_active', true)
+        .order('price', { ascending: true });
+      if (error) throw error;
+      state.plans = Array.isArray(data) ? data : [];
+      renderPlans();
+    } catch (error) {
+      console.error('Subscription plans loading failed:', error);
+      if (container) container.innerHTML = '<div class="profile-plans-empty">تعذر تحميل خطط الاشتراك حاليًا.</div>';
+    }
+  }
+
+  function renderPlans() {
+    const container = $('profilePlansList');
+    if (!container) return;
+    if (!state.plans.length) {
+      container.innerHTML = '<div class="profile-plans-empty">لا توجد خطط اشتراك متاحة حاليًا.</div>';
+      return;
+    }
+    container.innerHTML = state.plans.map((plan) => (
+      '<article class="profile-plan-tile">' +
+        '<div class="profile-plan-name">' + escapeHTML(plan.name || 'خطة اشتراك') + '</div>' +
+        '<button type="button" class="profile-plan-details" data-plan-action="details" data-plan-id="' + escapeHTML(plan.id) + '">اضغط للتفاصيل</button>' +
+      '</article>'
+    )).join('');
+  }
+
+  function openPlanDetails(planId) {
+    const plan = state.plans.find((item) => String(item.id) === String(planId));
+    if (!plan) return;
+    state.selectedPlan = plan;
+    const modal = $('planDetailsModal');
+    const title = $('planDetailsTitle');
+    const body = $('planDetailsBody');
+    if (!modal || !title || !body) return;
+
+    title.textContent = plan.name || 'تفاصيل الخطة';
+    const price = Number(plan.price || 0).toLocaleString('ar-EG');
+    const rows = [
+      '<div class="plan-detail-line"><strong>السعر</strong><span>' + price + ' جنيه</span></div>',
+      '<div class="plan-detail-line"><strong>المدة</strong><span>' + Number(plan.duration_days || 0).toLocaleString('ar-EG') + ' يوم</span></div>',
+      '<div class="plan-detail-line"><strong>نوع الخطة</strong><span>' + (plan.is_free_trial === true ? 'تجربة مجانية' : 'اشتراك مدفوع') + '</span></div>'
+    ];
+    if (plan.payment_method) rows.push('<div class="plan-detail-line"><strong>طريقة الدفع</strong><span>' + escapeHTML(plan.payment_method) + '</span></div>');
+    if (plan.description) rows.push('<div class="plan-detail-line plan-detail-description"><strong>تفاصيل ومميزات الخطة</strong><span>' + escapeHTML(plan.description) + '</span></div>');
+    body.innerHTML = rows.join('');
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('planDetailsSubscribe')?.focus();
+  }
+
+  function closePlanDetails() {
+    const modal = $('planDetailsModal');
+    if (modal) modal.hidden = true;
+    document.body.style.overflow = '';
+    state.selectedPlan = null;
+  }
+
+  function continueToSubscription() {
+    if (!state.selectedPlan) return;
+    window.location.href = 'subscription_plans.html?plan=' + encodeURIComponent(state.selectedPlan.id);
+  }
+
   function openProfileEditor() {
     $('editDoctorName').value = state.profile.full_name;
     $('editDoctorSpecialty').value = state.profile.profession;
@@ -254,6 +331,17 @@
   }
 
   function bindEvents() {
+    $('profilePlansList')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-plan-action="details"]');
+      if (button) openPlanDetails(button.dataset.planId);
+    });
+    $('planDetailsModal')?.addEventListener('click', (event) => {
+      if (event.target === event.currentTarget || event.target.closest('[data-plan-action="close"]')) closePlanDetails();
+    });
+    $('planDetailsSubscribe')?.addEventListener('click', continueToSubscription);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && $('planDetailsModal') && !$('planDetailsModal').hidden) closePlanDetails();
+    });
     $('editProfileBtn')?.addEventListener('click', openProfileEditor);
     $('cancelProfileBtn')?.addEventListener('click', closeProfileEditor);
     $('saveProfileBtn')?.addEventListener('click', saveProfile);
@@ -280,7 +368,7 @@
         return;
       }
 
-      await Promise.all([loadProfile(), loadSubscription()]);
+      await Promise.all([loadProfile(), loadSubscription(), loadPlans()]);
     } catch (error) {
       console.error('Profile initialization failed:', error);
       showToast(error.message || 'تعذر تحميل الصفحة الشخصية.');
