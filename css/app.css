@@ -373,27 +373,3 @@
   .dashboard-service-card,.dashboard-strip-arrow,.dashboard-notification-item{transition:none}
 }
 
-
-/* Admin dashboard card typography: keep this card compact without changing other cards. */
-#adminCard h4{
-  font-size:15px!important;
-  line-height:1.4!important;
-  margin-top:12px!important;
-}
-#adminCard p{
-  font-size:11px!important;
-  line-height:1.55!important;
-  margin-top:5px!important;
-}
-@media(max-width:640px){
-  #adminCard h4{
-    font-size:12px!important;
-    line-height:1.4!important;
-    margin-top:8px!important;
-  }
-  #adminCard p{
-    font-size:9px!important;
-    line-height:1.45!important;
-    margin-top:3px!important;
-  }
-}
