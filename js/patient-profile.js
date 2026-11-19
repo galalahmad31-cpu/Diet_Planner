@@ -17,6 +17,7 @@
   };
 
   const $ = (id) => document.getElementById(id);
+  let newPlanSessionCounter = 0;
 
   function setLink(id, page) {
     const element = $(id);
@@ -580,11 +581,18 @@
     url.searchParams.set('embed', '1');
     if (planId) url.searchParams.set('plan_id', planId);
     if (planType) url.searchParams.set('plan_type', planType);
-    if (!planId) url.searchParams.set('new_plan', '1');
 
-    const key = planId || 'new';
-    if (frame.dataset.planId !== key) {
-      frame.dataset.planId = key;
+    // Every explicit add-plan action gets a fresh iframe session, so an old
+    // activeCloudPlanId can never leak into the next new plan.
+    const key = planId ? 'plan:' + planId : 'new:' + (++newPlanSessionCounter);
+    if (!planId) {
+      url.searchParams.set('new_plan', '1');
+      url.searchParams.set('plan_session', String(newPlanSessionCounter));
+    }
+
+    if (frame.dataset.planKey !== key) {
+      frame.dataset.planKey = key;
+      frame.dataset.planId = planId || '';
       frame.style.height = '1px';
       frame.src = url.toString();
     }
@@ -598,7 +606,7 @@
     const details = $('followupDaysDetails');
     
     document.querySelectorAll('[data-open-plan]').forEach(button => button.classList.remove('is-active'));
-    if (frame) frame.dataset.planId = '';
+    if (frame) { frame.dataset.planId = ''; frame.dataset.planKey = ''; }
   }
 
   function formatPlanDate(date) {
