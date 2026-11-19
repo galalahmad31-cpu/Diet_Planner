@@ -280,7 +280,7 @@
     const body = $('weightTableBody');
     if (!body) return;
     if (!measurementState.loaded) {
-      void loadMeasurements().then(openMeasurementEntry);
+      void loadMeasurements().then(() => { if (measurementState.loaded) openMeasurementEntry(); });
       return;
     }
     const row = document.createElement('tr');
