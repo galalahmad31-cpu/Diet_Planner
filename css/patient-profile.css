@@ -79,11 +79,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-discounted output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid #d7ebe4;border-radius:8px;background:#eff8f4;color:#176b63;font-size:12px;font-weight:900}
 .patient-finance-empty{margin-bottom:12px;padding:10px 12px;border:1px dashed #d9e5e9;border-radius:9px;color:#718096;background:#fafcfd;font-size:10px;font-weight:700}
 .patient-finance-error{margin-top:12px;padding:9px 11px;border-radius:9px;background:#fff1f0;color:#b42318;font-size:11px;font-weight:700}
-.patient-finance-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
-.patient-finance-access-note{color:#82919a;font-size:9px;font-weight:700}
-.patient-finance-save-button{flex:0 0 auto;border:0;border-radius:9px;background:#176b63;color:#fff;padding:9px 16px;font:800 10px Cairo,sans-serif;cursor:pointer}
-.patient-finance-save-button:hover{background:#12574f}
-.patient-finance-save-button:disabled{opacity:.45;cursor:not-allowed}
+ .patient-finance-access-note{display:block;margin-top:10px;color:#82919a;font-size:9px;font-weight:700}
 .finance-state{padding:14px 8px;text-align:center;color:#718096;font-size:11px;font-weight:700}
 .patient-finance-success-toast{
   position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;
@@ -99,8 +95,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
   .patient-finance-content{padding-inline:0}
   .patient-finance-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 9px}
   .patient-finance-fields label{min-height:30px;display:flex;align-items:flex-end;line-height:1.35}
-  .patient-finance-footer{align-items:stretch;flex-direction:column}
-  .patient-finance-save-button{width:100%;min-height:40px}
 }
 /* Unified dashboard card palette */
 #modulesSection .plans-card .dashboard-details>summary{background:linear-gradient(120deg,#17633d,#26965d)!important}
