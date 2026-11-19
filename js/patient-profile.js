@@ -10,7 +10,9 @@
     patient: null,
     user: null,
     isAdmin: false,
-    hasActiveSubscription: false
+    hasActiveSubscription: false,
+    isEditing: false,
+    isSaving: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -576,11 +578,19 @@
     'notesInput'
   ];
 
+  const patientFinanceFieldIds = [
+    'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
+    'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollow'
+  ];
+
   function setEditing(enabled) {
-    patientFieldIds.forEach((id) => {
+    state.isEditing = Boolean(enabled);
+    const canEdit = state.isEditing && canWrite();
+    [...patientFieldIds, ...patientFinanceFieldIds].forEach((id) => {
       const field = $(id);
-      if (field) field.disabled = !enabled;
+      if (field) field.disabled = !canEdit;
     });
+    updatePatientFinanceWriteAccess();
 
     const saveArea = $('saveArea');
     const editButton = $('editButton');
@@ -588,30 +598,38 @@
     if (editButton) editButton.hidden = enabled;
   }
 
-  function enableEditing() {
+  async function enableEditing() {
     if (!canWrite()) {
-      alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.');
+      alert('تعديل بيانات المريض والاشتراك متاح أثناء الاشتراك المدفوع فقط.');
       return;
     }
 
     const details = $('patientDataDetails');
+    const financeDetails = $('patientFinanceDetails');
     if (details) details.open = true;
+    if (financeDetails) financeDetails.open = true;
+
+    // Ensure the existing finance record is loaded before enabling the shared editor.
+    const financeReady = await loadPatientFinance();
+    if (!financeReady) {
+      alert('تعذر تحميل بيانات الاشتراك. لم يتم تفعيل التعديل لتجنب استبدال بيانات محفوظة.');
+      return;
+    }
     setEditing(true);
   }
 
   function cancelEditing() {
-    fillPatientData();
     setEditing(false);
+    fillPatientData();
+    void loadPatientFinance(true);
     const details = $('patientDataDetails');
+    const financeDetails = $('patientFinanceDetails');
     if (details) details.open = false;
+    if (financeDetails) financeDetails.open = false;
   }
 
-  async function savePatient() {
-    if (!canWrite()) {
-      alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.');
-      setEditing(false);
-      return;
-    }
+  async function savePatientSection() {
+    if (!canWrite() || !state.isEditing) return false;
 
     const payload = {
       name: $('nameInput').value.trim() || 'مريض',
@@ -634,12 +652,12 @@
 
     if (error) {
       console.error('Save patient failed:', error);
-      alert('تعذر حفظ تعديلات المريض.');
-      return;
+      alert('تعذر حفظ تعديلات المريض. لم يتم إغلاق وضع التعديل.');
+      return false;
     }
 
     state.patient = data;
-    cancelEditing();
+    return true;
   }
 
   const patientFinanceState = { loaded: false, loading: false };
@@ -664,15 +682,8 @@
       'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollow'
     ].forEach((id) => {
       const field = $(id);
-      if (field) field.disabled = !allowed;
+      if (field) field.disabled = !allowed || !state.isEditing || patientFinanceState.loading;
     });
-    const saveButton = $('savePatientFinance');
-    if (saveButton) {
-      saveButton.disabled = !allowed || patientFinanceState.loading;
-      saveButton.title = allowed
-        ? 'حفظ بيانات الاشتراك والمواعيد'
-        : 'تعديل البيانات المالية متاح أثناء الاشتراك المدفوع فقط';
-    }
     const note = $('patientFinanceAccessNote');
     if (note) {
       note.textContent = state.isAdmin
@@ -684,8 +695,9 @@
   }
 
   async function loadPatientFinance(force = false) {
-    if (patientFinanceState.loading || (patientFinanceState.loaded && !force)) return;
-    if (!patientId || !supabase) return;
+    if (patientFinanceState.loading) return false;
+    if (patientFinanceState.loaded && !force) return true;
+    if (!patientId || !supabase) return false;
 
     if (!state.user) {
       try {
@@ -698,7 +710,7 @@
           errorBox.textContent = 'تعذر التحقق من جلسة تسجيل الدخول. أعد تحميل الصفحة وحاول مرة أخرى.';
           errorBox.hidden = false;
         }
-        return;
+        return false;
       }
     }
     if (!state.user?.id) {
@@ -707,7 +719,7 @@
         errorBox.textContent = 'يجب تسجيل الدخول لعرض بيانات الاشتراك.';
         errorBox.hidden = false;
       }
-      return;
+      return false;
     }
 
     patientFinanceState.loading = true;
@@ -746,12 +758,14 @@
         $('pfInputDiscountedPreview').textContent =
           Number(data.discounted_amount).toLocaleString('ar-EG', { maximumFractionDigits: 2 }) + ' جنيه';
       }
+      return true;
     } catch (error) {
       console.error('Patient finance load failed:', error);
       if (errorBox) {
         errorBox.textContent = 'تعذر تحميل بيانات الاشتراك والمواعيد. ' + (error.message || 'تحقق من الاتصال وصلاحيات قاعدة البيانات.');
         errorBox.hidden = false;
       }
+      return false;
     } finally {
       patientFinanceState.loading = false;
       if (loading) loading.hidden = true;
@@ -760,11 +774,7 @@
   }
 
   async function savePatientFinance() {
-    if (!canWrite()) {
-      alert('تعديل بيانات الاشتراك والمواعيد متاح أثناء الاشتراك المدفوع فقط.');
-      return;
-    }
-    if (!state.user?.id || !patientId) return;
+    if (!canWrite() || !state.isEditing || !state.user?.id || !patientId) return false;
 
     const errorBox = $('patientFinanceError');
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ''; }
@@ -780,22 +790,22 @@
     if ((start && !months) || (!start && months)) {
       errorBox.textContent = 'أدخل تاريخ بداية الاشتراك ومدة الاشتراك معًا.';
       errorBox.hidden = false;
-      return;
+      return false;
     }
     if (months !== null && (!Number.isInteger(months) || months < 1)) {
       errorBox.textContent = 'مدة الاشتراك يجب أن تكون عددًا صحيحًا يبدأ من شهر واحد.';
       errorBox.hidden = false;
-      return;
+      return false;
     }
     if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
       errorBox.textContent = 'قيمة الاشتراك غير صحيحة.';
       errorBox.hidden = false;
-      return;
+      return false;
     }
     if (!Number.isFinite(discount) || discount < 0 || discount > 100) {
       errorBox.textContent = 'نسبة الخصم يجب أن تكون بين 0 و100%.';
       errorBox.hidden = false;
-      return;
+      return false;
     }
 
     const payload = {
@@ -810,8 +820,6 @@
       next_follow_up_date: $('pfInputNextFollow').value || null
     };
 
-    const button = $('savePatientFinance');
-    if (button) { button.disabled = true; button.textContent = 'جارٍ الحفظ...'; }
     try {
       // subscription_end_date and discounted_amount are generated by PostgreSQL.
       // Only source columns are written here.
@@ -820,8 +828,9 @@
         .upsert(payload, { onConflict: 'patient_id' });
       if (error) throw error;
       patientFinanceState.loaded = false;
-      await loadPatientFinance(true);
-      showPatientFinanceSuccess();
+      const refreshed = await loadPatientFinance(true);
+      if (!refreshed) return false;
+      return true;
     } catch (error) {
       console.error('Patient finance save failed:', error);
       if (errorBox) {
@@ -829,7 +838,36 @@
         errorBox.hidden = false;
       }
     } finally {
-      if (button) button.textContent = 'حفظ بيانات الاشتراك';
+      updatePatientFinanceWriteAccess();
+    }
+  }
+
+  async function saveAllPatientData() {
+    if (!canWrite() || !state.isEditing || state.isSaving) return;
+
+    state.isSaving = true;
+    const saveButton = $('savePatientButton');
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = 'جارٍ حفظ القسمين...';
+    }
+
+    try {
+      const patientSaved = await savePatientSection();
+      if (!patientSaved) return;
+
+      const financeSaved = await savePatientFinance();
+      if (!financeSaved) return;
+
+      fillPatientData();
+      setEditing(false);
+      showPatientFinanceSuccess();
+    } finally {
+      state.isSaving = false;
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = 'حفظ التعديلات';
+      }
       updatePatientFinanceWriteAccess();
     }
   }
@@ -842,7 +880,7 @@
       toast.className = 'patient-finance-success-toast';
       toast.setAttribute('role', 'status');
       toast.setAttribute('aria-live', 'polite');
-      toast.textContent = 'تم حفظ بيانات الاشتراك والمواعيد بنجاح';
+      toast.textContent = 'تم حفظ بيانات المريض والاشتراك والمواعيد بنجاح';
       document.body.appendChild(toast);
     }
     toast.classList.remove('is-visible');
@@ -870,7 +908,7 @@
       event.stopPropagation();
     });
     $('editButton')?.addEventListener('click', enableEditing);
-    $('savePatientButton')?.addEventListener('click', savePatient);
+    $('savePatientButton')?.addEventListener('click', saveAllPatientData);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     $('addVisitButton')?.addEventListener('click', addVisit);
@@ -889,7 +927,6 @@
     $('patientFinanceDetails')?.addEventListener('toggle', (event) => {
       if (event.currentTarget.open) void loadPatientFinance();
     });
-    $('savePatientFinance')?.addEventListener('click', savePatientFinance);
     ['pfInputAmount', 'pfInputDiscount'].forEach((id) => {
       $(id)?.addEventListener('input', updateFinancePreview);
     });
