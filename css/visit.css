@@ -283,190 +283,441 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 /* Assessment is intentionally excluded from the dietary-plan workflow */
 #assessmentCard,#assessmentContent{display:none!important}
 
-/* Calculator layout: two clear workspaces */
-#calculatorContent .embedded-calculator{padding:14px;background:#f8fafc}
-#calculatorContent #calcTab{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:10px;align-items:start}
-#calculatorContent #calcTab>.calc-card{margin:0!important;min-width:0;border:1px solid #e2e8f0;border-radius:16px;padding:14px;box-shadow:0 3px 12px rgba(15,23,42,.03)}
-#calculatorContent .calc-card-energy{border-top:3px solid #0ea5e9;background:linear-gradient(180deg,#f0f9ff,#fff 28%)}
-#calculatorContent .calc-card-target{border-top:3px solid #10b981;background:linear-gradient(180deg,#ecfdf5,#fff 28%)}
-#calculatorContent .calc-card-energy .grid.grid-cols-2.md\\:grid-cols-3{grid-template-columns:repeat(2,minmax(0,1fr))}
-#calculatorContent #heightField{grid-column:1/-1}
-#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-#calculatorContent .calc-result-bmr{background:#f5f3ff;border:1px solid #e9d5ff}#calculatorContent .calc-result-tdee{background:#ecfdf5;border:1px solid #a7f3d0}#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-group{background:#f8fafc;border:1px solid #e2e8f0}
-#calculatorContent .calc-card-target .grid.grid-cols-3{gap:7px}#calculatorContent .calc-card-target input{min-height:42px}#calculatorContent #finalTargetCal{font-size:19px}
-@media(max-width:900px){#calculatorContent #calcTab{grid-template-columns:1fr;gap:14px}}
-@media(max-width:520px){#calculatorContent .embedded-calculator{padding:10px}#calculatorContent #calcTab>.calc-card{padding:14px;border-radius:16px}#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:76px;padding:8px}#calculatorContent .calc-card-target .grid.grid-cols-3{gap:7px}}
-
-/* Calculator UI refinement v2 */
-#calculatorContent{background:#f4f7fb!important}
-#calculatorContent .embedded-calculator{padding:12px;background:transparent}
-#calculatorContent #calcTab{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);gap:12px;align-items:stretch}
-#calculatorContent #calcTab>.calc-card{box-sizing:border-box;margin:0!important;min-width:0;padding:16px!important;border:1px solid #e5eaf1;border-radius:17px;background:#fff;box-shadow:0 5px 18px rgba(25,45,75,.045)}
-#calculatorContent .calc-card-energy{border-top:3px solid #3b82f6;background:linear-gradient(180deg,#f5f9ff 0,#fff 100px)}
-#calculatorContent .calc-card-target{border-top:3px solid #10b981;background:linear-gradient(180deg,#f2fcf8 0,#fff 100px)}
-#calculatorContent #calcTab h3{font-size:14px;line-height:1.5}
-#calculatorContent #calcTab h3 i{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;background:#e8f1ff;border-radius:9px;color:#2563eb!important}
-#calculatorContent #calcTab p{font-size:10px;line-height:1.65;color:#8491a5}
-#calculatorContent #calcTab label{font-size:11px;line-height:1.5;color:#526176}
-#calculatorContent #calcTab input,#calculatorContent #calcTab select{box-sizing:border-box;width:100%;min-height:38px;padding:8px 10px!important;border:1px solid #e1e7ef;border-radius:10px;background:#fff;color:#243247;font-size:12px;outline:none;transition:border-color .15s,box-shadow .15s}
-#calculatorContent #calcTab input:focus,#calculatorContent #calcTab select:focus{border-color:#93b4f7;box-shadow:0 0 0 3px rgba(59,130,246,.10)}
-#calculatorContent .calc-card-energy .grid.grid-cols-2.md\\:grid-cols-3{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px!important}
-#calculatorContent #heightField{grid-column:auto!important}
-#calculatorContent #eqBtnMifflin,#calculatorContent #eqBtnSchofield{padding:8px 12px!important;font-size:10px!important;border-radius:8px!important}
-#calculatorContent #calcTab button[data-action="calculateSelectedEnergy"]{min-height:40px;padding:10px!important;border-radius:10px;background:#2563eb!important;box-shadow:none!important;font-size:11px!important}
-#calculatorContent .calc-card-energy>div:has(#calcActivity){padding-top:10px!important;border-top-color:#edf1f6!important}
-#calculatorContent .calc-card-energy>div:has(#resBMR){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important;padding-top:12px!important}
-#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:74px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px!important;border-radius:12px!important}
-#calculatorContent .calc-result-neutral{background:#f7f9fc;border:1px solid #e8edf4}
-#calculatorContent .calc-result-bmr{background:#f5f3ff;border:1px solid #e5ddff}
-#calculatorContent .calc-result-tdee{background:#ecfdf5;border:1px solid #c7f1dc}
-#calculatorContent .calc-result-group{background:#fff7ed;border:1px solid #ffead1}
-#calculatorContent #resBMR,#calculatorContent #resTDEE{font-size:21px;line-height:1.2}
-#calculatorContent #resEquation,#calculatorContent #resSchofieldGroup{font-size:11px!important;text-align:center}
-#calculatorContent .calc-card-target h3{padding-bottom:12px!important;border-bottom-color:#e8f2ed!important}
-#calculatorContent .calc-card-target h3 i{background:#dcfce7;color:#059669!important}
-#calculatorContent .calc-card-target .space-y-4{display:flex;flex-direction:column;gap:12px!important}
-#calculatorContent .calc-card-target .space-y-4>div{margin:0!important}
-#calculatorContent #calcAdjustment{font-size:13px!important;font-weight:800}
-#calculatorContent #finalTargetCal{font-size:17px;line-height:1.2;color:#0369a1}
-#calculatorContent .calc-card-target .grid.grid-cols-3{gap:8px!important}
-#calculatorContent .calc-card-target .grid.grid-cols-3>div{padding:9px 7px 8px;background:#f8fafc;border:1px solid #edf1f6;border-radius:12px}
-#calculatorContent .calc-card-target .grid.grid-cols-3 label{text-align:center;font-size:10px}
-#calculatorContent .calc-card-target .grid.grid-cols-3 input{min-height:36px;text-align:center;font-size:13px!important;font-weight:800;background:#fff}
-#calculatorContent .calc-card-target .grid.grid-cols-3 span[id$="Grams"]{display:block;margin-top:6px;font-size:13px;font-weight:900;color:#0f766e}
-#calculatorContent #macroTotalAlert{font-size:10px;line-height:1.5}
-#calculatorContent button[data-action="applyCustomTargetToPatient"]{min-height:42px;padding:10px!important;border-radius:10px;font-size:11px!important;box-shadow:none!important}
-@media(max-width:900px){#calculatorContent #calcTab{grid-template-columns:1fr;gap:10px}}
-@media(max-width:560px){
-#calculatorContent .embedded-calculator{padding:8px}
-#calculatorContent #calcTab>.calc-card{padding:12px!important;border-radius:14px}
-#calculatorContent #calcTab h3{font-size:13px}
-#calculatorContent .calc-card-energy .grid.grid-cols-2.md\\:grid-cols-3{gap:8px!important}
-#calculatorContent #calcTab label{font-size:10px}
-#calculatorContent #calcTab input,#calculatorContent #calcTab select{min-height:36px;padding:7px 8px!important;font-size:11px}
-#calculatorContent .calc-result-neutral,#calculatorContent .calc-result-bmr,#calculatorContent .calc-result-tdee,#calculatorContent .calc-result-group{min-height:68px;padding:8px!important}
-#calculatorContent #resBMR,#calculatorContent #resTDEE{font-size:18px}
-#calculatorContent .calc-card-target .grid.grid-cols-3{gap:5px!important}
-#calculatorContent .calc-card-target .grid.grid-cols-3>div{padding:7px 4px}
-#calculatorContent .calc-card-target .grid.grid-cols-3 label{font-size:9px}
+/* Calculator workspace — single scoped source of truth */
+#calculatorContent{
+  background:#f5f7f8!important;
+  border-color:#e4e9eb!important;
 }
-/* New calculator information architecture */
-#calculatorContent #calcTab{display:flex;flex-direction:column;gap:14px}
-#calculatorContent #calcTab .energy-workspace,#calculatorContent #calcTab .macro-workspace{background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:18px;box-shadow:0 4px 16px rgba(24,44,75,.035);min-width:0}
-#calculatorContent #calcTab .energy-workspace{border-top:3px solid #3b82f6}
-#calculatorContent #calcTab .macro-workspace{border-top:3px solid #10b981}
-#calculatorContent #calcTab .workspace-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
-#calculatorContent #calcTab .workspace-step{display:block;color:#91a0b5;font-size:9px;font-weight:900;letter-spacing:1.2px;margin-bottom:5px}
-#calculatorContent #calcTab .workspace-heading h3{margin:0;color:#18283e;font-size:16px;font-weight:900}
-#calculatorContent #calcTab .workspace-heading p{margin:4px 0 0;font-size:10px;color:#8b98aa}
-#calculatorContent #calcTab .equation-switch{display:flex;gap:4px;padding:4px;background:#f1f5f9;border-radius:10px;flex-shrink:0}
-#calculatorContent #calcTab .equation-switch button{border:0;border-radius:7px;padding:9px 12px;font-size:10px;font-weight:800;color:#64748b;background:transparent;white-space:nowrap}
-#calculatorContent #calcTab #eqBtnMifflin.bg-white,#calculatorContent #calcTab #eqBtnSchofield.bg-white{background:#fff!important;color:#2563eb!important;box-shadow:0 1px 4px #dbe3ee}
-#calculatorContent #calcTab .patient-inputs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-#calculatorContent #calcTab .patient-inputs label,#calculatorContent #calcTab .activity-row label{display:block;font-size:11px;font-weight:800;color:#526176;margin-bottom:6px}
-#calculatorContent #calcTab .patient-inputs input,#calculatorContent #calcTab .patient-inputs select,#calculatorContent #calcTab .activity-row select{width:100%;height:42px;border:1px solid #e1e7ef;border-radius:10px;background:#f9fbfd;padding:0 11px;font-size:12px;font-weight:700;color:#243247;box-sizing:border-box}
-#calculatorContent #calcTab .activity-row{display:grid;grid-template-columns:minmax(150px,.65fr) minmax(220px,1.5fr) auto;align-items:end;gap:12px;margin-top:13px;padding-top:13px;border-top:1px solid #edf1f6}
-#calculatorContent #calcTab .activity-row label{margin:0}
-#calculatorContent #calcTab .activity-row button{height:42px;padding:0 18px;border-radius:10px;background:#2563eb;color:white;font-size:11px;font-weight:900;white-space:nowrap}
-#calculatorContent #calcTab .activity-row button:hover{background:#1d4ed8}
-#calculatorContent #calcTab .energy-results{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:9px;margin-top:14px}
-#calculatorContent #calcTab .energy-results>div{min-width:0;border:1px solid #e9edf4;border-radius:12px;background:#f8fafc;padding:12px 14px;display:flex;flex-direction:column;gap:5px}
-#calculatorContent #calcTab .energy-results small{font-size:10px;color:#77869a;font-weight:700}
-#calculatorContent #calcTab .energy-results strong{font-size:17px;color:#25364e;font-weight:900;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
-#calculatorContent #calcTab .energy-results em{font-size:9px;color:#91a0b5;font-style:normal;font-weight:600}
-#calculatorContent #calcTab .energy-results .primary{background:#effaf5;border-color:#cceedd}
-#calculatorContent #calcTab .energy-results .primary strong{color:#087f5b;font-size:21px}
-#calculatorContent #calcTab .result-equation strong{font-size:12px}
-#calculatorContent #calcTab .result-equation span{font-size:9px;color:#a0aabd}
-#calculatorContent #calcTab .schofield-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff7ed;color:#9a5a14;font-size:10px;display:flex;flex-direction:column;gap:4px}
-#calculatorContent #calcTab .schofield-note small{color:#b77928}
-#calculatorContent #calcTab .target-energy{padding:10px 14px;border-radius:12px;background:#ecfdf5;border:1px solid #cceedd;text-align:center;white-space:nowrap}
-#calculatorContent #calcTab .target-energy small{display:block;font-size:9px;color:#0f8b65;font-weight:800}
-#calculatorContent #calcTab .target-energy strong{display:block;font-size:22px;line-height:1.35;color:#047857;font-weight:900}
-#calculatorContent #calcTab .target-energy em{font-size:10px;font-style:normal}
-#calculatorContent #calcTab .target-adjustment{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:#f8fafc;border:1px solid #edf1f6}
-#calculatorContent #calcTab .target-adjustment label{font-size:11px;font-weight:900;color:#526176;min-width:150px}
-#calculatorContent #calcTab .target-adjustment label small{display:block;font-size:9px;color:#95a1b2;font-weight:600;margin-top:3px}
-#calculatorContent #calcTab .target-adjustment input{height:40px;max-width:220px;border:1px solid #dce5ef;border-radius:9px;background:white;padding:0 12px;font-weight:900;font-size:13px}
-#calculatorContent #calcTab .macro-section-label{display:flex;justify-content:space-between;align-items:center;margin:15px 0 9px;color:#34445a;font-size:11px}
-#calculatorContent #calcTab .macro-section-label span{font-size:9px;color:#8b98aa}
-#calculatorContent #calcTab .macro-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-#calculatorContent #calcTab .macro-item{padding:13px;border:1px solid #e7edf3;border-radius:13px;background:#fbfcfe;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-#calculatorContent #calcTab .macro-name{font-size:11px;font-weight:900;color:#425168;display:flex;align-items:center;gap:7px}
-#calculatorContent #calcTab .macro-dot{width:8px;height:8px;border-radius:50%;background:#64748b}
-#calculatorContent #calcTab .protein .macro-dot{background:#8b5cf6}
-#calculatorContent #calcTab .carbs .macro-dot{background:#f59e0b}
-#calculatorContent #calcTab .fats .macro-dot{background:#06b6d4}
-#calculatorContent #calcTab .macro-percent{display:flex;align-items:center;gap:4px;color:#8b98aa;font-size:11px;font-weight:800}
-#calculatorContent #calcTab .macro-percent input{width:54px;height:38px;text-align:center;border:1px solid #dfe7f0;border-radius:9px;background:#fff;font-size:15px;font-weight:900;color:#243247}
-#calculatorContent #calcTab .macro-grams{grid-column:1/-1;border-top:1px solid #edf1f6;padding-top:9px;display:flex;align-items:baseline;gap:7px}
-#calculatorContent #calcTab .macro-grams strong{font-size:22px;color:#1e344d;font-weight:900}
-#calculatorContent #calcTab .macro-grams small{font-size:10px;color:#91a0b5}
-#calculatorContent #calcTab .macro-alert{margin-top:8px;padding:8px;border-radius:9px;text-align:center;font-size:10px;font-weight:800}
-#calculatorContent #calcTab .macro-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px solid #edf1f6}
-#calculatorContent #calcTab .macro-footer>span{font-size:10px;color:#8b98aa}
-#calculatorContent #calcTab .macro-footer button{min-height:42px;padding:0 17px;border-radius:10px;background:#059669;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;gap:8px;white-space:nowrap}
-@media(max-width:760px){
-#calculatorContent #calcTab .workspace-heading{align-items:flex-start;flex-direction:column}
-#calculatorContent #calcTab .patient-inputs{grid-template-columns:repeat(2,minmax(0,1fr))}
-#calculatorContent #calcTab .activity-row{grid-template-columns:1fr;gap:8px}
-#calculatorContent #calcTab .activity-row button{width:100%}
-#calculatorContent #calcTab .energy-results{grid-template-columns:repeat(2,minmax(0,1fr))}
-#calculatorContent #calcTab .energy-results .primary{grid-column:1/-1}
-#calculatorContent #calcTab .macro-cards{grid-template-columns:1fr}
-#calculatorContent #calcTab .macro-item{grid-template-columns:1fr auto}
-#calculatorContent #calcTab .macro-grams{grid-column:auto;border:0;padding:0;justify-content:flex-end}
-#calculatorContent #calcTab .macro-footer{align-items:stretch;flex-direction:column}
-#calculatorContent #calcTab .macro-footer button{justify-content:center}
+#calculatorContent .embedded-calculator{
+  width:100%;
+  box-sizing:border-box;
+  padding:16px;
+  background:transparent;
 }
-@media(max-width:420px){#calculatorContent #calcTab .energy-workspace,#calculatorContent #calcTab .macro-workspace{padding:12px}#calculatorContent #calcTab .target-adjustment{align-items:stretch;flex-direction:column}#calculatorContent #calcTab .target-adjustment input{max-width:none;width:100%}}
-
-/* Color hierarchy: distinguish calculator workspaces and result groups */
-#calculatorContent #calcTab .energy-workspace{
-  background:linear-gradient(145deg,#f0f7ff 0%,#ffffff 58%);
-  border:1px solid #cfe2ff;border-top:5px solid #2563eb;
-  box-shadow:0 8px 24px rgba(37,99,235,.08)
+#calculatorContent #calcTab{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+  min-width:0;
 }
+#calculatorContent #calcTab .energy-workspace,
 #calculatorContent #calcTab .macro-workspace{
-  background:linear-gradient(145deg,#effcf6 0%,#ffffff 55%);
-  border:1px solid #c8efdc;border-top:5px solid #059669;
-  box-shadow:0 8px 24px rgba(5,150,105,.08)
+  box-sizing:border-box;
+  min-width:0;
+  padding:18px;
+  border:1px solid #e2e8e6;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(22,45,40,.035);
+}
+#calculatorContent #calcTab .energy-workspace{border-top:3px solid #9bb8d1}
+#calculatorContent #calcTab .macro-workspace{border-top:3px solid #8dbca7}
+#calculatorContent #calcTab .workspace-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
 }
 #calculatorContent #calcTab .workspace-step{
-  display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:6px;
-  background:#dbeafe;color:#1d4ed8;letter-spacing:.7px;margin-bottom:8px
+  display:block;
+  margin-bottom:5px;
+  color:#87958f;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.8px;
 }
-#calculatorContent #calcTab .macro-workspace .workspace-step{background:#d1fae5;color:#047857}
-#calculatorContent #calcTab .workspace-heading h3{color:#173b70}
-#calculatorContent #calcTab .macro-workspace .workspace-heading h3{color:#075c45}
-#calculatorContent #calcTab .patient-inputs>div{padding:10px;border-radius:12px;background:rgba(255,255,255,.82);border:1px solid #dce9fa}
-#calculatorContent #calcTab .patient-inputs label{color:#315a91}
-#calculatorContent #calcTab .patient-inputs input,#calculatorContent #calcTab .patient-inputs select{
-  background:#fff;border-color:#c9dcf6;box-shadow:inset 0 1px 2px rgba(30,64,175,.03)
+#calculatorContent #calcTab .workspace-heading h3{
+  margin:0;
+  color:#253b36;
+  font-size:16px;
+  line-height:1.55;
+  font-weight:900;
 }
-#calculatorContent #calcTab .activity-row{background:#e8f1ff;border:1px solid #d4e4fb;border-radius:12px;padding:12px;margin-top:12px}
-#calculatorContent #calcTab .activity-row label{color:#244f8d}
-#calculatorContent #calcTab .activity-row select{border-color:#bfd5f4;background:#fff}
-#calculatorContent #calcTab .energy-results>div{background:#e8f0fb;border-color:#d2e1f5}
-#calculatorContent #calcTab .energy-results .primary{background:#d9f7e9;border-color:#a9e8ca}
-#calculatorContent #calcTab .energy-results .result-equation{background:#f0eaff;border-color:#ded2ff}
-#calculatorContent #calcTab .energy-results .result-equation strong{color:#6d28d9}
-#calculatorContent #calcTab .target-adjustment{background:#e2f8ed;border-color:#bdebd5}
-#calculatorContent #calcTab .target-adjustment label{color:#087f5b}
-#calculatorContent #calcTab .macro-section-label{color:#087f5b}
-#calculatorContent #calcTab .macro-item{background:#fff;border-color:#d5eee2;box-shadow:0 3px 10px rgba(5,150,105,.04)}
-#calculatorContent #calcTab .macro-item.protein{background:linear-gradient(135deg,#f4efff,#fff 65%);border-color:#ded2ff}
-#calculatorContent #calcTab .macro-item.carbs{background:linear-gradient(135deg,#fff7e6,#fff 65%);border-color:#f9e2b6}
-#calculatorContent #calcTab .macro-item.fats{background:linear-gradient(135deg,#e9faff,#fff 65%);border-color:#c5edf7}
-#calculatorContent #calcTab .protein .macro-name{color:#6d28d9}
-#calculatorContent #calcTab .carbs .macro-name{color:#b45309}
-#calculatorContent #calcTab .fats .macro-name{color:#087e9b}
-#calculatorContent #calcTab .protein .macro-percent input{border-color:#d8c9ff;color:#6d28d9}
-#calculatorContent #calcTab .carbs .macro-percent input{border-color:#f5d79b;color:#b45309}
-#calculatorContent #calcTab .fats .macro-percent input{border-color:#b7e8f4;color:#087e9b}
-#calculatorContent #calcTab .macro-grams strong{color:#1d3b32}
-#calculatorContent #calcTab .macro-footer{background:#e2f8ed;border:1px solid #c6eedb;border-radius:12px;padding:12px;margin-top:12px}
-#calculatorContent #calcTab .macro-footer button{background:#047857;box-shadow:0 4px 10px rgba(4,120,87,.18)}
+#calculatorContent #calcTab .workspace-heading p{
+  margin:4px 0 0;
+  color:#87958f;
+  font-size:10px;
+  line-height:1.7;
+}
+#calculatorContent #calcTab .equation-switch{
+  display:flex;
+  flex:0 0 auto;
+  gap:4px;
+  padding:4px;
+  border:1px solid #e8edeb;
+  border-radius:10px;
+  background:#f6f8f7;
+}
+#calculatorContent #calcTab .equation-switch button{
+  min-height:34px;
+  padding:7px 11px;
+  border:1px solid transparent;
+  border-radius:7px;
+  background:transparent;
+  color:#65736d;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+#calculatorContent #calcTab #eqBtnMifflin.bg-white,
+#calculatorContent #calcTab #eqBtnSchofield.bg-white{
+  border-color:#e1e8e4!important;
+  background:#fff!important;
+  color:#176b52!important;
+  box-shadow:0 1px 3px rgba(25,55,43,.07);
+}
+#calculatorContent #calcTab .patient-inputs{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+#calculatorContent #calcTab .patient-inputs>div{
+  min-width:0;
+  padding:10px;
+  border:1px solid #e9eeec;
+  border-radius:11px;
+  background:#fbfcfb;
+}
+#calculatorContent #calcTab .patient-inputs label,
+#calculatorContent #calcTab .activity-row label{
+  display:block;
+  margin:0 0 6px;
+  color:#5b6c65;
+  font-size:11px;
+  font-weight:800;
+}
+#calculatorContent #calcTab .patient-inputs input,
+#calculatorContent #calcTab .patient-inputs select,
+#calculatorContent #calcTab .activity-row select{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  height:40px;
+  padding:0 10px;
+  border:1px solid #dfe7e3;
+  border-radius:9px;
+  background:#fff;
+  color:#263a33;
+  font-size:12px;
+  font-weight:700;
+}
+#calculatorContent #calcTab input:focus,
+#calculatorContent #calcTab select:focus{
+  outline:none;
+  border-color:#8bb9a4;
+  box-shadow:0 0 0 3px rgba(64,137,103,.10);
+}
+#calculatorContent #calcTab .activity-row{
+  display:grid;
+  grid-template-columns:minmax(150px,.65fr) minmax(220px,1.5fr) auto;
+  align-items:end;
+  gap:12px;
+  margin-top:13px;
+  padding:13px;
+  border:1px solid #e8eeeb;
+  border-radius:11px;
+  background:#f8faf9;
+}
+#calculatorContent #calcTab .activity-row label{margin:0}
+#calculatorContent #calcTab .activity-row button{
+  min-height:40px;
+  padding:0 17px;
+  border:0;
+  border-radius:9px;
+  background:#26785e;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+#calculatorContent #calcTab .activity-row button:hover{background:#1e674f}
+#calculatorContent #calcTab .energy-results{
+  display:grid;
+  grid-template-columns:1fr 1fr 1.15fr;
+  gap:9px;
+  margin-top:13px;
+}
+#calculatorContent #calcTab .energy-results>div{
+  display:flex;
+  min-width:0;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  padding:12px 14px;
+  border:1px solid #e8edeb;
+  border-radius:11px;
+  background:#fafbfb;
+}
+#calculatorContent #calcTab .energy-results small{
+  color:#7b8983;
+  font-size:10px;
+  font-weight:700;
+}
+#calculatorContent #calcTab .energy-results strong{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  flex-wrap:wrap;
+  color:#2e4039;
+  font-size:17px;
+  font-weight:900;
+}
+#calculatorContent #calcTab .energy-results em{
+  color:#97a39e;
+  font-size:9px;
+  font-style:normal;
+  font-weight:600;
+}
+#calculatorContent #calcTab .energy-results .primary{
+  border-color:#d4e8dd;
+  background:#f1f8f4;
+}
+#calculatorContent #calcTab .energy-results .primary strong{
+  color:#176b52;
+  font-size:21px;
+}
+#calculatorContent #calcTab .result-equation strong{
+  color:#44554e;
+  font-size:12px;
+}
+#calculatorContent #calcTab .schofield-note{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin-top:10px;
+  padding:10px 12px;
+  border:1px solid #eee7d8;
+  border-radius:10px;
+  background:#fbfaf6;
+  color:#766447;
+  font-size:10px;
+}
+#calculatorContent #calcTab .schofield-note small{color:#968365}
+#calculatorContent #calcTab .target-energy{
+  padding:9px 14px;
+  border:1px solid #d7e9df;
+  border-radius:11px;
+  background:#f3f8f5;
+  text-align:center;
+  white-space:nowrap;
+}
+#calculatorContent #calcTab .target-energy small{
+  display:block;
+  color:#668173;
+  font-size:9px;
+  font-weight:800;
+}
+#calculatorContent #calcTab .target-energy strong{
+  display:block;
+  color:#176b52;
+  font-size:22px;
+  line-height:1.35;
+  font-weight:900;
+}
+#calculatorContent #calcTab .target-energy em{
+  font-size:10px;
+  font-style:normal;
+}
+#calculatorContent #calcTab .target-adjustment{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid #e8edeb;
+  border-radius:11px;
+  background:#fafbfa;
+}
+#calculatorContent #calcTab .target-adjustment label{
+  min-width:150px;
+  color:#586960;
+  font-size:11px;
+  font-weight:900;
+}
+#calculatorContent #calcTab .target-adjustment label small{
+  display:block;
+  margin-top:3px;
+  color:#96a19b;
+  font-size:9px;
+  font-weight:600;
+}
+#calculatorContent #calcTab .target-adjustment input{
+  box-sizing:border-box;
+  width:100%;
+  max-width:220px;
+  height:40px;
+  padding:0 12px;
+  border:1px solid #dfe7e3;
+  border-radius:9px;
+  background:#fff;
+  font-size:13px;
+  font-weight:800;
+}
+#calculatorContent #calcTab .macro-section-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:15px 0 9px;
+  color:#43564d;
+  font-size:11px;
+}
+#calculatorContent #calcTab .macro-section-label span{
+  color:#89968f;
+  font-size:9px;
+}
+#calculatorContent #calcTab .macro-cards{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+#calculatorContent #calcTab .macro-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:13px;
+  border:1px solid #e7ece9;
+  border-radius:12px;
+  background:#fbfcfb;
+  box-shadow:none;
+}
+#calculatorContent #calcTab .macro-name{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#46574f;
+  font-size:11px;
+  font-weight:900;
+}
+#calculatorContent #calcTab .macro-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#82958b;
+}
+#calculatorContent #calcTab .macro-percent{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  color:#8b9791;
+  font-size:11px;
+  font-weight:800;
+}
+#calculatorContent #calcTab .macro-percent input{
+  box-sizing:border-box;
+  width:54px;
+  height:36px;
+  padding:0 5px;
+  border:1px solid #e0e7e3;
+  border-radius:8px;
+  background:#fff;
+  color:#2d4037;
+  text-align:center;
+  font-size:14px;
+  font-weight:900;
+}
+#calculatorContent #calcTab .macro-grams{
+  display:flex;
+  grid-column:1/-1;
+  align-items:baseline;
+  gap:7px;
+  padding-top:9px;
+  border-top:1px solid #edf1ee;
+}
+#calculatorContent #calcTab .macro-grams strong{
+  color:#2d4037;
+  font-size:21px;
+  font-weight:900;
+}
+#calculatorContent #calcTab .macro-grams small{
+  color:#929e97;
+  font-size:10px;
+}
+#calculatorContent #calcTab .macro-alert{
+  margin-top:8px;
+  padding:8px;
+  border:1px solid #f2d4d4;
+  border-radius:9px;
+  text-align:center;
+  font-size:10px;
+  font-weight:800;
+}
+#calculatorContent #calcTab .macro-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid #edf1ee;
+}
+#calculatorContent #calcTab .macro-footer>span{
+  color:#87948d;
+  font-size:10px;
+}
+#calculatorContent #calcTab .macro-footer button{
+  display:flex;
+  min-height:42px;
+  align-items:center;
+  gap:8px;
+  padding:0 17px;
+  border:0;
+  border-radius:10px;
+  background:#26785e;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+#calculatorContent #calcTab .macro-footer button:hover{background:#1e674f}
+#calculatorContent #calcTab button:focus-visible{
+  outline:2px solid #4e9678;
+  outline-offset:2px;
+}
+@media(max-width:760px){
+  #calculatorContent .embedded-calculator{padding:10px}
+  #calculatorContent #calcTab .energy-workspace,
+  #calculatorContent #calcTab .macro-workspace{padding:14px}
+  #calculatorContent #calcTab .workspace-heading{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  #calculatorContent #calcTab .patient-inputs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #calculatorContent #calcTab .activity-row{grid-template-columns:1fr;gap:8px}
+  #calculatorContent #calcTab .activity-row button{width:100%}
+  #calculatorContent #calcTab .energy-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #calculatorContent #calcTab .energy-results .primary{grid-column:1/-1}
+  #calculatorContent #calcTab .macro-cards{grid-template-columns:1fr}
+  #calculatorContent #calcTab .macro-item{grid-template-columns:1fr auto}
+  #calculatorContent #calcTab .macro-grams{
+    grid-column:auto;
+    padding:0;
+    border:0;
+    justify-content:flex-end;
+  }
+  #calculatorContent #calcTab .macro-footer{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  #calculatorContent #calcTab .macro-footer button{justify-content:center}
+}
+@media(max-width:420px){
+  #calculatorContent #calcTab .energy-workspace,
+  #calculatorContent #calcTab .macro-workspace{padding:12px}
+  #calculatorContent #calcTab .workspace-heading{gap:10px}
+  #calculatorContent #calcTab .equation-switch{width:100%}
+  #calculatorContent #calcTab .equation-switch button{flex:1;padding-inline:6px}
+  #calculatorContent #calcTab .target-adjustment{
+    align-items:stretch;
+    flex-direction:column;
+    gap:7px;
+  }
+  #calculatorContent #calcTab .target-adjustment label{min-width:0}
+  #calculatorContent #calcTab .target-adjustment input{max-width:none}
+  #calculatorContent #calcTab .energy-results{gap:7px}
+}
 
 
 /* Visit module cards: clear color identity + full-row layout */
