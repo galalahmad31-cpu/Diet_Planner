@@ -178,7 +178,10 @@ function renderDiets(){
     </article>`;
   }).join('');
   $('empty').classList.toggle('hidden',arr.length>0);
-  $('countBadge').textContent=`${diets.length} دايت`;
+  // The page uses the three dedicated statistic cards; there is no countBadge node.
+  // Keep this optional for older layouts without making library rendering fail.
+  const countBadge=$('countBadge');
+  if(countBadge) countBadge.textContent=`${diets.length} دايت`;
   $('totalStat').textContent=diets.length;
   $('mineStat').textContent=diets.filter(d=>d.created_by===user.id).length;
   $('publicStat').textContent=diets.filter(d=>d.visibility==='public').length;
