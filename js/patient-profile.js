@@ -520,12 +520,8 @@
   function openVisitEmbedded(visit) {
     const panel = $('visitEmbeddedPanel');
     const frame = $('visitFrame');
-    const title = $('activeVisitTitle');
     if (!panel || !frame || !visit?.id) return;
 
-    if (title) {
-      title.textContent = `الخطة رقم ${visit.visit_number ?? '—'} · ${formatVisitDate(visit.visit_date)}`;
-    }
     panel.hidden = false;
     const followupDetails = $('followupDaysDetails');
     if (followupDetails) followupDetails.open = false;
@@ -1189,7 +1185,6 @@
       };
       openVisitEmbedded(visit);
     });
-    $('closeVisitFrameBtn')?.addEventListener('click', closeVisitEmbedded);
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableBody')?.addEventListener('click', (event) => {
       const save = event.target.closest('[data-measurement-save]');
