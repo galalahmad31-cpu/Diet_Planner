@@ -10,9 +10,7 @@
 const sb=window.DietPlannerAccess?.supabaseClient;
 if (!sb) { console.error("Diet Planner access layer is unavailable to the gram-based diet module."); return; }
 const params=new URLSearchParams(location.search);
-const initialUrlVisitId=params.get('visit_id') || params.get('id');
-const initialUrlPatientId=params.get('patient_id');
-let visitId=initialUrlVisitId;
+const initialUrlPatientId=params.get('patient_id') || params.get('id');
 let patientId=initialUrlPatientId;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
@@ -55,56 +53,12 @@ async function canWriteVisitData(){
 async function loadPatient(){
  const user=await currentUser();
  if(!user){location.href='index.html';return false;}
-
- /*
-  * When this module is embedded in visit.html, visit.js already owns
-  * and validates the patient/visit context. Re-querying patients here
-  * creates an unnecessary dependency and can fail under a valid RLS setup.
-  * Consume the trusted page context instead.
-  */
- const pageContext=window.visitContext||{};
- if(pageContext.patient_id){
-  visitId=pageContext.id||visitId;
-  patientId=pageContext.patient_id;
-  window.currentPatientId=patientId;
-
-  patientInfo={
-    id:patientId,
-    name:document.getElementById('patientName')?.textContent||'',
-    targetCal:pageContext.energyRequirements?.energy_target_calories??'',
-    targetPro:pageContext.energyRequirements?.energy_target_protein??'',
-    targetCarb:pageContext.energyRequirements?.energy_target_carb??'',
-    targetFat:pageContext.energyRequirements?.energy_target_fat??'',
-    energy_approved_at:pageContext.energyRequirements?.energy_approved_at??null,
-    energy_target_calories:pageContext.energyRequirements?.energy_target_calories??null,
-    energy_target_protein:pageContext.energyRequirements?.energy_target_protein??null,
-    energy_target_carb:pageContext.energyRequirements?.energy_target_carb??null,
-    energy_target_fat:pageContext.energyRequirements?.energy_target_fat??null,
-    goal:'loss'
-   };
-  return true;
- }
-
- let resolvedPatientId=patientId;
-
- if(visitId){
-  const {data:v,error:ve}=await sb.from('patient_visits')
-   .select('id,patient_id,visit_number,visit_date')
-   .eq('id',visitId).eq('user_id',user.id).maybeSingle();
-
-  if(ve||!v){showToast('تعذر تحميل الزيارة','error');return false;}
-  resolvedPatientId=v.patient_id;
- }
-
- if(!resolvedPatientId){location.href='patient.html';return false;}
-
- const {data:p,error}=await sb.from('patients').select('*')
-  .eq('id',resolvedPatientId).eq('user_id',user.id).maybeSingle();
-
+ const resolvedPatientId=patientId||window.currentPatientId;
+ if(!resolvedPatientId){showToast('لم يتم تحديد المريض','error');return false;}
+ const {data:p,error}=await sb.from('patients').select('*').eq('id',resolvedPatientId).eq('user_id',user.id).maybeSingle();
  if(error||!p){showToast('تعذر تحميل ملف المريض','error');return false;}
-
- window.currentPatientId=resolvedPatientId;
- patientInfo={...p,targetCal:'',targetPro:'',targetCarb:'',targetFat:'',goal:'loss'};
+ window.currentPatientId=resolvedPatientId; patientId=resolvedPatientId;
+ patientInfo={...p,targetCal:p.energy_target_calories??'',targetPro:p.energy_target_protein??'',targetCarb:p.energy_target_carb??'',targetFat:p.energy_target_fat??'',goal:'loss'};
  return true;
 }
 
@@ -776,9 +730,7 @@ function executePrint(){
  buildPrintPlan();closePrintSettingsModal();setTimeout(()=>window.print(),200);
 }
 
-function goBack(){
- if(visitId){location.href=`visit.html?id=${encodeURIComponent(visitId)}`;return;}
- location.href=`patient-profile.html?id=${encodeURIComponent(window.currentPatientId||patientId)}`
+function goBack(){location.href=`patient-profile.html?id=${encodeURIComponent(window.currentPatientId||patientId)}`;
 }
 
 async function confirmAction(){
@@ -793,9 +745,7 @@ function init(){
  if(dietInitPromise)return dietInitPromise;
 
  dietInitPromise=(async()=>{
-   const ctx=window.visitContext||{};
-   visitId=ctx.id || params.get('visit_id') || params.get('id') || null;
-   patientId=ctx.patient_id || params.get('patient_id') || null;
+   patientId=params.get('patient_id') || params.get('id') || window.currentPatientId || null;
 
    initFoodSearchInteraction();
 
