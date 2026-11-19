@@ -50,8 +50,7 @@
 
 
 /* About page branded green header and horizontal navigation */
-.about-main-card{padding:0!important;border-radius:24px!important;overflow:hidden}
-.about-branded-header{position:relative;isolation:isolate;overflow:hidden;color:#fff;background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);border-radius:24px 24px 0 0}
+.about-branded-header{position:relative;isolation:isolate;overflow:hidden;color:#fff;background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);border-radius:24px;margin-bottom:20px}
 .about-branded-header:after{content:"";position:absolute;z-index:0;width:230px;height:230px;left:-65px;top:-125px;border:35px solid rgba(255,255,255,.07);border-radius:50%;pointer-events:none}
 .about-brand-inner{position:relative;z-index:1;width:100%;padding:12px 16px 10px}
 .about-brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
@@ -71,7 +70,6 @@
 .about-branded-header .about-access-card.active{background:#fff;border-color:#fff;color:#126b5d;box-shadow:0 3px 10px rgba(0,0,0,.10)}
 .about-branded-header .about-access-card.active i{color:#168879}
 .about-branded-header .about-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.about-main-card>.mt-5.flex.justify-end{padding:0 1.25rem 1.25rem;margin-top:1.25rem}
 @media(max-width:600px){
  .about-brand-inner{padding:9px 10px 7px}
  .about-brand-row{min-height:48px}
@@ -84,5 +82,4 @@
  .about-branded-header .about-access-track{gap:7px}
  .about-branded-header .about-access-card{min-height:33px;padding:5px 9px;border-radius:9px;font-size:9px;gap:5px}
  .about-branded-header .about-access-card i{font-size:11px}
- .about-main-card>.mt-5.flex.justify-end{padding:0 .85rem .85rem;margin-top:1rem}
 }
