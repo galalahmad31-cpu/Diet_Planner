@@ -11,7 +11,10 @@ const sb=window.DietPlannerAccess?.supabaseClient;
 if (!sb) { console.error("Diet Planner access layer is unavailable to the gram-based diet module."); return; }
 const params=new URLSearchParams(location.search);
 const initialUrlPatientId=params.get('patient_id') || params.get('id');
+const initialUrlPlanId=params.get('plan_id');
+const isNewPlan=params.get('new_plan')==='1';
 let patientId=initialUrlPatientId;
+let activePlanStartDate=null;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
@@ -119,25 +122,33 @@ async function ensureAllFoods(){
 }
 
 async function loadPlan(shouldRender=true){
- let query=sb.from('nutrition_plans').select('id,patient_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
- query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
- const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
- if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
- const plan=plans?.[0];
- if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;updateTargets();if(shouldRender)renderDays();return;}
- activeCloudPlanId=plan.id;
- const approved=Number(patientInfo.energy_target_calories)>0 && !!patientInfo.energy_approved_at;
- patientInfo.targetCal=approved?patientInfo.energy_target_calories:(plan.target_calories??'');
- patientInfo.targetPro=approved?patientInfo.energy_target_protein:(plan.target_protein??'');
- patientInfo.targetCarb=approved?patientInfo.energy_target_carb:(plan.target_carb??'');
- patientInfo.targetFat=approved?patientInfo.energy_target_fat:(plan.target_fat??'');
- patientInfo.goal=plan.goal||'loss';
- const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name,notes').eq('plan_id',plan.id).order('day_number',{ascending:true});
- const ids=(dayRows||[]).map(x=>x.id);
- let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
- const mids=meals.map(x=>x.id); let items=[]; if(mids.length){const r=await sb.from('plan_items').select('id,meal_id,food_id,quantity_g,frequency,notes').in('meal_id',mids);items=r.data||[];}
- daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',isCollapsed:false,meals:meals.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:items.filter(i=>i.meal_id===m.id).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
- savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
+  if(isNewPlan && !initialUrlPlanId){
+    activeCloudPlanId=null; activePlanStartDate=null;
+    daysData=[]; savedDaysData=[];
+    updateTargets(); if(shouldRender)renderDays();
+    return;
+  }
+  let query=sb.from('nutrition_plans').select('id,patient_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
+  query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
+  if(initialUrlPlanId) query=query.eq('id',initialUrlPlanId);
+  const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
+  if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
+  const plan=plans?.[0];
+  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;updateTargets();if(shouldRender)renderDays();return;}
+  activeCloudPlanId=plan.id;
+  activePlanStartDate=plan.start_date||null;
+  const approved=Number(patientInfo.energy_target_calories)>0 && !!patientInfo.energy_approved_at;
+  patientInfo.targetCal=approved?patientInfo.energy_target_calories:(plan.target_calories??'');
+  patientInfo.targetPro=approved?patientInfo.energy_target_protein:(plan.target_protein??'');
+  patientInfo.targetCarb=approved?patientInfo.energy_target_carb:(plan.target_carb??'');
+  patientInfo.targetFat=approved?patientInfo.energy_target_fat:(plan.target_fat??'');
+  patientInfo.goal=plan.goal||'loss';
+  const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name,notes').eq('plan_id',plan.id).order('day_number',{ascending:true});
+  const ids=(dayRows||[]).map(x=>x.id);
+  let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
+  const mids=meals.map(x=>x.id); let items=[]; if(mids.length){const r=await sb.from('plan_items').select('id,meal_id,food_id,quantity_g,frequency,notes').in('meal_id',mids);items=r.data||[];}
+  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',isCollapsed:false,meals:meals.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:items.filter(i=>i.meal_id===m.id).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
+  savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
 }
 
 function getPlanFoodIds(){
@@ -562,7 +573,7 @@ async function savePlan(){
       id:planId,
       patient_id:window.currentPatientId||patientId,
       plan_name:'الخطة الغذائية باستخدام الجرامات',
-      start_date:new Date().toISOString().slice(0,10),
+      start_date:activePlanStartDate || new Date().toISOString().slice(0,10),
       target_calories:Number(patientInfo.targetCal)||null,
       target_protein:Number(patientInfo.targetPro)||null,
       target_carb:Number(patientInfo.targetCarb)||null,
