@@ -657,44 +657,100 @@ async function savePlan(){
 }
 
 function renderDays(){
- const container=document.getElementById('daysContainer');if(!container)return;
+ const container=document.getElementById('daysContainer');
+ if(!container)return;
+
  container.innerHTML=daysData.length?daysData.map((d,di)=>{
-   const calc=calculateDay(d),calPct=patientInfo.targetCal?Math.min(100,calc.cal/Number(patientInfo.targetCal)*100):0,proPct=patientInfo.targetPro?Math.min(100,calc.pro/Number(patientInfo.targetPro)*100):0,carbPct=patientInfo.targetCarb?Math.min(100,calc.carb/Number(patientInfo.targetCarb)*100):0,fatPct=patientInfo.targetFat?Math.min(100,calc.fat/Number(patientInfo.targetFat)*100):0;
-   return `<section class="day-card bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden" data-day-id="${escapeHtml(d.id)}">
-    <div class="flex items-center justify-between gap-3 p-4 border-b border-slate-100 bg-slate-50/60">
-     <div class="flex items-center gap-2 min-w-0"><button class="day-action-always text-slate-500" onclick="window.dietPlan.toggleDayCollapse('${escapeHtml(d.id)}')"><i class="fa-solid ${d.isCollapsed?'fa-chevron-down':'fa-chevron-up'}"></i></button><input value="${escapeHtml(d.title||`اليوم ${di+1}`)}" onchange="window.dietPlan.updateDayTitle('${escapeHtml(d.id)}',this.value)" class="font-black bg-transparent outline-none min-w-0"><span class="text-xs text-slate-400">${d.meals?.length||0} وجبات</span></div>
-     <div class="flex items-center gap-2"><button class="day-edit-btn bg-slate-900 text-white text-xs font-extrabold px-3 py-2 rounded-xl" onclick="window.dietPlan.editDay('${escapeHtml(d.id)}')">تعديل</button><button class="day-save-btn bg-emerald-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl" onclick="window.dietPlan.saveDay('${escapeHtml(d.id)}')">حفظ</button><button class="day-action-always bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-2 rounded-xl" onclick="window.dietPlan.duplicateDay('${escapeHtml(d.id)}')" title="نسخ اليوم"><i class="fa-regular fa-copy"></i> نسخ</button><button class="day-action-always text-rose-500 px-2" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')"><i class="fa-solid fa-trash"></i></button></div>
+  const calc=calculateDay(d);
+  const calPct=patientInfo.targetCal?Math.min(100,calc.cal/Number(patientInfo.targetCal)*100):0;
+  const proPct=patientInfo.targetPro?Math.min(100,calc.pro/Number(patientInfo.targetPro)*100):0;
+  const carbPct=patientInfo.targetCarb?Math.min(100,calc.carb/Number(patientInfo.targetCarb)*100):0;
+  const fatPct=patientInfo.targetFat?Math.min(100,calc.fat/Number(patientInfo.targetFat)*100):0;
+  const meals=d.meals||[];
+  const itemCount=meals.reduce((sum,meal)=>sum+(meal.items||[]).length,0);
+
+  return \`<section class="day-card bg-white border border-slate-200 rounded-2xl overflow-hidden" data-day-id="\${escapeHtml(d.id)}">
+   <header class="day-card-header">
+    <div class="day-card-heading">
+     <button type="button" class="day-collapse-btn day-action-always" onclick="window.dietPlan.toggleDayCollapse('\${escapeHtml(d.id)}')" aria-label="\${d.isCollapsed?'فتح':'طي'} اليوم">
+      <i class="fa-solid \${d.isCollapsed?'fa-chevron-down':'fa-chevron-up'}" aria-hidden="true"></i>
+     </button>
+     <div class="day-title-group">
+      <input value="\${escapeHtml(d.title||\`اليوم \${di+1}\`)}" onchange="window.dietPlan.updateDayTitle('\${escapeHtml(d.id)}',this.value)" aria-label="اسم اليوم" class="day-title-input">
+      <span class="day-card-meta">\${meals.length} وجبات <span>·</span> \${itemCount} أصناف</span>
+     </div>
     </div>
-    ${d.isCollapsed?'':`<div class="p-4 space-y-4">
-     <div class="day-metrics-strip grid grid-cols-4 sm:grid-cols-7 gap-1">
-      ${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
-      ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
-      ${metricCard('الكارب',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
-      ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
-      ${metricCard('Na',Math.round(calc.sod),'mg',null,0,'sky')}
-      ${metricCard('K',Math.round(calc.pot),'mg',null,0,'emerald')}
-      ${metricCard('P',Math.round(calc.pho),'mg',null,0,'slate')}
+    <div class="day-card-actions no-print">
+     <button type="button" class="day-edit-btn" onclick="window.dietPlan.editDay('\${escapeHtml(d.id)}')"><i class="fa-solid fa-pen" aria-hidden="true"></i><span>تعديل</span></button>
+     <button type="button" class="day-save-btn" onclick="window.dietPlan.saveDay('\${escapeHtml(d.id)}')"><i class="fa-solid fa-check" aria-hidden="true"></i><span>حفظ</span></button>
+     <button type="button" class="day-action-always day-copy-btn" onclick="window.dietPlan.duplicateDay('\${escapeHtml(d.id)}')" title="نسخ اليوم" aria-label="نسخ اليوم"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+     <button type="button" class="day-action-always day-delete-btn" onclick="window.dietPlan.deleteDay('\${escapeHtml(d.id)}')" title="حذف اليوم" aria-label="حذف اليوم"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+    </div>
+   </header>
+
+   \${d.isCollapsed?'':\`<div class="day-card-body">
+    <section class="day-summary" aria-label="ملخص القيمة الغذائية لليوم">
+     <div class="day-summary-heading"><strong>ملخص اليوم</strong><span>القيم المحسوبة من الأصناف المضافة</span></div>
+     <div class="day-macros-grid">
+      \${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
+      \${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
+      \${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
+      \${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
      </div>
-     <div class="flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center gap-2"><button onclick="window.dietPlan.openAddMealModal('${escapeHtml(d.id)}')" class="bg-sky-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة وجبة</button><button onclick="window.dietPlan.openFixedMeals('${escapeHtml(d.id)}')" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">تطبيق دايت ثابت</button></div>
-      <textarea rows="1" oninput="window.dietPlan.updateDayNotes('${escapeHtml(d.id)}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="ملاحظات اليوم" class="day-note-input flex-1 min-w-[220px] min-h-[38px] overflow-hidden resize-none bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs font-semibold leading-relaxed">${escapeHtml(d.notes||'')}</textarea>
+     <div class="day-micros-row" aria-label="المعادن">
+      <span><b>Na</b><strong>\${Math.round(calc.sod)}</strong><small>mg</small></span>
+      <span><b>K</b><strong>\${Math.round(calc.pot)}</strong><small>mg</small></span>
+      <span><b>P</b><strong>\${Math.round(calc.pho)}</strong><small>mg</small></span>
      </div>
-     ${(d.meals||[]).map((m,mi)=>`<div class="meal-card border border-slate-200 rounded-2xl overflow-hidden">
-      <div class="flex items-center justify-between gap-3 p-3 bg-slate-50"><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" class="font-black bg-transparent outline-none flex-1"><div class="flex items-center gap-2"><button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" class="text-slate-400"><i class="fa-solid fa-arrow-up"></i></button><button onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" class="text-slate-400"><i class="fa-solid fa-arrow-down"></i></button><button onclick="window.dietPlan.openFoodModal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="bg-emerald-600 text-white text-xs font-extrabold px-3 py-2 rounded-xl">إضافة صنف</button><button onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div>
-      <div class="overflow-x-auto"><table class="w-full text-[11px]"><thead><tr class="text-slate-400 border-b border-slate-100"><th class="py-2 px-2 text-right">الصنف</th><th class="py-2 px-2 text-center">الكمية</th><th class="py-2 px-2 text-center">المقياس</th><th class="py-2 px-2 text-center">التكرار</th><th class="py-2 px-2">ملاحظة</th><th class="py-2 px-2 text-center no-print">حساب</th></tr></thead>
-      <tbody>${m.items?.length?m.items.map(it=>{const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return'';return `<tr class="border-b border-slate-50 last:border-0"><td class="py-1.5 px-2 font-bold text-slate-800">${escapeHtml(f.name)}</td><td class="py-1.5 px-2 text-center"><input type="number" min="0" step="1" value="${num(it.grams)}" onchange="window.dietPlan.updateMealItemGrams('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" class="w-24 bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-1 text-center font-extrabold text-emerald-700"><span class="text-[9px] text-slate-400 mr-1">جم</span></td><td class="py-1.5 px-2 text-center text-emerald-700 font-bold">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td class="py-1.5 px-2 text-center"><input type="text" value="${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="7/7" class="w-20 bg-sky-50 border border-sky-200 rounded-lg px-2 py-1 text-center font-extrabold text-sky-700"></td><td class="py-1.5 px-2"><input type="text" value="${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="ملاحظة" class="w-full min-w-[120px] bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 text-right font-semibold text-amber-800" title="ملاحظة خاصة بهذا الصنف"></td><td class="py-1.5 px-2 text-center no-print whitespace-nowrap"><div class="inline-flex items-center justify-center gap-3"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)" class="w-4 h-4 cursor-pointer"><button onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></div></td></tr>`}).join(''):'<tr><td colspan="6" class="py-3 text-center text-slate-400 font-semibold">لا توجد أصناف مضافة لهذه الوجبة بعد</td></tr>'}</tbody>
-      </table></div>
-     </div>`).join('')}
-    </div>`}
-   </section>`;
- }).join(''):'<div class="text-center py-12 text-slate-400 font-bold">لا توجد أيام غذائية بعد. أضف يومًا جديدًا للبدء.</div>';
+    </section>
+
+    <section class="day-tools" aria-label="أدوات اليوم">
+     <div class="day-primary-actions no-print">
+      <button type="button" onclick="window.dietPlan.openAddMealModal('\${escapeHtml(d.id)}')" class="day-add-meal-btn"><i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة وجبة</button>
+      <button type="button" onclick="window.dietPlan.openFixedMeals('\${escapeHtml(d.id)}')" class="day-fixed-meal-btn"><i class="fa-solid fa-book-open" aria-hidden="true"></i> تطبيق دايت ثابت</button>
+     </div>
+     <label class="day-notes-wrap"><span>ملاحظات اليوم</span><textarea rows="1" oninput="window.dietPlan.updateDayNotes('\${escapeHtml(d.id)}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="أضف ملاحظة خاصة بهذا اليوم" class="day-note-input">\${escapeHtml(d.notes||'')}</textarea></label>
+    </section>
+
+    <section class="day-meals-list" aria-label="وجبات اليوم">
+     \${meals.map((m,mi)=>{
+      const foods=(m.items||[]).map(it=>({item:it,food:foodDatabase.find(x=>String(x.id)===String(it.foodId))})).filter(x=>x.food);
+      return \`<article class="meal-card">
+       <header class="meal-card-header">
+        <div class="meal-title-wrap"><span class="meal-order">\${String(mi+1).padStart(2,'0')}</span><input value="\${escapeHtml(m.name||\`وجبة \${mi+1}\`)}" onchange="window.dietPlan.updateMealName('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}',this.value)" aria-label="اسم الوجبة" class="meal-title-input"><span class="meal-items-count">\${foods.length} أصناف</span></div>
+        <div class="meal-card-actions no-print">
+         <button type="button" onclick="window.dietPlan.moveMeal('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}',-1)" \${mi===0?'disabled':''} class="meal-order-btn" title="تحريك لأعلى" aria-label="تحريك لأعلى"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+         <button type="button" onclick="window.dietPlan.moveMeal('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}',1)" \${mi===meals.length-1?'disabled':''} class="meal-order-btn" title="تحريك لأسفل" aria-label="تحريك لأسفل"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+         <button type="button" onclick="window.dietPlan.openFoodModal('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}')" class="meal-add-food-btn"><i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة صنف</button>
+         <button type="button" onclick="window.dietPlan.deleteMeal('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}')" class="meal-delete-btn" title="حذف الوجبة" aria-label="حذف الوجبة"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+        </div>
+       </header>
+       <div class="meal-table-wrap">
+        <table class="meal-items-table">
+         <thead><tr><th>الصنف</th><th>الكمية</th><th>المقياس المنزلي</th><th>التكرار</th><th>ملاحظة</th><th class="no-print">حساب</th></tr></thead>
+         <tbody>\${foods.length?foods.map(({item:it,food:f})=>\`<tr>
+          <td class="meal-food-name">\${escapeHtml(f.name)}</td>
+          <td class="meal-quantity"><input type="number" min="0" step="1" value="\${num(it.grams)}" onchange="window.dietPlan.updateMealItemGrams('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}','\${escapeHtml(it.itemId)}',this.value)" aria-label="الكمية بالجرام"><span>جم</span></td>
+          <td class="meal-household">\${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td>
+          <td><input type="text" value="\${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}','\${escapeHtml(it.itemId)}',this.value)" placeholder="7/7" aria-label="التكرار" class="meal-repeat-input"></td>
+          <td><input type="text" value="\${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}','\${escapeHtml(it.itemId)}',this.value)" placeholder="ملاحظة" aria-label="ملاحظة الصنف" class="meal-item-note"></td>
+          <td class="meal-calc-cell no-print"><input type="checkbox" \${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}','\${escapeHtml(it.itemId)}',this.checked)" aria-label="إدراج الصنف في الحساب"><button type="button" onclick="window.dietPlan.deleteFoodItemFromMeal('\${escapeHtml(d.id)}','\${escapeHtml(m.id)}','\${escapeHtml(it.itemId)}')" class="meal-item-delete" title="حذف الصنف" aria-label="حذف الصنف"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
+         </tr>\`).join(''):'<tr><td colspan="6" class="meal-empty-state">لا توجد أصناف في هذه الوجبة. استخدم «إضافة صنف» للبدء.</td></tr>'}</tbody>
+        </table>
+       </div>
+      </article>\`;
+     }).join('')}
+    </section>
+   </div>\`}
+  </section>\`;
+ }).join(''):'<div class="day-empty-state">لا توجد أيام غذائية بعد. أضف يومًا جديدًا للبدء.</div>';
+
  daysData.forEach(d=>setDayEditMode(d.id,!!dayEditModes[String(d.id)]));
  container.querySelectorAll('.day-note-input').forEach(el=>{
-   el.style.height='auto';
-   el.style.height=el.scrollHeight+'px';
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
  });
 }
-
 function openPrintSettingsModal(){
  const modal=document.getElementById('printSettingsModal');
  const pb=document.getElementById('executePrintBtn');
