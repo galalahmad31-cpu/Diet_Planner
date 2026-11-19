@@ -497,7 +497,7 @@
 
     const { data, error } = await supabase
       .from('nutrition_plans')
-      .select('id,patient_id,plan_name,start_date,target_calories,updated_at,created_at')
+      .select('id,patient_id,plan_name,start_date,updated_at,created_at')
       .eq('patient_id', patientId)
       .order('updated_at', { ascending: false })
       .order('created_at', { ascending: false });
@@ -517,7 +517,10 @@
     const planNumberById = new Map(
       [...data]
         .sort((a, b) => String(a.created_at || a.start_date || '').localeCompare(String(b.created_at || b.start_date || '')))
-        .map((plan, index) => [String(plan.id), index + 1])
+        .map((plan, index) => {
+          const savedNumber = /^الخطة\s+(\d+)/.exec(String(plan.plan_name || ''))?.[1];
+          return [String(plan.id), savedNumber ? Number(savedNumber) : index + 1];
+        })
     );
 
     data.forEach((plan) => {
@@ -660,10 +663,21 @@
       return;
     }
     if (state.isCreatingPlan || !patientId) return;
-
-    // Open the plan workspace without preselecting a type.
-    // The user chooses grams or exchanges from the module cards/tabs.
-    openPlanEmbedded(null, '');
+    state.isCreatingPlan = true;
+    updateWriteControls();
+    try {
+      const { data: planId, error } = await supabase.rpc('create_nutrition_plan', { p_patient_id: patientId });
+      if (error) throw error;
+      if (!planId) throw new Error('لم يتم استلام معرّف الخطة الجديدة.');
+      await loadNutritionPlans();
+      openPlanEmbedded(planId, '');
+    } catch (error) {
+      console.error('Create nutrition plan failed:', error);
+      await Swal.fire('تعذر إضافة الخطة', error.message || 'حدث خطأ أثناء إنشاء الخطة الغذائية.', 'error');
+    } finally {
+      state.isCreatingPlan = false;
+      updateWriteControls();
+    }
   }
 
   function fillPatientData() {
