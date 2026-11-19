@@ -20,8 +20,7 @@ header a{border:1px solid #29434d}
 .patient-name-bar{background:#fff;border:1px solid #e4edf0;border-radius:14px;padding:13px 17px;box-shadow:0 2px 10px rgba(20,45,60,.025)}
 #patientName{font-size:clamp(1.1rem,2.2vw,1.45rem)!important;font-weight:800;letter-spacing:0;color:#102a35;margin:0 0 5px!important;line-height:1.45}
 main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!important;box-shadow:0 3px 14px rgba(20,45,60,.025)!important}
-#modulesSection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
-#modulesSection .measurements-card{grid-column:1/-1}
+#modulesSection{display:block;width:100%;min-width:0;margin-top:12px!important}
 .dashboard-card{min-width:0;margin:0!important;padding:0!important;background:#fff;border:1px solid var(--dp-line);border-radius:14px;box-shadow:0 2px 9px rgba(20,45,60,.025);overflow:visible;transition:border-color .15s,box-shadow .15s}
 .dashboard-card:hover{border-color:#c4ddd6}
 .dashboard-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:76px;padding:12px;transition:background .15s}
@@ -52,9 +51,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #visitsList>div:hover{border-color:#b8d9d2!important}
 #writeAccessStatus,.access-note{display:none!important}
 
-@media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.measurements-card .measurements-direct{min-height:68px;height:68px;padding:10px}main{padding-inline:12px!important;padding-top:14px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.dashboard-details>summary{min-height:68px;padding:10px}.dashboard-panel{padding:10px}}
-@media(max-width:350px){#modulesSection{grid-template-columns:1fr}}
+@media(max-width:600px){.measurements-card .measurements-direct{min-height:68px;height:68px;padding:10px}main{padding-inline:12px!important;padding-top:14px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{display:block;width:100%;gap:0}.dashboard-details>summary{min-height:68px;padding:10px}.dashboard-panel{padding:10px}}
 
 /* Explicit visibility states for edit mode */
 #saveArea.hidden{display:none!important}
@@ -103,24 +100,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #modulesSection .plans-card .dashboard-details>summary:hover{filter:brightness(1.08)}
 .patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
 
-/* Direct measurements card navigation */
-.measurements-card .dashboard-card-direct-link{display:flex;align-items:center;gap:12px;width:100%;text-decoration:none;cursor:pointer}
-.measurements-card .dashboard-card-arrow{font-size:20px;font-weight:900;color:#bfdbfe;transition:transform .18s}
-.measurements-card .dashboard-card-direct-link:hover .dashboard-card-arrow{transform:translateX(-4px)}
-
-/* Restore original blue measurements card appearance; retain direct click */
-.measurements-card .measurements-direct{
- display:flex;align-items:center;gap:8px;width:100%;padding:12px;
- border-radius:13px;text-decoration:none;cursor:pointer;
- background:linear-gradient(135deg,#174c78,#287db2)!important;
- border:1px solid #246c9c;min-height:76px;height:76px
-}
-.measurements-card .measurements-direct .dashboard-card-head h3,
-.measurements-card .measurements-direct .dashboard-card-head p{color:#fff!important}
-.measurements-card .measurements-direct .dashboard-icon.blue{background:rgba(255,255,255,.17)!important;color:#fff!important}
-.measurements-card .measurements-direct .dashboard-card-arrow{color:#fff!important}
-.measurements-card .measurements-direct:hover{filter:brightness(1.06)}
-
 /* Finance modal mobile layout: two fields per row */
 @media screen and (max-width: 767px){
   #patientFinanceForm{
@@ -134,21 +113,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
   #patientFinanceForm input,#patientFinanceForm select{width:100%!important;min-width:0!important;box-sizing:border-box!important;font-size:12px!important;padding:8px 6px!important}
   #patientFinanceModal .finance-summary-box,#patientFinanceModal .patient-finance-actions{grid-column:1/-1!important}
 }
-
-
-/* Nutrition support direct card — warm amber palette, distinct from other modules. */
-.nutrition-support-card .measurements-direct{
- display:flex;align-items:center;gap:8px;width:100%;padding:12px;
- border-radius:13px;text-decoration:none;cursor:pointer;
- background:linear-gradient(120deg,#9a4d12,#d97706)!important;
- border:1px solid #b45309;min-height:76px;height:76px;box-sizing:border-box;
- transition:filter .15s,box-shadow .15s
-}
-.nutrition-support-card .measurements-direct .dashboard-card-head h3,
-.nutrition-support-card .measurements-direct .dashboard-card-head p{color:#fff!important}
-.nutrition-support-card .nutrition-support-icon{background:rgba(255,255,255,.2)!important;color:#fff!important}
-.nutrition-support-card .measurements-direct .dashboard-card-arrow{color:#fff!important}
-.nutrition-support-card .measurements-direct:hover{filter:brightness(1.07);box-shadow:0 5px 16px rgba(154,77,18,.18)}
 
 
 /* Brief, non-blocking confirmation after saving patient finances */
@@ -267,39 +231,31 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 
 
-/* Inline measurements panel on the patient profile */
-.measurements-details{width:100%}
-.measurements-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none}
-.measurements-summary::-webkit-details-marker{display:none}
-.measurements-chevron{transition:transform .2s ease}
-.measurements-details[open] .measurements-chevron{transform:rotate(180deg)}
-.measurements-panel{padding:14px 16px 16px;border-top:1px solid #e8eef0}
-.measurements-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.measurements-access-status{margin:0;color:#64748b;font-size:11px;font-weight:700}
-.measurements-add-button{flex:0 0 auto;border:0;border-radius:10px;background:#059669;color:#fff;padding:9px 14px;font:800 11px Cairo,sans-serif;cursor:pointer}
-.measurements-add-button:hover{background:#047857}
-.measurements-add-button.is-disabled{opacity:.45;cursor:not-allowed}
-.measurements-state{padding:16px;text-align:center;color:#94a3b8;font-size:12px;font-weight:700}
-.measurements-error{color:#be123c}
-.measurements-table-wrap{width:100%;overflow-x:auto;border:1px solid #edf1f3;border-radius:12px}
-.measurements-table{width:100%;min-width:650px;border-collapse:collapse;text-align:center;font-family:Cairo,sans-serif}
-.measurements-table th{padding:10px 8px;background:#f8fafc;color:#64748b;font-size:10px;font-weight:900;white-space:nowrap}
-.measurements-table td{padding:10px 8px;border-top:1px solid #f1f5f9;color:#475569;font-size:11px;font-weight:700}
-.measurements-table .measurement-weight{color:#047857;font-weight:900}
-.measurement-delete-button{border:0;background:transparent;color:#f43f5e;padding:5px;cursor:pointer}
-.measurement-inline-actions{display:flex;gap:5px}
-.measurement-inline-actions button{border:0;border-radius:7px;padding:7px 8px;font:800 10px Cairo,sans-serif;cursor:pointer}
-.measurement-save{background:#059669;color:#fff}
-.measurement-cancel{background:#f1f5f9;color:#475569}
-.inline-measurement-row td{padding:6px 4px}
-.inline-measurement-row input,.inline-measurement-row select{width:100%;min-width:75px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px 5px;font:700 10px Cairo,sans-serif}
-@media(max-width:640px){.measurements-panel{padding:11px 9px}.measurements-toolbar{align-items:flex-start;flex-direction:column}.measurements-add-button{width:100%}.measurements-table{min-width:610px}}
 
-/* Keep the measurements summary visually consistent with its former blue card. */
-.measurements-card .measurements-summary{background:linear-gradient(135deg,#174c78,#287db2)!important;border:1px solid #246c9c;border-radius:13px;min-height:76px}
-.measurements-card .measurements-summary .dashboard-card-head h3,
-.measurements-card .measurements-summary .dashboard-card-head p,
-.measurements-card .measurements-summary .measurements-chevron{color:#fff!important}
-.measurements-card .measurements-summary .dashboard-icon.blue{background:rgba(255,255,255,.17)!important;color:#fff!important}
-.measurements-card .measurements-summary:hover{filter:brightness(1.06)}
-.measurements-card .measurements-details[open]>summary{background:linear-gradient(135deg,#174c78,#287db2)!important}
+/* Patient profile modules: three aligned tabs with one full-width workspace. */
+.patient-module-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin:0 0 12px}
+.patient-module-tab{display:flex;align-items:center;gap:10px;min-width:0;min-height:76px;padding:12px 14px;border:1px solid #dce7eb;border-radius:13px;background:#fff;color:#163541;text-align:right;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 2px 9px rgba(20,45,60,.025);transition:background .16s,border-color .16s,box-shadow .16s}
+.patient-module-tab-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.patient-module-tab-copy strong{font-size:12px;font-weight:900;line-height:1.5}
+.patient-module-tab-copy small{font-size:9px;font-weight:600;color:#82919a;line-height:1.45}
+.patient-module-tab .dashboard-icon{width:36px;height:36px;flex:0 0 36px}
+.patient-module-tab:hover{border-color:#9dc9bd;background:#f8fcfb}
+.patient-module-tab.is-active{border-color:#176b63;background:#eaf6f2;box-shadow:inset 0 0 0 1px #176b63,0 4px 12px rgba(23,107,99,.08)}
+.patient-module-tab.is-active .patient-module-tab-copy strong{color:#176b63}
+.patient-module-tab:focus-visible{outline:3px solid #8bd2c2;outline-offset:2px}
+.patient-module-panel{width:100%;min-width:0;background:#fff;border:1px solid #dfe9ec;border-radius:14px;box-shadow:0 3px 12px rgba(20,45,60,.035);overflow:hidden}
+.patient-module-panel[hidden]{display:none!important}
+.patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:16px}
+.patient-support-panel{padding:0}
+#nutritionSupportFrame{display:block;width:100%;height:900px;border:0;background:#f5f8f8}
+@media(max-width:680px){
+ .patient-module-tabs{gap:6px;margin-bottom:9px}
+ .patient-module-tab{min-height:66px;padding:8px 7px;gap:6px;justify-content:center;flex-direction:column;text-align:center;border-radius:11px}
+ .patient-module-tab .dashboard-icon{width:29px;height:29px;flex-basis:29px;font-size:13px;border-radius:8px}
+ .patient-module-tab-copy{gap:1px}
+ .patient-module-tab-copy strong{font-size:9px;line-height:1.4}
+ .patient-module-tab-copy small{font-size:7px;line-height:1.3}
+ .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:11px 9px}
+ #nutritionSupportFrame{min-height:760px}
+}
+@media(max-width:360px){.patient-module-tab{padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
