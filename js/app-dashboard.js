@@ -419,7 +419,7 @@
     elements.featureCards.forEach(card => {
       const href = (card.getAttribute("href") || "").split("?")[0];
       // Public pages should remain accessible to visitors.
-      if (href === "article.html" || href === "about.html" || href === "feedback.html") {
+      if (href === "article.html" || href === "about.html" || href === "feedback.html" || href === "quickcalc.html") {
         card.classList.remove("dp-feature-locked");
         card.removeAttribute("aria-disabled");
         card.removeAttribute("title");
