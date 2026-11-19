@@ -580,6 +580,7 @@
     url.searchParams.set('embed', '1');
     if (planId) url.searchParams.set('plan_id', planId);
     if (planType) url.searchParams.set('plan_type', planType);
+    if (!planId) url.searchParams.set('new_plan', '1');
 
     const key = planId || 'new';
     if (frame.dataset.planId !== key) {
