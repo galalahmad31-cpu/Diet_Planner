@@ -4,8 +4,8 @@
     dir="rtl"
     >
     <head>
-        <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-        <title>المقالات | Diet Planner
+        <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="description" content="مقالات علمية في التغذية العلاجية والتغذية الإكلينيكية، مراجعات مبنية على الأدلة وإرشادات عملية لأخصائيي التغذية."><meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="https://nutrition-3.vercel.app/article.html"><meta property="og:type" content="website"><meta property="og:title" content="مقالات التغذية العلاجية | Diet Planner"><meta property="og:description" content="مكتبة مفتوحة من المقالات العلمية في التغذية العلاجية والتغذية الإكلينيكية."><meta property="og:url" content="https://nutrition-3.vercel.app/article.html">
+        <title>مقالات التغذية العلاجية | Diet Planner
         </title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,15 +57,15 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <a href="app.html" class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600"><i class="fa-solid fa-arrow-right"></i>الرئيسية</a><button id="addBtn" class="flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white"><i class="fa-solid fa-plus"></i>إضافة مقال</button>
+                            <a href="/" class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600"><i class="fa-solid fa-arrow-right"></i>الرئيسية</a><a id="adminHomeLink" href="app.html" class="hidden flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600">لوحة العمل</a><button id="addBtn" type="button" class="hidden flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white"><i class="fa-solid fa-plus"></i>إضافة مقال</button>
                         </div>
                     </div>
                 </header>
                 <section class="article-hero mt-6 rounded-[28px] p-6 sm:p-9"><div class="relative z-10 max-w-3xl"><span class="article-kicker"><i class="fa-solid fa-book-open"></i> KNOWLEDGE HUB</span><h2 class="mt-4 text-2xl font-extrabold leading-relaxed sm:text-4xl">المعرفة العلمية، <span>في مكان واحد.</span></h2><p class="mt-3 max-w-2xl text-sm leading-8 sm:text-base">اقرأ، ابحث، واكتشف محتوى يساعدك على اتخاذ قرارات غذائية أكثر دقة.</p><div class="article-stats mt-5"><span><i class="fa-solid fa-layer-group"></i> مكتبة المقالات</span><span><i class="fa-solid fa-magnifying-glass"></i> بحث ذكي</span><span><i class="fa-solid fa-bookmark"></i> محتوى منظم</span></div></div><div class="article-hero-art"><i class="fa-solid fa-book-open"></i><span>SCIENCE<br> &amp; NUTRITION</span></div></section><section class="mt-5 glass rounded-3xl p-4 sm:p-5">
                     <div class="flex flex-col gap-3 sm:flex-row">
                         <div class="relative flex-1">
-                            <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="search" class="h-12 w-full rounded-2xl border border-slate-200 bg-white pr-11 pl-4 text-sm outline-none focus:border-brand-400" placeholder="ابحث عن موضوع، مقال، أو مؤلف...">
-                        </div><select id="filter" class="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold"><option value="all">كل المقالات</option><option value="public">المقالات العامة</option><option value="private">مقالاتي الخاصة</option></select>
+                            <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="search" type="search" class="h-12 w-full rounded-2xl border border-slate-200 bg-white pr-11 pl-4 text-sm outline-none focus:border-brand-400" placeholder="ابحث عن موضوع، مقال، أو مؤلف...">
+                        </div>
                     </div>
                 </section>
                 <section class="mt-6">
@@ -181,7 +181,7 @@
                                     <div class="text-xs text-slate-500">عام: يظهر للمستخدمين. خاص: يظهر لك فقط.
                                     </div>
                                 </div><label class="flex cursor-pointer items-center gap-3"><input id="public" type="checkbox"><span id="toggleText" class="text-sm font-bold">خاص</span></label>
-                            </div><label id="articleAccessWrap" class="hidden rounded-2xl border bg-slate-50 p-4"><span class="font-extrabold text-sm">نوع المحتوى المنشور</span><select id="articleAccess" class="mt-3 h-11 w-full rounded-xl border bg-white px-3 text-sm font-bold"><option value="">أساسي — متاح للباقة Basic</option><option value="article">متقدم — يحتاج Professional</option></select></label>
+                            </div>
                         </div>
                         <div class="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                             <button id="cancel" class="h-11 rounded-xl border px-5 font-bold">إلغاء</button><button id="save" class="h-11 rounded-xl bg-brand-600 px-6 font-bold text-white">حفظ المقال</button>
@@ -257,7 +257,7 @@
         <script src="js/auth-access.js?v=20261118-subscription-gate-v2">
 
         </script>
-        <script src="js/article.js">
+        <script src="js/article.js?v=20261119-public-articles-admin-only-v1">
 
         </script>
     </body>
