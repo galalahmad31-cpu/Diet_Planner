@@ -650,3 +650,70 @@ body{font-family:Cairo,Arial,sans-serif;background:radial-gradient(circle at 92%
 .patient-delete-cancel{background:#f1f5f9;color:#475569}
 .patient-delete-ok{background:#dc2626;color:#fff;box-shadow:0 5px 14px rgba(220,38,38,.2)}
 .patient-delete-ok:hover{background:#b91c1c}
+
+/* Nutrition Support main page: shared green header and swipe navigation */
+.ns-main-header{
+  position:relative;isolation:isolate;z-index:30;display:block;width:100%;max-width:none;
+  margin:0 0 20px!important;padding:0!important;overflow:hidden;border:0!important;
+  border-radius:24px!important;color:#fff!important;
+  background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%)!important;
+  box-shadow:0 14px 32px rgba(15,90,85,.16);
+}
+.ns-main-header:after{
+  content:"";position:absolute;z-index:-1;width:230px;height:230px;left:-65px;top:-125px;
+  border:35px solid rgba(255,255,255,.07);border-radius:50%;pointer-events:none;
+}
+.ns-main-header-inner{position:relative;z-index:1;width:100%;margin:0 auto;padding:12px 16px 10px;box-sizing:border-box}
+.ns-main-brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
+.ns-main-brand{display:flex;align-items:center;gap:13px;min-width:0}
+.ns-main-brand-logo{
+  display:grid;place-items:center;width:52px;height:52px;flex:0 0 52px;border-radius:15px;
+  color:#fff;background:rgba(255,255,255,.16);box-shadow:0 8px 22px rgba(0,0,0,.12);font-size:22px;
+}
+.ns-main-brand-copy h1{margin:0!important;color:#fff!important;font-size:20px!important;font-weight:900;line-height:1.3}
+.ns-main-brand-copy p{margin:3px 0 0!important;color:#bcebe0!important;font-size:11px;font-weight:800}
+.ns-main-page-label{
+  flex:0 0 auto;padding:6px 11px;border:1px solid rgba(255,255,255,.2);border-radius:999px;
+  background:rgba(255,255,255,.11);color:#e7fff8;font-size:10px;font-weight:800;white-space:nowrap;
+}
+.ns-main-access-nav{
+  display:block!important;position:relative;z-index:2;width:100%;max-width:none;margin:8px 0 0;
+  padding:8px 0 3px!important;background:transparent!important;border:0;
+  border-top:1px solid rgba(255,255,255,.16);overflow:hidden;box-sizing:border-box;
+}
+.ns-main-access-track{
+  display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;
+  gap:8px!important;width:100%;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 1px 5px!important;
+  direction:rtl;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+}
+.ns-main-access-track::-webkit-scrollbar{display:none!important}
+.ns-main-access-card{
+  display:inline-flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;
+  justify-content:center!important;gap:7px!important;min-width:max-content!important;min-height:36px!important;
+  padding:6px 12px!important;margin:0!important;border:1px solid rgba(255,255,255,.18)!important;
+  border-radius:11px!important;background:rgba(255,255,255,.10)!important;color:#e9fffa!important;
+  box-shadow:none!important;font-family:'Cairo',sans-serif!important;font-size:10px!important;font-weight:800!important;
+  line-height:1.3!important;text-decoration:none!important;white-space:nowrap!important;scroll-snap-align:start;
+  transition:background .16s ease,border-color .16s ease;
+}
+.ns-main-access-card i{display:inline-block!important;flex:0 0 auto!important;font-size:12px!important;line-height:1!important;color:#a9e7d9!important}
+.ns-main-access-card span{display:inline-block!important;font-size:inherit!important;line-height:inherit!important;white-space:nowrap!important}
+.ns-main-access-card:hover{background:rgba(255,255,255,.19)!important;border-color:rgba(255,255,255,.34)!important;color:#fff!important}
+.ns-main-access-card.active{background:#fff!important;border-color:#fff!important;color:#126b5d!important;box-shadow:0 3px 10px rgba(0,0,0,.10)!important}
+.ns-main-access-card.active i{color:#168879!important}
+.ns-main-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:700px){
+  .ns-main-header{border-radius:22px!important;margin-bottom:16px!important}
+  .ns-main-header-inner{padding:9px 10px 7px}
+  .ns-main-brand-row{min-height:48px}
+  .ns-main-brand{gap:10px}
+  .ns-main-brand-logo{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:18px}
+  .ns-main-brand-copy h1{font-size:18px!important}
+  .ns-main-brand-copy p{font-size:10px}
+  .ns-main-page-label{font-size:9px;padding:4px 8px}
+  .ns-main-access-nav{margin-top:7px;padding:7px 0 2px!important}
+  .ns-main-access-track{gap:7px!important}
+  .ns-main-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
+  .ns-main-access-card i{font-size:11px!important}
+}
+@media print{.ns-main-header{display:none!important}}
