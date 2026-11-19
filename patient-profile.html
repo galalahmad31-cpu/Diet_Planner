@@ -240,20 +240,20 @@
             <details id="followupDaysDetails" class="followup-days-details" open>
               <summary class="followup-days-summary">
                 <span class="followup-days-summary-copy">
-                  <strong id="followupDaysTitle">أيام المتابعة</strong>
-                  <small>عرض الخطط المسجلة وإخفاؤها</small>
+                  <strong id="followupDaysTitle">الخطط الغذائية</strong>
+                  <small>عرض الخطط الغذائية المسجلة</small>
                 </span>
                 <i class="fa-solid fa-chevron-down followup-days-toggle-icon" aria-hidden="true"></i>
               </summary>
-              <div id="visitsLoading" class="followup-state">جاري تحميل أيام المتابعة...</div>
-              <div id="visitsEmpty" class="followup-state" hidden>لا توجد أيام متابعة مسجلة لهذا المريض.</div>
+              <div id="visitsLoading" class="followup-state">جاري تحميل الخطط الغذائية...</div>
+              <div id="visitsEmpty" class="followup-state" hidden>لا توجد خطط غذائية مسجلة لهذا المريض.</div>
               <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
             </details>
-            <button type="button" id="addVisitButton" class="followup-add-button">＋ إضافة يوم</button>
+            <button type="button" id="addPlanButton" class="followup-add-button">＋ إضافة خطة</button>
           </div>
         </section>
-        <section id="visitEmbeddedPanel" class="visit-embedded-panel" aria-label="تفاصيل الخطة المحددة" hidden>
-<iframe id="visitFrame" title="تفاصيل الخطة الغذائية" loading="lazy" referrerpolicy="same-origin"></iframe>
+        <section id="visitEmbeddedPanel" class="visit-embedded-panel" aria-label="محرر الخطة الغذائية المحددة" hidden>
+<iframe id="visitFrame" title="محرر الخطط الغذائية" loading="lazy" referrerpolicy="same-origin"></iframe>
         </section>
       </div>
     </section>
