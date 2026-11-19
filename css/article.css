@@ -48,6 +48,10 @@
 #grid .article-card .cover-label{right:8px;bottom:4px;font-size:5px;letter-spacing:.8px}
 @media(max-width:640px){#grid .article-card .article-card-cover{height:42px!important;min-height:42px;padding:4px 6px!important}#grid .article-card .article-category{font-size:7px;padding:2px 5px}#grid .article-card .cover-symbol{width:26px;height:26px;left:10px;top:7px}#grid .article-card .cover-symbol i{font-size:13px}#grid .article-card .cover-label{font-size:4px;right:6px;bottom:3px}}
 
+/* Respect the HTML hidden state in the reader panel at every viewport. */
+#articleReaderPane #readerPlaceholder[hidden],
+#articleReaderPane #readerContent[hidden]{display:none!important}
+
 /* Accessible split-view article library */
 #articleWorkspace{min-height:460px}
 .article-list-item{position:relative;display:flex;align-items:center;gap:8px;min-width:0;padding:5px;border:1px solid #e5eeee;border-radius:16px;background:rgba(255,255,255,.92);transition:border-color .18s,background .18s,box-shadow .18s}
