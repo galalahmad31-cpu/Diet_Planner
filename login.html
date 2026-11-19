@@ -50,7 +50,7 @@
 <div id="signupOtpPanel" hidden>
   <div class="field">
     <label for="signupOtp">رمز التحقق المرسل إلى بريدك الإلكتروني</label>
-    <input id="signupOtp" name="one-time-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" aria-describedby="signupOtpEmail" style="text-align:center;direction:ltr;letter-spacing:8px;font-size:24px;font-weight:800;">
+    <input id="signupOtp" name="one-time-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" placeholder="00000000" aria-describedby="signupOtpEmail" style="text-align:center;direction:ltr;letter-spacing:8px;font-size:24px;font-weight:800;">
     <p id="signupOtpEmail" class="field-hint" style="direction:ltr;text-align:center;"></p>
   </div>
   <button id="verifySignupOtpButton" type="button" class="btn">تأكيد البريد الإلكتروني</button>
@@ -62,7 +62,7 @@
 <script>
 document.querySelectorAll("[data-toggle-password]").forEach(button=>button.addEventListener("click",()=>{const input=document.getElementById(button.dataset.togglePassword);const visible=input.type==="password";input.type=visible?"text":"password";button.innerHTML=visible?'<i class="fa-regular fa-eye-slash"></i>':'<i class="fa-regular fa-eye"></i>';button.setAttribute("aria-label",visible?"إخفاء كلمة المرور":"إظهار كلمة المرور")}));
 </script>
-<script src="js/auth-access.js?v=20261119-email-otp-v1"></script>
+<script src="js/auth-access.js?v=20261119-email-otp-v2"></script>
 
   
 </body>
