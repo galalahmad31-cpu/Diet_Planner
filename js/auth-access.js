@@ -431,7 +431,7 @@
       if (data?.user && !data.user.email_confirmed_at) {
         showOtpStep(email);
         showAuthMessage(
-          "تم إنشاء حسابك. أدخل رمز التحقق المرسل إلى بريدك الإلكتروني لإكمال التسجيل.",
+          "التحقق من البريد الإلكتروني\\nتم إنشاء حسابك بنجاح. أرسلنا رمز التحقق المكوّن من 8 أرقام إلى بريدك الإلكتروني.\\nإذا لم تجد الرسالة في صندوق الوارد (Inbox)، يُرجى مراجعة البريد غير المرغوب فيه (Spam أو Junk).",
           "success"
         );
         return;
@@ -458,7 +458,7 @@
       return;
     }
     if (!/^\d{8}$/.test(otp || "")) {
-      showAuthMessage("أدخل رمز التحقق المكوّن من 6 أرقام.");
+      showAuthMessage("أدخل رمز التحقق المكوّن من 8 أرقام.");
       return;
     }
 
@@ -517,7 +517,10 @@
         );
         return;
       }
-      showAuthMessage("تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.", "success");
+      showAuthMessage(
+        "التحقق من البريد الإلكتروني\\nتم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.\\nإذا لم تجده في صندوق الوارد (Inbox)، راجع مجلد البريد غير المرغوب فيه (Spam أو Junk).",
+        "success"
+      );
       document.getElementById("signupOtp")?.focus();
     } catch (error) {
       console.error("OTP resend failed:", error);
