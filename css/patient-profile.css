@@ -72,6 +72,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-details[open]>.patient-finance-summary{background:#faf9ff}
 .patient-finance-content{padding:14px 2px 4px;border-top:1px solid #edf1f4}
 .patient-finance-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.patient-finance-fields[hidden]{display:none!important}
 .patient-finance-fields>div{min-width:0}
 .patient-finance-fields input,.patient-finance-fields select{box-sizing:border-box;width:100%;min-width:0}
 .patient-finance-fields input:disabled,.patient-finance-fields select:disabled{background:#f4f7f8;color:#52636e;opacity:1}
