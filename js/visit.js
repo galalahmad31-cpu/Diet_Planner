@@ -67,7 +67,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20261119-numbered-plans-v3',
+      src: 'js/visit-diet-plan.js?v=20261119-auto-open-grams-v1',
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
