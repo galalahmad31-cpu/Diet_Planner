@@ -433,3 +433,112 @@ html.visit-embedded .visit-module-grid .module-card.module-active{
 html.visit-embedded .text-slate-400{color:#475569!important}
 html.visit-embedded .text-slate-500{color:#475569!important}
 html.visit-embedded .text-slate-300{color:#64748b!important}
+
+/* Daily diet plan layout: single visual hierarchy, scoped to day cards. */
+
+/* Daily diet plan layout: single visual hierarchy, scoped to day cards. */
+#daysContainer{display:grid;gap:16px}
+#daysContainer .day-card{border:1px solid #dbe4e8!important;border-radius:17px!important;background:#fff!important;box-shadow:0 3px 12px rgba(15,45,55,.045)!important}
+#daysContainer .day-card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;background:#f8fafb;border-bottom:1px solid #e8eef0}
+#daysContainer .day-card-heading{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+#daysContainer .day-collapse-btn{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border:1px solid #dce6e8;border-radius:9px;background:#fff;color:#47616a}
+#daysContainer .day-title-group{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+#daysContainer .day-title-input{min-width:90px;max-width:220px;padding:3px 0;border:0;border-bottom:1px solid transparent;background:transparent;color:#183b46;font-size:15px;font-weight:900;outline:none}
+#daysContainer .day-title-input:focus{border-bottom-color:#17836e}
+#daysContainer .day-card-meta{display:inline-flex;align-items:center;gap:5px;color:#647782;font-size:10px;font-weight:700;white-space:nowrap}
+#daysContainer .day-card-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+#daysContainer .day-card-actions button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:33px;padding:6px 10px;border:1px solid #dce6e8;border-radius:9px;background:#fff;color:#38515b;font-size:10px;font-weight:800}
+#daysContainer .day-card-actions .day-edit-btn{background:#edf3f5;border-color:#e1e9eb;color:#294650}
+#daysContainer .day-card-actions .day-save-btn{background:#16856d;border-color:#16856d;color:#fff}
+#daysContainer .day-card-actions .day-copy-btn{width:33px;padding:0;color:#526a73}
+#daysContainer .day-card-actions .day-delete-btn{width:33px;padding:0;border-color:#f1dddd;background:#fff8f8;color:#b45353}
+#daysContainer .day-card-actions button:disabled{opacity:.38;cursor:not-allowed}
+#daysContainer .day-card-body{display:grid;gap:14px;padding:15px}
+#daysContainer .day-summary{padding:12px;border:1px solid #e6edef;border-radius:13px;background:#fbfcfc}
+#daysContainer .day-summary-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
+#daysContainer .day-summary-heading strong{color:#23434d;font-size:12px;font-weight:900}
+#daysContainer .day-summary-heading span{color:#71828a;font-size:9px;font-weight:600}
+#daysContainer .day-macros-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#daysContainer .day-macros-grid>div{min-width:0;padding:9px 7px!important;border:1px solid #e5ecee!important;border-radius:10px!important;background:#fff!important;color:#28434c!important}
+#daysContainer .day-macros-grid>div>div:first-child{gap:3px!important;flex-wrap:wrap}
+#daysContainer .day-macros-grid>div span{color:#62747c!important}
+#daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{color:#183b46!important;font-size:15px!important;font-weight:900!important}
+#daysContainer .day-macros-grid>div>div:nth-child(2) span:last-child{color:#687c84!important}
+#daysContainer .day-macros-grid>div>div:last-child{background:#edf2f3!important}
+#daysContainer .day-micros-row{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid #e9eff0}
+#daysContainer .day-micros-row span{display:inline-flex;align-items:baseline;gap:4px;padding:4px 9px;border-radius:7px;background:#f1f5f6;color:#526872;font-size:10px}
+#daysContainer .day-micros-row b{color:#3e626c;font-size:9px}
+#daysContainer .day-micros-row strong{color:#203f49;font-size:11px;font-weight:900}
+#daysContainer .day-micros-row small{color:#687c84;font-size:8px}
+#daysContainer .day-tools{display:grid;grid-template-columns:auto minmax(220px,1fr);align-items:center;gap:12px}
+#daysContainer .day-primary-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#daysContainer .day-primary-actions button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:8px 12px;border-radius:9px;font-size:10px;font-weight:800}
+#daysContainer .day-add-meal-btn{border:1px solid #16856d;background:#16856d;color:#fff}
+#daysContainer .day-fixed-meal-btn{border:1px solid #dce6e8;background:#fff;color:#425e68}
+#daysContainer .day-notes-wrap{display:flex;align-items:center;gap:8px;min-width:0}
+#daysContainer .day-notes-wrap>span{flex:0 0 auto;color:#647780;font-size:9px;font-weight:800}
+#daysContainer .day-note-input{width:100%;min-width:0;min-height:36px;padding:8px 10px;border:1px solid #e2e9eb;border-radius:9px;background:#fff;color:#294650;font-size:10px;line-height:1.6;resize:vertical}
+#daysContainer .day-note-input::placeholder{color:#87969c}
+#daysContainer .day-meals-list{display:grid;gap:11px}
+#daysContainer .meal-card{min-width:0;overflow:hidden;border:1px solid #e2e9eb;border-radius:13px;background:#fff}
+#daysContainer .meal-card-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:#f7f9fa;border-bottom:1px solid #e8eef0}
+#daysContainer .meal-title-wrap{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+#daysContainer .meal-order{display:grid;place-items:center;width:25px;height:25px;flex:0 0 25px;border-radius:7px;background:#e8f3ef;color:#24715f;font-size:9px;font-weight:900}
+#daysContainer .meal-title-input{width:100%;min-width:70px;max-width:220px;border:0;background:transparent;color:#24444e;font-size:12px;font-weight:900;outline:none}
+#daysContainer .meal-title-input:focus{border-bottom:1px solid #16856d}
+#daysContainer .meal-items-count{flex:0 0 auto;color:#75858b;font-size:9px;font-weight:700}
+#daysContainer .meal-card-actions{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+#daysContainer .meal-card-actions button{display:grid;place-items:center;min-width:30px;height:30px;padding:0 8px;border:1px solid #e1e8ea;border-radius:8px;background:#fff;color:#5c7078;font-size:10px}
+#daysContainer .meal-card-actions button:disabled{opacity:.3;cursor:not-allowed}
+#daysContainer .meal-card-actions .meal-add-food-btn{display:inline-flex;align-items:center;gap:5px;padding:0 10px;border-color:#16856d;background:#16856d;color:#fff;font-weight:800}
+#daysContainer .meal-card-actions .meal-delete-btn{border-color:#f0dddd;background:#fffafa;color:#b65a5a}
+#daysContainer .meal-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#daysContainer .meal-items-table{width:100%;min-width:690px;border-collapse:collapse;font-size:10px}
+#daysContainer .meal-items-table th{padding:9px 8px;background:#fff;color:#60747c;text-align:center;font-size:9px;font-weight:800;white-space:nowrap}
+#daysContainer .meal-items-table th:first-child{text-align:right}
+#daysContainer .meal-items-table td{padding:8px;border-top:1px solid #edf1f2;color:#405861;vertical-align:middle}
+#daysContainer .meal-items-table .meal-food-name{min-width:145px;color:#203f49;font-weight:800}
+#daysContainer .meal-items-table input:not([type=checkbox]){width:100%;min-width:70px;min-height:31px;padding:5px 7px;border:1px solid #e2e9eb;border-radius:7px;background:#fff;color:#294650;font-size:10px}
+#daysContainer .meal-items-table .meal-quantity{min-width:100px;text-align:center;white-space:nowrap}
+#daysContainer .meal-items-table .meal-quantity input{width:65px!important;display:inline-block;text-align:center;font-weight:800}
+#daysContainer .meal-items-table .meal-quantity span{margin-inline-start:3px;color:#75858b;font-size:9px}
+#daysContainer .meal-items-table .meal-household{text-align:center;white-space:nowrap;color:#28745f;font-weight:800}
+#daysContainer .meal-items-table .meal-repeat-input{max-width:80px;text-align:center}
+#daysContainer .meal-items-table .meal-calc-cell{text-align:center;white-space:nowrap}
+#daysContainer .meal-items-table .meal-calc-cell input{width:15px;height:15px;vertical-align:middle;accent-color:#16856d}
+#daysContainer .meal-items-table .meal-item-delete{margin-inline-start:8px;color:#b65a5a}
+#daysContainer .meal-items-table .meal-empty-state{padding:18px;text-align:center;color:#71828a;font-size:10px}
+#daysContainer .day-empty-state{padding:32px 16px;border:1px dashed #cbd8dc;border-radius:14px;background:#fff;color:#60747c;text-align:center;font-size:12px;font-weight:800}
+@media(max-width:640px){
+ #daysContainer{gap:12px}
+ #daysContainer .day-card-header{align-items:flex-start;padding:10px;gap:8px}
+ #daysContainer .day-card-heading{gap:7px}
+ #daysContainer .day-title-group{gap:5px}
+ #daysContainer .day-title-input{max-width:125px;font-size:12px}
+ #daysContainer .day-card-meta{font-size:8px}
+ #daysContainer .day-card-actions{gap:4px}
+ #daysContainer .day-card-actions button{min-height:30px;padding:5px 7px;font-size:9px}
+ #daysContainer .day-card-actions .day-copy-btn,#daysContainer .day-card-actions .day-delete-btn{width:30px}
+ #daysContainer .day-card-actions button span{display:none}
+ #daysContainer .day-card-body{gap:11px;padding:10px}
+ #daysContainer .day-summary{padding:9px}
+ #daysContainer .day-summary-heading span{font-size:8px}
+ #daysContainer .day-macros-grid{gap:5px}
+ #daysContainer .day-macros-grid>div{padding:7px 4px!important}
+ #daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{font-size:13px!important}
+ #daysContainer .day-tools{grid-template-columns:1fr;gap:9px}
+ #daysContainer .day-primary-actions button{flex:1;min-height:34px;padding:7px 8px;font-size:9px}
+ #daysContainer .day-notes-wrap{align-items:flex-start;flex-direction:column;gap:4px}
+ #daysContainer .day-note-input{min-height:34px}
+ #daysContainer .meal-card-header{align-items:flex-start;flex-direction:column;gap:7px;padding:9px}
+ #daysContainer .meal-card-actions{width:100%;justify-content:flex-end}
+ #daysContainer .meal-title-input{max-width:none;font-size:11px}
+ #daysContainer .meal-items-count{font-size:8px}
+ #daysContainer .meal-card-actions button{min-width:29px;height:29px}
+ #daysContainer .meal-card-actions .meal-add-food-btn{flex:1;max-width:120px}
+ #daysContainer .meal-items-table{min-width:650px}
+}
+@media(max-width:360px){
+ #daysContainer .day-card-actions .day-copy-btn{display:none}
+ #daysContainer .day-macros-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
