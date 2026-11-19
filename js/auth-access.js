@@ -363,59 +363,171 @@
     await checkUserAccess(data?.session);
   }
 
+  let pendingSignupEmail = "";
+  let signupBusy = false;
+
+  function showOtpStep(email) {
+    const registerForm = document.getElementById("registerForm");
+    const fields = document.getElementById("registerFields");
+    const otpPanel = document.getElementById("signupOtpPanel");
+    const emailLabel = document.getElementById("signupOtpEmail");
+
+    pendingSignupEmail = email;
+    if (fields) fields.hidden = true;
+    if (otpPanel) otpPanel.hidden = false;
+    if (emailLabel) emailLabel.textContent = email;
+    if (registerForm) registerForm.dataset.step = "verify";
+    document.getElementById("signupOtp")?.focus();
+  }
+
+  function showRegistrationStep() {
+    const fields = document.getElementById("registerFields");
+    const otpPanel = document.getElementById("signupOtpPanel");
+    const registerForm = document.getElementById("registerForm");
+    if (fields) fields.hidden = false;
+    if (otpPanel) otpPanel.hidden = true;
+    if (registerForm) delete registerForm.dataset.step;
+    pendingSignupEmail = "";
+  }
+
   async function registerUser() {
-    const name =
-      document.getElementById("registerName")?.value.trim();
+    if (signupBusy) return;
 
-    const email =
-      document.getElementById("registerEmail")?.value.trim();
-
-    const password =
-      document.getElementById("registerPassword")?.value;
-
-    const button =
-      document.getElementById("registerButton");
+    const name = document.getElementById("registerName")?.value.trim();
+    const email = document.getElementById("registerEmail")?.value.trim().toLowerCase();
+    const password = document.getElementById("registerPassword")?.value;
+    const button = document.getElementById("registerButton");
 
     if (!name || !email || !password) {
       showAuthMessage("من فضلك أكمل جميع البيانات.");
       return;
     }
-
     if (!isStrongPassword(password)) {
       showAuthMessage(STRONG_PASSWORD_MESSAGE);
       return;
     }
 
+    signupBusy = true;
     setBusy(button, true, "إنشاء الحساب");
-
-    const { data, error } =
-      await supabaseClient.auth.signUp({
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            full_name: name
-          }
-        }
+        options: { data: { full_name: name } }
       });
 
-    setBusy(button, false, "إنشاء الحساب");
+      if (error) {
+        showAuthMessage(
+          error.message || "تعذر إنشاء الحساب حاليًا. حاول مرة أخرى."
+        );
+        return;
+      }
 
-    if (error) {
-      showAuthMessage(error.message);
-      return;
+      if (data?.session) {
+        await checkUserAccess(data.session);
+        return;
+      }
+
+      if (data?.user && !data.user.email_confirmed_at) {
+        showOtpStep(email);
+        showAuthMessage(
+          "تم إنشاء حسابك. أدخل رمز التحقق المرسل إلى بريدك الإلكتروني لإكمال التسجيل.",
+          "success"
+        );
+        return;
+      }
+
+      showAuthMessage("تعذر بدء التحقق من البريد الإلكتروني. حاول إعادة التسجيل أو تسجيل الدخول.");
+    } catch (error) {
+      console.error("Signup failed:", error);
+      showAuthMessage(error?.message || "حدث خطأ أثناء إنشاء الحساب.");
+    } finally {
+      signupBusy = false;
+      setBusy(button, false, "إنشاء الحساب");
     }
-
-    if (data?.session) {
-      await checkUserAccess(data.session);
-      return;
-    }
-
-    showAuthMessage(
-      "التحقق من البريد الإلكتروني\nتم إنشاء حسابك بنجاح. يرجى فتح رسالة التأكيد المرسلة إلى بريدك الإلكتروني والضغط على رابط التحقق. إذا لم تجد الرسالة في صندوق الوارد، فتفقّد قسم الرسائل غير المرغوب فيها (Spam). بعد تأكيد البريد، يمكنك تسجيل الدخول.",
-      "success"
-    );
   }
+
+  async function verifySignupOtp() {
+    if (signupBusy) return;
+    const otp = document.getElementById("signupOtp")?.value.trim();
+    const button = document.getElementById("verifySignupOtpButton");
+
+    if (!pendingSignupEmail) {
+      showAuthMessage("ابدأ إنشاء الحساب أولًا لإرسال رمز التحقق.");
+      showRegistrationStep();
+      return;
+    }
+    if (!/^\\d{6}$/.test(otp || "")) {
+      showAuthMessage("أدخل رمز التحقق المكوّن من 6 أرقام.");
+      return;
+    }
+
+    signupBusy = true;
+    setBusy(button, true, "جارٍ التحقق...");
+    try {
+      const { data, error } = await supabaseClient.auth.verifyOtp({
+        email: pendingSignupEmail,
+        token: otp,
+        type: "signup"
+      });
+
+      if (error) {
+        showAuthMessage(
+          error.message?.toLowerCase().includes("expired")
+            ? "انتهت صلاحية الرمز. اطلب إرسال رمز جديد."
+            : "رمز التحقق غير صحيح أو انتهت صلاحيته. راجع الرمز أو اطلب رمزًا جديدًا."
+        );
+        return;
+      }
+
+      if (!data?.session?.user) {
+        showAuthMessage("تم التحقق، لكن تعذر إنشاء جلسة الدخول. حاول تسجيل الدخول.");
+        return;
+      }
+
+      showAuthMessage("تم تأكيد بريدك الإلكتروني بنجاح.", "success");
+      await checkUserAccess(data.session);
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+      showAuthMessage("تعذر التحقق من الرمز حاليًا. حاول مرة أخرى.");
+    } finally {
+      signupBusy = false;
+      setBusy(button, false, "تأكيد البريد الإلكتروني");
+    }
+  }
+
+  async function resendSignupOtp() {
+    if (signupBusy) return;
+    if (!pendingSignupEmail) {
+      showAuthMessage("لا يوجد تسجيل قيد التحقق. ابدأ بإنشاء الحساب أولًا.");
+      return;
+    }
+
+    const button = document.getElementById("resendSignupOtpButton");
+    signupBusy = true;
+    setBusy(button, true, "جارٍ إعادة الإرسال...");
+    try {
+      const { error } = await supabaseClient.auth.resend({
+        type: "signup",
+        email: pendingSignupEmail
+      });
+      if (error) {
+        showAuthMessage(
+          error.message || "تعذر إعادة إرسال رمز التحقق. انتظر قليلًا ثم حاول مرة أخرى."
+        );
+        return;
+      }
+      showAuthMessage("تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.", "success");
+      document.getElementById("signupOtp")?.focus();
+    } catch (error) {
+      console.error("OTP resend failed:", error);
+      showAuthMessage("تعذر إعادة إرسال الرمز حاليًا. حاول مرة أخرى.");
+    } finally {
+      signupBusy = false;
+      setBusy(button, false, "إعادة إرسال الرمز");
+    }
+  }
+
 
   async function loginWithGoogle() {
     const button =
@@ -487,6 +599,24 @@
     document
       .getElementById("registerButton")
       ?.addEventListener("click", registerUser);
+    document
+      .getElementById("verifySignupOtpButton")
+      ?.addEventListener("click", verifySignupOtp);
+    document
+      .getElementById("resendSignupOtpButton")
+      ?.addEventListener("click", resendSignupOtp);
+    document
+      .getElementById("backToRegisterButton")
+      ?.addEventListener("click", () => {
+        showRegistrationStep();
+        const box = document.getElementById("authMessage");
+        if (box) box.style.display = "none";
+      });
+    document
+      .getElementById("signupOtp")
+      ?.addEventListener("input", (event) => {
+        event.target.value = event.target.value.replace(/\\D/g, "").slice(0, 6);
+      });
 
     document
       .getElementById("googleLoginButton")
