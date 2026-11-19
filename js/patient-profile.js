@@ -536,16 +536,10 @@
       number.textContent = String(planNumber);
       number.setAttribute('aria-label', 'الخطة رقم ' + planNumber);
 
-      const details = document.createElement('span');
-      details.className = 'followup-day-details';
       const title = document.createElement('strong');
+      title.className = 'followup-day-title';
       title.textContent = plan.plan_name || 'خطة غذائية';
-      const date = document.createElement('small');
-      date.className = 'followup-day-date';
-      const planDate = plan.start_date || (plan.created_at ? String(plan.created_at).slice(0, 10) : null);
-      date.textContent = 'الخطة رقم ' + planNumber + ' · ' + (planDate ? formatPlanDate(planDate) : 'بدون تاريخ');
-      details.append(title, date);
-      openButton.append(number, details);
+      openButton.append(number, title);
 
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
@@ -576,7 +570,7 @@
 
     panel.hidden = false;
     const details = $('followupDaysDetails');
-    if (details) details.open = false;
+    
     document.querySelectorAll('[data-open-plan]').forEach(button => {
       button.classList.toggle('is-active', button.dataset.openPlan === String(planId || ''));
     });
@@ -602,7 +596,7 @@
     const frame = $('planFrame');
     if (panel) panel.hidden = true;
     const details = $('followupDaysDetails');
-    if (details) details.open = true;
+    
     document.querySelectorAll('[data-open-plan]').forEach(button => button.classList.remove('is-active'));
     if (frame) frame.dataset.planId = '';
   }
@@ -735,7 +729,7 @@
 
     const details = $('patientDataDetails');
     const financeDetails = $('patientFinanceDetails');
-    if (details) details.open = true;
+    
 
     // Load finance before opening its disclosure to avoid a duplicate toggle-triggered request.
     const financeReady = await loadPatientFinance();
@@ -754,7 +748,7 @@
     void loadPatientFinance(true);
     const details = $('patientDataDetails');
     const financeDetails = $('patientFinanceDetails');
-    if (details) details.open = false;
+    
     if (financeDetails) financeDetails.open = false;
   }
 
