@@ -540,11 +540,6 @@ function bindStaticActions() {
       return;
     }
 
-    if (action === 'selectEnergyEquation') {
-      selectEnergyEquation(target.dataset.equation);
-      return;
-    }
-
     const fn = resolveAction(action);
     if (typeof fn === 'function') fn(event);
   });
