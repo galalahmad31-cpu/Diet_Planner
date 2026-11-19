@@ -588,7 +588,7 @@
       frame.style.height = '1px';
       frame.src = url.toString();
     }
-    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Keep the selected plan in place; do not auto-scroll the page.
   }
 
   function closePlanEmbedded() {
