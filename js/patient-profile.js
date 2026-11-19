@@ -209,7 +209,53 @@
       : date.toLocaleDateString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  function formatMeasurementDelta(value) {
+    if (!Number.isFinite(value)) return { value: '—', note: 'لا توجد بيانات كافية', trend: 'neutral' };
+    const rounded = Math.round(Math.abs(value) * 10) / 10;
+    if (Math.abs(value) < 0.05) return { value: '0.0 كجم', note: 'لا يوجد تغير', trend: 'neutral' };
+    return value > 0
+      ? { value: `+${rounded.toFixed(1)} كجم`, note: 'زيادة في الوزن', trend: 'up' }
+      : { value: `−${rounded.toFixed(1)} كجم`, note: 'انخفاض في الوزن', trend: 'down' };
+  }
+
+  function updateMeasurementSummary() {
+    const logs = measurementState.logs;
+    const overallValue = $('weightChangeOverall');
+    const overallNote = $('weightChangeOverallNote');
+    const recentValue = $('weightChangeRecent');
+    const recentNote = $('weightChangeRecentNote');
+    const bmiValue = $('latestMeasurementBmi');
+    const bmiNote = $('latestMeasurementBmiNote');
+    if (!overallValue || !overallNote || !recentValue || !recentNote || !bmiValue || !bmiNote) return;
+
+    const validLogs = logs.filter(log => Number.isFinite(log.weight) && log.weight > 0);
+    const first = validLogs[0];
+    const latest = validLogs[validLogs.length - 1];
+    const overall = first && latest ? formatMeasurementDelta(latest.weight - first.weight) : null;
+    overallValue.textContent = overall?.value || '—';
+    overallNote.textContent = overall ? (validLogs.length > 1 ? overall.note : 'هذا هو القياس المسجل الأول') : 'لا توجد قياسات مسجلة';
+    overallValue.dataset.trend = overall?.trend || 'neutral';
+
+    const previous = validLogs.length > 1 ? validLogs[validLogs.length - 2] : null;
+    const recent = previous && latest ? formatMeasurementDelta(latest.weight - previous.weight) : null;
+    recentValue.textContent = recent?.value || '—';
+    recentNote.textContent = recent ? recent.note : 'يلزم تسجيل قياسين على الأقل';
+    recentValue.dataset.trend = recent?.trend || 'neutral';
+
+    const heightCm = Number(state.patient?.height);
+    if (latest && Number.isFinite(heightCm) && heightCm > 0) {
+      const bmi = latest.weight / Math.pow(heightCm / 100, 2);
+      bmiValue.textContent = Number.isFinite(bmi) ? bmi.toFixed(1) : '—';
+      bmiNote.textContent = Number.isFinite(bmi) ? `بناءً على آخر وزن (${latest.weight.toFixed(1)} كجم)` : 'تعذر حساب المؤشر';
+    } else {
+      bmiValue.textContent = '—';
+      bmiNote.textContent = latest ? 'أدخل طول المريض في بياناته لحساب BMI' : 'لا يوجد وزن مسجل لحساب BMI';
+    }
+    bmiValue.dataset.trend = 'neutral';
+  }
+
   function renderMeasurements() {
+    updateMeasurementSummary();
     const body = $('weightTableBody');
     if (!body) return;
     if (!measurementState.logs.length) {
