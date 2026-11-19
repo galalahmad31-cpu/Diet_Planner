@@ -44,7 +44,7 @@
     <div class="feedback-layout">
       <section class="feedback-main-card glass overflow-hidden rounded-3xl shadow-sm">
         <div class="feedback-header bg-gradient-to-l from-brand-700 to-brand-500 px-5 py-5 text-white sm:px-7">
-          <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="feedback-header-inner">
             <div class="flex min-w-0 items-center gap-3">
               <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
                 <i class="fa-solid fa-star text-xl"></i>
@@ -80,15 +80,15 @@
               </div>
             </div>
 
-            <div class="mt-6">
+            <div class="feedback-submit-row mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <button id="saveFeedbackBtn" type="submit" class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-extrabold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-paper-plane"></i><span>إرسال التقييم</span></button>
+              <button id="deleteFeedbackBtn" type="button" class="hidden inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 text-sm font-extrabold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-trash"></i><span>حذف التقييم</span></button>
+            </div>
+
+            <div class="feedback-comment-section mt-6">
               <label for="feedbackComment" class="text-sm font-extrabold text-slate-800">رأيك وملاحظاتك</label>
               <textarea id="feedbackComment" maxlength="2000" rows="6" placeholder="اكتب رأيك في التطبيق أو أي ملاحظات تساعدنا على التطوير..." class="mt-2 w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"></textarea>
               <div class="mt-2 text-xs text-slate-400">الحد الأقصى 2000 حرف.</div>
-            </div>
-
-            <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <button id="saveFeedbackBtn" type="submit" class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-extrabold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-paper-plane"></i><span>إرسال التقييم</span></button>
-              <button id="deleteFeedbackBtn" type="button" class="hidden inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 text-sm font-extrabold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-trash"></i><span>حذف التقييم</span></button>
             </div>
           </form>
           <div id="feedbackStatus" class="hidden" role="status" aria-live="polite"></div>
@@ -101,8 +101,6 @@
             <a href="login.html" class="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-extrabold text-white transition hover:bg-brand-700"><i class="fa-solid fa-right-to-bracket"></i><span>تسجيل الدخول</span></a>
           </div>
         </div>
-      </section>
-
       </section>
 
       <section class="feedback-reviews-card mt-5 glass overflow-hidden rounded-3xl shadow-sm">
