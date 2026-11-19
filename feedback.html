@@ -28,7 +28,7 @@
       }
     };
   </script>
-  <link rel="stylesheet" href="css/feedback.css?v=20261119-mobile-row2">
+  <link rel="stylesheet" href="css/feedback.css?v=20261119-green-header-nav1">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -43,23 +43,36 @@
   <main id="feedbackPage" class="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
     <div class="feedback-layout">
       <section class="feedback-main-card glass overflow-hidden rounded-3xl shadow-sm">
-        <div class="feedback-header bg-gradient-to-l from-brand-700 to-brand-500 px-5 py-5 text-white sm:px-7">
-          <div class="feedback-header-inner">
-            <div class="feedback-heading flex min-w-0 items-center gap-3">
-              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                <i class="fa-solid fa-star text-xl"></i>
+        <div class="feedback-header feedback-branded-header">
+          <div class="feedback-brand-inner">
+            <div class="feedback-brand-row">
+              <div class="feedback-brand">
+                <div class="feedback-brand-logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></div>
+                <div class="feedback-brand-copy">
+                  <h1>Diet Planner</h1>
+                  <p>د. أحمد جلال</p>
+                </div>
               </div>
-              <div class="min-w-0">
-                <h1 class="text-xl font-extrabold">شاركنا رأيك</h1>
-                <p class="mt-1 text-xs leading-6 text-white/85">رأيك يساعدنا على تطوير Diet Planner وتحسين تجربتك.</p>
-              </div>
+              <span class="feedback-page-label">شاركنا رأيك</span>
             </div>
-            <a href="app.html" class="feedback-home-link inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/25 bg-white/15 px-4 text-sm font-bold text-white transition hover:bg-white/25">
-              <i class="fa-solid fa-house"></i><span>الرئيسية</span>
-            </a>
+            <nav class="feedback-access-nav" dir="rtl" aria-label="التنقل السريع">
+              <div class="feedback-access-track">
+                <a href="app.html" class="feedback-access-card"><i class="fa-solid fa-house" aria-hidden="true"></i><span>الرئيسية</span></a>
+                <a href="patient.html" class="feedback-access-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><span>قائمة المرضى</span></a>
+                <a href="food.html" class="feedback-access-card"><i class="fa-solid fa-apple-whole" aria-hidden="true"></i><span>مكتبة الأغذية</span></a>
+                <a href="products.html" class="feedback-access-card"><i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i><span>المنتجات الغذائية</span></a>
+                <a href="diet.html" class="feedback-access-card"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>مكتبة الدايت</span></a>
+                <a href="recipe.html" class="feedback-access-card"><i class="fa-solid fa-bowl-food" aria-hidden="true"></i><span>الوصفات الصحية</span></a>
+                <a href="quickcalc.html" class="feedback-access-card"><i class="fa-solid fa-calculator" aria-hidden="true"></i><span>الحاسبة السريعة</span></a>
+                <a href="finance.html" class="feedback-access-card"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span>اشتراكات المرضى</span></a>
+                <a href="article.html" class="feedback-access-card"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>المقالات</span></a>
+                <a href="profile.html" class="feedback-access-card"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i><span>الصفحة الشخصية وخطط الاشتراك</span></a>
+                <a href="feedback.html" class="feedback-access-card active" aria-current="page"><i class="fa-solid fa-star" aria-hidden="true"></i><span>شاركنا رأيك</span></a>
+                <a href="about.html" class="feedback-access-card"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>عن التطبيق</span></a>
+              </div>
+            </nav>
           </div>
         </div>
-
         <div id="feedbackComposerContent" class="px-6 py-7 sm:px-8">
           <form id="feedbackForm" class="mt-6">
             <input id="feedbackRating" type="hidden" value="">
