@@ -379,9 +379,8 @@ async function init(){
  const gram=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام الجرامات');
 
  /*
-  * The exchange plan uses the targets saved by calculator approval.
-  * Prefer its own saved targets, then fall back to the gram plan for
-  * older records where the exchange row exists without targets.
+  * Approved patient-level requirements are the single source of truth.
+  * Older visit plan targets remain a fallback for legacy records.
   */
  if(ex){
   S.t={
@@ -399,6 +398,16 @@ async function init(){
   };
  }else{
   S.t={cal:0,pro:0,carb:0,fat:0};
+ }
+
+ const approved=ctx().energyRequirements||{};
+ if(approved.energy_approved_at && n(approved.energy_target_calories)>0){
+  S.t={
+   cal:n(approved.energy_target_calories),
+   pro:n(approved.energy_target_protein),
+   carb:n(approved.energy_target_carb),
+   fat:n(approved.energy_target_fat)
+  };
  }
 
  if(ex && isUuid(ex.id)){
