@@ -66,6 +66,12 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 .day-delete{border:0;background:#dc2626;color:#fff;border-radius:8px;width:29px;height:29px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px}.day-delete:hover{background:#b91c1c}
 .day-empty{font-size:11px;color:#94a3b8;padding:4px 2px}
 
+@media(max-width:380px){
+  .days-toolbar{flex-wrap:wrap}
+  .days-add{width:100%;justify-content:flex-start}
+  .days-add input{flex-basis:120px;width:120px!important}
+}
+
 /* Main EN / TPN tabs */
 .support-tabs{margin:9px 18px 0;border:1px solid var(--line);border-radius:12px 12px 0 0;overflow:hidden;background:#fff;display:grid;grid-template-columns:1fr 1fr}
 .support-tab{border:0;background:#f7fafb;color:#64748b;padding:10px 9px;font:800 12px Cairo;cursor:pointer;transition:.18s;border-bottom:2px solid transparent}
