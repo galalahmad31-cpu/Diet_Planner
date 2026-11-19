@@ -245,6 +245,47 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 }
 
 .embedded-diet-plan{width:100%;}
+
+/* Diet-plan primary actions: one balanced row inside the nutrition-target card. */
+.visit-diet-actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  margin-top:12px;
+}
+.visit-diet-action-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-width:0;
+  min-height:42px;
+  padding:9px 16px;
+  border:1px solid transparent;
+  border-radius:12px;
+  color:#fff;
+  font-family:'Cairo',sans-serif;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.4;
+  white-space:nowrap;
+  box-shadow:0 2px 7px rgba(15,90,75,.12);
+  transition:background .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+.visit-diet-action-button:active{transform:translateY(1px)}
+.visit-diet-action-button:focus-visible{outline:3px solid rgba(22,133,109,.25);outline-offset:2px}
+.visit-diet-add-button{background:#16856d;border-color:#16856d}
+.visit-diet-add-button:hover{background:#126f5b}
+.visit-diet-print-button{background:#0f9674;border-color:#0f9674}
+.visit-diet-print-button:hover{background:#0c7f63}
+@media(max-width:640px){
+  .visit-diet-actions{gap:9px;margin-top:11px}
+  .visit-diet-action-button{flex:1;min-height:40px;padding:8px 9px;border-radius:10px;font-size:11px;gap:6px}
+  .visit-diet-action-button i{font-size:12px}
+}
+
 .embedded-diet-plan .print-only{display:none!important;}
 @media print{.embedded-diet-plan .print-only{display:block!important;}}
 
