@@ -584,11 +584,35 @@ async function savePlan(){
       );
     }
 
-    const planId=activeCloudPlanId || null;
+    const currentPatientId=window.currentPatientId||patientId;
+    let planId=activeCloudPlanId || null;
+
+    // Never send a stale plan id to the RPC. The database accepts an id only
+    // when it belongs to this patient and this exact plan type.
+    if(planId){
+      const {data:matchingPlan,error:matchingPlanError}=await sb
+        .from('nutrition_plans')
+        .select('id')
+        .eq('id',planId)
+        .eq('patient_id',currentPatientId)
+        .eq('plan_name','الخطة الغذائية باستخدام الجرامات')
+        .maybeSingle();
+
+      if(matchingPlanError)throw matchingPlanError;
+      if(!matchingPlan){
+        if(isNewPlan){
+          // A new-plan session must not inherit an id from an earlier iframe state.
+          activeCloudPlanId=null;
+          planId=null;
+        }else{
+          throw new Error('معرّف الخطة لا يطابق المريض أو نوع الخطة الحالي. أعد فتح الخطة من شريط الخطط قبل الحفظ؛ لم يتم تغيير بيانات قاعدة البيانات.');
+        }
+      }
+    }
 
     const planData={
       id:planId,
-      patient_id:window.currentPatientId||patientId,
+      patient_id:currentPatientId,
       plan_name:'الخطة الغذائية باستخدام الجرامات',
       start_date:activePlanStartDate || new Date().toISOString().slice(0,10),
       target_calories:Number(patientInfo.targetCal)||null,
