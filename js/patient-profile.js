@@ -166,12 +166,6 @@
     state.patient = data;
     fillPatientData();
     setLink('financeLink', 'finance.html');
-    const nutritionSupportLink = $('nutritionSupportLink');
-    if (nutritionSupportLink && data.id) {
-      // Keep the destination bound to the loaded patient, not to a stale/legacy URL.
-      nutritionSupportLink.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(data.id)}`;
-      nutritionSupportLink.dataset.patientId = data.id;
-    }
 
     // Reveal the loaded patient immediately. Access checks and secondary modules
     // run afterward and cannot block the main patient record.
@@ -915,18 +909,57 @@
     toast.dismissTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1800);
   }
 
-  function bindEvents() {
-    $('nutritionSupportLink')?.addEventListener('click', (event) => {
-      const id = state.patient?.id || event.currentTarget?.dataset?.patientId || patientId;
-      if (!id) {
-        event.preventDefault();
-        alert('تعذر فتح الدعم الغذائي: لم يتم تحديد ملف المريض.');
-        return;
+  function activatePatientModule(moduleName) {
+    const modules = {
+      measurements: { tab: 'measurementsTab', panel: 'measurementsPanel' },
+      plans: { tab: 'plansTab', panel: 'plansPanel' },
+      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' }
+    };
+    if (!modules[moduleName]) return;
+
+    Object.entries(modules).forEach(([name, refs]) => {
+      const active = name === moduleName;
+      const tab = $(refs.tab);
+      const panel = $(refs.panel);
+      if (tab) {
+        tab.classList.toggle('is-active', active);
+        tab.setAttribute('aria-selected', String(active));
+        tab.setAttribute('tabindex', active ? '0' : '-1');
       }
-      event.preventDefault();
-      try { sessionStorage.setItem('dpNutritionSupportPatientId', id); } catch (_) {}
-      window.location.href = `nutritionsupport-patient.html?patient=${encodeURIComponent(id)}`;
+      if (panel) panel.hidden = !active;
     });
+
+    if (moduleName === 'measurements') void loadMeasurements();
+    if (moduleName === 'plans') void loadVisits();
+    if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
+  }
+
+  function loadNutritionSupportFrame() {
+    const frame = $('nutritionSupportFrame');
+    const id = state.patient?.id || patientId;
+    if (!frame || !id || frame.dataset.loaded === 'true') return;
+    try { sessionStorage.setItem('dpNutritionSupportPatientId', id); } catch (_) {}
+    frame.src = `nutritionsupport-patient.html?patient=${encodeURIComponent(id)}&embed=1`;
+    frame.dataset.loaded = 'true';
+  }
+
+  function bindPatientModuleTabs() {
+    document.querySelectorAll('[data-module]').forEach((tab) => {
+      tab.addEventListener('click', () => activatePatientModule(tab.dataset.module));
+    });
+    window.addEventListener('message', (event) => {
+      if (event.origin !== window.location.origin || event.data?.type !== 'dp-nsp-embed-height') return;
+      const frame = $('nutritionSupportFrame');
+      if (frame && event.source === frame.contentWindow) {
+        const height = Number(event.data.height);
+        if (Number.isFinite(height)) frame.style.height = `${Math.max(700, Math.min(height + 24, 12000))}px`;
+      }
+    });
+    activatePatientModule('measurements');
+  }
+
+  function bindEvents() {
+    bindPatientModuleTabs();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
       event.preventDefault();
@@ -937,9 +970,6 @@
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     $('addVisitButton')?.addEventListener('click', addVisit);
-    $('measurementsDetails')?.addEventListener('toggle', (event) => {
-      if (event.currentTarget.open) void loadMeasurements();
-    });
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableBody')?.addEventListener('click', (event) => {
       const save = event.target.closest('[data-measurement-save]');
