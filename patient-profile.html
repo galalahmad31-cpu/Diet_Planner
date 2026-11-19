@@ -13,10 +13,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
-  <script src="js/patient-profile.js?v=20261119-no-followup-arrow-v1" defer></script>
+  <script src="js/patient-profile.js?v=20261119-remove-embedded-heading-v1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-no-followup-arrow-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-remove-embedded-heading-v1">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -236,11 +236,7 @@
           </div>
         </section>
         <section id="visitEmbeddedPanel" class="visit-embedded-panel" aria-label="تفاصيل الخطة المحددة" hidden>
-          <div class="visit-embedded-heading">
-            <strong id="activeVisitTitle">تفاصيل الخطة</strong>
-            <button type="button" id="closeVisitFrameBtn">العودة لأيام المتابعة</button>
-          </div>
-          <iframe id="visitFrame" title="تفاصيل الخطة الغذائية" loading="lazy" referrerpolicy="same-origin"></iframe>
+<iframe id="visitFrame" title="تفاصيل الخطة الغذائية" loading="lazy" referrerpolicy="same-origin"></iframe>
         </section>
       </div>
     </section>
