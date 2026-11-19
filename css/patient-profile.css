@@ -260,28 +260,47 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 @media(max-width:360px){.patient-module-tab{padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
 
-/* Measurement history table inside the full-width patient module panel. */
-.measurements-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.measurements-access-status{margin:0;color:#64748b;font-size:11px;font-weight:700}
-.measurements-add-button{flex:0 0 auto;border:0;border-radius:10px;background:#059669;color:#fff;padding:9px 14px;font:800 11px Cairo,sans-serif;cursor:pointer}
+/* Measurement history: one semantic, readable table in the patient workspace. */
+.measurements-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.measurements-access-status{margin:0;color:#64748b;font-size:11px;font-weight:700;line-height:1.7}
+.measurements-add-button{flex:0 0 auto;border:0;border-radius:10px;background:#059669;color:#fff;padding:9px 16px;font:800 11px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
 .measurements-add-button:hover{background:#047857}
+.measurements-add-button:focus-visible,.measurement-delete-button:focus-visible{outline:3px solid #8bd2c2;outline-offset:2px}
 .measurements-add-button.is-disabled{opacity:.45;cursor:not-allowed}
-.measurements-state{padding:16px;text-align:center;color:#94a3b8;font-size:12px;font-weight:700}
-.measurements-error{color:#be123c}
-.measurements-table-wrap{width:100%;overflow-x:auto;border:1px solid #edf1f3;border-radius:12px}
-.measurements-table{width:100%;min-width:650px;border-collapse:collapse;text-align:center;font-family:Cairo,sans-serif}
-.measurements-table th{padding:10px 8px;background:#f8fafc;color:#64748b;font-size:10px;font-weight:900;white-space:nowrap}
-.measurements-table td{padding:10px 8px;border-top:1px solid #f1f5f9;color:#475569;font-size:11px;font-weight:700}
-.measurements-table .measurement-weight{color:#047857;font-weight:900}
-.measurement-delete-button{border:0;background:transparent;color:#f43f5e;padding:5px;cursor:pointer}
-.measurement-inline-actions{display:flex;gap:5px}
-.measurement-inline-actions button{border:0;border-radius:7px;padding:7px 8px;font:800 10px Cairo,sans-serif;cursor:pointer}
+.measurements-table-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
+.measurements-table-heading h3{margin:0;color:#163541;font-size:13px;font-weight:900}
+.measurements-table-heading p{margin:3px 0 0;color:#82919a;font-size:9px;font-weight:600}
+.measurements-table-unit{padding:5px 9px;border-radius:7px;background:#eef6f4;color:#176b63;font-size:9px;font-weight:800;white-space:nowrap}
+.measurements-state{padding:18px 12px!important;text-align:center;color:#94a3b8!important;font-size:11px!important;font-weight:700!important}
+.measurements-error{color:#be123c!important}
+.measurements-table-wrap{width:100%;max-width:100%;overflow-x:auto;border:1px solid #e5edf0;border-radius:11px;background:#fff;overscroll-behavior-inline:contain}
+.measurements-table-wrap:focus-visible{outline:3px solid #8bd2c2;outline-offset:2px}
+.measurements-table{width:100%;min-width:680px;border-collapse:separate;border-spacing:0;table-layout:fixed;text-align:center;font-family:'Cairo',sans-serif}
+.measurements-table th{padding:11px 8px;background:#f1f7f6;color:#526873;font-size:10px;font-weight:900;white-space:nowrap;border-bottom:1px solid #dfe9e8}
+.measurements-table th:first-child{width:17%}
+.measurements-table th:nth-child(2){width:15%}
+.measurements-table th:nth-child(3),.measurements-table th:nth-child(4){width:17%}
+.measurements-table th:nth-child(5){width:21%}
+.measurements-table th:last-child{width:13%}
+.measurements-table th span{color:#82919a;font-size:9px;font-weight:700}
+.measurements-table td{padding:10px 8px;border-bottom:1px solid #edf2f4;color:#475569;font-size:10px;font-weight:700;line-height:1.6;vertical-align:middle}
+.measurements-table tbody tr:last-child td{border-bottom:0}
+.measurements-table tbody tr:nth-child(even){background:#fbfdfd}
+.measurements-table tbody tr:hover{background:#f3faf7}
+.measurements-table .measurement-weight{color:#047857;font-weight:900;font-size:11px;font-variant-numeric:tabular-nums}
+.measurements-table td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+.measurement-delete-button{width:30px;height:30px;border:1px solid #fee2e2;border-radius:8px;background:#fff7f7;color:#e11d48;cursor:pointer}
+.measurement-delete-button:hover{background:#ffe4e6}
+.measurement-inline-actions{display:flex;justify-content:center;gap:5px}
+.measurement-inline-actions button{border:0;border-radius:7px;padding:7px 9px;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
 .measurement-save{background:#059669;color:#fff}
 .measurement-cancel{background:#f1f5f9;color:#475569}
-.inline-measurement-row td{padding:6px 4px}
-.inline-measurement-row input,.inline-measurement-row select{width:100%;min-width:75px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px 5px;font:700 10px Cairo,sans-serif}
+.inline-measurement-row{background:#f0faf6!important}
+.inline-measurement-row td{padding:7px 4px}
+.inline-measurement-row input,.inline-measurement-row select{width:100%;min-width:0;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:8px 5px;font:700 10px Cairo,sans-serif}
 @media(max-width:640px){
- .measurements-toolbar{align-items:flex-start;flex-direction:column}
+ .measurements-toolbar{align-items:stretch;flex-direction:column;gap:8px}
  .measurements-add-button{width:100%}
- .measurements-table{min-width:610px}
+ .measurements-table-heading{align-items:flex-start}
+ .measurements-table{min-width:680px}
 }
