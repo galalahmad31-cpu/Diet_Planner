@@ -688,8 +688,18 @@
     if (!patientId || !supabase) return;
 
     if (!state.user) {
-      state.user = await access?.getCurrentUser?.();
-      if (state.user) void refreshWriteAccess();
+      try {
+        state.user = await access?.getCurrentUser?.();
+        if (state.user) void refreshWriteAccess();
+      } catch (sessionError) {
+        console.error('Patient finance session lookup failed:', sessionError);
+        const errorBox = $('patientFinanceError');
+        if (errorBox) {
+          errorBox.textContent = 'تعذر التحقق من جلسة تسجيل الدخول. أعد تحميل الصفحة وحاول مرة أخرى.';
+          errorBox.hidden = false;
+        }
+        return;
+      }
     }
     if (!state.user?.id) {
       const errorBox = $('patientFinanceError');
