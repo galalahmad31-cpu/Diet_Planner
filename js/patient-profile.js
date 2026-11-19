@@ -309,7 +309,25 @@
     if (!date || !Number.isFinite(weight) || weight <= 0 ||
         (waistRaw !== '' && (!Number.isFinite(waist) || waist <= 0)) ||
         (hipRaw !== '' && (!Number.isFinite(hip) || hip <= 0))) {
-      alert('راجع التاريخ والوزن والقياسات المدخلة.');
+      if (window.Swal && typeof window.Swal.fire === 'function') {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'راجع بيانات القياس',
+          text: 'تأكد من إدخال تاريخ القياس والوزن بصورة صحيحة، وراجع قيم محيط الوسط والأرداف إذا أدخلتها.',
+          confirmButtonText: 'حسنًا',
+          buttonsStyling: false,
+          customClass: {
+            popup: 'patient-measurement-swal',
+            title: 'patient-measurement-swal-title',
+            htmlContainer: 'patient-measurement-swal-text',
+            confirmButton: 'patient-measurement-swal-confirm'
+          },
+          allowOutsideClick: true,
+          heightAuto: false
+        });
+      } else {
+        alert('راجع بيانات القياس: تأكد من التاريخ والوزن والقياسات المدخلة.');
+      }
       return;
     }
     const saveButton = document.querySelector('[data-measurement-save]');
