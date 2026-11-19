@@ -13,10 +13,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
-  <script src="js/patient-profile.js?v=20261119-numbered-plans-v1" defer></script>
+  <script src="js/patient-profile.js?v=20261119-patient-finance-dates-v1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-plan-toolbar-v5">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-patient-finance-dates-v1">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -100,10 +100,13 @@
                 <div id="patientFinanceForm" class="patient-fields patient-finance-fields">
                   <div><label for="pfInputStart">بداية الاشتراك</label><input id="pfInputStart" type="date" disabled></div>
                   <div><label for="pfInputMonths">مدة الاشتراك (شهر)</label><input id="pfInputMonths" type="number" min="1" step="1" disabled></div>
+                  <div class="patient-finance-readonly"><label>تاريخ انتهاء الاشتراك</label><output id="pfInputEndDate">—</output></div>
                   <div><label for="pfInputAmount">قيمة الاشتراك (جنيه)</label><input id="pfInputAmount" type="number" min="0" step="0.01" disabled></div>
                   <div><label for="pfInputDiscount">نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0" disabled></div>
                   <div class="patient-finance-discounted"><label>قيمة الاشتراك بعد الخصم</label><output id="pfInputDiscountedPreview">—</output></div>
                   <div><label for="pfInputPaid">حالة السداد</label><select id="pfInputPaid" disabled><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
+                  <div><label for="pfInputLastVisit">آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date" disabled></div>
+                  <div><label for="pfInputNextFollowUp">موعد المتابعة القادم</label><input id="pfInputNextFollowUp" type="date" disabled></div>
 
                 </div>
                 <div id="patientFinanceError" class="patient-finance-error" role="alert" hidden></div>
