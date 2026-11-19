@@ -69,14 +69,19 @@ async function loadPatient(){
   window.currentPatientId=patientId;
 
   patientInfo={
-   id:patientId,
-   name:document.getElementById('patientName')?.textContent||'',
-   targetCal:'',
-   targetPro:'',
-   targetCarb:'',
-   targetFat:'',
-   goal:'loss'
-  };
+    id:patientId,
+    name:document.getElementById('patientName')?.textContent||'',
+    targetCal:pageContext.energyRequirements?.energy_target_calories??'',
+    targetPro:pageContext.energyRequirements?.energy_target_protein??'',
+    targetCarb:pageContext.energyRequirements?.energy_target_carb??'',
+    targetFat:pageContext.energyRequirements?.energy_target_fat??'',
+    energy_approved_at:pageContext.energyRequirements?.energy_approved_at??null,
+    energy_target_calories:pageContext.energyRequirements?.energy_target_calories??null,
+    energy_target_protein:pageContext.energyRequirements?.energy_target_protein??null,
+    energy_target_carb:pageContext.energyRequirements?.energy_target_carb??null,
+    energy_target_fat:pageContext.energyRequirements?.energy_target_fat??null,
+    goal:'loss'
+   };
   return true;
  }
 
@@ -168,7 +173,12 @@ async function loadPlan(shouldRender=true){
  const plan=plans?.[0];
  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;updateTargets();if(shouldRender)renderDays();return;}
  activeCloudPlanId=plan.id;
- patientInfo.targetCal=plan.target_calories??''; patientInfo.targetPro=plan.target_protein??''; patientInfo.targetCarb=plan.target_carb??''; patientInfo.targetFat=plan.target_fat??''; patientInfo.goal=plan.goal||'loss';
+ const approved=Number(patientInfo.energy_target_calories)>0 && !!patientInfo.energy_approved_at;
+ patientInfo.targetCal=approved?patientInfo.energy_target_calories:(plan.target_calories??'');
+ patientInfo.targetPro=approved?patientInfo.energy_target_protein:(plan.target_protein??'');
+ patientInfo.targetCarb=approved?patientInfo.energy_target_carb:(plan.target_carb??'');
+ patientInfo.targetFat=approved?patientInfo.energy_target_fat:(plan.target_fat??'');
+ patientInfo.goal=plan.goal||'loss';
  const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name,notes').eq('plan_id',plan.id).order('day_number',{ascending:true});
  const ids=(dayRows||[]).map(x=>x.id);
  let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
