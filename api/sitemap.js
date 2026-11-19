@@ -3,7 +3,7 @@ const SUPABASE_KEY = 'sb_publishable_A6u5kWAdL60bYpz1wRyv6w_J2p896iY';
 module.exports = async function handler(req, res) {
   try {
     const response = await fetch(SUPABASE_URL + '/rest/v1/articles?select=id,updated_at&visibility=eq.public&order=updated_at.desc', {
-      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+      headers: { apikey: SUPABASE_KEY }
     });
     if (!response.ok) throw new Error('Article sitemap query failed: ' + response.status);
     const articles = await response.json();
