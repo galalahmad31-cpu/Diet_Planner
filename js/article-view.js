@@ -34,6 +34,12 @@ function setArticleSchema(a,url){
  document.head.appendChild(script);
 }
 (async()=>{
+ const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
+ const isAuthenticated=accessStatus?.authenticated===true && !!accessStatus?.user;
+ if(isAuthenticated){
+  $('guestStartLink')?.remove();
+  $('articleGuestCta')?.remove();
+ }
  const id=new URLSearchParams(location.search).get('id');
  if(!client||!id||!/^[0-9a-f-]{36}$/i.test(id)){ $('articleLoading').hidden=true;$('articleError').hidden=false;setMeta('robots','noindex,follow');return}
  try{
