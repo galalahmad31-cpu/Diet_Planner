@@ -64,7 +64,7 @@
     const canWrite = state.isAdmin || state.hasActiveSubscription;
 
     const editButton = $('editButton');
-    const addVisitButton = $('addPlanButton');
+    const addPlanButton = $('addPlanButton');
     updateMeasurementWriteAccess();
     updatePatientFinanceWriteAccess();
 
@@ -77,11 +77,11 @@
         : 'تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط';
     }
 
-    if (addVisitButton) {
-      addVisitButton.disabled = !canWrite;
-      addVisitButton.classList.toggle('opacity-50', !canWrite);
-      addVisitButton.classList.toggle('cursor-not-allowed', !canWrite);
-      addVisitButton.title = canWrite
+    if (addPlanButton) {
+      addPlanButton.disabled = !canWrite;
+      addPlanButton.classList.toggle('opacity-50', !canWrite);
+      addPlanButton.classList.toggle('cursor-not-allowed', !canWrite);
+      addPlanButton.title = canWrite
         ? 'إضافة خطة غذائية'
         : 'إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط';
     }
