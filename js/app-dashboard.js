@@ -329,48 +329,148 @@
     return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(ry, rm - 1, rd)) / 86400000);
   }
 
+  function notificationFormatDate(value) {
+    const key = notificationDateKey(value);
+    if (!key) return "";
+    const [year, month, day] = key.split("-");
+    return `${day}/${month}/${year}`;
+  }
+
+  function renderDashboardNotifications(items, loadState = "loaded") {
+    const host = document.getElementById("dashboardNotificationsContent");
+    if (!host) return;
+    host.replaceChildren();
+
+    if (loadState === "loading") {
+      const loading = document.createElement("div");
+      loading.className = "dashboard-notifications-loading";
+      loading.textContent = "جارٍ تحميل الإشعارات...";
+      host.appendChild(loading);
+      host.dataset.loadState = loadState;
+      return;
+    }
+
+    if (loadState === "error" || loadState === "unavailable") {
+      const message = document.createElement("div");
+      message.className = "dashboard-notifications-empty";
+      message.textContent = "تعذر تحميل الإشعارات حاليًا.";
+      host.appendChild(message);
+      host.dataset.loadState = loadState;
+      return;
+    }
+
+    if (!items.length) {
+      const empty = document.createElement("div");
+      empty.className = "dashboard-notifications-empty";
+      empty.textContent = "لا توجد إشعارات أو مهام متابعة مستحقة حاليًا.";
+      host.appendChild(empty);
+      host.dataset.loadState = loadState;
+      return;
+    }
+
+    items.forEach((item) => {
+      const row = document.createElement("article");
+      row.className = `dashboard-notification-row ${item.kind}`;
+
+      const icon = document.createElement("span");
+      icon.className = "dashboard-notification-row-icon";
+      const iconElement = document.createElement("i");
+      iconElement.className = item.icon;
+      iconElement.setAttribute("aria-hidden", "true");
+      icon.appendChild(iconElement);
+
+      const details = document.createElement("div");
+      details.className = "dashboard-notification-row-details";
+
+      const patient = document.createElement("strong");
+      patient.className = "dashboard-notification-patient";
+      patient.textContent = item.patientName || "المريض";
+
+      const action = document.createElement("span");
+      action.className = "dashboard-notification-action";
+      action.textContent = item.action;
+
+      const date = document.createElement("time");
+      date.className = "dashboard-notification-date";
+      date.textContent = notificationFormatDate(item.date);
+      date.dateTime = item.date || "";
+
+      details.append(patient, action);
+      row.append(icon, details, date);
+      host.appendChild(row);
+    });
+
+    host.dataset.loadState = loadState;
+  }
+
   async function loadDashboardNotifications(userId) {
     if (!userId) {
-      renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "unavailable");
+      renderDashboardNotifications([], "unavailable");
       return;
     }
 
     const supabase = window.DietPlannerAccess?.supabaseClient;
     if (!supabase) {
-      renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "unavailable");
+      renderDashboardNotifications([], "unavailable");
       return;
     }
+
+    renderDashboardNotifications([], "loading");
 
     try {
       const { data, error } = await supabase
         .from("patient_finances")
-        .select("subscription_end_date,next_follow_up_date,subscription_start_date,subscription_months")
+        .select("patient_id,subscription_end_date,next_follow_up_date,subscription_start_date,subscription_months,patients(name)")
         .eq("user_id", userId);
 
       if (error) throw error;
 
-      const counts = { today: 0, tomorrow: 0, subscriptions: 0 };
       const today = notificationTodayKey();
+      const notifications = [];
 
       (data || []).forEach((row) => {
+        const patientName = row.patients?.name || "المريض";
         const followUp = notificationDateKey(row.next_follow_up_date);
         const followUpDays = followUp ? notificationDaysUntil(followUp, today) : null;
-        if (followUpDays === 0) counts.today += 1;
-        if (followUpDays === 1) counts.tomorrow += 1;
+
+        if (followUpDays === 0 || followUpDays === 1) {
+          notifications.push({
+            patientName,
+            kind: "follow-up",
+            icon: "fa-solid fa-calendar-check",
+            action: followUpDays === 0 ? "مطلوب: متابعة المريض اليوم" : "مطلوب: متابعة المريض غدًا",
+            date: followUp
+          });
+        }
 
         const subscriptionEnd = notificationDateKey(row.subscription_end_date) ||
           notificationAddMonths(row.subscription_start_date, row.subscription_months);
         const subscriptionDays = subscriptionEnd ? notificationDaysUntil(subscriptionEnd, today) : null;
-        if (subscriptionDays !== null && subscriptionDays <= 7) counts.subscriptions += 1;
+
+        if (subscriptionDays !== null && subscriptionDays <= 7) {
+          let action = "مطلوب: التواصل مع المريض لتجديد الاشتراك";
+          if (subscriptionDays === 0) action = "مطلوب: تجديد الاشتراك — ينتهي اليوم";
+          else if (subscriptionDays === 1) action = "مطلوب: التواصل للتجديد — ينتهي غدًا";
+          else if (subscriptionDays > 1) action = `مطلوب: التواصل للتجديد — متبقي ${subscriptionDays} أيام`;
+          else action = "مطلوب: التواصل مع المريض — الاشتراك منتهٍ";
+
+          notifications.push({
+            patientName,
+            kind: "subscription",
+            icon: "fa-solid fa-credit-card",
+            action,
+            date: subscriptionEnd
+          });
+        }
       });
 
-      renderDashboardNotifications(counts, "loaded");
+      notifications.sort((a, b) => b.date.localeCompare(a.date) || a.patientName.localeCompare(b.patientName, "ar"));
+      renderDashboardNotifications(notifications, "loaded");
     } catch (error) {
-      renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "error");
+      renderDashboardNotifications([], "error");
       console.warn("Dashboard notifications could not be loaded:", error);
     }
   }
-
 
   // ---------------------------------------------------------
   // Dashboard services ribbon
@@ -442,7 +542,7 @@
 
   function bindDashboardServiceRibbonAndNotifications() {
     bindDashboardServiceRibbon();
-    renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "loading");
+    renderDashboardNotifications([], "loading");
   }
 
 
