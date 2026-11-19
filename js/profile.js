@@ -254,8 +254,12 @@
 
     try {
       const opened = await window.openSubscribeModal(String(selectedPlan.id));
-      if (opened) closePlanDetails();
-      else showToast('تعذر فتح نموذج الاشتراك لهذه الخطة. حاول مرة أخرى.');
+      if (opened) {
+        closePlanDetails();
+        document.body.style.overflow = 'hidden';
+      } else {
+        showToast('تعذر فتح نموذج الاشتراك لهذه الخطة. حاول مرة أخرى.');
+      }
     } catch (error) {
       console.error('Opening subscription form failed:', error);
       showToast('حدث خطأ أثناء فتح نموذج الاشتراك.');
