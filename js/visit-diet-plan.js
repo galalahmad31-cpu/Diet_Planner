@@ -165,8 +165,7 @@ async function ensureAllFoods(){
 }
 
 async function loadPlan(shouldRender=true){
- let query=sb.from('nutrition_plans').select('id,patient_id,visit_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
- if(visitId) query=query.eq('visit_id',visitId);
+ let query=sb.from('nutrition_plans').select('id,patient_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
  query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
  const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
  if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
@@ -608,7 +607,6 @@ async function savePlan(){
     const planData={
       id:planId,
       patient_id:window.currentPatientId||patientId,
-      visit_id:visitId||null,
       plan_name:'الخطة الغذائية باستخدام الجرامات',
       start_date:new Date().toISOString().slice(0,10),
       target_calories:Number(patientInfo.targetCal)||null,
