@@ -233,7 +233,7 @@ html,body{max-width:100%;overflow-x:hidden}
 
 
 /* Patient profile modules: three aligned tabs with one full-width workspace. */
-.patient-module-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin:0 0 12px}
+.patient-module-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;margin:0 0 12px}
 .patient-module-tab{display:flex;align-items:center;gap:10px;min-width:0;min-height:76px;padding:12px 14px;border:1px solid #dce7eb;border-radius:13px;background:#fff;color:#163541;text-align:right;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 2px 9px rgba(20,45,60,.025);transition:background .16s,border-color .16s,box-shadow .16s}
 .patient-module-tab-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
 .patient-module-tab-copy strong{font-size:12px;font-weight:900;line-height:1.5}
@@ -249,7 +249,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .patient-support-panel{padding:0}
 #nutritionSupportFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:#f5f8f8}
 @media(max-width:680px){
- .patient-module-tabs{gap:6px;margin-bottom:9px}
+ .patient-module-tabs{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:9px}
  .patient-module-tab{min-height:66px;padding:8px 7px;gap:6px;justify-content:center;flex-direction:column;text-align:center;border-radius:11px}
  .patient-module-tab .dashboard-icon{width:29px;height:29px;flex-basis:29px;font-size:13px;border-radius:8px}
  .patient-module-tab-copy{gap:1px}
