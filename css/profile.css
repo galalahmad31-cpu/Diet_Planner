@@ -111,3 +111,53 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
  .plan-details-dialog{padding:21px 16px;border-radius:18px}
  .plan-details-dialog h2{font-size:19px}
 }
+
+
+/* Inline subscription request modal on the profile page */
+.profile-subscribe-backdrop,.profile-subscription-confirm-backdrop{
+  display:none;position:fixed;inset:0;z-index:1600;align-items:center;justify-content:center;
+  padding:16px;background:rgba(14,40,37,.58);backdrop-filter:blur(4px)
+}
+.profile-subscribe-backdrop{overflow-y:auto}
+.profile-subscribe-dialog{
+  width:min(100%,560px);max-height:min(88vh,760px);overflow-y:auto;background:#fff;
+  border:1px solid #e2eee9;border-radius:22px;padding:22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.24);direction:rtl
+}
+.profile-subscribe-dialog h2{margin:0 0 16px;color:#173e37;font-size:20px;font-weight:900}
+.profile-selected-plan-info{margin-bottom:16px;padding:13px 15px;border-radius:12px;background:#f2f8f5;color:#31574e;font-size:13px;line-height:1.9}
+.profile-subscribe-field{margin-bottom:14px}
+.profile-subscribe-field label{display:block;margin-bottom:7px;color:#314d46;font-size:12px;font-weight:800}
+.profile-subscribe-field input,.profile-subscribe-field textarea{
+  display:block;width:100%;min-width:0;border:1px solid #d6e2df;border-radius:11px;
+  padding:11px 12px;background:#fff;color:#263f39;font:600 12px Cairo,sans-serif
+}
+.profile-subscribe-field textarea{min-height:88px;resize:vertical}
+.profile-subscribe-help{margin-top:6px;color:#81918c;font-size:10px}
+.profile-pending-actions{display:none;gap:8px;flex-wrap:wrap;margin-top:10px}
+.profile-subscribe-actions,.profile-confirm-actions{display:flex;gap:9px;margin-top:18px}
+.profile-subscribe-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:1;min-width:0;min-height:43px;padding:9px 12px;border:0;border-radius:11px;font:800 12px Cairo,sans-serif;cursor:pointer;transition:background .15s ease,opacity .15s ease}
+.profile-subscribe-btn:disabled{opacity:.6;cursor:not-allowed}
+.profile-subscribe-primary{background:#16866d;color:#fff}
+.profile-subscribe-primary:hover{background:#116d59}
+.profile-subscribe-secondary{background:#eef3f1;color:#60736d}
+.profile-subscribe-secondary:hover{background:#e2ebe7}
+.profile-subscribe-danger{background:#fff0f0;color:#b42318}
+.profile-subscribe-danger:hover{background:#ffe2e2}
+.profile-subscription-confirm-backdrop{z-index:1700}
+.profile-subscription-confirm{width:min(100%,390px);padding:22px;border-radius:20px;background:#fff;text-align:center;direction:rtl;box-shadow:0 20px 60px rgba(0,0,0,.24)}
+.profile-confirm-icon{display:grid;place-items:center;width:50px;height:50px;margin:0 auto 12px;border-radius:50%;background:#fff0f0;color:#b42318;font-size:21px}
+.profile-subscription-confirm h3{margin:0 0 8px;color:#173e37;font-size:17px;font-weight:900}
+.profile-confirm-message{margin:0 0 17px;color:#6d817d;font-size:12px;line-height:1.9}
+.profile-subscription-toast{
+  display:none;position:fixed;z-index:1800;bottom:22px;left:50%;transform:translateX(-50%);
+  max-width:min(92vw,460px);padding:11px 18px;border-radius:11px;background:#173c39;color:#fff;
+  box-shadow:0 8px 28px rgba(0,0,0,.18);font:700 12px/1.8 Cairo,sans-serif;text-align:center
+}
+.profile-subscription-toast.show{display:block}
+@media(max-width:600px){
+ .profile-subscribe-dialog{padding:19px 15px;border-radius:18px}
+ .profile-subscribe-dialog h2{font-size:18px}
+ .profile-subscribe-actions,.profile-confirm-actions{gap:7px}
+ .profile-subscribe-btn{font-size:11px;padding:8px 9px}
+}
