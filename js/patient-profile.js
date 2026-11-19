@@ -543,7 +543,7 @@
       const date = document.createElement('small');
       date.className = 'followup-day-date';
       const planDate = plan.start_date || (plan.created_at ? String(plan.created_at).slice(0, 10) : null);
-      date.textContent = 'الخطة رقم ' + (index + 1) + ' · ' + (planDate ? formatPlanDate(planDate) : 'بدون تاريخ');
+      date.textContent = 'الخطة رقم ' + planNumber + ' · ' + (planDate ? formatPlanDate(planDate) : 'بدون تاريخ');
       details.append(title, date);
       openButton.append(number, details);
 
@@ -660,7 +660,7 @@
     if (state.isCreatingPlan || !patientId) return;
 
     const choice = await Swal.fire({
-      title: 'إنشاء خطة غذائية جديدة',
+      title: 'إضافة خطة غذائية',
       input: 'select',
       inputOptions: {
         'الخطة الغذائية باستخدام الجرامات': 'خطة بالجرامات',
@@ -668,7 +668,7 @@
       },
       inputPlaceholder: 'اختر نوع الخطة',
       showCancelButton: true,
-      confirmButtonText: 'إنشاء الخطة',
+      confirmButtonText: 'فتح سجل جديد',
       cancelButtonText: 'إلغاء',
       confirmButtonColor: '#26765a',
       reverseButtons: true,
@@ -676,43 +676,7 @@
     });
     if (!choice.isConfirmed || !choice.value) return;
 
-    state.isCreatingPlan = true;
-    updateWriteControls();
-    try {
-      const today = new Date();
-      const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
-        .toISOString().slice(0, 10);
-      const { data: created, error } = await supabase
-        .from('nutrition_plans')
-        .insert({
-          patient_id: patientId,
-          plan_name: choice.value,
-          start_date: localDate
-        })
-        .select('id,patient_id,plan_name,start_date,created_at')
-        .single();
-      if (error) throw error;
-      if (!created?.id) throw new Error('لم يتم استلام رقم الخطة بعد إنشائها.');
-
-      await loadNutritionPlans();
-      openPlanEmbedded(created.id, created.plan_name);
-      await Swal.fire({
-        toast: true,
-        position: 'top',
-        icon: 'success',
-        title: 'تم إنشاء الخطة رقم ' + (document.querySelectorAll('[data-open-plan]').length),
-        text: 'تاريخ الخطة: ' + formatPlanDate(created.start_date || localDate),
-        showConfirmButton: false,
-        timer: 2200,
-        heightAuto: false
-      });
-    } catch (error) {
-      console.error('Create nutrition plan failed:', error);
-      await Swal.fire('تعذر إنشاء الخطة', error?.message || 'حدث خطأ أثناء إنشاء الخطة.', 'error');
-    } finally {
-      state.isCreatingPlan = false;
-      updateWriteControls();
-    }
+    openPlanEmbedded(null, choice.value);
   }
 
   function fillPatientData() {
