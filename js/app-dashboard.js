@@ -101,7 +101,12 @@
     }
 
     // Reveal only after getAccessStatus() confirms role === "admin".
+    // The card is initially hidden by three independent mechanisms:
+    // the hidden attribute, Tailwind's .hidden class, and inline display:none!important.
+    // Clear all three so the admin card is visible on phones as well as desktop.
     card.hidden = false;
+    card.classList.remove("hidden");
+    card.removeAttribute("hidden");
     card.removeAttribute("aria-hidden");
     card.removeAttribute("tabindex");
     card.style.removeProperty("display");
