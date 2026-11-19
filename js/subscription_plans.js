@@ -59,6 +59,12 @@
     state.plans = plans || [];
     state.subscriptions = subscriptions || [];
     render();
+
+    // Open the requested plan directly when arriving from the profile page.
+    const requestedPlanId = new URLSearchParams(window.location.search).get('plan');
+    if (requestedPlanId && state.plans.some(plan => String(plan.id) === requestedPlanId)) {
+      openSubscribe(requestedPlanId);
+    }
   }
 
   function activeSubscription() {
