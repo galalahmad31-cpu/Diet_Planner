@@ -915,7 +915,7 @@
       plans: { tab: 'plansTab', panel: 'plansPanel' },
       'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' }
     };
-    if (!modules[moduleName]) return;
+    if (moduleName !== null && !modules[moduleName]) return;
 
     Object.entries(modules).forEach(([name, refs]) => {
       const active = name === moduleName;
@@ -924,7 +924,7 @@
       if (tab) {
         tab.classList.toggle('is-active', active);
         tab.setAttribute('aria-selected', String(active));
-        tab.setAttribute('tabindex', active ? '0' : '-1');
+        tab.setAttribute('tabindex', active || moduleName === null ? '0' : '-1');
       }
       if (panel) panel.hidden = !active;
     });
@@ -945,7 +945,10 @@
 
   function bindPatientModuleTabs() {
     document.querySelectorAll('[data-module]').forEach((tab) => {
-      tab.addEventListener('click', () => activatePatientModule(tab.dataset.module));
+      tab.addEventListener('click', () => {
+        const nextModule = tab.classList.contains('is-active') ? null : tab.dataset.module;
+        activatePatientModule(nextModule);
+      });
     });
     window.addEventListener('message', (event) => {
       if (event.origin !== window.location.origin || event.data?.type !== 'dp-nsp-embed-height') return;
@@ -955,7 +958,8 @@
         if (Number.isFinite(height)) frame.style.height = `${Math.max(700, Math.min(height + 24, 12000))}px`;
       }
     });
-    activatePatientModule('measurements');
+    // Keep the workspace compact on first load; open a module only after an explicit selection.
+    activatePatientModule(null);
   }
 
   function bindEvents() {
