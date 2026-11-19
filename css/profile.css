@@ -4,10 +4,38 @@ input:focus,textarea:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3p
 .spinner{width:30px;height:30px;border:3px solid #d9efec;border-top-color:#178f84;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 
 
-/* Profile page branded green header and horizontal navigation */
-.profile-page-header{position:relative;isolation:isolate;overflow:hidden;color:#fff;background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);border:0!important;border-radius:24px!important;box-shadow:0 16px 36px rgba(15,90,85,.18)!important}
-.profile-page-header:after{content:"";position:absolute;z-index:-1;width:230px;height:230px;left:-65px;top:-125px;border:35px solid rgba(255,255,255,.07);border-radius:50%;pointer-events:none}
-.profile-header-inner{position:relative;z-index:1;padding:12px 16px 10px}
+
+/* Profile page: Food Library-style rounded brand card and swipe navigation */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.profile-page-main{width:100%;max-width:none;margin:0;padding:0!important}
+.profile-page-shell{width:100%;max-width:none!important;margin:0!important}
+.profile-page-header{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  width:calc(100% - 48px);
+  max-width:1500px;
+  margin:16px auto 16px!important;
+  box-sizing:border-box;
+  color:#fff;
+  background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%);
+  border:0!important;
+  border-radius:24px!important;
+  box-shadow:0 14px 32px rgba(15,90,85,.16)!important;
+}
+.profile-page-header:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:230px;
+  height:230px;
+  left:-65px;
+  top:-125px;
+  border:35px solid rgba(255,255,255,.07);
+  border-radius:50%;
+  pointer-events:none;
+}
+.profile-header-inner{position:relative;z-index:1;width:100%;margin:0 auto;padding:12px 16px 10px;box-sizing:border-box}
 .profile-brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
 .profile-brand{display:flex;align-items:center;gap:13px;min-width:0}
 .profile-brand-logo{display:grid;place-items:center;width:52px;height:52px;flex:0 0 52px;border-radius:15px;color:#fff;background:rgba(255,255,255,.16);box-shadow:0 8px 22px rgba(0,0,0,.12);font-size:22px}
@@ -24,47 +52,22 @@ input:focus,textarea:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3p
 .profile-page-header .profile-access-card.active{background:#fff!important;border-color:#fff!important;color:#126b5d!important;box-shadow:0 3px 10px rgba(0,0,0,.10)!important}
 .profile-page-header .profile-access-card.active i{color:#168879!important}
 .profile-page-header .profile-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
-@media(max-width:600px){
- .profile-header-inner{padding:9px 10px 7px}
- .profile-brand-row{min-height:48px}
- .profile-brand{gap:10px}
- .profile-brand-logo{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:18px}
- .profile-brand-copy h1{font-size:18px!important}
- .profile-brand-copy p{font-size:10px}
- .profile-page-label{font-size:9px;padding:5px 8px;white-space:normal;text-align:center;max-width:48%}
- .profile-page-header .profile-access-nav{margin-top:7px;padding:7px 0 2px!important}
- .profile-page-header .profile-access-track{gap:7px!important}
- .profile-page-header .profile-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
- .profile-page-header .profile-access-card i{font-size:11px!important}
-}
-
-/* Use the complete viewport width on the profile page */
-html,body{width:100%;max-width:100%;overflow-x:hidden}
-.profile-page-main{width:100%;max-width:none;margin:0;padding:0!important}
-.profile-page-shell{width:100%;max-width:none!important;margin:0!important}
-.profile-page-header{
-  width:100%;
-  max-width:none;
-  margin:0 0 16px!important;
-  border-radius:0 0 22px 22px!important;
-}
-.profile-header-inner{width:100%;max-width:none;margin:0;padding-inline:clamp(14px,2vw,30px)}
-.profile-content-grid{
-  width:100%;
-  max-width:none;
-  margin:0;
-  padding:0 clamp(12px,2vw,28px);
-  box-sizing:border-box;
-  gap:16px;
-}
-.profile-content-grid>.glass{
-  min-width:0;
-  border-radius:20px!important;
-}
+.profile-content-grid{width:100%;max-width:none;margin:0;padding:0 clamp(12px,2vw,28px);box-sizing:border-box;gap:16px}
+.profile-content-grid>.glass{min-width:0;border-radius:20px!important}
 .profile-page-shell>footer{padding-inline:12px}
 @media(max-width:600px){
-  .profile-page-header{margin-bottom:12px!important;border-radius:0 0 18px 18px!important}
+  .profile-page-header{width:calc(100% - 24px);margin:12px auto 12px!important;border-radius:20px!important}
   .profile-header-inner{padding:9px 10px 7px}
+  .profile-brand-row{min-height:48px}
+  .profile-brand{gap:10px}
+  .profile-brand-logo{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:18px}
+  .profile-brand-copy h1{font-size:18px!important}
+  .profile-brand-copy p{font-size:10px}
+  .profile-page-label{font-size:9px;padding:5px 8px;white-space:normal;text-align:center;max-width:48%}
+  .profile-page-header .profile-access-nav{margin-top:7px;padding:7px 0 2px!important}
+  .profile-page-header .profile-access-track{gap:7px!important}
+  .profile-page-header .profile-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
+  .profile-page-header .profile-access-card i{font-size:11px!important}
   .profile-content-grid{padding:0 10px;gap:12px}
   .profile-content-grid>.glass{padding:16px!important;border-radius:16px!important}
 }
