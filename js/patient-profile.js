@@ -1107,7 +1107,7 @@
         if (event.data?.type === 'dp-visit-embed-height') {
           const height = Number(event.data.height);
           if (Number.isFinite(height) && height > 0) {
-            visitFrame.style.height = `${Math.max(1, Math.min(height + 4, 16000))}px`;
+            visitFrame.style.height = `${Math.max(1, Math.min(height, 16000))}px`;
           }
           return;
         }
