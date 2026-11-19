@@ -637,3 +637,39 @@ html[data-theme="dark"] .recipe-modal {
   #grid .recipe-list-basis{font-size:9px!important}
   #grid .recipe-list-view{padding-inline:9px!important}
 }
+
+
+/* Final recipe index: one clean metadata row; no ingredient/description previews */
+#grid.recipe-list{display:flex!important;flex-direction:column!important;gap:6px!important}
+#grid.recipe-list > .recipe-list-row{
+  display:grid!important;
+  grid-template-columns:34px minmax(150px,1.5fr) minmax(82px,.65fr) minmax(88px,.75fr) minmax(125px,1fr) auto!important;
+  grid-template-rows:minmax(48px,auto)!important;
+  align-items:center!important;justify-items:stretch!important;
+  column-gap:12px!important;row-gap:0!important;
+  min-height:58px!important;padding:7px 12px!important;
+  border:1px solid #e1eae4!important;border-radius:9px!important;
+  background:#fff!important;box-shadow:0 1px 3px rgba(28,70,52,.035)!important;
+}
+#grid.recipe-list > .recipe-list-row:nth-child(even){background:#f1f6f2!important}
+#grid .recipe-list-logo{width:30px!important;height:30px!important;flex-basis:30px!important;border-radius:8px!important;font-size:12px!important}
+#grid .recipe-list-name{min-width:0!important}
+#grid .recipe-list-name h2{margin:0!important;font-size:12px!important;line-height:1.4!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#grid .recipe-list-calories{display:flex!important;align-items:center!important;gap:5px!important;white-space:nowrap!important;font-size:11px!important;font-weight:800!important}
+#grid .recipe-list-basis,#grid .recipe-list-author{min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;font-size:10px!important;font-weight:700!important;color:#687b70!important}
+#grid .recipe-list-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;white-space:nowrap!important}
+#grid .recipe-list-view{min-height:30px!important;padding:5px 11px!important;font-size:10px!important;border-radius:7px!important}
+#grid .recipe-list-icon-btn{width:27px!important;height:27px!important}
+@media(max-width:760px){
+ #grid.recipe-list > .recipe-list-row{grid-template-columns:27px minmax(95px,1.3fr) auto auto minmax(85px,.9fr) auto!important;column-gap:7px!important;padding:7px 8px!important;min-height:48px!important}
+ #grid .recipe-list-logo{width:25px!important;height:25px!important;flex-basis:25px!important;font-size:10px!important}
+ #grid .recipe-list-name h2{font-size:10px!important}
+ #grid .recipe-list-calories{font-size:9px!important;gap:3px!important}
+ #grid .recipe-list-basis,#grid .recipe-list-author{font-size:9px!important}
+ #grid .recipe-list-view{min-height:27px!important;padding:4px 7px!important;font-size:9px!important}
+ #grid .recipe-list-icon-btn{width:24px!important;height:24px!important}
+}
+@media(max-width:420px){
+ #grid.recipe-list{overflow-x:auto!important}
+ #grid.recipe-list > .recipe-list-row{min-width:560px!important}
+}
