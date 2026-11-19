@@ -37,3 +37,34 @@ input:focus,textarea:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3p
  .profile-page-header .profile-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
  .profile-page-header .profile-access-card i{font-size:11px!important}
 }
+
+/* Use the complete viewport width on the profile page */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.profile-page-main{width:100%;max-width:none;margin:0;padding:0!important}
+.profile-page-shell{width:100%;max-width:none!important;margin:0!important}
+.profile-page-header{
+  width:100%;
+  max-width:none;
+  margin:0 0 16px!important;
+  border-radius:0 0 22px 22px!important;
+}
+.profile-header-inner{width:100%;max-width:none;margin:0;padding-inline:clamp(14px,2vw,30px)}
+.profile-content-grid{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0 clamp(12px,2vw,28px);
+  box-sizing:border-box;
+  gap:16px;
+}
+.profile-content-grid>.glass{
+  min-width:0;
+  border-radius:20px!important;
+}
+.profile-page-shell>footer{padding-inline:12px}
+@media(max-width:600px){
+  .profile-page-header{margin-bottom:12px!important;border-radius:0 0 18px 18px!important}
+  .profile-header-inner{padding:9px 10px 7px}
+  .profile-content-grid{padding:0 10px;gap:12px}
+  .profile-content-grid>.glass{padding:16px!important;border-radius:16px!important}
+}
