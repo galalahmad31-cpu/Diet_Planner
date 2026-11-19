@@ -70,7 +70,7 @@
                 </button>
             </section>
             <div id="visitContent" class="hidden">
-                <!-- VISIT HEADER -->
+                <!-- PATIENT NUTRITION PLAN HEADER -->
                 <section class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3 min-w-0">
@@ -82,16 +82,8 @@
                                     —
                                 </h2>
                                 <p class="text-xs text-slate-400 mt-1">
-                                    خطة رقم
-                                    <span id="visitNumber" class="font-extrabold text-slate-600">
-                                        —
-                                    </span>
-                                    <span class="mx-1">
-                                        •
-                                    </span>
-                                    <span id="visitDate">
-                                        —
-                                    </span>
+                                    الخطة الغذائية للمريض
+                                    
                                 </p>
                             </div>
                         </div>
@@ -552,55 +544,6 @@
                         </div>
                     </div>
                     <div id="toastContainer" class="fixed bottom-5 left-5 z-50 space-y-2 pointer-events-none no-print">
-                    </div>
-                </div>
-                <!-- ASSESSMENT DELETE CONFIRMATION -->
-                <div id="deleteAssessmentModal" class="lab-modal hidden fixed inset-0 z-50 lab-modal-backdrop items-center justify-center p-4">
-                    <div class="lab-modal-panel w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden text-center" role="dialog" aria-modal="true">
-                        <div class="p-6 pb-4">
-                            <div class="mx-auto w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-trash">
-                                </i>
-                            </div>
-                            <h3 class="font-black text-slate-800 mt-4">
-                                حذف التقييم الغذائي؟
-                            </h3>
-                            <p class="text-xs text-slate-500 mt-2 leading-6">
-                                سيتم حذف التقييم المحفوظ لهذه الزيارة بالكامل.
-                            </p>
-                        </div>
-                        <div class="px-5 pb-5 flex gap-2">
-                            <button type="button" data-action="closeDeleteAssessmentModal" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold transition">
-                                إلغاء
-                            </button>
-                            <button id="confirmDeleteAssessmentBtn" type="button" data-action="confirmDeleteAssessment" class="flex-1 px-4 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold transition">
-                                نعم، حذف التقييم
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- DELETE LAB CONFIRMATION -->
-                <div id="deleteLabModal" class="lab-modal hidden fixed inset-0 z-50 lab-modal-backdrop items-center justify-center p-4" data-action="handleDeleteModalBackdrop">
-                    <div class="lab-modal-panel w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden text-center" role="dialog" aria-modal="true">
-                        <div class="p-6 pb-4">
-                            <div class="mx-auto w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-trash">
-                                </i>
-                            </div>
-                            <h3 class="font-black text-slate-800 mt-4">
-                                حذف التحليل؟
-                            </h3>
-                            <p id="deleteLabText" class="text-xs text-slate-500 mt-2 leading-6">
-                            </p>
-                        </div>
-                        <div class="px-5 pb-5 flex gap-2">
-                            <button type="button" data-action="closeDeleteLabModal" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold transition">
-                                إلغاء
-                            </button>
-                            <button type="button" data-action="confirmDeleteLab" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold transition">
-                                نعم، حذف
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <!-- Module dialogs and print containers -->
