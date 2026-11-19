@@ -439,12 +439,11 @@
     const loading = $('visitsLoading');
     const empty = $('visitsEmpty');
     const list = $('visitsList');
-
     if (!loading || !empty || !list) return;
 
-    loading.classList.remove('hidden');
-    empty.classList.add('hidden');
-    list.innerHTML = '';
+    loading.hidden = false;
+    empty.hidden = true;
+    list.replaceChildren();
 
     const { data, error } = await supabase
       .from('patient_visits')
@@ -452,48 +451,106 @@
       .eq('patient_id', patientId)
       .order('visit_number', { ascending: false });
 
-    loading.classList.add('hidden');
+    loading.hidden = true;
 
     if (error) {
       console.error('Load visits failed:', error);
-      list.innerHTML = '<div class="text-center py-5 text-xs font-bold text-red-500">تعذر تحميل الزيارات.</div>';
+      loading.hidden = false;
+      loading.textContent = 'تعذر تحميل أيام المتابعة.';
       return;
     }
 
     if (!data?.length) {
-      empty.classList.remove('hidden');
+      empty.hidden = false;
       return;
     }
 
-    data.forEach((visit, index) => {
-      const row = document.createElement('div');
-      row.className = 'flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-emerald-300 px-4 py-3 transition' + (index === 0 ? ' latest-visit-row' : '');
+    data.forEach((visit) => {
+      const row = document.createElement('article');
+      row.className = 'followup-day-row';
 
-      const visitLink = document.createElement('a');
-      visitLink.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
-      visitLink.className = 'flex items-center gap-3 min-w-0 flex-1';
-      visitLink.innerHTML = `
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">${escapeHtml(visit.visit_number)}</div>
-        <div class="min-w-0">
-          <div class="font-extrabold text-sm text-slate-800">خطة رقم ${escapeHtml(visit.visit_number)}</div>
-          <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(formatVisitDate(visit.visit_date))}</div>
-        </div>`;
+      const openButton = document.createElement('button');
+      openButton.type = 'button';
+      openButton.className = 'followup-day-open';
+      openButton.dataset.openVisit = visit.id;
+      openButton.dataset.visitNumber = String(visit.visit_number ?? '');
+      openButton.dataset.visitDate = String(visit.visit_date ?? '');
+      openButton.setAttribute('aria-label', `فتح الخطة رقم ${visit.visit_number}`);
+
+      const number = document.createElement('span');
+      number.className = 'followup-day-number';
+      number.textContent = String(visit.visit_number ?? '—');
+
+      const details = document.createElement('span');
+      details.className = 'followup-day-details';
+      const title = document.createElement('strong');
+      title.textContent = `الخطة رقم ${visit.visit_number ?? '—'}`;
+      const date = document.createElement('small');
+      date.textContent = formatVisitDate(visit.visit_date);
+      details.append(title, date);
+      const arrow = document.createElement('i');
+      arrow.className = 'fa-solid fa-chevron-left followup-day-arrow';
+      arrow.setAttribute('aria-hidden', 'true');
+      openButton.append(number, details, arrow);
 
       const deleteButton = document.createElement('button');
       deleteButton.type = 'button';
-      deleteButton.className = 'shrink-0 w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center';
+      deleteButton.className = 'followup-day-delete';
       deleteButton.title = 'حذف الخطة';
-      deleteButton.setAttribute('aria-label', 'حذف الزيارة');
-      deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
-      deleteButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        deleteVisit(visit);
-      });
+      deleteButton.setAttribute('aria-label', `حذف الخطة رقم ${visit.visit_number}`);
+      deleteButton.innerHTML = '<i class="fa-solid fa-trash" aria-hidden="true"></i>';
+      deleteButton.addEventListener('click', () => void deleteVisit(visit));
 
-      row.append(visitLink, deleteButton);
+      row.append(openButton, deleteButton);
       list.appendChild(row);
     });
+
+    const activeFrame = $('visitFrame');
+    if (activeFrame?.dataset.visitId) {
+      const stillExists = data.some(item => String(item.id) === String(activeFrame.dataset.visitId));
+      if (!stillExists) closeVisitEmbedded();
+      else {
+        list.querySelectorAll('[data-open-visit]').forEach(button => {
+          button.classList.toggle('is-active', button.dataset.openVisit === activeFrame.dataset.visitId);
+        });
+      }
+    }
+  }
+
+  function openVisitEmbedded(visit) {
+    const panel = $('visitEmbeddedPanel');
+    const frame = $('visitFrame');
+    const title = $('activeVisitTitle');
+    if (!panel || !frame || !visit?.id) return;
+
+    if (title) {
+      title.textContent = `الخطة رقم ${visit.visit_number ?? '—'} · ${formatVisitDate(visit.visit_date)}`;
+    }
+    panel.hidden = false;
+    document.querySelectorAll('[data-open-visit]').forEach(button => {
+      button.classList.toggle('is-active', button.dataset.openVisit === String(visit.id));
+    });
+
+    if (frame.dataset.visitId !== String(visit.id)) {
+      frame.dataset.visitId = String(visit.id);
+      frame.style.height = '1px';
+      frame.src = `visit.html?id=${encodeURIComponent(visit.id)}&embed=1`;
+    }
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function closeVisitEmbedded() {
+    const panel = $('visitEmbeddedPanel');
+    const frame = $('visitFrame');
+    if (panel) panel.hidden = true;
+    document.querySelectorAll('[data-open-visit]').forEach(button => button.classList.remove('is-active'));
+    if (frame) frame.dataset.visitId = '';
+  }
+
+  async function openVisitFromList(visit) {
+    if (!visit?.id) return;
+    openVisitEmbedded(visit);
   }
 
   function escapeHtml(value) {
@@ -573,55 +630,69 @@
       return;
     }
 
+    if (String($('visitFrame')?.dataset.visitId || '') === String(visit.id)) closeVisitEmbedded();
     await loadVisits();
   }
 
   async function addVisit() {
     if (!canWrite()) {
-      alert('إضافة الخطة متاحة أثناء الاشتراك المدفوع فقط.');
+      alert('إضافة يوم متابعة متاحة أثناء الاشتراك المدفوع فقط.');
       return;
     }
+    if (state.isCreatingVisit) return;
 
-    const user = state.user;
-    if (!user) {
-      alert('تعذر تحديد المستخدم الحالي.');
-      return;
+    state.isCreatingVisit = true;
+    const button = $('addVisitButton');
+    if (button) button.disabled = true;
+
+    try {
+      const user = state.user || await access?.getCurrentUser?.();
+      if (!user?.id) {
+        alert('تعذر تحديد المستخدم الحالي.');
+        return;
+      }
+
+      const { data: lastVisit, error: lastError } = await supabase
+        .from('patient_visits')
+        .select('visit_number')
+        .eq('patient_id', patientId)
+        .order('visit_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (lastError) {
+        console.error('Get last visit failed:', lastError);
+        alert('تعذر معرفة رقم الخطة التالية.');
+        return;
+      }
+
+      const nextNumber = (Number(lastVisit?.visit_number) || 0) + 1;
+      const { data: visit, error } = await supabase
+        .from('patient_visits')
+        .insert({
+          patient_id: patientId,
+          user_id: user.id,
+          visit_number: nextNumber,
+          visit_date: new Date().toISOString().slice(0, 10)
+        })
+        .select('id,visit_number,visit_date')
+        .single();
+
+      if (error || !visit) {
+        console.error('Create visit failed:', error);
+        alert(error?.code === '23505'
+          ? 'تم إنشاء خطة متابعة أخرى في الوقت نفسه. حدّث القائمة وحاول مرة أخرى.'
+          : 'تعذر إنشاء يوم المتابعة.');
+        await loadVisits();
+        return;
+      }
+
+      await loadVisits();
+      openVisitEmbedded(visit);
+    } finally {
+      state.isCreatingVisit = false;
+      if (button) button.disabled = !canWrite();
     }
-
-    const { data: lastVisit, error: lastError } = await supabase
-      .from('patient_visits')
-      .select('visit_number')
-      .eq('patient_id', patientId)
-      .order('visit_number', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (lastError) {
-      console.error('Get last visit failed:', lastError);
-      alert('تعذر معرفة رقم الخطة التالية.');
-      return;
-    }
-
-    const nextNumber = (lastVisit?.visit_number || 0) + 1;
-
-    const { data: visit, error } = await supabase
-      .from('patient_visits')
-      .insert({
-        patient_id: patientId,
-        user_id: user.id,
-        visit_number: nextNumber,
-        visit_date: new Date().toISOString().slice(0, 10)
-      })
-      .select('id')
-      .single();
-
-    if (error) {
-      console.error('Create visit failed:', error);
-      alert('تعذر إنشاء الخطة.');
-      return;
-    }
-
-    window.location.href = `visit.html?id=${encodeURIComponent(visit.id)}`;
   }
 
   function fillPatientData() {
@@ -1033,6 +1104,22 @@
     });
     window.addEventListener('message', (event) => {
       if (event.origin !== window.location.origin) return;
+
+      const visitFrame = $('visitFrame');
+      if (visitFrame && event.source === visitFrame.contentWindow) {
+        if (event.data?.type === 'dp-visit-embed-height') {
+          const height = Number(event.data.height);
+          if (Number.isFinite(height) && height > 0) {
+            visitFrame.style.height = `${Math.max(1, Math.min(height + 4, 16000))}px`;
+          }
+          return;
+        }
+        if (event.data?.type === 'dp-visit-close') {
+          closeVisitEmbedded();
+          return;
+        }
+      }
+
       const frame = $('nutritionSupportFrame');
       if (!frame || event.source !== frame.contentWindow) return;
 
@@ -1085,6 +1172,17 @@
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     $('addVisitButton')?.addEventListener('click', addVisit);
+    $('visitsList')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-open-visit]');
+      if (!button) return;
+      const visit = {
+        id: button.dataset.openVisit,
+        visit_number: button.dataset.visitNumber,
+        visit_date: button.dataset.visitDate
+      };
+      void openVisitFromList(visit);
+    });
+    $('closeVisitFrameBtn')?.addEventListener('click', closeVisitEmbedded);
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableBody')?.addEventListener('click', (event) => {
       const save = event.target.closest('[data-measurement-save]');
