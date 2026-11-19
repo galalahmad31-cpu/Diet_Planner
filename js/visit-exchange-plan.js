@@ -36,7 +36,7 @@ async function findPlans(){
  if(!c.patient_id)throw new Error('لم يتم تحديد المريض لخطة البدائل.');
  if(!dbx)throw new Error('تعذر الاتصال بقاعدة البيانات.');
  const {data,error}=await dbx.from('nutrition_plans')
-  .select('id,patient_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,goal,created_at,updated_at')
+  .select('id,patient_id,plan_name,start_date,created_at,updated_at')
   .eq('patient_id',c.patient_id)
   .order('updated_at',{ascending:false})
   .order('created_at',{ascending:false});
@@ -61,54 +61,15 @@ async function ensureExchangePlan(skipAuth=false){
   return null;
  }
 
- const plans=await findPlans();
- const exchange=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام البدائل');
- const base=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام الجرامات');
-
- if(exchange){
-  S.t={
-   cal:n(exchange.target_calories),
-   pro:n(exchange.target_protein),
-   carb:n(exchange.target_carb),
-   fat:n(exchange.target_fat)
-  };
-  S.plan=exchange.id;
-  return S.plan;
- }
-
- if(base){
-  S.t={
-   cal:n(base.target_calories),
-   pro:n(base.target_protein),
-   carb:n(base.target_carb),
-   fat:n(base.target_fat)
-  };
- }else{
-  S.t={cal:0,pro:0,carb:0,fat:0};
- }
-
- const id=crypto.randomUUID();
- const payload={
-  id,
-  patient_id:c.patient_id,
-  plan_name:'الخطة الغذائية باستخدام البدائل',
-  start_date:new Date().toISOString().slice(0,10),
-  target_calories:base?.target_calories??null,
-  target_protein:base?.target_protein??null,
-  target_carb:base?.target_carb??null,
-  target_fat:base?.target_fat??null,
-  target_fluid:base?.target_fluid??null,
-  goal:base?.goal??null,
-  notes:base?.notes??null
- };
-
- const r=await dbx.from('nutrition_plans').insert(payload).select('id').single();
- if(r.error){
-  status('تعذر إنشاء خطة البدائل: '+r.error.message,true);
-  return null;
- }
-
- S.plan=r.data.id;
+ const {data:createdPlanId,error:createError}=await dbx.rpc('create_nutrition_plan',{p_patient_id:c.patient_id});
+ if(createError||!createdPlanId){status('تعذر إنشاء خطة البدائل: '+(createError?.message||'لم يتم استلام معرّف الخطة'),true);return null;}
+ const {data:createdPlan,error:loadError}=await dbx.from('nutrition_plans').select('plan_name').eq('id',createdPlanId).eq('patient_id',c.patient_id).single();
+ if(loadError)throw loadError;
+ const baseName=String(createdPlan.plan_name||'الخطة الغذائية').replace(/\s*-\s*بال(?:جرامات|بدائل)$/,'');
+ const typedName=baseName+' - بالبدائل';
+ const {error:renameError}=await dbx.from('nutrition_plans').update({plan_name:typedName}).eq('id',createdPlanId).eq('patient_id',c.patient_id);
+ if(renameError)throw renameError;
+ S.plan=createdPlanId;
  return S.plan;
 }
 async function loadDays(){if(!S.plan){S.days=[];S.savedDays=[];renderDays();return}const {data:dr,error:de}=await dbx.from('plan_days').select('id,plan_id,day_number,day_name').eq('plan_id',S.plan).order('day_number',{ascending:true});if(de){throw new Error('تعذر تحميل أيام خطة البدائل: '+de.message);}const ids=(dr||[]).map(x=>x.id);let ms=[];if(ids.length){const r=await dbx.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});if(r.error){throw new Error('تعذر تحميل وجبات الخطة: '+r.error.message);}ms=r.data||[]}const mids=ms.map(x=>x.id);let its=[];if(mids.length){const r=await dbx.from('plan_items').select('id,meal_id,food_id,quantity_g,household_measure,frequency,item_name').in('meal_id',mids);if(r.error){throw new Error('تعذر تحميل أصناف الخطة: '+r.error.message);}its=r.data||[]}S.days=(dr||[]).map(d=>({id:d.id,title:d.day_name||'اليوم',meals:ms.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',items:its.filter(i=>i.meal_id===m.id).map(i=>({id:i.id,name:i.item_name||'',measure:i.household_measure||'',repeat:i.frequency||''}))}))}));S.savedDays=clone(S.days);S.dayEditing={};renderDays()}
@@ -396,25 +357,23 @@ async function init(){
   const c=ctx();
   if(!c.patient_id)throw new Error('لم يتم تحديد المريض.');
   const plans=await findPlans();
-  const ex=requestedExchangePlanId
-   ? plans.find(p=>String(p.id)===String(requestedExchangePlanId)&&p.plan_name==='الخطة الغذائية باستخدام البدائل')
-   : plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام البدائل');
-  if(requestedExchangePlanId&&!ex)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
-  const gram=plans.find(p=>p.plan_name==='الخطة الغذائية باستخدام الجرامات');
-  if(ex)S.t={cal:n(ex.target_calories),pro:n(ex.target_protein),carb:n(ex.target_carb),fat:n(ex.target_fat)};
-  else if(gram)S.t={cal:n(gram.target_calories),pro:n(gram.target_protein),carb:n(gram.target_carb),fat:n(gram.target_fat)};
-  else S.t={cal:0,pro:0,carb:0,fat:0};
-  const approved=window.currentPatientEnergy||{};
-  if(approved.energy_approved_at&&n(approved.energy_target_calories)>0){
-   S.t={cal:n(approved.energy_target_calories),pro:n(approved.energy_target_protein),carb:n(approved.energy_target_carb),fat:n(approved.energy_target_fat)};
-  }
-  if(ex&&isUuid(ex.id)){
-   S.plan=ex.id;S.editing=false;
-   await loadExchangeValues();
-   await loadDays();
-  }else{
-   S.plan=null;S.editing=true;
-  }
+  const selectedPlan=requestedExchangePlanId ? plans.find(p=>String(p.id)===String(requestedExchangePlanId))
+   : plans.find(p=>String(p.plan_name||'').includes('البدائل')||String(p.plan_name||'').includes('بالبدائل'));
+  if(requestedExchangePlanId&&!selectedPlan)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
+  const patientEnergy=window.currentPatientEnergy||{};
+  S.t={cal:n(patientEnergy.energy_target_calories),pro:n(patientEnergy.energy_target_protein),carb:n(patientEnergy.energy_target_carb),fat:n(patientEnergy.energy_target_fat)};
+  if(selectedPlan&&isUuid(selectedPlan.id)){
+   const selectedName=String(selectedPlan.plan_name||'');
+   if(selectedName.includes('الجرامات')||selectedName.includes('بالجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
+   const isFreshNumberedPlan=/^الخطة\s+\d+\s+-/.test(selectedName);
+   if(isFreshNumberedPlan){
+    const typedName=selectedName+' - بالبدائل';
+    const {error:renameError}=await dbx.from('nutrition_plans').update({plan_name:typedName}).eq('id',selectedPlan.id).eq('patient_id',c.patient_id);
+    if(renameError)throw renameError;
+   }
+   S.plan=selectedPlan.id; S.editing=isFreshNumberedPlan;
+   await loadExchangeValues(); await loadDays();
+  }else{S.plan=null;S.editing=true;}
   render();renderDays();setButtons();
   S.ready=true;
  }catch(error){
