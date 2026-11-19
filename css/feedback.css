@@ -396,7 +396,7 @@ body{
   }
   /* Keep name, rating and submit action on one compact row on phones. */
   .feedback-form-topline{
-    grid-template-columns:minmax(0,.88fr) minmax(0,1.22fr) minmax(0,.9fr);
+    grid-template-columns:minmax(0,.92fr) minmax(0,1.16fr) minmax(0,.92fr);
     gap:.4rem;
     align-items:stretch;
   }
@@ -406,6 +406,7 @@ body{
     min-height:82px;
     padding:.55rem .4rem;
     justify-content:center;
+    overflow:hidden;
   }
   .feedback-name-panel .text-xs,
   .feedback-rating-panel label{
@@ -421,18 +422,29 @@ body{
     overflow-wrap:anywhere;
   }
   .feedback-stars{
-    justify-content:center;
+    display:flex;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow:hidden;
+    justify-content:space-between;
     gap:0;
     margin-top:.2rem;
   }
-  .feedback-stars .star-button{
-    flex:1 1 0;
-    min-width:0;
+  /* Override the broader phone star minimum-width rule so five stars stay inside this panel. */
+  #feedbackPage .feedback-stars .star-button{
+    display:flex;
+    flex:1 1 20%;
+    width:20%;
+    min-width:0!important;
+    max-width:20%;
     min-height:30px;
     padding:0;
+    margin:0;
+    overflow:hidden;
   }
-  .feedback-stars .star-button i{
-    font-size:.88rem;
+  #feedbackPage .feedback-stars .star-button i{
+    font-size:.82rem;
   }
   .feedback-actions{
     display:flex;
