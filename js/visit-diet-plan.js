@@ -677,7 +677,7 @@ function renderDays(){
      </button>
      <div class="day-title-group">
       <input value="${escapeHtml(d.title||`اليوم ${di+1}`)}" onchange="window.dietPlan.updateDayTitle('${escapeHtml(d.id)}',this.value)" aria-label="اسم اليوم" class="day-title-input">
-      <span class="day-card-meta">${meals.length} وجبات <span>·</span> ${itemCount} أصناف</span>
+      <span class="day-card-meta">${itemCount} أصناف</span>
      </div>
     </div>
     <div class="day-card-actions no-print">
