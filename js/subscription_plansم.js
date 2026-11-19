@@ -119,6 +119,10 @@
     if ($('pendingActions')) $('pendingActions').style.display = 'none';
     if ($('paymentProof')) $('paymentProof').value = '';
     if ($('paymentNote')) $('paymentNote').value = '';
+    const title = $('profileSubscribeTitle');
+    if (title) title.textContent = 'الاشتراك في الخطة';
+    const info = $('selectedPlanInfo');
+    if (info) { info.style.display = ''; info.textContent = ''; }
     setTrialMode(false);
   }
 
@@ -143,9 +147,18 @@
 
     resetModal();
     state.selectedPlanId = plan.id;
-    $('selectedPlanInfo').innerHTML = $('profilePlansList')
-      ? `<strong>${esc(plan.name)}</strong>`
-      : `<strong>${esc(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${esc(plan.payment_method)}`;
+    const title = $('profileSubscribeTitle');
+    if (title) title.textContent = `الاشتراك في الخطة - ${plan.name || 'الخطة'}`;
+    const info = $('selectedPlanInfo');
+    if (info) {
+      if ($('profilePlansList')) {
+        info.style.display = 'none';
+        info.textContent = '';
+      } else {
+        info.style.display = '';
+        info.innerHTML = `<strong>${esc(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${esc(plan.payment_method)}`;
+      }
+    }
     setTrialMode(plan.is_free_trial === true);
     $('subscribeModal').style.display = 'flex';
     $('subscribeModal').setAttribute('aria-hidden', 'false');
@@ -158,9 +171,15 @@
     const plan = state.plans.find(p => p.id === sub.plan_id);
     state.currentSubscription = sub;
     state.selectedPlanId = sub.plan_id;
-    $('selectedPlanInfo').innerHTML = $('profilePlansList')
-      ? `<strong>${esc(plan?.name || 'الخطة')}</strong>`
-      : `<strong>${esc(plan?.name || 'الخطة')}</strong><br>الحالة: <strong>قيد المراجعة</strong><br>${plan ? `المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>` : ''}${sub.notes ? `الملاحظات: ${esc(sub.notes)}` : ''}`;
+    const title = $('profileSubscribeTitle');
+    if (title) title.textContent = `طلب الاشتراك - ${plan?.name || 'الخطة'}`;
+    const info = $('selectedPlanInfo');
+    if (info) {
+      info.style.display = '';
+      info.innerHTML = $('profilePlansList')
+        ? '<strong>حالة الطلب: قيد المراجعة</strong>'
+        : `<strong>${esc(plan?.name || 'الخطة')}</strong><br>الحالة: <strong>قيد المراجعة</strong><br>${plan ? `المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>` : ''}${sub.notes ? `الملاحظات: ${esc(sub.notes)}` : ''}`;
+    }
     $('paymentProof').value = '';
     $('paymentNote').value = sub.notes || '';
     $('submitSubscriptionBtn').style.display = 'none';
