@@ -2,7 +2,7 @@
 'use strict';
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
-const state={plans:[],subs:[],profiles:[],patients:[],activeTab:'requests',requestSearch:'',requestStatus:'all'};
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],activeTab:'requests',requestSearch:'',requestStatus:'all'};
 let confirmAction=null;
 
 const $=id=>document.getElementById(id);
@@ -41,6 +41,7 @@ async function loadAll(){
  if(p.error)throw p.error;if(s.error)throw s.error;if(prof.error)throw prof.error;if(pat.error)throw pat.error;
  state.plans=p.data||[];state.subs=s.data||[];state.profiles=prof.data||[];state.patients=pat.data||[];
   renderRequests();renderPlans();renderDoctors();
+  await loadAnnouncements();
 }
 function renderRequests(){
  const body=$('requestsBody');
@@ -175,13 +176,113 @@ async function proof(id){
  if(r.error||!r.data?.signedUrl){$('proofBody').innerHTML='<div class="state">تعذر عرض إثبات الدفع.</div>';return}
  $('proofBody').innerHTML='<img src="'+esc(r.data.signedUrl)+'" style="max-width:100%;max-height:70vh;display:block;margin:auto;border-radius:12px" alt="إثبات الدفع">'
 }
+
+const ANNOUNCEMENT_TYPES={
+ update:{label:'تحديث جديد',icon:'fa-wand-magic-sparkles',className:'update'},
+ announcement:{label:'إعلان مهم',icon:'fa-bullhorn',className:'announcement'},
+ tip:{label:'نصيحة واستخدام',icon:'fa-lightbulb',className:'tip'},
+ alert:{label:'تنبيه',icon:'fa-triangle-exclamation',className:'alert'}
+};
+function announcementDate(value){
+ if(!value)return 'بدون تاريخ انتهاء';
+ const d=new Date(value);
+ return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('ar-EG',{year:'numeric',month:'short',day:'numeric'});
+}
+async function loadAnnouncements(){
+ const host=$('announcementList'),box=$('announcementState');
+ if(!host||!box)return;
+ box.style.display='block';box.textContent='جاري تحميل الإعلانات...';host.style.display='none';
+ const {data,error}=await sb.from('announcements').select('id,title,content,type,is_active,is_pinned,starts_at,expires_at,created_at,updated_at').order('is_pinned',{ascending:false}).order('created_at',{ascending:false});
+ if(error){box.textContent='تعذر تحميل الإعلانات. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.';console.error('Announcements load failed:',error);return}
+ state.announcements=data||[];
+ $('announcementCount').textContent=state.announcements.length;
+ $('announcementActiveCount').textContent=state.announcements.filter(a=>a.is_active).length;
+ renderAnnouncements();
+}
+function renderAnnouncements(){
+ const host=$('announcementList'),box=$('announcementState');
+ if(!host||!box)return;
+ if(!state.announcements.length){host.replaceChildren();host.style.display='none';box.style.display='block';box.textContent='لا توجد إعلانات حتى الآن. أضف أول إعلان من الزر أعلاه.';return}
+ box.style.display='none';host.style.display='grid';
+ host.innerHTML=state.announcements.map(a=>{
+  const type=ANNOUNCEMENT_TYPES[a.type]||ANNOUNCEMENT_TYPES.update;
+  return `<article class="announcement-admin-item ${type.className}">
+   <div class="announcement-admin-top"><span class="announcement-admin-type"><i class="fa-solid ${type.icon}"></i> ${type.label}</span><span class="badge ${a.is_active?'paid':'off'}">${a.is_active?'منشور':'مسودة / متوقف'}</span></div>
+   <h3>${esc(a.title)}</h3><p>${esc(a.content).replace(/\n/g,'<br>')}</p>
+   <div class="announcement-admin-meta"><span><i class="fa-regular fa-calendar"></i> ${announcementDate(a.created_at)}</span><span>${a.expires_at?'ينتهي: '+announcementDate(a.expires_at):'دون تاريخ انتهاء'}</span>${a.is_pinned?'<span class="announcement-pin"><i class="fa-solid fa-thumbtack"></i> مثبت</span>':''}</div>
+   <div class="announcement-admin-actions"><button class="btn btn-outline" type="button" data-announcement-edit="${a.id}"><i class="fa-solid fa-pen"></i> تعديل</button><button class="btn btn-outline" type="button" data-announcement-toggle="${a.id}">${a.is_active?'إيقاف النشر':'نشر الآن'}</button><button class="btn btn-danger" type="button" data-announcement-delete="${a.id}"><i class="fa-solid fa-trash"></i> حذف</button></div>
+  </article>`;
+ }).join('');
+}
+function openAnnouncementForm(item=null){
+ const a=item||{},type=a.type||'update';
+ const expiry=a.expires_at?new Date(a.expires_at).toISOString().slice(0,10):'';
+ openModal(item?'تعديل الإعلان':'إضافة إعلان جديد',`
+  <form id="announcementForm" class="announcement-form">
+   <div class="field full"><label for="announcementTitle">عنوان الإعلان</label><input id="announcementTitle" maxlength="140" required value="${esc(a.title||'')}" placeholder="مثال: تحديث جديد في مكتبة الأغذية"></div>
+   <div class="field full"><label for="announcementContent">نص الإعلان</label><textarea id="announcementContent" maxlength="5000" required rows="5" placeholder="اكتب تفاصيل الإعلان هنا...">${esc(a.content||'')}</textarea></div>
+   <div class="field"><label for="announcementType">نوع الإعلان</label><select id="announcementType"><option value="update" ${type==='update'?'selected':''}>تحديث جديد</option><option value="announcement" ${type==='announcement'?'selected':''}>إعلان مهم</option><option value="tip" ${type==='tip'?'selected':''}>نصيحة واستخدام</option><option value="alert" ${type==='alert'?'selected':''}>تنبيه</option></select></div>
+   <div class="field"><label for="announcementExpiry">تاريخ انتهاء الإعلان (اختياري)</label><input id="announcementExpiry" type="date" value="${expiry}"></div>
+   <div class="announcement-form-options"><label class="check"><input id="announcementActive" type="checkbox" ${item?(a.is_active?'checked':''):'checked'}> نشر الإعلان</label><label class="check"><input id="announcementPinned" type="checkbox" ${a.is_pinned?'checked':''}> تثبيت الإعلان في الأعلى</label></div>
+   <div class="modal-foot"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i> ${item?'حفظ التعديلات':'نشر الإعلان'}</button><button class="btn btn-outline" type="button" id="announcementCancel">إلغاء</button></div>
+  </form>`);
+ $('announcementCancel').onclick=closeModal;
+ $('announcementForm').onsubmit=event=>saveAnnouncement(event,item?.id||null);
+}
+async function saveAnnouncement(event,id){
+ event.preventDefault();
+ const form=$('announcementForm');
+ if(!form.reportValidity())return;
+ const title=$('announcementTitle').value.trim(),content=$('announcementContent').value.trim();
+ if(title.length<3||!content){toast('أدخل عنوانًا واضحًا ونص الإعلان.');return}
+ const expiryValue=$('announcementExpiry').value;
+ const expiresAt=expiryValue?new Date(expiryValue+'T23:59:59').toISOString():null;
+ if(expiresAt&&new Date(expiresAt)<=new Date()){toast('تاريخ الانتهاء يجب أن يكون في المستقبل.');return}
+ const button=form.querySelector('button[type="submit"]');
+ const original=button.innerHTML;button.disabled=true;button.textContent='جاري الحفظ...';
+ const payload={title,content,type:$('announcementType').value,is_active:$('announcementActive').checked,is_pinned:$('announcementPinned').checked,expires_at:expiresAt,updated_at:new Date().toISOString()};
+ try{
+  let result;
+  if(id)result=await sb.from('announcements').update(payload).eq('id',id);
+  else{
+   const user=await access.getCurrentUser();
+   if(!user?.id)throw new Error('انتهت جلسة الدخول. سجّل الدخول مرة أخرى.');
+   result=await sb.from('announcements').insert({...payload,created_by:user.id});
+  }
+  if(result.error)throw result.error;
+  closeModal();toast(id?'تم تحديث الإعلان بنجاح.':'تم حفظ الإعلان بنجاح.');await loadAnnouncements();
+ }catch(error){console.error('Announcement save failed:',error);toast(error?.message||'تعذر حفظ الإعلان.')}
+ finally{if(button.isConnected){button.disabled=false;button.innerHTML=original}}
+}
+async function toggleAnnouncement(id){
+ const item=state.announcements.find(a=>a.id===id);if(!item)return;
+ const {error}=await sb.from('announcements').update({is_active:!item.is_active,updated_at:new Date().toISOString()}).eq('id',id);
+ if(error){toast(error.message||'تعذر تحديث حالة الإعلان.');return}
+ toast(item.is_active?'تم إيقاف نشر الإعلان.':'تم نشر الإعلان.');await loadAnnouncements();
+}
+function deleteAnnouncement(id){
+ const item=state.announcements.find(a=>a.id===id);if(!item)return;
+ askConfirm('حذف الإعلان','هل تريد حذف الإعلان <b>'+esc(item.title)+'</b> نهائيًا؟',async()=>{
+  const {error}=await sb.from('announcements').delete().eq('id',id);
+  if(error){toast(error.message||'تعذر حذف الإعلان.');return}
+  toast('تم حذف الإعلان.');await loadAnnouncements();
+ });
+}
+
 function switchTab(tab){
  state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
- ['requests','plans','doctors'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors()
+ ['requests','plans','doctors','announcements'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors();if(tab==='announcements')loadAnnouncements()
 }
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 $('newPlanBtn').onclick=()=>openPlan(null);$('refreshBtn').onclick=()=>loadAll();$('refreshDoctorsBtn').onclick=()=>loadAll();$('doctorSearch').oninput=renderDoctors;
+$('newAnnouncementBtn').onclick=()=>openAnnouncementForm();$('refreshAnnouncementsBtn').onclick=()=>loadAnnouncements();
+$('announcementList').onclick=e=>{
+ const edit=e.target.closest('[data-announcement-edit]'),toggle=e.target.closest('[data-announcement-toggle]'),del=e.target.closest('[data-announcement-delete]');
+ if(edit){const item=state.announcements.find(a=>a.id===edit.dataset.announcementEdit);if(item)openAnnouncementForm(item)}
+ else if(toggle)toggleAnnouncement(toggle.dataset.announcementToggle);
+ else if(del)deleteAnnouncement(del.dataset.announcementDelete);
+};
  $('requestSearch').oninput=e=>{state.requestSearch=e.target.value;renderRequests()};
  document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;renderRequests()});
 $('dashboardBtn').onclick=()=>location.href='app.html';$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.replace('index.html')};
