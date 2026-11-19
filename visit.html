@@ -15,11 +15,9 @@
         </script>
         <script src="js/auth-access.js?v=20261118-subscription-gate-v2">
         </script>
-        <script src="js/visit-calculator.js?v=20261116-7" defer>
+<script src="js/visit.js?v=20261119-energy-separated-v1" defer>
         </script>
-        <script src="js/visit.js?v=20261119-content-height-v1" defer>
-        </script>
-        <link rel="stylesheet" href="css/visit.css?v=20261119-embedded-view-v1">
+        <link rel="stylesheet" href="css/visit.css?v=20261119-energy-separated-v1">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
         </script>
@@ -118,22 +116,6 @@
                                     </h4>
                                     <p class="hidden sm:block text-[10px] text-slate-400 mt-1 leading-snug">
                                         تقييم الحالة الغذائية والقياسات والتحاليل.
-                                    </p>
-                                </div>
-                            </div>
-                        </button>
-                        <button id="calculatorCard" type="button" data-action="toggleModule" data-module="calculator"
-           class="module-card calculator-module w-full text-right block rounded-2xl p-2.5 sm:p-5 shadow-sm hover:border-sky-400 hover:shadow-md">
-                            <div class="flex items-center gap-2 sm:gap-4">
-                                <div class="w-9 h-9 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-base sm:text-xl">
-                                    🧮
-                                </div>
-                                <div class="min-w-0">
-                                    <h4 class="font-black text-slate-800 text-[11px] sm:text-base leading-snug">
-                                        الاحتياجات
-                                    </h4>
-                                    <p class="text-[9px] sm:text-[11px] text-slate-400 mt-1 leading-snug">
-                                        حساب الاحتياجات الغذائية وأهداف الماكروز للزيارة.
                                     </p>
                                 </div>
                             </div>
@@ -333,45 +315,6 @@
                                     <textarea id="dietaryHistory" rows="5" placeholder="سجل التاريخ الغذائي كما ذكره المريض..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
                                     </textarea>
                                 </section>
-                            </div>
-                        </div>
-                        <div id="calculatorContent" class="hidden w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                            <div class="embedded-calculator w-full p-3 sm:p-5">
-                                <section class="tab-content" id="calcTab">
-  <div class="energy-workspace">
-    <div class="workspace-heading">
-      <div><span class="workspace-step">01 · ENERGY</span><h3>حساب الاحتياج من الطاقة</h3><p>بيانات المريض ← المعادلة ← الاحتياج اليومي</p></div>
-      <div class="equation-switch"><button id="eqBtnMifflin" data-action="selectEnergyEquation" data-equation="mifflin" type="button">Mifflin-St Jeor</button><button id="eqBtnSchofield" data-action="selectEnergyEquation" data-equation="schofield" type="button">Schofield</button></div>
-    </div>
-    <div class="patient-inputs">
-      <div><label for="energyGender">النوع</label><select id="energyGender"><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
-      <div><label for="energyAge">العمر (سنة)</label><input id="energyAge" min="0" placeholder="30" step="0.1" type="number"/></div>
-      <div><label for="energyWeight">الوزن (كجم)</label><input id="energyWeight" min="0.1" placeholder="75" step="0.1" type="number"/></div>
-      <div id="heightField"><label for="energyHeight">الطول (سم)</label><input id="energyHeight" min="30" placeholder="175" step="0.1" type="number"/></div>
-    </div>
-    <div class="activity-row"><label for="calcActivity">مستوى النشاط البدني</label><select id="calcActivity"><option value="1.2">خامل جداً (بدون تمارين)</option><option value="1.375">نشاط خفيف (1-3 أيام/الأسبوع)</option><option selected value="1.55">نشاط متوسط (3-5 أيام/الأسبوع)</option><option value="1.725">نشاط عالٍ (6-7 أيام/الأسبوع)</option><option value="1.9">نشاط مفرط جداً (عمل شاق / تدريب مضاعف)</option></select><button data-action="calculateSelectedEnergy" type="button">احسب الاحتياج <i class="fa-solid fa-arrow-left"></i></button></div>
-    <div class="energy-results">
-      <div class="result-equation"><small>المعادلة المستخدمة</small><strong id="resEquation">Mifflin-St Jeor</strong></div>
-      <div class="result-metric"><small>BMR · معدل الأيض الأساسي</small><strong><b id="resBMR">0</b><em>kcal/day</em></strong></div>
-      <div class="result-metric primary"><small>TDEE · الاحتياج اليومي</small><strong><b id="resTDEE">0</b><em>kcal/day</em></strong></div>
-    </div>
-  </div>
-  <div class="macro-workspace">
-    <div class="workspace-heading">
-      <div><span class="workspace-step">02 · TARGET & MACROS</span><h3>تحديد السعرات وتوزيع الماكروز</h3><p>اضبط الهدف اليومي ثم حدد نسب المغذيات الكبرى</p></div>
-      <div class="target-energy"><small>السعرات المستهدفة</small><strong><span id="finalTargetCal">0</span> <em>kcal</em></strong></div>
-    </div>
-    <div class="target-adjustment"><label for="calcAdjustment">التعديل من TDEE <small>(عجز − / فائض +)</small></label><input id="calcAdjustment" inputmode="numeric" data-action-input="updateTargetAndMacros" placeholder="-500 أو +300" type="text" value="-500"/></div>
-    <div class="macro-section-label"><strong>توزيع الطاقة على الماكروز</strong><span>المجموع المطلوب 100%</span></div>
-    <div class="macro-cards">
-      <div class="macro-item protein"><div class="macro-name"><span class="macro-dot"></span> البروتين</div><div class="macro-percent"><input id="macroProPercent" data-action-input="updateTargetAndMacros" type="number" value="30"/><span>%</span></div><div class="macro-grams"><strong id="macroProGrams">0g</strong><small>جرام / يوم</small></div></div>
-      <div class="macro-item carbs"><div class="macro-name"><span class="macro-dot"></span> الكربوهيدرات</div><div class="macro-percent"><input id="macroCarbPercent" data-action-input="updateTargetAndMacros" type="number" value="40"/><span>%</span></div><div class="macro-grams"><strong id="macroCarbGrams">0g</strong><small>جرام / يوم</small></div></div>
-      <div class="macro-item fats"><div class="macro-name"><span class="macro-dot"></span> الدهون</div><div class="macro-percent"><input id="macroFatPercent" data-action-input="updateTargetAndMacros" type="number" value="30"/><span>%</span></div><div class="macro-grams"><strong id="macroFatGrams">0g</strong><small>جرام / يوم</small></div></div>
-    </div>
-    <div id="macroTotalAlert" class="macro-alert hidden"></div>
-    <div class="macro-footer"><span>القيم بالجرام محسوبة تلقائيًا حسب السعرات والنسب.</span><button data-action="applyCustomTargetToPatient" type="button"><i class="fa-solid fa-check"></i> اعتماد الهدف في خطة المريض</button></div>
-  </div>
-</section>
                             </div>
                         </div>
                         <div id="dietPlanContent" class="hidden w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
