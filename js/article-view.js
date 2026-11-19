@@ -34,8 +34,13 @@ function setArticleSchema(a,url){
  document.head.appendChild(script);
 }
 (async()=>{
- const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
- const isAuthenticated=accessStatus?.authenticated===true && !!accessStatus?.user;
+ let isAuthenticated=false;
+ try{
+  const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
+  isAuthenticated=accessStatus?.authenticated===true && !!accessStatus?.user;
+ }catch(authError){
+  console.warn('Could not verify article-page session:',authError);
+ }
  if(isAuthenticated){
   $('guestStartLink')?.remove();
   $('articleGuestCta')?.remove();
