@@ -13,7 +13,6 @@
     hasActiveSubscription: false,
     isEditing: false,
     isSaving: false,
-    isCreatingVisit: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -535,7 +534,7 @@
       const date = document.createElement('small');
       date.className = 'followup-day-date';
       date.textContent = plan.start_date
-        ? formatVisitDate(plan.start_date)
+        ? formatPlanDate(plan.start_date)
         : 'بدون تاريخ محدد';
       details.append(title, date);
       openButton.append(number, details);
@@ -552,10 +551,10 @@
       list.appendChild(row);
     });
 
-    const activeFrame = $('visitFrame');
+    const activeFrame = $('planFrame');
     if (activeFrame?.dataset.planId) {
       const stillExists = data.some(item => String(item.id) === String(activeFrame.dataset.planId));
-      if (!stillExists) closeVisitEmbedded();
+      if (!stillExists) closePlanEmbedded();
       else list.querySelectorAll('[data-open-plan]').forEach(button => {
         button.classList.toggle('is-active', button.dataset.openPlan === activeFrame.dataset.planId);
       });
@@ -563,8 +562,8 @@
   }
 
   function openPlanEmbedded(planId = null, planType = '') {
-    const panel = $('visitEmbeddedPanel');
-    const frame = $('visitFrame');
+    const panel = $('planEmbeddedPanel');
+    const frame = $('planFrame');
     if (!panel || !frame || !patientId) return;
 
     panel.hidden = false;
@@ -590,9 +589,9 @@
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function closeVisitEmbedded() {
-    const panel = $('visitEmbeddedPanel');
-    const frame = $('visitFrame');
+  function closePlanEmbedded() {
+    const panel = $('planEmbeddedPanel');
+    const frame = $('planFrame');
     if (panel) panel.hidden = true;
     const details = $('followupDaysDetails');
     if (details) details.open = true;
@@ -600,7 +599,7 @@
     if (frame) frame.dataset.planId = '';
   }
 
-  function formatVisitDate(date) {
+  function formatPlanDate(date) {
     if (!date) return 'بدون تاريخ';
     const value = new Date(`${date}T00:00:00`);
     return new Intl.DateTimeFormat('ar-EG', {
@@ -637,7 +636,7 @@
         .eq('id', plan.id).eq('patient_id', patientId);
       if (error) throw error;
 
-      if (String($('visitFrame')?.dataset.planId || '') === String(plan.id)) closeVisitEmbedded();
+      if (String($('planFrame')?.dataset.planId || '') === String(plan.id)) closePlanEmbedded();
       await loadNutritionPlans();
     } catch (error) {
       console.error('Delete nutrition plan failed:', error);
@@ -1067,17 +1066,17 @@
     window.addEventListener('message', (event) => {
       if (event.origin !== window.location.origin) return;
 
-      const visitFrame = $('visitFrame');
-      if (visitFrame && event.source === visitFrame.contentWindow) {
-        if (event.data?.type === 'dp-visit-embed-height') {
+      const planFrame = $('planFrame');
+      if (planFrame && event.source === planFrame.contentWindow) {
+        if (event.data?.type === 'dp-plan-embed-height') {
           const height = Number(event.data.height);
           if (Number.isFinite(height) && height > 0) {
-            visitFrame.style.height = `${Math.max(1, Math.min(height, 16000))}px`;
+            planFrame.style.height = `${Math.max(1, Math.min(height, 16000))}px`;
           }
           return;
         }
-        if (event.data?.type === 'dp-visit-close') {
-          closeVisitEmbedded();
+        if (event.data?.type === 'dp-plan-close') {
+          closePlanEmbedded();
           return;
         }
       }
