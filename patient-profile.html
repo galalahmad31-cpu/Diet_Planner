@@ -15,7 +15,7 @@
   <script src="js/patient-profile.js?v=20261119-patient-phone1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-green-card-nav-final1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-patient-layout-v2">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -59,20 +59,12 @@
     <div id="loadingState" class="text-center py-8 text-sm text-slate-400">جاري تحميل ملف المريض...</div>
     <div id="patientContent" class="hidden">
       <h2 id="patientName" class="font-black text-slate-800 text-2xl"></h2>
-    </div>
-    <div id="errorState" class="hidden text-center py-8">
-      <div class="text-3xl mb-3">⚠️</div><p id="errorText" class="text-sm font-bold text-red-600"></p>
-      <a href="patient.html" class="inline-block mt-4 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold">العودة لقائمة المرضى</a>
-    </div>
-  </section>
 
-  <section id="modulesSection" class="hidden patient-dashboard mt-5">
-    <article class="dashboard-card patient-data-card">
       <div class="patient-data-heading">
         <details id="patientDataDetails" class="patient-data-details">
           <summary class="patient-data-summary">
             <span class="dashboard-icon teal" aria-hidden="true">👤</span>
-            <span class="patient-data-title"><strong>بيانات المريض</strong><small>البيانات الأساسية والتشخيص</small></span>
+            <span class="patient-data-title"><strong>البيانات الأساسية</strong><small>عرض أو تعديل بيانات الملف</small></span>
             <span class="patient-data-actions" id="patientDataActions">
               <button type="button" id="editButton" class="patient-edit-button">✏️ تعديل</button>
               <span id="saveArea" class="patient-save-actions" hidden>
@@ -97,7 +89,16 @@
           </div>
         </details>
       </div>
-    </article>
+
+    </div>
+    <div id="errorState" class="hidden text-center py-8">
+      <div class="text-3xl mb-3">⚠️</div><p id="errorText" class="text-sm font-bold text-red-600"></p>
+      <a href="patient.html" class="inline-block mt-4 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold">العودة لقائمة المرضى</a>
+    </div>
+  </section>
+
+  <section id="modulesSection" class="hidden patient-dashboard mt-3">
+
     <article class="dashboard-card measurements-card"><a id="weightLink" class="dashboard-details measurements-direct"><span class="dashboard-card-head"><span class="dashboard-icon blue">📈</span><span><h3>متابعة القياسات</h3><p>الوزن والقياسات عبر الوقت</p></span><span class="dashboard-card-arrow">←</span></a></article>
     <article class="dashboard-card patient-finance-card"><button type="button" id="openPatientFinance" class="finance-card-trigger"><span class="dashboard-card-head"><span class="dashboard-icon purple">💳</span><span><h3>اشتراك ومواعيد المريض</h3><p>إدارة الاشتراك ومواعيد المتابعة</p></span><i class="fa-solid fa-arrow-up-left-from-square details-chevron"></i></button></article>
     <article class="dashboard-card plans-card"><details class="dashboard-details"><summary><span class="dashboard-card-head"><span class="dashboard-icon green">🍽️</span><span><h3>الخطة الغذائية</h3><p>إدارة الخطط المسجلة للمريض</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary><div class="dashboard-panel"><button type="button" id="addVisitButton" class="dashboard-primary-btn">＋ إضافة خطة جديدة</button><div id="visitsLoading" class="text-center py-4 text-xs text-slate-400">جاري تحميل الخطط...</div><div id="visitsEmpty" class="hidden text-center py-4 text-xs text-slate-400">لا توجد خطط غذائية مسجلة.</div><div id="visitsList" class="plans-list"></div></div></details></article>
