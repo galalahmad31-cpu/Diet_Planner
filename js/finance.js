@@ -403,11 +403,11 @@ async function recordAttendance(patientId, actualVisitDate) {
 
     const { error } = await supabase
         .from('patient_finances')
-        .update({
+        .upsert({
+            patient_id: patientId,
+            user_id: user.id,
             last_visit_date: visitDate
-        })
-        .eq('patient_id', patientId)
-        .eq('user_id', user.id);
+        }, { onConflict: 'patient_id' });
 
     if (error) {
         console.error(error);
