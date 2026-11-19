@@ -681,7 +681,7 @@
 
   const patientFinanceFieldIds = [
     'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
-    'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollow'
+    'pfInputPaid'
   ];
 
   function setEditing(enabled) {
@@ -781,7 +781,7 @@
     const allowed = canWrite();
     [
       'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
-      'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollow'
+      'pfInputPaid'
     ].forEach((id) => {
       const field = $(id);
       if (field) field.disabled = !allowed || !state.isEditing || state.isSaving || patientFinanceState.loading;
@@ -838,7 +838,7 @@
     try {
       const { data, error } = await supabase
         .from('patient_finances')
-        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid,last_visit_date,next_follow_up_date')
+        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid')
         .eq('patient_id', patientId)
         .eq('user_id', state.user.id)
         .maybeSingle();
@@ -850,8 +850,6 @@
       $('pfInputAmount').value = data?.subscription_amount ?? '';
       $('pfInputDiscount').value = data?.discount_percent ?? 0;
       $('pfInputPaid').value = String(Boolean(data?.is_paid));
-      $('pfInputLastVisit').value = data?.last_visit_date || '';
-      $('pfInputNextFollow').value = data?.next_follow_up_date || '';
 
       if (empty) empty.hidden = Boolean(data);
       if (form) form.hidden = false;
@@ -918,9 +916,7 @@
       subscription_months: months,
       subscription_amount: amount,
       discount_percent: discount,
-      is_paid: $('pfInputPaid').value === 'true',
-      last_visit_date: $('pfInputLastVisit').value || null,
-      next_follow_up_date: $('pfInputNextFollow').value || null
+      is_paid: $('pfInputPaid').value === 'true'
     };
 
     try {
