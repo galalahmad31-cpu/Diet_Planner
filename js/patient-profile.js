@@ -62,6 +62,7 @@
 
     const editButton = $('editButton');
     const addVisitButton = $('addVisitButton');
+    updateMeasurementWriteAccess();
 
     if (editButton) {
       editButton.disabled = !canWrite;
@@ -161,7 +162,6 @@
 
     state.patient = data;
     fillPatientData();
-    setLink('weightLink', 'weight.html');
     setLink('financeLink', 'finance.html');
     const nutritionSupportLink = $('nutritionSupportLink');
     if (nutritionSupportLink && data.id) {
@@ -179,6 +179,183 @@
 
     updateWriteControls();
     await loadVisits();
+  }
+
+
+  // Inline patient measurements: reuse the existing weight_logs schema and the
+  // same subscription/admin write gate without navigating away from this profile.
+  const measurementState = { logs: [], loaded: false, loading: false };
+
+  function updateMeasurementWriteAccess() {
+    const button = $('addMeasurementRowBtn');
+    const status = $('measurementAccessStatus');
+    if (!button) return;
+    const allowed = canWrite();
+    button.disabled = !allowed;
+    button.title = allowed ? 'إضافة قياس جديد' : 'إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط';
+    button.classList.toggle('is-disabled', !allowed);
+    if (status) {
+      status.textContent = state.isAdmin
+        ? 'وضع المدير: يمكنك إضافة القياسات وإدارتها.'
+        : state.hasActiveSubscription
+          ? 'الاشتراك فعال — يمكنك إضافة قياس جديد.'
+          : 'يمكنك عرض السجل الحالي؛ إضافة قياس جديد متاحة أثناء الاشتراك المدفوع.';
+    }
+  }
+
+  function measurementDateLabel(value) {
+    if (!value) return '—';
+    const date = new Date(`${value}T00:00:00`);
+    return Number.isNaN(date.getTime())
+      ? escapeHtml(value)
+      : date.toLocaleDateString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function renderMeasurements() {
+    const body = $('weightTableBody');
+    if (!body) return;
+    if (!measurementState.logs.length) {
+      body.innerHTML = '<tr><td colspan="6" class="measurements-state">لا توجد قياسات مسجلة لهذا المريض.</td></tr>';
+      return;
+    }
+    const labels = { excellent: 'ممتاز', good: 'جيد', fair: 'متوسط', poor: 'ضعيف' };
+    body.innerHTML = measurementState.logs.map((log, index) => `
+      <tr>
+        <td data-label="التاريخ">${measurementDateLabel(log.date)}</td>
+        <td data-label="الوزن (كجم)" class="measurement-weight">${Number(log.weight).toFixed(1)}</td>
+        <td data-label="محيط الوسط (سم)">${log.waist == null ? '—' : Number(log.waist).toFixed(1)}</td>
+        <td data-label="محيط الأرداف (سم)">${log.hip == null ? '—' : Number(log.hip).toFixed(1)}</td>
+        <td data-label="الالتزام">${escapeHtml(labels[log.adherence] || '—')}</td>
+        <td data-label="إجراء" class="no-print"><button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
+      </tr>`).join('');
+  }
+
+  async function loadMeasurements() {
+    if (measurementState.loaded || measurementState.loading || !patientId || !supabase) return;
+    measurementState.loading = true;
+    const loading = $('measurementsLoading');
+    const errorBox = $('measurementsError');
+    if (loading) loading.hidden = false;
+    if (errorBox) { errorBox.hidden = true; errorBox.textContent = ''; }
+    try {
+      const { data, error } = await supabase
+        .from('weight_logs')
+        .select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at')
+        .eq('patient_id', patientId)
+        .order('measurement_date', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      measurementState.logs = (data || []).map(item => ({
+        id: item.id,
+        date: item.measurement_date,
+        weight: Number(item.weight),
+        waist: item.waist_cm == null ? null : Number(item.waist_cm),
+        hip: item.hip_cm == null ? null : Number(item.hip_cm),
+        adherence: item.diet_adherence || '',
+        notes: item.notes || ''
+      }));
+      measurementState.loaded = true;
+      renderMeasurements();
+    } catch (error) {
+      console.error('Patient inline measurements load failed:', error);
+      if (errorBox) {
+        errorBox.textContent = 'تعذر تحميل سجل القياسات. تحقق من الاتصال وصلاحيات قاعدة البيانات ثم أعد فتح القسم.';
+        errorBox.hidden = false;
+      }
+    } finally {
+      measurementState.loading = false;
+      if (loading) loading.hidden = true;
+    }
+  }
+
+  function openMeasurementEntry() {
+    if (!canWrite()) {
+      alert('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط.');
+      return;
+    }
+    if ($('inlineMeasurementRow')) {
+      $('inlineMeasurementRow').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const body = $('weightTableBody');
+    if (!body) return;
+    if (!measurementState.loaded) {
+      void loadMeasurements().then(openMeasurementEntry);
+      return;
+    }
+    const row = document.createElement('tr');
+    row.id = 'inlineMeasurementRow';
+    row.className = 'inline-measurement-row';
+    const now = new Date();
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    row.innerHTML = `
+      <td><input type="date" id="inlineDate" value="${localDate}" aria-label="تاريخ القياس"></td>
+      <td><input type="number" step="0.1" min="0.1" id="inlineWeight" placeholder="كجم" aria-label="الوزن"></td>
+      <td><input type="number" step="0.1" min="0.1" id="inlineWaist" placeholder="سم" aria-label="محيط الوسط"></td>
+      <td><input type="number" step="0.1" min="0.1" id="inlineHip" placeholder="سم" aria-label="محيط الأرداف"></td>
+      <td><select id="inlineAdherence" aria-label="الالتزام"><option value="">—</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></td>
+      <td class="no-print"><div class="measurement-inline-actions"><button type="button" data-measurement-save class="measurement-save">حفظ</button><button type="button" data-measurement-cancel class="measurement-cancel">إلغاء</button></div></td>`;
+    body.prepend(row);
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('inlineWeight')?.focus();
+  }
+
+  async function saveMeasurementEntry() {
+    if (!canWrite()) return;
+    const date = $('inlineDate')?.value;
+    const weight = Number.parseFloat($('inlineWeight')?.value);
+    const waistRaw = $('inlineWaist')?.value ?? '';
+    const hipRaw = $('inlineHip')?.value ?? '';
+    const waist = waistRaw === '' ? null : Number.parseFloat(waistRaw);
+    const hip = hipRaw === '' ? null : Number.parseFloat(hipRaw);
+    const adherence = $('inlineAdherence')?.value || '';
+    if (!date || !Number.isFinite(weight) || weight <= 0 ||
+        (waistRaw !== '' && (!Number.isFinite(waist) || waist <= 0)) ||
+        (hipRaw !== '' && (!Number.isFinite(hip) || hip <= 0))) {
+      alert('راجع التاريخ والوزن والقياسات المدخلة.');
+      return;
+    }
+    const saveButton = document.querySelector('[data-measurement-save]');
+    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'جارٍ الحفظ...'; }
+    try {
+      const { data, error } = await supabase.from('weight_logs').insert({
+        patient_id: patientId,
+        weight,
+        measurement_date: date,
+        waist_cm: waist,
+        hip_cm: hip,
+        diet_adherence: adherence || null,
+        notes: null
+      }).select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
+      if (error) throw error;
+      measurementState.logs.push({
+        id: data.id, date: data.measurement_date, weight: Number(data.weight),
+        waist: data.waist_cm == null ? null : Number(data.waist_cm),
+        hip: data.hip_cm == null ? null : Number(data.hip_cm),
+        adherence: data.diet_adherence || '', notes: data.notes || ''
+      });
+      measurementState.logs.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.id).localeCompare(String(b.id)));
+      renderMeasurements();
+    } catch (error) {
+      console.error('Save patient measurement failed:', error);
+      alert('تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.');
+      if (saveButton) { saveButton.disabled = false; saveButton.textContent = 'حفظ'; }
+    }
+  }
+
+  async function deleteMeasurement(index) {
+    const entry = measurementState.logs[index];
+    if (!entry || !state.user || !window.confirm('هل تريد حذف قياس الوزن المحدد؟')) return;
+    try {
+      const { error } = await supabase.from('weight_logs')
+        .delete().eq('id', entry.id).eq('patient_id', patientId);
+      if (error) throw error;
+      measurementState.logs.splice(index, 1);
+      renderMeasurements();
+    } catch (error) {
+      console.error('Delete patient measurement failed:', error);
+      alert('تعذر حذف القياس من قاعدة البيانات.');
+    }
   }
 
   async function loadVisits() {
@@ -582,6 +759,18 @@
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     $('addVisitButton')?.addEventListener('click', addVisit);
+    $('measurementsDetails')?.addEventListener('toggle', (event) => {
+      if (event.currentTarget.open) void loadMeasurements();
+    });
+    $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
+    $('weightTableBody')?.addEventListener('click', (event) => {
+      const save = event.target.closest('[data-measurement-save]');
+      const cancel = event.target.closest('[data-measurement-cancel]');
+      const remove = event.target.closest('[data-measurement-delete]');
+      if (save) void saveMeasurementEntry();
+      else if (cancel) $('inlineMeasurementRow')?.remove();
+      else if (remove) void deleteMeasurement(Number(remove.dataset.measurementDelete));
+    });
     $('openPatientFinance')?.addEventListener('click', openPatientFinanceModal);
     $('savePatientFinance')?.addEventListener('click', savePatientFinance);
     $('cancelPatientFinance')?.addEventListener('click', closePatientFinanceModal);
