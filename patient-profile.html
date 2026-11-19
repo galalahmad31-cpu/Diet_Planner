@@ -93,18 +93,18 @@
       </div>
     </article>
     <article class="dashboard-card measurements-card"><a id="weightLink" class="dashboard-details measurements-direct"><span class="dashboard-card-head"><span class="dashboard-icon blue">📈</span><span><h3>متابعة القياسات</h3><p>الوزن والقياسات عبر الوقت</p></span><span class="dashboard-card-arrow">←</span></a></article>
-    <article class="dashboard-card patient-finance-card"><button type="button" id="openPatientFinance" class="finance-card-trigger"><span class="dashboard-card-head"><span class="dashboard-icon purple">💳</span><span><h3>ماليات المريض</h3><p>المدفوعات والمستحقات</p></span><i class="fa-solid fa-arrow-up-left-from-square details-chevron"></i></button></article>
+    <article class="dashboard-card patient-finance-card"><button type="button" id="openPatientFinance" class="finance-card-trigger"><span class="dashboard-card-head"><span class="dashboard-icon purple">💳</span><span><h3>اشتراك ومواعيد المريض</h3><p>إدارة الاشتراك ومواعيد المتابعة</p></span><i class="fa-solid fa-arrow-up-left-from-square details-chevron"></i></button></article>
     <article class="dashboard-card plans-card"><details class="dashboard-details"><summary><span class="dashboard-card-head"><span class="dashboard-icon green">🍽️</span><span><h3>الخطة الغذائية</h3><p>إدارة الخطط المسجلة للمريض</p></span><i class="fa-solid fa-chevron-down details-chevron"></i></summary><div class="dashboard-panel"><button type="button" id="addVisitButton" class="dashboard-primary-btn">＋ إضافة خطة جديدة</button><div id="visitsLoading" class="text-center py-4 text-xs text-slate-400">جاري تحميل الخطط...</div><div id="visitsEmpty" class="hidden text-center py-4 text-xs text-slate-400">لا توجد خطط غذائية مسجلة.</div><div id="visitsList" class="plans-list"></div></div></details></article>
-    <article class="dashboard-card nutrition-support-card"><a id="nutritionSupportLink" class="dashboard-details measurements-direct" href="nutritionsupport-patient.html"><span class="dashboard-card-head"><span class="dashboard-icon nutrition-support-icon">🩺</span><span><h3>الدعم الغذائي</h3><p>إدارة ومتابعة الدعم الغذائي للمريض</p></span><span class="dashboard-card-arrow">←</span></a></article>
+    <article class="dashboard-card nutrition-support-card"><a id="nutritionSupportLink" class="dashboard-details measurements-direct" href="nutritionsupport-patient.html"><span class="dashboard-card-head"><span class="dashboard-icon nutrition-support-icon">🩺</span><span><h3>الدعم الغذائي</h3><p>التغذية الأنبوبية والوريدية بالمستشفى</p></span><span class="dashboard-card-arrow">←</span></a></article>
   </section>
 </main>
 
 <div id="patientFinanceModal" class="patient-finance-modal hidden" role="dialog" aria-modal="true" aria-labelledby="patientFinanceTitle">
  <div class="patient-finance-backdrop" data-close-finance></div>
  <section class="patient-finance-dialog">
-  <header class="patient-finance-modal-head"><div><h2 id="patientFinanceTitle">ماليات المريض</h2><p id="patientFinanceName"></p></div><button type="button" id="closePatientFinance">✕</button></header>
+  <header class="patient-finance-modal-head"><div><h2 id="patientFinanceTitle">اشتراك ومواعيد المريض</h2><p id="patientFinanceName"></p></div><button type="button" id="closePatientFinance">✕</button></header>
   <div id="patientFinanceLoading" class="finance-state">جاري تحميل البيانات المالية...</div>
-  <div id="patientFinanceEmpty" class="hidden finance-state">لا توجد بيانات مالية مسجلة. يمكنك إدخال بيانات الاشتراك أدناه.</div>
+  <div id="patientFinanceEmpty" class="hidden finance-state">لا توجد بيانات اشتراك ومواعيد مسجلة. يمكنك إدخال البيانات أدناه.</div>
   <div id="patientFinanceForm" class="patient-fields grid grid-cols-2 gap-3">
    <div class="min-w-0"><label>بداية الاشتراك</label><input id="pfInputStart" type="date"></div>
    <div class="min-w-0"><label>مدة الاشتراك (شهر)</label><input id="pfInputMonths" type="number" min="1"></div>
