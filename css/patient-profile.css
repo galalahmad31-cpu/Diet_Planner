@@ -359,3 +359,444 @@ body.support-delete-modal-open{overflow:hidden}
  .followup-days-list{grid-template-columns:1fr}
  .visit-embedded-heading{padding:9px}
 }
+
+
+/* Patient-level energy and macro calculator — scoped to its own tab. */
+#patientEnergyPanel{
+  background:#f5f7f8!important;
+  border-color:#e4e9eb!important;
+}
+#patientEnergyPanel .embedded-calculator{
+  width:100%;
+  box-sizing:border-box;
+  padding:16px;
+  background:transparent;
+}
+#patientEnergyPanel #calcTab{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+  min-width:0;
+}
+#patientEnergyPanel #calcTab .energy-workspace,
+#patientEnergyPanel #calcTab .macro-workspace{
+  box-sizing:border-box;
+  min-width:0;
+  padding:18px;
+  border:1px solid #e2e8e6;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(22,45,40,.035);
+}
+#patientEnergyPanel #calcTab .energy-workspace{border-top:3px solid #9bb8d1}
+#patientEnergyPanel #calcTab .macro-workspace{border-top:3px solid #8dbca7}
+#patientEnergyPanel #calcTab .workspace-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+#patientEnergyPanel #calcTab .workspace-step{
+  display:block;
+  margin-bottom:5px;
+  color:#87958f;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.8px;
+}
+#patientEnergyPanel #calcTab .workspace-heading h3{
+  margin:0;
+  color:#253b36;
+  font-size:16px;
+  line-height:1.55;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .workspace-heading p{
+  margin:4px 0 0;
+  color:#87958f;
+  font-size:10px;
+  line-height:1.7;
+}
+#patientEnergyPanel #calcTab .equation-switch{
+  display:flex;
+  flex:0 0 auto;
+  gap:4px;
+  padding:4px;
+  border:1px solid #e8edeb;
+  border-radius:10px;
+  background:#f6f8f7;
+}
+#patientEnergyPanel #calcTab .equation-switch button{
+  min-height:34px;
+  padding:7px 11px;
+  border:1px solid transparent;
+  border-radius:7px;
+  background:transparent;
+  color:#65736d;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+#patientEnergyPanel #calcTab #eqBtnMifflin.bg-white,
+#patientEnergyPanel #calcTab #eqBtnSchofield.bg-white{
+  border-color:#e1e8e4!important;
+  background:#fff!important;
+  color:#176b52!important;
+  box-shadow:0 1px 3px rgba(25,55,43,.07);
+}
+#patientEnergyPanel #calcTab .patient-inputs{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+#patientEnergyPanel #calcTab .patient-inputs>div{
+  min-width:0;
+  padding:10px;
+  border:1px solid #e9eeec;
+  border-radius:11px;
+  background:#fbfcfb;
+}
+#patientEnergyPanel #calcTab .patient-inputs label,
+#patientEnergyPanel #calcTab .activity-row label{
+  display:block;
+  margin:0 0 6px;
+  color:#5b6c65;
+  font-size:11px;
+  font-weight:800;
+}
+#patientEnergyPanel #calcTab .patient-inputs input,
+#patientEnergyPanel #calcTab .patient-inputs select,
+#patientEnergyPanel #calcTab .activity-row select{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  height:40px;
+  padding:0 10px;
+  border:1px solid #dfe7e3;
+  border-radius:9px;
+  background:#fff;
+  color:#263a33;
+  font-size:12px;
+  font-weight:700;
+}
+#patientEnergyPanel #calcTab input:focus,
+#patientEnergyPanel #calcTab select:focus{
+  outline:none;
+  border-color:#8bb9a4;
+  box-shadow:0 0 0 3px rgba(64,137,103,.10);
+}
+#patientEnergyPanel #calcTab .activity-row{
+  display:grid;
+  grid-template-columns:minmax(150px,.65fr) minmax(220px,1.5fr) auto;
+  align-items:end;
+  gap:12px;
+  margin-top:13px;
+  padding:13px;
+  border:1px solid #e8eeeb;
+  border-radius:11px;
+  background:#f8faf9;
+}
+#patientEnergyPanel #calcTab .activity-row label{margin:0}
+#patientEnergyPanel #calcTab .activity-row button{
+  min-height:40px;
+  padding:0 17px;
+  border:0;
+  border-radius:9px;
+  background:#26785e;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+#patientEnergyPanel #calcTab .activity-row button:hover{background:#1e674f}
+#patientEnergyPanel #calcTab .energy-results{
+  display:grid;
+  grid-template-columns:1fr 1fr 1.15fr;
+  gap:9px;
+  margin-top:13px;
+}
+#patientEnergyPanel #calcTab .energy-results>div{
+  display:flex;
+  min-width:0;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  padding:12px 14px;
+  border:1px solid #e8edeb;
+  border-radius:11px;
+  background:#fafbfb;
+}
+#patientEnergyPanel #calcTab .energy-results small{
+  color:#7b8983;
+  font-size:10px;
+  font-weight:700;
+}
+#patientEnergyPanel #calcTab .energy-results strong{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  flex-wrap:wrap;
+  color:#2e4039;
+  font-size:17px;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .energy-results em{
+  color:#97a39e;
+  font-size:9px;
+  font-style:normal;
+  font-weight:600;
+}
+#patientEnergyPanel #calcTab .energy-results .primary{
+  border-color:#d4e8dd;
+  background:#f1f8f4;
+}
+#patientEnergyPanel #calcTab .energy-results .primary strong{
+  color:#176b52;
+  font-size:21px;
+}
+#patientEnergyPanel #calcTab .result-equation strong{
+  color:#44554e;
+  font-size:12px;
+}
+#patientEnergyPanel #calcTab .schofield-note{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin-top:10px;
+  padding:10px 12px;
+  border:1px solid #eee7d8;
+  border-radius:10px;
+  background:#fbfaf6;
+  color:#766447;
+  font-size:10px;
+}
+#patientEnergyPanel #calcTab .schofield-note small{color:#968365}
+#patientEnergyPanel #calcTab .target-energy{
+  padding:9px 14px;
+  border:1px solid #d7e9df;
+  border-radius:11px;
+  background:#f3f8f5;
+  text-align:center;
+  white-space:nowrap;
+}
+#patientEnergyPanel #calcTab .target-energy small{
+  display:block;
+  color:#668173;
+  font-size:9px;
+  font-weight:800;
+}
+#patientEnergyPanel #calcTab .target-energy strong{
+  display:block;
+  color:#176b52;
+  font-size:22px;
+  line-height:1.35;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .target-energy em{
+  font-size:10px;
+  font-style:normal;
+}
+#patientEnergyPanel #calcTab .target-adjustment{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid #e8edeb;
+  border-radius:11px;
+  background:#fafbfa;
+}
+#patientEnergyPanel #calcTab .target-adjustment label{
+  min-width:150px;
+  color:#586960;
+  font-size:11px;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .target-adjustment label small{
+  display:block;
+  margin-top:3px;
+  color:#96a19b;
+  font-size:9px;
+  font-weight:600;
+}
+#patientEnergyPanel #calcTab .target-adjustment input{
+  box-sizing:border-box;
+  width:100%;
+  max-width:220px;
+  height:40px;
+  padding:0 12px;
+  border:1px solid #dfe7e3;
+  border-radius:9px;
+  background:#fff;
+  font-size:13px;
+  font-weight:800;
+}
+#patientEnergyPanel #calcTab .macro-section-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:15px 0 9px;
+  color:#43564d;
+  font-size:11px;
+}
+#patientEnergyPanel #calcTab .macro-section-label span{
+  color:#89968f;
+  font-size:9px;
+}
+#patientEnergyPanel #calcTab .macro-cards{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+#patientEnergyPanel #calcTab .macro-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:13px;
+  border:1px solid #e7ece9;
+  border-radius:12px;
+  background:#fbfcfb;
+  box-shadow:none;
+}
+#patientEnergyPanel #calcTab .macro-name{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#46574f;
+  font-size:11px;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .macro-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#82958b;
+}
+#patientEnergyPanel #calcTab .macro-percent{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  color:#8b9791;
+  font-size:11px;
+  font-weight:800;
+}
+#patientEnergyPanel #calcTab .macro-percent input{
+  box-sizing:border-box;
+  width:54px;
+  height:36px;
+  padding:0 5px;
+  border:1px solid #e0e7e3;
+  border-radius:8px;
+  background:#fff;
+  color:#2d4037;
+  text-align:center;
+  font-size:14px;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .macro-grams{
+  display:flex;
+  grid-column:1/-1;
+  align-items:baseline;
+  gap:7px;
+  padding-top:9px;
+  border-top:1px solid #edf1ee;
+}
+#patientEnergyPanel #calcTab .macro-grams strong{
+  color:#2d4037;
+  font-size:21px;
+  font-weight:900;
+}
+#patientEnergyPanel #calcTab .macro-grams small{
+  color:#929e97;
+  font-size:10px;
+}
+#patientEnergyPanel #calcTab .macro-alert{
+  margin-top:8px;
+  padding:8px;
+  border:1px solid #f2d4d4;
+  border-radius:9px;
+  text-align:center;
+  font-size:10px;
+  font-weight:800;
+}
+#patientEnergyPanel #calcTab .macro-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid #edf1ee;
+}
+#patientEnergyPanel #calcTab .macro-footer>span{
+  color:#87948d;
+  font-size:10px;
+}
+#patientEnergyPanel #calcTab .macro-footer button{
+  display:flex;
+  min-height:42px;
+  align-items:center;
+  gap:8px;
+  padding:0 17px;
+  border:0;
+  border-radius:10px;
+  background:#26785e;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+#patientEnergyPanel #calcTab .macro-footer button:hover{background:#1e674f}
+#patientEnergyPanel #calcTab button:focus-visible{
+  outline:2px solid #4e9678;
+  outline-offset:2px;
+}
+@media(max-width:760px){
+  #patientEnergyPanel .embedded-calculator{padding:10px}
+  #patientEnergyPanel #calcTab .energy-workspace,
+  #patientEnergyPanel #calcTab .macro-workspace{padding:14px}
+  #patientEnergyPanel #calcTab .workspace-heading{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  #patientEnergyPanel #calcTab .patient-inputs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #patientEnergyPanel #calcTab .activity-row{grid-template-columns:1fr;gap:8px}
+  #patientEnergyPanel #calcTab .activity-row button{width:100%}
+  #patientEnergyPanel #calcTab .energy-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #patientEnergyPanel #calcTab .energy-results .primary{grid-column:1/-1}
+  #patientEnergyPanel #calcTab .macro-cards{grid-template-columns:1fr}
+  #patientEnergyPanel #calcTab .macro-item{grid-template-columns:1fr auto}
+  #patientEnergyPanel #calcTab .macro-grams{
+    grid-column:auto;
+    padding:0;
+    border:0;
+    justify-content:flex-end;
+  }
+  #patientEnergyPanel #calcTab .macro-footer{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  #patientEnergyPanel #calcTab .macro-footer button{justify-content:center}
+}
+@media(max-width:420px){
+  #patientEnergyPanel #calcTab .energy-workspace,
+  #patientEnergyPanel #calcTab .macro-workspace{padding:12px}
+  #patientEnergyPanel #calcTab .workspace-heading{gap:10px}
+  #patientEnergyPanel #calcTab .equation-switch{width:100%}
+  #patientEnergyPanel #calcTab .equation-switch button{flex:1;padding-inline:6px}
+  #patientEnergyPanel #calcTab .target-adjustment{
+    align-items:stretch;
+    flex-direction:column;
+    gap:7px;
+  }
+  #patientEnergyPanel #calcTab .target-adjustment label{min-width:0}
+  #patientEnergyPanel #calcTab .target-adjustment input{max-width:none}
+  #patientEnergyPanel #calcTab .energy-results{gap:7px}
+}
+
+.energy-approval-status{margin:0 0 12px;padding:10px 13px;border:1px solid #dcebe2;border-radius:10px;background:#f5faf7;color:#426452;font:700 11px Cairo,sans-serif}
+.energy-approval-status.is-approved{border-color:#b9dfc8;background:#effaf3;color:#21613e}
+.energy-approval-status.is-error{border-color:#f2caca;background:#fff6f6;color:#a33b3b}
