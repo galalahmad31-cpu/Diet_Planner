@@ -606,13 +606,6 @@
       .getElementById("resendSignupOtpButton")
       ?.addEventListener("click", resendSignupOtp);
     document
-      .getElementById("backToRegisterButton")
-      ?.addEventListener("click", () => {
-        showRegistrationStep();
-        const box = document.getElementById("authMessage");
-        if (box) box.style.display = "none";
-      });
-    document
       .getElementById("signupOtp")
       ?.addEventListener("input", (event) => {
         event.target.value = event.target.value.replace(/\\D/g, "").slice(0, 6);
