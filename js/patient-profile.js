@@ -791,9 +791,9 @@
     const note = $('patientFinanceAccessNote');
     if (note) {
       note.textContent = state.isAdmin
-        ? 'وضع المدير: يمكنك تعديل بيانات الاشتراك والمواعيد.'
+        ? 'وضع المدير: يمكنك تعديل بيانات الاشتراك.'
         : state.hasActiveSubscription
-          ? 'الاشتراك فعال — يمكنك تعديل بيانات الاشتراك والمواعيد.'
+          ? 'الاشتراك فعال — يمكنك تعديل بيانات الاشتراك.'
           : 'عرض البيانات متاح؛ التعديل والحفظ متاحان أثناء الاشتراك المدفوع فقط.';
     }
   }
@@ -831,7 +831,7 @@
     const form = $('patientFinanceForm');
     const empty = $('patientFinanceEmpty');
     const errorBox = $('patientFinanceError');
-    if (loading) { loading.hidden = false; loading.textContent = 'جاري تحميل بيانات الاشتراك والمواعيد...'; }
+    if (loading) { loading.hidden = false; loading.textContent = 'جاري تحميل بيانات الاشتراك...'; }
     if (form) form.hidden = true;
     if (empty) empty.hidden = true;
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ''; }
@@ -865,7 +865,7 @@
     } catch (error) {
       console.error('Patient finance load failed:', error);
       if (errorBox) {
-        errorBox.textContent = 'تعذر تحميل بيانات الاشتراك والمواعيد. ' + (error.message || 'تحقق من الاتصال وصلاحيات قاعدة البيانات.');
+        errorBox.textContent = 'تعذر تحميل بيانات الاشتراك. ' + (error.message || 'تحقق من الاتصال وصلاحيات قاعدة البيانات.');
         errorBox.hidden = false;
       }
       return false;
@@ -1004,7 +1004,7 @@
       toast.className = 'patient-finance-success-toast';
       toast.setAttribute('role', 'status');
       toast.setAttribute('aria-live', 'polite');
-      toast.textContent = 'تم حفظ بيانات المريض والاشتراك والمواعيد بنجاح';
+      toast.textContent = 'تم حفظ بيانات المريض والاشتراك بنجاح';
       document.body.appendChild(toast);
     }
     toast.classList.remove('is-visible');
