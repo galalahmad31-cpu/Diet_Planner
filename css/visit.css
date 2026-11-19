@@ -283,10 +283,8 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 /* Assessment is intentionally excluded from the dietary-plan workflow */
 #assessmentCard,#assessmentContent{display:none!important}
 
-/* Calculator workspace — single scoped source of truth */
-/* Visit module cards: clear color identity + full-row layout */
+/* Visit module cards: shared visual style; embedded layout is defined once below. */
 .visit-module-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.visit-module-grid #assessmentCard{grid-column:1/-1}
 .visit-module-grid .module-card{
   min-height:112px;padding:18px!important;border:1px solid transparent!important;
   border-radius:17px!important;box-shadow:0 5px 16px rgba(15,23,42,.07);
@@ -294,18 +292,18 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 }
 .visit-module-grid .module-card h4{font-size:15px!important;font-weight:900!important}
 .visit-module-grid .module-card p{font-size:11px!important;line-height:1.7!important}
-.visit-module-grid #assessmentCard{background:linear-gradient(110deg,#fff8e8,#fff)!important;border-color:#f5d58c!important}
+.visit-module-grid #assessmentCard{grid-column:1/-1;background:linear-gradient(110deg,#fff8e8,#fff)!important;border-color:#f5d58c!important}
 .visit-module-grid #assessmentCard>div>div:first-child{background:#ffedbd!important;color:#a16207!important}
 .visit-module-grid #dietPlanCard{background:linear-gradient(110deg,#e8fbf1,#fff)!important;border-color:#8fe0b8!important}
 .visit-module-grid #dietPlanCard>div>div:first-child{background:#c9f4dd!important;color:#047857!important}
 .visit-module-grid #exchangePlanCard{background:linear-gradient(110deg,#f3eaff,#fff)!important;border-color:#cbb3ff!important}
 .visit-module-grid #exchangePlanCard>div>div:first-child{background:#e5d5ff!important;color:#6d28d9!important}
-.visit-module-grid .module-card.module-active{box-shadow:0 0 0 3px currentColor,0 8px 20px rgba(15,23,42,.1)!important}
+.visit-module-grid .module-card.module-active{box-shadow:0 0 0 2px currentColor,0 5px 14px rgba(15,23,42,.08)!important}
 @media(max-width:640px){
- .visit-module-grid{grid-template-columns:1fr}
- .visit-module-grid #assessmentCard{grid-column:auto}
- .visit-module-grid .module-card{min-height:76px;padding:13px!important}
- .visit-module-grid .module-card h4{font-size:13px!important}
+  .visit-module-grid{grid-template-columns:1fr}
+  .visit-module-grid #assessmentCard{grid-column:auto}
+  .visit-module-grid .module-card{min-height:76px;padding:13px!important}
+  .visit-module-grid .module-card h4{font-size:13px!important}
 }
 
 /* Visit page: Food Library-style green card and swipe navigation */
@@ -389,7 +387,7 @@ html.visit-embedded #moduleContent{margin-top:12px!important}
  html.visit-embedded #visitContent>section:first-child{padding:10px!important}
 }
 
-/* Embedded patient visit: remove duplicate theme control and keep plan tabs compact. */
+/* Embedded visit: one compact two-column plan selector; no duplicate global theme control. */
 html.visit-embedded #dp-theme-toggle{display:none!important}
 html.visit-embedded .visit-module-grid{
   display:grid!important;
@@ -400,52 +398,33 @@ html.visit-embedded .visit-module-grid{
 html.visit-embedded .visit-module-grid #assessmentCard{display:none!important}
 html.visit-embedded .visit-module-grid #dietPlanCard,
 html.visit-embedded .visit-module-grid #exchangePlanCard{
-  display:flex!important;
-  align-items:center!important;
-  min-width:0!important;
-  min-height:58px!important;
-  padding:8px 11px!important;
-  border-radius:12px!important;
-  box-shadow:0 2px 7px rgba(15,23,42,.045)!important;
+  display:flex!important;align-items:center!important;min-width:0!important;
+  min-height:52px!important;padding:7px 10px!important;border-radius:11px!important;
+  box-shadow:0 1px 5px rgba(15,23,42,.045)!important;
 }
 html.visit-embedded .visit-module-grid #dietPlanCard>div,
 html.visit-embedded .visit-module-grid #exchangePlanCard>div{
-  display:flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:8px!important;
-  width:100%!important;
-  min-width:0!important;
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-start!important;gap:7px!important;width:100%!important;min-width:0!important;
 }
 html.visit-embedded .visit-module-grid #dietPlanCard>div>div:first-child,
 html.visit-embedded .visit-module-grid #exchangePlanCard>div>div:first-child{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  width:30px!important;
-  height:30px!important;
-  flex:0 0 30px!important;
-  border-radius:9px!important;
-  font-size:13px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:27px!important;height:27px!important;flex:0 0 27px!important;border-radius:8px!important;font-size:12px!important;
 }
 html.visit-embedded .visit-module-grid #dietPlanCard h4,
 html.visit-embedded .visit-module-grid #exchangePlanCard h4{
-  margin:0!important;
-  font-size:11px!important;
-  line-height:1.5!important;
-  white-space:nowrap!important;
+  margin:0!important;font-size:11px!important;line-height:1.4!important;white-space:nowrap!important;
 }
 html.visit-embedded .visit-module-grid #dietPlanCard p,
 html.visit-embedded .visit-module-grid #exchangePlanCard p{display:none!important}
 html.visit-embedded .visit-module-grid .module-card.module-active{
-  box-shadow:inset 0 0 0 1.5px currentColor,0 3px 9px rgba(15,23,42,.06)!important;
+  box-shadow:inset 0 0 0 1px currentColor,0 2px 6px rgba(15,23,42,.05)!important;
 }
 @media(max-width:380px){
   html.visit-embedded .visit-module-grid{gap:6px!important}
   html.visit-embedded .visit-module-grid #dietPlanCard,
-  html.visit-embedded .visit-module-grid #exchangePlanCard{padding:7px 8px!important;min-height:54px!important}
+  html.visit-embedded .visit-module-grid #exchangePlanCard{min-height:48px!important;padding:6px 7px!important}
   html.visit-embedded .visit-module-grid #dietPlanCard h4,
   html.visit-embedded .visit-module-grid #exchangePlanCard h4{font-size:10px!important}
 }
-
