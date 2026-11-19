@@ -126,10 +126,11 @@ function resetArticleSeo(){
 }
 function updateArticleSeo(a){
  const url=location.origin+'/article.html?id='+encodeURIComponent(a.id);
- const description=safe(a.content||'').replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim().slice(0,155)||a.title;
+ const descriptionNode=document.createElement('div');descriptionNode.innerHTML=safe(a.content||'');
+ const description=(descriptionNode.textContent||'').replace(/\s+/g,' ').trim().slice(0,155)||a.title;
  document.title=(a.title||'مقال علمي')+' | مقالات التغذية العلاجية - Diet Planner';
  setMeta('description',description);
- setMeta('robots','index,follow,max-image-preview:large');
+ setMeta('robots',a.visibility==='public'?'index,follow,max-image-preview:large':'noindex,nofollow');
  setMeta('og:type','article',true);
  setMeta('og:title',document.title,true);
  setMeta('og:description',description,true);
