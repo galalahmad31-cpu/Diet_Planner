@@ -24,7 +24,7 @@ body{font-family:Cairo,sans-serif;background:#f5f8f8;color:#1e293b}.article-body
 </head>
 <body class="min-h-screen">
 <main class="mx-auto max-w-4xl px-4 py-6 sm:py-10">
-<nav class="mb-5 flex items-center justify-between gap-3"><a href="article.html" class="rounded-xl border bg-white px-4 py-2 text-sm font-bold text-slate-700"><i class="fa-solid fa-arrow-right ml-1"></i> كل المقالات</a><a href="login.html#register" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white">ابدأ استخدام Diet Planner</a></nav>
+<nav class="mb-5 flex items-center justify-between gap-3"><a href="article.html" class="rounded-xl border bg-white px-4 py-2 text-sm font-bold text-slate-700"><i class="fa-solid fa-arrow-right ml-1"></i> كل المقالات</a><a id="guestStartLink" href="login.html#register" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white">ابدأ استخدام Diet Planner</a></nav>
 <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-9">
 <div id="articleLoading" class="py-16 text-center text-slate-500"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="mt-3">جاري تحميل المقال...</p></div>
 <div id="articleError" hidden class="py-16 text-center"><h1 class="text-xl font-extrabold">المقال غير متاح</h1><p class="mt-2 text-sm text-slate-500">قد يكون المقال غير منشور أو تم نقله.</p></div>
@@ -35,7 +35,7 @@ body{font-family:Cairo,sans-serif;background:#f5f8f8;color:#1e293b}.article-body
 <div id="articleBody" class="article-body pt-6"></div>
 </div>
 </article>
-<section class="mt-6 rounded-3xl bg-slate-900 p-6 text-center text-white sm:p-8">
+<section id="articleGuestCta" class="mt-6 rounded-3xl bg-slate-900 p-6 text-center text-white sm:p-8">
 <h2 class="text-xl font-extrabold">حوّل المعرفة إلى ممارسة أكثر تنظيمًا</h2>
 <p class="mt-2 text-sm leading-7 text-slate-300">استخدم أدوات Diet Planner لتصميم الخطط الغذائية وتنظيم ملفات المرضى ومتابعتهم.</p>
 <a href="login.html#register" class="mt-4 inline-flex rounded-xl bg-emerald-500 px-6 py-3 text-sm font-extrabold text-white">إنشاء حساب</a>
