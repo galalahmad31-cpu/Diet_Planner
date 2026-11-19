@@ -15,7 +15,7 @@
   <script src="js/patient-profile.js?v=20261119-patient-module-tabs-v1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-patient-module-tabs-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261119-measurements-table-v2">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
 
@@ -142,10 +142,29 @@
         </div>
         <div id="measurementsLoading" class="measurements-state" hidden>جاري تحميل سجل القياسات...</div>
         <div id="measurementsError" class="measurements-state measurements-error" hidden></div>
-        <div class="measurements-table-wrap">
+        <div class="measurements-table-heading">
+          <div>
+            <h3>سجل القياسات</h3>
+            <p>تاريخ وقياسات المريض المسجلة بترتيب زمني</p>
+          </div>
+          <span class="measurements-table-unit">الوزن ومحيطات الجسم</span>
+        </div>
+        <div class="measurements-table-wrap" role="region" aria-label="جدول سجل القياسات" tabindex="0">
           <table class="measurements-table">
-            <thead><tr><th>التاريخ</th><th>الوزن (كجم)</th><th>محيط الوسط (سم)</th><th>محيط الأرداف (سم)</th><th>الالتزام</th><th class="no-print">إجراء</th></tr></thead>
-            <tbody id="weightTableBody"><tr><td colspan="6" class="measurements-state">افتح القسم لعرض سجل القياسات.</td></tr></tbody>
+            <caption class="measurements-table-caption">سجل قياسات المريض: التاريخ والوزن ومحيط الوسط ومحيط الأرداف والالتزام الغذائي</caption>
+            <thead>
+              <tr>
+                <th scope="col">التاريخ</th>
+                <th scope="col">الوزن <span>(كجم)</span></th>
+                <th scope="col">محيط الوسط <span>(سم)</span></th>
+                <th scope="col">محيط الأرداف <span>(سم)</span></th>
+                <th scope="col">الالتزام الغذائي</th>
+                <th scope="col" class="no-print">إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="weightTableBody">
+              <tr><td colspan="6" class="measurements-state">افتح القسم لعرض سجل القياسات.</td></tr>
+            </tbody>
           </table>
         </div>
       </div>
