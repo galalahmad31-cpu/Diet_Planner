@@ -120,54 +120,219 @@
 
             </section>
 
-            <section class="mt-7">
-
-                <div class="mb-4">
-
-                    <h3 class="text-lg font-extrabold text-slate-800">
-                        الأقسام الرئيسية
-                    </h3>
-
-                    <p class="mt-1 text-xs text-slate-500">
-                        اختر القسم الذي تريد العمل عليه
-                    </p>
-
+            <section class="dashboard-services-section mt-5" aria-labelledby="dashboardServicesTitle">
+                <div class="dashboard-section-heading mb-3 flex items-center justify-between gap-3">
+                    <div>
+                        <h3 id="dashboardServicesTitle" class="text-base font-extrabold text-slate-800">الأقسام الرئيسية</h3>
+                        <p class="mt-1 text-[11px] text-slate-500">اسحب الشريط لاستعراض جميع الأدوات</p>
+                    </div>
+                    <div class="dashboard-strip-controls" aria-label="التحكم في شريط الأقسام">
+                        <button type="button" class="dashboard-strip-arrow" data-dashboard-scroll="next" aria-label="الأقسام التالية"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button type="button" class="dashboard-strip-arrow" data-dashboard-scroll="previous" aria-label="الأقسام السابقة"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-                    <a href="patient.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+                <div class="dashboard-services-strip" id="dashboardServicesStrip" tabindex="0" aria-label="شريط الأقسام">
+                    <a href="patient.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
                         <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                                <i class="fa-solid fa-user-group text-xl"></i>
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                                <i class="fa-solid fa-user-group text-base"></i>
                             </div>
 
                             <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
                         </div>
 
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
                             قائمة المرضى
                         </h4>
 
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
                             إدارة المرضى، الملفات الغذائية، الخطط والمتابعة.
                         </p>
                     </a>
-
-                    <a href="notifications.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
+<a href="food.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
                         <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
-                                <i class="fa-solid fa-bell text-xl"></i>
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                                <i class="fa-solid fa-apple-whole text-base"></i>
                             </div>
 
                             <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
                         </div>
 
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            مكتبة الأغذية
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            استعراض وإدارة قاعدة بيانات الأغذية والقيم الغذائية.
+                        </p>
+                    </a>
+<a href="products.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
+                                <i class="fa-solid fa-prescription-bottle-medical text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            المنتجات الغذائية
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            مكتبة التركيبات الغذائية العلاجية وتصنيفها وقيمها الغذائية.
+                        </p>
+                    </a>
+<a href="diet.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                                <i class="fa-solid fa-layer-group text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            مكتبة الدايت
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            إنشاء وحفظ وإدارة خطط الدايت والقوالب الأسبوعية.
+                        </p>
+                    </a>
+<a href="recipe.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
+                                <i class="fa-solid fa-bowl-food text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            الوصفات الصحية
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            إنشاء واستعراض وصفات صحية مع مكوناتها وطريقة تحضيرها وقيمها الغذائية.
+                        </p>
+                    </a>
+<a href="quickcalc.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
+                                <i class="fa-solid fa-calculator text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            الحاسبة السريعة
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            حساب السعرات والاحتياجات الغذائية بسرعة.
+                        </p>
+                    </a>
+<a href="finance.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+                                <i class="fa-solid fa-wallet text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            اشتراكات المرضى
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            إدارة الاشتراكات والمدفوعات وحالة التجديد.
+                        </p>
+                    </a>
+<a href="article.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+                                <i class="fa-solid fa-newspaper text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            المقالات
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            إنشاء وإدارة المقالات والمحتوى التثقيفي ونشره للعامة.
+                        </p>
+                    </a>
+<a href="profile.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                                <i class="fa-solid fa-user-doctor text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                             الصفحة الشخصية و خطط الاشتراك 
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            بيانات الحساب، التخصص وحالة الاشتراك.
+                        </p>
+                    </a>
+<a href="feedback.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-yellow-50 text-yellow-600">
+                                <i class="fa-solid fa-star text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            شاركنا رأيك
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            قيّم تجربتك مع Diet Planner واكتب رأيك وملاحظاتك.
+                        </p>
+                    </a>
+<a href="about.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50 text-brand-600">
+                                <i class="fa-solid fa-circle-info text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
+                            عن التطبيق
+                        </h4>
+
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
+                            تعرف على Diet Planner ومحتوى التطبيق ومزاياه.
+                        </p>
+                    </a>
+<a href="notifications.html" class="nav-card dashboard-service-card glass group rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="icon-box dashboard-service-icon flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
+                                <i class="fa-solid fa-bell text-base"></i>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
+                        </div>
+
+                        <h4 class="mt-2 text-sm font-extrabold text-slate-800">
                             الإشعارات
                         </h4>
 
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                        <p class="mt-1 text-[11px] leading-5 text-slate-500">
                             تنبيهات الاشتراكات ومواعيد المتابعة القادمة.
                         </p>
 
@@ -184,189 +349,6 @@
                             </span>
                         </div>
                     </a>
-
-                    <a href="food.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
-                                <i class="fa-solid fa-apple-whole text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            مكتبة الأغذية
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            استعراض وإدارة قاعدة بيانات الأغذية والقيم الغذائية.
-                        </p>
-                    </a>
-
-                    <a href="products.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
-                                <i class="fa-solid fa-prescription-bottle-medical text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            المنتجات الغذائية
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            مكتبة التركيبات الغذائية العلاجية وتصنيفها وقيمها الغذائية.
-                        </p>
-                    </a>
-
-                    <a href="diet.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-                                <i class="fa-solid fa-layer-group text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            مكتبة الدايت
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            إنشاء وحفظ وإدارة خطط الدايت والقوالب الأسبوعية.
-                        </p>
-                    </a>
-
-                    <a href="recipe.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
-                                <i class="fa-solid fa-bowl-food text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            الوصفات الصحية
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            إنشاء واستعراض وصفات صحية مع مكوناتها وطريقة تحضيرها وقيمها الغذائية.
-                        </p>
-                    </a>
-
-                    <a href="quickcalc.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
-                                <i class="fa-solid fa-calculator text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            الحاسبة السريعة
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            حساب السعرات والاحتياجات الغذائية بسرعة.
-                        </p>
-                    </a>
-
-                    <a href="finance.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-600">
-                                <i class="fa-solid fa-wallet text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            اشتراكات المرضى
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            إدارة الاشتراكات والمدفوعات وحالة التجديد.
-                        </p>
-                    </a>
-
-
-
-                    <a href="article.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
-                                <i class="fa-solid fa-newspaper text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            المقالات
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            إنشاء وإدارة المقالات والمحتوى التثقيفي ونشره للعامة.
-                        </p>
-                    </a>
-
-                    <a href="profile.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
-                                <i class="fa-solid fa-user-doctor text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                             الصفحة الشخصية و خطط الاشتراك 
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            بيانات الحساب، التخصص وحالة الاشتراك.
-                        </p>
-                    </a>
-
-                    <a href="feedback.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-50 text-yellow-600">
-                                <i class="fa-solid fa-star text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            شاركنا رأيك
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            قيّم تجربتك مع Diet Planner واكتب رأيك وملاحظاتك.
-                        </p>
-                    </a>
-
-                    <a href="about.html" class="nav-card glass group rounded-3xl p-5 shadow-sm">
-                        <div class="flex items-start justify-between">
-                            <div class="icon-box flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-brand-600">
-                                <i class="fa-solid fa-circle-info text-xl"></i>
-                            </div>
-
-                            <i class="fa-solid fa-arrow-left text-slate-300 transition group-hover:-translate-x-1 group-hover:text-brand-500"></i>
-                        </div>
-
-                        <h4 class="mt-5 text-lg font-extrabold text-slate-800">
-                            عن التطبيق
-                        </h4>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            تعرف على Diet Planner ومحتوى التطبيق ومزاياه.
-                        </p>
-                    </a>
-
                     <a
                         id="adminCard"
                         href="admin.html"
@@ -388,9 +370,19 @@
                             إدارة طلبات الاشتراك ومراجعة إثباتات الدفع.
                         </p>
                     </a>
-
                 </div>
-
+            </section>
+            <section class="dashboard-notifications-section mt-5" aria-labelledby="dashboardNotificationsTitle">
+                <div class="dashboard-notifications-header">
+                    <div>
+                        <h3 id="dashboardNotificationsTitle" class="text-base font-extrabold text-slate-800">مركز الإشعارات</h3>
+                        <p class="mt-1 text-[11px] text-slate-500">ملخص المواعيد والاشتراكات التي تحتاج إلى متابعة</p>
+                    </div>
+                    <a href="notifications.html" class="dashboard-all-notifications">كل الإشعارات <i class="fa-solid fa-arrow-left"></i></a>
+                </div>
+                <div class="dashboard-notifications-content" id="dashboardNotificationsContent" aria-live="polite">
+                    <div class="dashboard-notifications-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>جارٍ تحميل الإشعارات...</span></div>
+                </div>
             </section>
 
             <footer class="py-8 text-center">
