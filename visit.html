@@ -17,7 +17,7 @@
         </script>
 <script src="js/visit.js?v=20261119-numbered-plans-v2" defer>
         </script>
-        <link rel="stylesheet" href="css/visit.css?v=20261119-header-clean-v2">
+        <link rel="stylesheet" href="css/visit.css?v=20261119-plan-actions-v1">
         <link rel="stylesheet" href="css/theme.css?v=20260921-3">
         <script src="js/theme.js?v=20260921-3">
         </script>
@@ -161,32 +161,20 @@
                                                     </b>
                                                 </div>
                                             </div>
-                                            <div class="flex justify-end mt-3 no-print">
-                                                <button data-action="dietPlan.openPrintSettingsModal" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
-                                                    <i class="fa-solid fa-print">
-                                                    </i>
-                                                    <span>
-                                                        طباعة
-                                                    </span>
+                                            <div class="visit-diet-actions no-print">
+                                                <button type="button" data-action="dietPlan.addNewDay" class="visit-diet-action-button visit-diet-add-button">
+                                                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                                    <span>إضافة يوم جديد</span>
+                                                </button>
+                                                <button type="button" data-action="dietPlan.openPrintSettingsModal" class="visit-diet-action-button visit-diet-print-button">
+                                                    <i class="fa-solid fa-print" aria-hidden="true"></i>
+                                                    <span>طباعة</span>
                                                 </button>
                                             </div>
                                         </div>
                                     </section>
                                     <section id="planTab" class="space-y-5">
-                                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
-                                            <div>
-                                                <h3 class="font-extrabold text-slate-800 text-lg">
-                                                    البرنامج الغذائي
-                                                </h3>
-                                            </div>
-                                            <button data-action="dietPlan.addNewDay" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
-                                                <i class="fa-solid fa-plus">
-                                                </i>
-                                                <span>
-                                                    إضافة يوم جديد
-                                                </span>
-                                            </button>
-                                        </div>
+                                        
                                         <div id="emptyState" class="hidden text-center py-12 bg-white border border-dashed border-slate-300 rounded-2xl p-6 space-y-3 no-print">
                                             <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
                                                 <i class="fa-solid fa-utensils">
@@ -195,9 +183,7 @@
                                             <h4 class="font-bold text-slate-700 text-base">
                                                 لا توجد أيام تغذوية مضافة
                                             </h4>
-                                            <button data-action="dietPlan.addNewDay" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl">
-                                                إنشاء اليوم الأول
-                                            </button>
+                                            <p class="text-xs text-slate-500 font-semibold">استخدم زر «إضافة يوم جديد» أعلى الخطة لبدء البرنامج الغذائي.</p>
                                         </div>
                                         <div id="daysContainer" class="space-y-5">
                                         </div>
