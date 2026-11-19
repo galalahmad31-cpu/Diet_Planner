@@ -297,7 +297,15 @@
       if (!state.user && !(await loadUser())) return false;
       if (!subscriptionDataPromise) subscriptionDataPromise = loadData();
       await subscriptionDataPromise;
-      openSubscribe(String(planId));
+
+      const requestedId = String(planId);
+      const matchingPending = pendingSubscription();
+      if (matchingPending && String(matchingPending.plan_id) === requestedId) {
+        openPending(matchingPending.id);
+        return true;
+      }
+
+      openSubscribe(requestedId);
       return state.selectedPlanId != null;
     } catch (error) {
       showError('opening inline subscription form failed', error);
