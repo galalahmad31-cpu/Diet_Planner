@@ -68,9 +68,10 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-details[open] .patient-finance-chevron{transform:rotate(180deg);color:#7654bd}
 .patient-finance-details[open]>.patient-finance-summary{background:#faf9ff}
 .patient-finance-content{padding:14px 2px 4px;border-top:1px solid #edf1f4}
-.patient-finance-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.patient-finance-fields{display:flex;flex-direction:column;gap:12px}
 .patient-finance-fields[hidden]{display:none!important}
-.patient-finance-fields>div{min-width:0}
+.patient-finance-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.patient-finance-row>div{min-width:0}
 .patient-finance-fields input,.patient-finance-fields select{box-sizing:border-box;width:100%;min-width:0}
 .patient-finance-fields input:disabled,.patient-finance-fields select:disabled{background:#f4f7f8;color:#52636e;opacity:1}
 .patient-finance-discounted output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid #d7ebe4;border-radius:8px;background:#eff8f4;color:#176b63;font-size:12px;font-weight:900}
@@ -88,10 +89,10 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
   transition:opacity .2s ease,transform .2s ease;
 }
 .patient-finance-success-toast.is-visible{opacity:1;transform:translate(-50%,0)}
-@media(max-width:900px){.patient-finance-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.patient-finance-row{gap:10px}}
 @media(max-width:520px){
   .patient-finance-content{padding-inline:0}
-  .patient-finance-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 9px}
+  .patient-finance-row{grid-template-columns:1fr;gap:10px}
   .patient-finance-fields label{min-height:30px;display:flex;align-items:flex-end;line-height:1.35}
 }
 /* Unified dashboard card palette */
