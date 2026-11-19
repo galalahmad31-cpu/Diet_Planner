@@ -454,22 +454,22 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
 #daysContainer .day-card-actions .day-delete-btn{width:33px;padding:0;border-color:#f1dddd;background:#fff8f8;color:#b45353}
 #daysContainer .day-card-actions button:disabled{opacity:.38;cursor:not-allowed}
 #daysContainer .day-card-body{display:grid;gap:14px;padding:15px}
-#daysContainer .day-summary{padding:12px;border:1px solid #e6edef;border-radius:13px;background:#fbfcfc}
-#daysContainer .day-summary-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
-#daysContainer .day-summary-heading strong{color:#23434d;font-size:12px;font-weight:900}
-#daysContainer .day-summary-heading span{color:#71828a;font-size:9px;font-weight:600}
+#daysContainer .day-summary{padding:13px;border:1px solid #b8d6cc;border-radius:13px;background:#f1f7f4}
+#daysContainer .day-summary-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:11px}
+#daysContainer .day-summary-heading strong{color:#164638;font-size:15px;font-weight:900}
+#daysContainer .day-summary-heading span{color:#435f55;font-size:11px;font-weight:700}
 #daysContainer .day-macros-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-#daysContainer .day-macros-grid>div{min-width:0;padding:9px 7px!important;border:1px solid #e5ecee!important;border-radius:10px!important;background:#fff!important;color:#28434c!important}
+#daysContainer .day-macros-grid>div{min-width:0;padding:10px 8px!important;border:1px solid #cbded7!important;border-radius:10px!important;background:#fff!important;color:#24483d!important}
 #daysContainer .day-macros-grid>div>div:first-child{gap:3px!important;flex-wrap:wrap}
-#daysContainer .day-macros-grid>div span{color:#62747c!important}
-#daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{color:#183b46!important;font-size:15px!important;font-weight:900!important}
-#daysContainer .day-macros-grid>div>div:nth-child(2) span:last-child{color:#687c84!important}
-#daysContainer .day-macros-grid>div>div:last-child{background:#edf2f3!important}
-#daysContainer .day-micros-row{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid #e9eff0}
-#daysContainer .day-micros-row span{display:inline-flex;align-items:baseline;gap:4px;padding:4px 9px;border-radius:7px;background:#f1f5f6;color:#526872;font-size:10px}
-#daysContainer .day-micros-row b{color:#3e626c;font-size:9px}
-#daysContainer .day-micros-row strong{color:#203f49;font-size:11px;font-weight:900}
-#daysContainer .day-micros-row small{color:#687c84;font-size:8px}
+#daysContainer .day-macros-grid>div span{color:#425c53!important;font-size:10px!important;font-weight:800!important}
+#daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{color:#123f32!important;font-size:18px!important;font-weight:900!important}
+#daysContainer .day-macros-grid>div>div:nth-child(2) span:last-child{color:#405a51!important;font-size:11px!important;font-weight:800!important}
+#daysContainer .day-macros-grid>div>div:last-child{background:#dcebe4!important}
+#daysContainer .day-micros-row{display:flex;align-items:center;justify-content:flex-start;gap:9px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #cbded7}
+#daysContainer .day-micros-row span{display:inline-flex;align-items:baseline;gap:6px;padding:7px 12px;border:1px solid #d3e3dc;border-radius:8px;background:#e5f0eb;color:#294f42;font-size:12px}
+#daysContainer .day-micros-row b{color:#245b48;font-size:12px;font-weight:900}
+#daysContainer .day-micros-row strong{color:#123f32;font-size:15px;font-weight:900}
+#daysContainer .day-micros-row small{color:#405a51;font-size:10px;font-weight:800}
 #daysContainer .day-tools{display:grid;grid-template-columns:auto minmax(220px,1fr);align-items:center;gap:12px}
 #daysContainer .day-primary-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 #daysContainer .day-primary-actions button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:8px 12px;border-radius:9px;font-size:10px;font-weight:800}
@@ -522,10 +522,10 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
  #daysContainer .day-card-actions button span{display:none}
  #daysContainer .day-card-body{gap:11px;padding:10px}
  #daysContainer .day-summary{padding:9px}
- #daysContainer .day-summary-heading span{font-size:8px}
+ #daysContainer .day-summary-heading span{font-size:10px}
  #daysContainer .day-macros-grid{gap:5px}
  #daysContainer .day-macros-grid>div{padding:7px 4px!important}
- #daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{font-size:13px!important}
+ #daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{font-size:16px!important}
  #daysContainer .day-tools{grid-template-columns:1fr;gap:9px}
  #daysContainer .day-primary-actions button{flex:1;min-height:34px;padding:7px 8px;font-size:9px}
  #daysContainer .day-notes-wrap{align-items:flex-start;flex-direction:column;gap:4px}
