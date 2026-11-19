@@ -484,11 +484,11 @@
     });
   }
 
-  async function loadNutritionPlans() {
+  async function loadNutritionPlans({ autoOpenLatest = false } = {}) {
     const loading = $('visitsLoading');
     const empty = $('visitsEmpty');
     const list = $('visitsList');
-    if (!loading || !empty || !list) return;
+    if (!loading || !empty || !list) return [];
 
     loading.hidden = false;
     loading.textContent = 'جاري تحميل الخطط الغذائية...';
@@ -507,11 +507,11 @@
       console.error('Load nutrition plans failed:', error);
       loading.hidden = false;
       loading.textContent = 'تعذر تحميل الخطط الغذائية.';
-      return;
+      return [];
     }
     if (!data?.length) {
       empty.hidden = false;
-      return;
+      return [];
     }
 
     const planNumberById = new Map(
@@ -565,6 +565,15 @@
         button.classList.toggle('is-active', button.dataset.openPlan === activeFrame.dataset.planId);
       });
     }
+
+    if (autoOpenLatest) {
+      const latestGramsPlan = data.find(plan =>
+        !String(plan.plan_name || '').includes('البدائل')
+        && String(plan.plan_name || '').includes('الجرامات')
+      );
+      if (latestGramsPlan) openPlanEmbedded(latestGramsPlan.id, 'الخطة الغذائية باستخدام الجرامات');
+    }
+    return data;
   }
 
   function openPlanEmbedded(planId = null, planType = '') {
@@ -584,6 +593,9 @@
     url.searchParams.set('embed', '1');
     if (planId) url.searchParams.set('plan_id', planId);
     if (planType) url.searchParams.set('plan_type', planType);
+    if (planId && String(planType).includes('الجرامات')) {
+      url.searchParams.set('auto_open_grams', '1');
+    }
 
     // Every explicit add-plan action gets a fresh iframe session, so an old
     // activeCloudPlanId can never leak into the next new plan.
@@ -1099,7 +1111,9 @@
         if (status) status.textContent = 'تعذر تحميل حاسبة الطاقة. حدّث الصفحة وحاول مرة أخرى.';
       }
     }
-    if (moduleName === 'plans') void loadNutritionPlans();
+    if (moduleName === 'plans') {
+      void loadNutritionPlans({ autoOpenLatest: true });
+    }
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
   }
 
