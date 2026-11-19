@@ -46,7 +46,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .save-actions{display:flex;gap:8px;margin-top:14px}.save-actions button{flex:1;border:0;border-radius:8px;padding:9px;font:800 10px Cairo,sans-serif;cursor:pointer}.save-actions #savePatientButton{background:#16834a;color:white}.save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
 #editButton{margin-bottom:4px;border-radius:9px}
 #addVisitButton{border-radius:9px!important}
-#visitsList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+#visitsList{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:stretch;gap:7px;margin-top:8px;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-inline:contain;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
 #visitsList>div{border:1px solid var(--dp-line)!important;border-radius:11px!important;background:#fbfdfe!important;padding:9px 10px!important;transition:border-color .15s}
 #visitsList>div:hover{border-color:#b8d9d2!important}
 #writeAccessStatus,.access-note{display:none!important}
