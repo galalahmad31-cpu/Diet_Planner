@@ -871,3 +871,51 @@ main{padding:clamp(16px,3vw,32px)!important}
   .quickcalc-page-header .quick-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
   .quickcalc-page-header .quick-access-card i{font-size:11px!important}
 }
+
+
+/* Full-width quick calculator layout: remove outer gutters and max-width cap */
+html,body{width:100%;min-width:0;max-width:100%;margin:0!important;padding:0!important;overflow-x:hidden}
+.quickcalc-page-body{min-height:100vh;padding:0!important}
+.main-container.quickcalc-fullwidth-shell{
+  display:block;
+  width:100%!important;
+  max-width:none!important;
+  min-height:100vh;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+.quickcalc-page-header{
+  width:100%;
+  max-width:none;
+  margin:0!important;
+  border-radius:0 0 22px 22px!important;
+}
+.quickcalc-header-inner{width:100%;max-width:none;margin:0}
+.quickcalc-main-content{
+  width:100%;
+  max-width:none;
+  margin:0!important;
+  padding:clamp(10px,1.6vw,22px)!important;
+  box-sizing:border-box;
+}
+#sub-content-quick-calc{
+  width:100%;
+  max-width:none;
+  margin:0!important;
+  padding:0!important;
+  min-height:0!important;
+}
+#sub-content-quick-calc>.border{
+  width:100%;
+  max-width:none;
+  margin-inline:0!important;
+}
+@media(max-width:640px){
+  .quickcalc-page-header{border-radius:0 0 16px 16px!important}
+  .quickcalc-main-content{padding:9px!important}
+  #sub-content-quick-calc{gap:10px!important}
+  #sub-content-quick-calc>.border{border-radius:14px!important}
+}
