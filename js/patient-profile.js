@@ -580,7 +580,6 @@
     url.searchParams.set('embed', '1');
     if (planId) url.searchParams.set('plan_id', planId);
     if (planType) url.searchParams.set('plan_type', planType);
-    else url.searchParams.set('new_plan', '1');
 
     const key = planId || 'new';
     if (frame.dataset.planId !== key) {
@@ -653,26 +652,9 @@
     }
     if (state.isCreatingPlan || !patientId) return;
 
-    const choice = await Swal.fire({
-      title: 'إضافة خطة غذائية',
-      input: 'select',
-      inputOptions: {
-        'الخطة الغذائية باستخدام الجرامات': 'خطة بالجرامات',
-        'الخطة الغذائية باستخدام البدائل': 'خطة بالبدائل'
-      },
-      inputPlaceholder: 'اختر نوع الخطة',
-      showCancelButton: true,
-      confirmButtonText: 'فتح سجل جديد',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#26765a',
-      reverseButtons: true,
-      showClass: { popup: '', backdrop: '' },
-      hideClass: { popup: '', backdrop: '' },
-      inputValidator: value => value ? undefined : 'اختر نوع الخطة أولاً'
-    });
-    if (!choice.isConfirmed || !choice.value) return;
-
-    openPlanEmbedded(null, choice.value);
+    // Open the plan workspace without preselecting a type.
+    // The user chooses grams or exchanges from the module cards/tabs.
+    openPlanEmbedded(null, '');
   }
 
   function fillPatientData() {
