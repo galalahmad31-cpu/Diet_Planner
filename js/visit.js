@@ -58,7 +58,24 @@ const db = window.DietPlannerAccess?.supabaseClient;
         visit_date,
         patients (
           id,
-          name
+          name,
+          energy_equation,
+          energy_gender,
+          energy_age,
+          energy_height_cm,
+          energy_weight_kg,
+          energy_activity_factor,
+          energy_bmr,
+          energy_tdee,
+          energy_adjustment,
+          energy_target_calories,
+          energy_protein_percent,
+          energy_carb_percent,
+          energy_fat_percent,
+          energy_target_protein,
+          energy_target_carb,
+          energy_target_fat,
+          energy_approved_at
         )
       `)
       .eq('id', visitId)
@@ -90,7 +107,8 @@ const db = window.DietPlannerAccess?.supabaseClient;
       id: data.id,
       patient_id: data.patient_id,
       visit_number: data.visit_number ?? null,
-      visit_date: data.visit_date ?? null
+      visit_date: data.visit_date ?? null,
+      energyRequirements: data.patients || null
     };
 
     document.getElementById('loadingState').classList.add('hidden');
@@ -158,7 +176,6 @@ const db = window.DietPlannerAccess?.supabaseClient;
   async function toggleModule(module) {
     const contents = {
       assessment: document.getElementById('assessmentContent'),
-      calculator: document.getElementById('calculatorContent'),
       dietPlan: document.getElementById('dietPlanContent'),
       exchangePlan: document.getElementById('exchangePlanContent')
     };
@@ -168,7 +185,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     const isOpen = !content.classList.contains('hidden');
     Object.values(contents).forEach(el => el?.classList.add('hidden'));
-    const moduleCardIds = {assessment:'assessmentCard',calculator:'calculatorCard',dietPlan:'dietPlanCard',exchangePlan:'exchangePlanCard'};
+    const moduleCardIds = {assessment:'assessmentCard',dietPlan:'dietPlanCard',exchangePlan:'exchangePlanCard'};
     Object.entries(moduleCardIds).forEach(([key, cardId]) => {
       const card = document.getElementById(cardId);
       if (card) card.classList.toggle('module-active', key === module && !isOpen);
@@ -181,37 +198,10 @@ const db = window.DietPlannerAccess?.supabaseClient;
     if (module === 'assessment') {
       loadAssessment();
     } else {
-      // Calculator is loaded statically by visit.html (defer, before this file).
-      // Avoid injecting a second script and masking parse/runtime errors as a generic load failure.
-      if (module === 'calculator') {
-        if (typeof window.initCalculator !== 'function') {
-          console.error('[Visit] calculator script missing; page build/cache is stale or script failed.');
-          content.classList.add('hidden');
-          showError('ملف حاسبة الاحتياجات لم يعمل (نسخة الصفحة: 20261116-3). حدّث الصفحة أو أعد فتحها.');
-          return;
-        }
-      } else {
-        const loaded = await loadModule(module);
-        if (!loaded) {
-          content.classList.add('hidden');
-          return;
-        }
-      }
-
-      if (module === 'calculator') {
-        try {
-          const initialized = await window.initCalculator();
-          if (initialized === false) {
-            content.classList.add('hidden');
-            showError('تعذر تهيئة حاسبة الاحتياجات. راجع بيانات الزيارة وحاول مرة أخرى.');
-            return;
-          }
-        } catch (error) {
-          console.error('Calculator module initialization failed:', error);
-          content.classList.add('hidden');
-          showError('حدث خطأ أثناء تهيئة حاسبة الاحتياجات.');
-          return;
-        }
+      const loaded = await loadModule(module);
+      if (!loaded) {
+        content.classList.add('hidden');
+        return;
       }
 
       if (module === 'dietPlan') {
