@@ -12,6 +12,7 @@ if (!sb) { console.error("Diet Planner access layer is unavailable to the gram-b
 const params=new URLSearchParams(location.search);
 const initialUrlPatientId=params.get('patient_id') || params.get('id');
 const initialUrlPlanId=params.get('plan_id');
+const autoOpenGrams=params.get('auto_open_grams')==='1';
 const isNewPlan=params.get('new_plan')==='1';
 let patientId=initialUrlPatientId;
 let activePlanStartDate=null, activePlanName=null;
@@ -806,6 +807,19 @@ function init(){
    if(!foodsLoaded){dietInitPromise=null;return false;}
 
    renderDays();
+   if(autoOpenGrams){
+     const days=daysData;
+     days.forEach(day=>{day.isCollapsed=false;});
+     renderDays();
+     const firstDay=days[0];
+     if(firstDay?.id){
+       const firstDayCard=document.querySelector(`[data-day-id="${CSS.escape(String(firstDay.id))}"]`);
+       if(firstDayCard){
+         const collapseButton=firstDayCard.querySelector('.day-collapse-btn');
+         if(firstDayCard.classList.contains('day-collapsed') && collapseButton) collapseButton.click();
+       }
+     }
+   }
    return true;
  })().catch(error=>{
    console.error('Diet plan initialization failed:',error);
