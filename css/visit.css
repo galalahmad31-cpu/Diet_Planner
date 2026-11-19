@@ -388,3 +388,64 @@ html.visit-embedded #moduleContent{margin-top:12px!important}
  html.visit-embedded body>main{padding:7px!important}
  html.visit-embedded #visitContent>section:first-child{padding:10px!important}
 }
+
+/* Embedded patient visit: remove duplicate theme control and keep plan tabs compact. */
+html.visit-embedded #dp-theme-toggle{display:none!important}
+html.visit-embedded .visit-module-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  align-items:stretch!important;
+}
+html.visit-embedded .visit-module-grid #assessmentCard{display:none!important}
+html.visit-embedded .visit-module-grid #dietPlanCard,
+html.visit-embedded .visit-module-grid #exchangePlanCard{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  min-height:58px!important;
+  padding:8px 11px!important;
+  border-radius:12px!important;
+  box-shadow:0 2px 7px rgba(15,23,42,.045)!important;
+}
+html.visit-embedded .visit-module-grid #dietPlanCard>div,
+html.visit-embedded .visit-module-grid #exchangePlanCard>div{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html.visit-embedded .visit-module-grid #dietPlanCard>div>div:first-child,
+html.visit-embedded .visit-module-grid #exchangePlanCard>div>div:first-child{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:30px!important;
+  height:30px!important;
+  flex:0 0 30px!important;
+  border-radius:9px!important;
+  font-size:13px!important;
+}
+html.visit-embedded .visit-module-grid #dietPlanCard h4,
+html.visit-embedded .visit-module-grid #exchangePlanCard h4{
+  margin:0!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+  white-space:nowrap!important;
+}
+html.visit-embedded .visit-module-grid #dietPlanCard p,
+html.visit-embedded .visit-module-grid #exchangePlanCard p{display:none!important}
+html.visit-embedded .visit-module-grid .module-card.module-active{
+  box-shadow:inset 0 0 0 1.5px currentColor,0 3px 9px rgba(15,23,42,.06)!important;
+}
+@media(max-width:380px){
+  html.visit-embedded .visit-module-grid{gap:6px!important}
+  html.visit-embedded .visit-module-grid #dietPlanCard,
+  html.visit-embedded .visit-module-grid #exchangePlanCard{padding:7px 8px!important;min-height:54px!important}
+  html.visit-embedded .visit-module-grid #dietPlanCard h4,
+  html.visit-embedded .visit-module-grid #exchangePlanCard h4{font-size:10px!important}
+}
+
