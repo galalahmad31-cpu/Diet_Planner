@@ -11,7 +11,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-        <link rel="stylesheet" href="css/weight.css?v=20261115-actions-fix1">
+        <link rel="stylesheet" href="css/weight.css?v=20261119-green-card-nav1">
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
         </script>
         <script src="js/auth-access.js?v=20261118-subscription-gate-v2">
@@ -23,40 +23,37 @@
         </script>
     </head>
     <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
-        <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 no-print">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-900/40">
-                        <i class="fa-solid fa-leaf text-white text-xl">
-                        </i>
-                    </div>
-                    <div>
-                        <h1 class="font-black text-lg sm:text-xl tracking-tight leading-tight">
-                            Diet Planner
-                        </h1>
-                        <p class="text-sm font-bold text-emerald-400">
-                            د. أحمد جلال
-                        </p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a id="dashboardBtn" href="app.html" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-sm flex items-center gap-2">
-                        <i class="fa-solid fa-house">
-                        </i>
-                        <span>
-                            الرئيسية
-                        </span>
-                    </a>
-                    <a id="backBtn" href="#" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-sm flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-right">
-                        </i>
-                        <span>
-                            ملف المريض
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </header>
+        <header class="weight-page-header no-print">
+  <div class="weight-header-inner">
+    <div class="weight-brand-row">
+      <div class="weight-brand">
+        <div class="weight-brand-logo"><i class="fa-solid fa-leaf" aria-hidden="true"></i></div>
+        <div class="weight-brand-copy">
+          <h1>Diet Planner</h1>
+          <p>د. أحمد جلال</p>
+        </div>
+      </div>
+      <span class="weight-page-label">متابعة القياسات</span>
+    </div>
+    <nav class="weight-access-nav" dir="rtl" aria-label="التنقل السريع">
+      <div class="weight-access-track">
+        <a id="dashboardBtn" href="app.html" class="weight-access-card"><i class="fa-solid fa-house" aria-hidden="true"></i><span>الرئيسية</span></a>
+        <a href="patient.html" class="weight-access-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><span>قائمة المرضى</span></a>
+        <a id="backBtn" href="#" class="weight-access-card"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span>ملف المريض</span></a>
+        <a href="food.html" class="weight-access-card"><i class="fa-solid fa-apple-whole" aria-hidden="true"></i><span>مكتبة الأغذية</span></a>
+        <a href="products.html" class="weight-access-card"><i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i><span>المنتجات الغذائية</span></a>
+        <a href="diet.html" class="weight-access-card"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>مكتبة الدايت</span></a>
+        <a href="recipe.html" class="weight-access-card"><i class="fa-solid fa-bowl-food" aria-hidden="true"></i><span>الوصفات الصحية</span></a>
+        <a href="quickcalc.html" class="weight-access-card"><i class="fa-solid fa-calculator" aria-hidden="true"></i><span>الحاسبة السريعة</span></a>
+        <a href="finance.html" class="weight-access-card"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span>اشتراكات المرضى</span></a>
+        <a href="article.html" class="weight-access-card"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>المقالات</span></a>
+        <a href="profile.html" class="weight-access-card"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i><span>الصفحة الشخصية وخطط الاشتراك</span></a>
+        <a href="feedback.html" class="weight-access-card"><i class="fa-solid fa-star" aria-hidden="true"></i><span>شاركنا رأيك</span></a>
+        <a href="about.html" class="weight-access-card"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>عن التطبيق</span></a>
+      </div>
+    </nav>
+  </div>
+</header>
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
             <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <div class="flex items-center gap-2">
