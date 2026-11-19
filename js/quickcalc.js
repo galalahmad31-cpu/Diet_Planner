@@ -776,30 +776,9 @@ document.addEventListener('change', function (event) {
   }
 });
 
-async function initializeQuickCalculatorAccess() {
-  const access = window.DietPlannerAccess;
-  if (!access?.getCurrentUser) {
-    console.error('Quick Calculator: auth-access.js is not available.');
-    return;
-  }
-
-  const accessStatus = await access.getAccessStatus();
-  if (!accessStatus?.authenticated || !accessStatus.user) {
-    window.location.replace('index.html');
-    return;
-  }
-  const user = accessStatus.user;
-  if (accessStatus.isAdmin !== true &&
-      (await access.hasActiveSubscription(user.id)) !== true) {
-    window.location.replace('subscription_plans_index.html');
-    return;
-  }
-
-  // The calculator is visible only to an active subscriber or administrator.
-}
-
-window.addEventListener("DOMContentLoaded", async () => {
-    await initializeQuickCalculatorAccess();
+// Public utility: calculations run locally and do not require authentication
+// or a subscription. Keep account and subscription checks off this page.
+window.addEventListener("DOMContentLoaded", () => {
     calculateQuickGIR();
     calculateDextrosePrep();
     toggleDexMode();
