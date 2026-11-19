@@ -294,7 +294,7 @@ function renderPatients() {
                 </div>
 
                 <div>
-                    <div class="text-[11px] text-slate-400">النهاية</div>
+                    <div class="text-[11px] text-slate-400">تاريخ انتهاء الاشتراك</div>
                     <div class="mt-1 text-sm font-bold">${fmt(finance.subscription_end_date)}</div>
                 </div>
 
@@ -303,9 +303,13 @@ function renderPatients() {
                     <div class="mt-1 text-sm font-bold">${finance.is_paid ? 'نعم' : 'لا'}</div>
                 </div>
 
+                <div>
+                    <div class="text-[11px] text-slate-400">آخر زيارة فعلية</div>
+                    <div class="mt-1 text-sm font-bold">${fmt(finance.last_visit_date)}</div>
+                </div>
 
                 <div>
-                    <div class="text-[11px] text-slate-400">المتابعة القادمة</div>
+                    <div class="text-[11px] text-slate-400">موعد المتابعة القادم</div>
                     <div class="mt-1 text-sm font-bold">${fmt(finance.next_follow_up_date)}</div>
                 </div>
             </div>
