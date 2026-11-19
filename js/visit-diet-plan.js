@@ -14,7 +14,7 @@ const initialUrlPatientId=params.get('patient_id') || params.get('id');
 const initialUrlPlanId=params.get('plan_id');
 const isNewPlan=params.get('new_plan')==='1';
 let patientId=initialUrlPatientId;
-let activePlanStartDate=null;
+let activePlanStartDate=null, activePlanName=null;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
@@ -124,26 +124,37 @@ async function ensureAllFoods(){
 
 async function loadPlan(shouldRender=true){
   if(isNewPlan && !initialUrlPlanId){
-    activeCloudPlanId=null; activePlanStartDate=null;
+    activeCloudPlanId=null; activePlanStartDate=null; activePlanName=null;
     daysData=[]; savedDaysData=[];
+    patientInfo.targetCal=patientInfo.energy_target_calories??'';
+    patientInfo.targetPro=patientInfo.energy_target_protein??'';
+    patientInfo.targetCarb=patientInfo.energy_target_carb??'';
+    patientInfo.targetFat=patientInfo.energy_target_fat??'';
     updateTargets(); if(shouldRender)renderDays();
     return;
   }
-  let query=sb.from('nutrition_plans').select('id,patient_id,plan_name,start_date,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,notes,created_at,updated_at').eq('patient_id',window.currentPatientId||patientId);
-  query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
+  let query=sb.from('nutrition_plans').select('id,patient_id,plan_name,start_date,target_fluid,notes,created_at,updated_at')
+    .eq('patient_id',window.currentPatientId||patientId);
   if(initialUrlPlanId) query=query.eq('id',initialUrlPlanId);
+  else query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
   const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
   if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
   const plan=plans?.[0];
-  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;updateTargets();if(shouldRender)renderDays();return;}
-  activeCloudPlanId=plan.id;
-  activePlanStartDate=plan.start_date||null;
-  const approved=Number(patientInfo.energy_target_calories)>0 && !!patientInfo.energy_approved_at;
-  patientInfo.targetCal=approved?patientInfo.energy_target_calories:(plan.target_calories??'');
-  patientInfo.targetPro=approved?patientInfo.energy_target_protein:(plan.target_protein??'');
-  patientInfo.targetCarb=approved?patientInfo.energy_target_carb:(plan.target_carb??'');
-  patientInfo.targetFat=approved?patientInfo.energy_target_fat:(plan.target_fat??'');
-  patientInfo.goal=plan.goal||'loss';
+  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;activePlanName=null;updateTargets();if(shouldRender)renderDays();return;}
+  activeCloudPlanId=plan.id; activePlanStartDate=plan.start_date||null;
+  activePlanName=plan.plan_name||'الخطة الغذائية باستخدام الجرامات';
+  if(/^الخطة\s+\d+\s+-/.test(activePlanName) && !activePlanName.includes('الجرامات') && !activePlanName.includes('بالجرامات')){
+    const typedName=activePlanName+' - بالجرامات';
+    const {error:renameError}=await sb.from('nutrition_plans').update({plan_name:typedName}).eq('id',plan.id).eq('patient_id',window.currentPatientId||patientId);
+    if(renameError)throw renameError;
+    activePlanName=typedName;
+  }else if(activePlanName.includes('البدائل')||activePlanName.includes('بالبدائل')){
+    throw new Error('هذه الخطة مخصصة للبدائل وليست خطة الجرامات.');
+  }
+  patientInfo.targetCal=patientInfo.energy_target_calories??'';
+  patientInfo.targetPro=patientInfo.energy_target_protein??'';
+  patientInfo.targetCarb=patientInfo.energy_target_carb??'';
+  patientInfo.targetFat=patientInfo.energy_target_fat??'';
   const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name,notes').eq('plan_id',plan.id).order('day_number',{ascending:true});
   const ids=(dayRows||[]).map(x=>x.id);
   let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
@@ -590,37 +601,23 @@ async function savePlan(){
     // Never send a stale plan id to the RPC. The database accepts an id only
     // when it belongs to this patient and this exact plan type.
     if(planId){
-      const {data:matchingPlan,error:matchingPlanError}=await sb
-        .from('nutrition_plans')
-        .select('id')
-        .eq('id',planId)
-        .eq('patient_id',currentPatientId)
-        .eq('plan_name','الخطة الغذائية باستخدام الجرامات')
-        .maybeSingle();
-
+      const {data:matchingPlan,error:matchingPlanError}=await sb.from('nutrition_plans').select('id,plan_name')
+        .eq('id',planId).eq('patient_id',currentPatientId).maybeSingle();
       if(matchingPlanError)throw matchingPlanError;
       if(!matchingPlan){
-        if(isNewPlan){
-          // A new-plan session must not inherit an id from an earlier iframe state.
-          activeCloudPlanId=null;
-          planId=null;
-        }else{
-          throw new Error('معرّف الخطة لا يطابق المريض أو نوع الخطة الحالي. أعد فتح الخطة من شريط الخطط قبل الحفظ؛ لم يتم تغيير بيانات قاعدة البيانات.');
-        }
+        if(isNewPlan){activeCloudPlanId=null;activePlanName=null;planId=null;}
+        else throw new Error('معرّف الخطة لا يطابق المريض الحالي. أعد فتح الخطة من شريط الخطط قبل الحفظ.');
+      }else{
+        if(String(matchingPlan.plan_name||'').includes('البدائل'))throw new Error('هذه الخطة مخصصة للبدائل وليست خطة الجرامات.');
+        activePlanName=matchingPlan.plan_name;
       }
     }
 
     const planData={
       id:planId,
       patient_id:currentPatientId,
-      plan_name:'الخطة الغذائية باستخدام الجرامات',
+      plan_name:activePlanName || 'الخطة الغذائية باستخدام الجرامات',
       start_date:activePlanStartDate || new Date().toISOString().slice(0,10),
-      target_calories:Number(patientInfo.targetCal)||null,
-      target_protein:Number(patientInfo.targetPro)||null,
-      target_carb:Number(patientInfo.targetCarb)||null,
-      target_fat:Number(patientInfo.targetFat)||null,
-      target_fluid:null,
-      goal:patientInfo.goal||null,
       notes:null
     };
 
