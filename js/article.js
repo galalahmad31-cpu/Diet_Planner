@@ -102,7 +102,7 @@ function render(){
    ${isAdmin?`<div class="article-list-actions"><span class="article-list-status ${pub?'is-public':'is-private'}">${pub?'منشور':'خاص'}</span><button data-a="edit" data-id="${esc(a.id)}" title="تعديل المقال" aria-label="تعديل المقال"><i class="fa-solid fa-pen"></i></button><button data-a="delete" data-id="${esc(a.id)}" title="حذف المقال" aria-label="حذف المقال"><i class="fa-solid fa-trash"></i></button></div>`:''}`;
   $('grid').appendChild(el);
  });
- if(selectedArticleId&&!visible.some(a=>a.id===selectedArticleId))closeArticle(false);
+ if(selectedArticleId&&!visible.some(a=>a.id===selectedArticleId))closeArticle(true);
 }
 function openArticle(id,updateHistory=true){
  const a=articles.find(x=>x.id===id&& (isAdmin||x.visibility==='public'));
