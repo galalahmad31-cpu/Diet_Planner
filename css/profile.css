@@ -125,7 +125,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
   box-shadow:0 24px 70px rgba(0,0,0,.24);direction:rtl
 }
 .profile-subscribe-dialog h2{margin:0 0 16px;color:#173e37;font-size:20px;font-weight:900}
-.profile-selected-plan-info{margin-bottom:16px;padding:13px 15px;border-radius:12px;background:#f2f8f5;color:#31574e;font-size:13px;line-height:1.9}
+.profile-selected-plan-info{margin:0 0 20px;padding:0 0 14px;border:0;border-bottom:1px solid #e6efeb;background:transparent;color:#173e37;font-size:26px;font-weight:900;line-height:1.45;text-align:right}
+.profile-selected-plan-info strong{display:block;font-size:26px;font-weight:900;letter-spacing:.1px}
+@media(max-width:600px){.profile-selected-plan-info,.profile-selected-plan-info strong{font-size:23px}}
 .profile-subscribe-field{margin-bottom:14px}
 .profile-subscribe-field label{display:block;margin-bottom:7px;color:#314d46;font-size:12px;font-weight:800}
 .profile-subscribe-field input,.profile-subscribe-field textarea{
