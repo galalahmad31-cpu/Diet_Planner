@@ -65,11 +65,11 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20261119-plan-open-fix-v2',
+      src: 'js/visit-diet-plan.js?v=20261119-plan-loader-fix-v3',
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
-      src: 'js/visit-exchange-plan.js?v=20261119-plan-open-fix-v2',
+      src: 'js/visit-exchange-plan.js?v=20261119-exchange-loader-fix-v3',
       ready: () => !!window.exchangePlan?.init
     }
   };
@@ -142,7 +142,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     content.classList.remove('hidden');
 
-    {
+    try {
       const loaded = await loadModule(module);
       if (!loaded) {
         content.classList.add('hidden');
@@ -150,12 +150,18 @@ const db = window.DietPlannerAccess?.supabaseClient;
       }
 
       if (module === 'dietPlan') {
-        window.dietPlan.init();
+        await window.dietPlan.init();
       }
 
       if (module === 'exchangePlan') {
-        window.exchangePlan.init();
+        await window.exchangePlan.init();
       }
+    } catch (error) {
+      console.error('Nutrition plan module initialization failed:', error);
+      content.classList.remove('hidden');
+      const status = content.querySelector('#exchangePlanStatus');
+      if (status && module === 'exchangePlan') status.textContent = error?.message || 'تعذر تحميل خطة البدائل.';
+      return;
     }
 
     content.scrollIntoView({ behavior: 'smooth', block: 'start' });
