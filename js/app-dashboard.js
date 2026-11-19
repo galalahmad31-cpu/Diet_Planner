@@ -317,44 +317,18 @@
     return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(ry, rm - 1, rd)) / 86400000);
   }
 
-  function renderNotificationIndicators(counts) {
-    const host = document.getElementById("notificationCardIndicators");
-    if (!host) return;
-
-    const types = [
-      { key: "today", icon: "fa-solid fa-calendar-check", label: "متابعات اليوم", color: "today" },
-      { key: "tomorrow", icon: "fa-solid fa-calendar-plus", label: "متابعات الغد", color: "tomorrow" },
-      { key: "subscriptions", icon: "fa-solid fa-credit-card", label: "تنبيهات الاشتراكات", color: "subscriptions" }
-    ];
-
-    host.replaceChildren();
-    types.forEach((type) => {
-      const count = counts[type.key] || 0;
-      const marker = document.createElement("span");
-      marker.className = `notification-card-indicator ${type.color}`;
-      marker.title = `${type.label}: ${count}`;
-      marker.setAttribute("role", "img");
-      marker.setAttribute("aria-label", `${type.label}: ${count}`);
-      marker.innerHTML = `<i class="${type.icon}" aria-hidden="true"></i><span class="notification-count">${count}</span>`;
-      host.appendChild(marker);
-    });
-    host.classList.toggle("has-notifications", host.childElementCount > 0);
-  }
-
-  async function loadNotificationCardIndicators(userId) {
-    const host = document.getElementById("notificationCardIndicators");
-    if (!host) return;
-
-    // Keep visible zero-count indicators in place while data is loading.
-    renderNotificationIndicators({ today: 0, tomorrow: 0, subscriptions: 0 });
-
-    const supabase = window.DietPlannerAccess?.supabaseClient;
-    if (!supabase || !userId) {
-      host.dataset.loadState = "unavailable";
+  async function loadDashboardNotifications(userId) {
+    if (!userId) {
+      renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "unavailable");
       return;
     }
 
-    host.dataset.loadState = "loading";
+    const supabase = window.DietPlannerAccess?.supabaseClient;
+    if (!supabase) {
+      renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "unavailable");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("patient_finances")
@@ -378,14 +352,10 @@
         if (subscriptionDays !== null && subscriptionDays <= 7) counts.subscriptions += 1;
       });
 
-      renderNotificationIndicators(counts);
       renderDashboardNotifications(counts, "loaded");
-      host.dataset.loadState = "loaded";
     } catch (error) {
-      // Keep the zero-count indicators visible if the data request fails.
-      host.dataset.loadState = "error";
       renderDashboardNotifications({ today: 0, tomorrow: 0, subscriptions: 0 }, "error");
-      console.warn("Notification card indicators could not be loaded:", error);
+      console.warn("Dashboard notifications could not be loaded:", error);
     }
   }
 
@@ -545,8 +515,8 @@
         status.isAdmin
       );
 
-      // Load subtle per-type notification markers after authentication.
-      await loadNotificationCardIndicators(status.user.id);
+      // Load the dashboard notification summary after authentication.
+      await loadDashboardNotifications(status.user.id);
     } catch (error) {
       console.error("Dashboard access verification failed:", error);
       // Fail closed rather than rendering an entitled dashboard on an error.
