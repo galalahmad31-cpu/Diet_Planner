@@ -567,11 +567,15 @@
     }
 
     if (autoOpenLatest) {
+      // New plans use a numbered name (e.g. "الخطة 1 - date"), not a
+      // fixed "الجرامات" label. Choose the newest non-alternatives plan;
+      // the embedded editor is explicitly opened in gram mode below.
       const latestGramsPlan = data.find(plan =>
         !String(plan.plan_name || '').includes('البدائل')
-        && String(plan.plan_name || '').includes('الجرامات')
       );
-      if (latestGramsPlan) openPlanEmbedded(latestGramsPlan.id, 'الخطة الغذائية باستخدام الجرامات');
+      if (latestGramsPlan) {
+        openPlanEmbedded(latestGramsPlan.id, 'الخطة الغذائية باستخدام الجرامات');
+      }
     }
     return data;
   }
@@ -605,11 +609,13 @@
       url.searchParams.set('plan_session', String(newPlanSessionCounter));
     }
 
-    if (frame.dataset.planKey !== key) {
+    const nextUrl = url.toString();
+    if (frame.dataset.planKey !== key || frame.dataset.planUrl !== nextUrl) {
       frame.dataset.planKey = key;
       frame.dataset.planId = planId || '';
+      frame.dataset.planUrl = nextUrl;
       frame.style.height = '1px';
-      frame.src = url.toString();
+      frame.src = nextUrl;
     }
     // Keep the selected plan in place; do not auto-scroll the page.
   }
@@ -621,7 +627,11 @@
     const details = $('followupDaysDetails');
     
     document.querySelectorAll('[data-open-plan]').forEach(button => button.classList.remove('is-active'));
-    if (frame) { frame.dataset.planId = ''; frame.dataset.planKey = ''; }
+    if (frame) {
+      frame.dataset.planId = '';
+      frame.dataset.planKey = '';
+      frame.dataset.planUrl = '';
+    }
   }
 
   function formatPlanDate(date) {
