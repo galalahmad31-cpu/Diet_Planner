@@ -773,3 +773,6 @@ html.nsp-embedded #section-en,
 html.nsp-embedded #section-tpn{margin-bottom:0!important;padding-bottom:0!important}
 html.nsp-embedded .monitoring-container-shared-tpn{display:none!important}
 html.nsp-embedded .delete-confirm-overlay.show{display:none!important}
+
+/* In the patient-profile iframe, the patient name is already shown by the host page. */
+html.nsp-embedded .detail-top{display:none!important}
