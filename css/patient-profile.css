@@ -74,6 +74,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-fields input,.patient-finance-fields select{box-sizing:border-box;width:100%;min-width:0}
 .patient-finance-fields input:disabled,.patient-finance-fields select:disabled{background:#f4f7f8;color:#52636e;opacity:1}
 .patient-finance-discounted output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid #d7ebe4;border-radius:8px;background:#eff8f4;color:#176b63;font-size:12px;font-weight:900}
+.patient-finance-readonly output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid #e2e8ee;border-radius:8px;background:#f4f7f8;color:#52636e;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
 .patient-finance-empty{margin-bottom:12px;padding:10px 12px;border:1px dashed #d9e5e9;border-radius:9px;color:#718096;background:#fafcfd;font-size:10px;font-weight:700}
 .patient-finance-error{margin-top:12px;padding:9px 11px;border-radius:9px;background:#fff1f0;color:#b42318;font-size:11px;font-weight:700}
  .patient-finance-access-note{display:block;margin-top:10px;color:#82919a;font-size:9px;font-weight:700}
