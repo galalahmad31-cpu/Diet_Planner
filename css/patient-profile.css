@@ -305,3 +305,21 @@ html,body{max-width:100%;overflow-x:hidden}
  .measurements-table-heading{align-items:flex-start}
  .measurements-table{min-width:680px}
 }
+
+/* Host-level confirmation for actions initiated inside the nutrition-support iframe. */
+.support-day-delete-modal[hidden]{display:none!important}
+.support-day-delete-modal{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.52);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.support-day-delete-box{width:min(290px,calc(100vw - 32px));padding:16px 17px 13px;border-radius:17px;background:#fff;box-shadow:0 20px 60px rgba(15,23,42,.24);text-align:center;font-family:'Cairo',sans-serif}
+.support-day-delete-icon{width:36px;height:36px;margin:0 auto 7px;border-radius:50%;display:grid;place-items:center;background:#fff1f2;color:#dc2626;font-size:15px}
+.support-day-delete-box h3{margin:0 0 6px;color:#243b43;font-size:15px;font-weight:900}
+.support-day-delete-box p{margin:0 0 14px;color:#687981;font-size:10px;font-weight:600;line-height:1.8;white-space:pre-line}
+.support-day-delete-actions{display:flex;justify-content:center;align-items:center;gap:9px}
+.support-day-delete-actions button{min-width:78px;border:0;border-radius:9px;padding:8px 13px;font:800 11px 'Cairo',sans-serif;cursor:pointer}
+.support-day-delete-actions [data-delete-cancel]{background:#f1f5f9;color:#52616a}
+.support-day-delete-actions [data-delete-confirm]{background:#dc2626;color:#fff}
+.support-day-delete-actions button:focus-visible{outline:3px solid #a7c9c1;outline-offset:2px}
+html[data-theme="dark"] .support-day-delete-box{background:#172a2b}
+html[data-theme="dark"] .support-day-delete-box h3{color:#edf7f4}
+html[data-theme="dark"] .support-day-delete-box p{color:#bbceca}
+html[data-theme="dark"] .support-day-delete-actions [data-delete-cancel]{background:#263c3d;color:#dcebe8}
+body.support-delete-modal-open{overflow:hidden}
