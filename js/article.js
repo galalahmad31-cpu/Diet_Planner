@@ -83,7 +83,57 @@ function syncTextDirection(root){
 }
 
 async function load(){let query=supabase.from('articles').select('id,created_by,title,author_name,content,visibility,published_at,created_at,updated_at').order('updated_at',{ascending:false});if(!isAdmin)query=query.eq('visibility','public');const{data,error}=await query;if(error)throw error;articles=data||[];render()}
-function render(){const q=$('search').value.trim().toLowerCase(),v=articles.filter(a=>!q||[a.title,a.author_name].some(x=>String(x||'').toLowerCase().includes(q)));$('grid').innerHTML='';$('empty').classList.toggle('hidden',v.length>0);v.forEach(a=>{const pub=a.visibility==='public',el=document.createElement('article');el.className='article-card';const detailUrl='article-view.html?id='+encodeURIComponent(a.id);el.innerHTML=`<div class="article-card-cover ${pub?'cover-public':'cover-private'}"><span class="article-category">${pub?'<i class="fa-solid fa-earth-africa"></i> منشور':'<i class="fa-solid fa-lock"></i> مسودة خاصة'}</span><div class="cover-symbol"><i class="fa-solid fa-book-open"></i></div><span class="cover-label">DIET PLANNER · KNOWLEDGE</span></div><div class="article-card-body"><div class="article-card-meta"><span><i class="fa-regular fa-calendar"></i> ${date(a.published_at||a.updated_at)}</span>${isAdmin?`<div class="article-actions"><button data-a="edit" data-id="${a.id}" title="تعديل المقال" aria-label="تعديل المقال"><i class="fa-solid fa-pen"></i></button><button data-a="delete" data-id="${a.id}" title="حذف المقال" aria-label="حذف المقال"><i class="fa-solid fa-trash"></i></button></div>`:''}</div><a href="${detailUrl}" class="article-card-title"><h3>${esc(a.title)}</h3><p>بقلم ${esc(a.author_name)}</p></a><div class="article-card-footer"><span><i class="fa-regular fa-clock"></i> قراءة علمية</span><a href="${detailUrl}">اقرأ المقال <i class="fa-solid fa-arrow-left"></i></a></div></div>`;$('grid').appendChild(el)})}
+let selectedArticleId=null;
+function render(){
+ const q=$('search').value.trim().toLowerCase();
+ const visible=articles.filter(a=>!q||[a.title,a.author_name].some(x=>String(x||'').toLowerCase().includes(q)));
+ $('grid').innerHTML='';
+ $('empty').classList.toggle('hidden',visible.length>0);
+ $('articleCount').textContent=visible.length+' مقال';
+ visible.forEach(a=>{
+  const pub=a.visibility==='public',detailUrl='article-view.html?id='+encodeURIComponent(a.id);
+  const el=document.createElement('article');
+  el.className='article-list-item'+(selectedArticleId===a.id?' is-selected':'');
+  el.innerHTML=`<a href="${detailUrl}" data-open-article="${esc(a.id)}" class="article-list-link">
+    <span class="article-list-icon"><i class="fa-solid fa-book-open"></i></span>
+    <span class="article-list-copy"><strong>${esc(a.title)}</strong><small>${esc(a.author_name)} · ${date(a.published_at||a.updated_at)}</small></span>
+    <i class="fa-solid fa-chevron-left article-list-chevron"></i>
+   </a>
+   ${isAdmin?`<div class="article-list-actions"><span class="article-list-status ${pub?'is-public':'is-private'}">${pub?'منشور':'خاص'}</span><button data-a="edit" data-id="${esc(a.id)}" title="تعديل المقال" aria-label="تعديل المقال"><i class="fa-solid fa-pen"></i></button><button data-a="delete" data-id="${esc(a.id)}" title="حذف المقال" aria-label="حذف المقال"><i class="fa-solid fa-trash"></i></button></div>`:''}`;
+  $('grid').appendChild(el);
+ });
+ if(selectedArticleId&&!visible.some(a=>a.id===selectedArticleId))closeArticle(false);
+}
+function openArticle(id,updateHistory=true){
+ const a=articles.find(x=>x.id===id&& (isAdmin||x.visibility==='public'));
+ if(!a)return;
+ selectedArticleId=a.id;
+ $('readerPlaceholder').hidden=true;
+ $('readerContent').hidden=false;
+ $('readerTitle').textContent=a.title||'';
+ $('readerAuthor').textContent='بقلم: '+(a.author_name||'');
+ const published=a.published_at||a.created_at||a.updated_at;
+ $('readerDate').textContent=published?'تاريخ النشر: '+new Intl.DateTimeFormat('ar-EG',{dateStyle:'long'}).format(new Date(published)):'';
+ $('readerDate').dateTime=published||'';
+ $('readerBody').innerHTML=safe(a.content||'');
+ syncTextDirection($('readerBody'));
+ $('openStandaloneArticle').href='article-view.html?id='+encodeURIComponent(a.id);
+ document.querySelectorAll('.article-list-item').forEach(el=>el.classList.toggle('is-selected',el.querySelector('[data-open-article]')?.dataset.openArticle===a.id));
+ $('articleReaderPane').classList.add('has-article');
+ if(updateHistory){
+  const url=new URL(location.href);url.hash='article-'+a.id;
+  history.pushState({articleId:a.id},'',url);
+ }
+}
+function closeArticle(updateHistory=true){
+ selectedArticleId=null;
+ $('readerContent').hidden=true;
+ $('readerPlaceholder').hidden=false;
+ $('articleReaderPane').classList.remove('has-article');
+ document.querySelectorAll('.article-list-item').forEach(el=>el.classList.remove('is-selected'));
+ if(updateHistory&&location.hash.startsWith('#article-'))history.pushState({},'',location.pathname+location.search);
+}
+
 function openEditor(a=null){if(!isAdmin)return;editingId=a?.id||null;$('modalTitle').textContent=a?'تعديل المقال':'إضافة مقال';$('title').value=a?.title||'';$('author').value=a?.author_name||profile?.full_name||'';$('editor').innerHTML=safe(a?.content||'');syncTextDirection($('editor'));$('public').checked=a?.visibility==='public';$('pubDate').textContent=a?.published_at?date(a.published_at):'سيُحدد عند النشر';$('updDate').textContent=a?.updated_at?date(a.updated_at):'عند الحفظ';state();$('editModal').classList.remove('hidden');document.body.classList.add('overflow-hidden')}
 function closeEditor(){$('editModal').classList.add('hidden');document.body.classList.remove('overflow-hidden');editingId=null}
 function state(){$('toggleText').textContent=$('public').checked?'عام':'خاص';$('state').textContent=$('public').checked?'عام — متاح للمستخدمين':'خاص — ظاهر لك فقط'}
@@ -170,7 +220,19 @@ $('editor').addEventListener('focusin',e=>{
   const cell=e.target.closest('#editor td,#editor th');
   if(cell)selectCell(cell);
 });
-$('grid').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=articles.find(x=>x.id===b.dataset.id);if(!a)return;if(b.dataset.a==='edit'&&isAdmin)openEditor(a);if(b.dataset.a==='delete'&&isAdmin)del(a.id)};
+$('grid').onclick=e=>{
+ const action=e.target.closest('[data-a]');
+ if(action){e.preventDefault();e.stopPropagation();const a=articles.find(x=>x.id===action.dataset.id);if(!a)return;if(action.dataset.a==='edit'&&isAdmin)openEditor(a);if(action.dataset.a==='delete'&&isAdmin)del(a.id);return;}
+ const link=e.target.closest('[data-open-article]');
+ if(!link)return;
+ e.preventDefault();
+ openArticle(link.dataset.openArticle,true);
+};
+$('backToArticles').onclick=()=>closeArticle(true);
+window.addEventListener('popstate',()=>{
+ const match=location.hash.match(/^#article-([0-9a-f-]{36})$/i);
+ if(match)openArticle(match[1],false);else closeArticle(false);
+});
 $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.onkeydown=e=>{if(e.key==='Escape')closeEditor()};
 (async()=>{try{
   if(!supabase){throw new Error('تعذر تهيئة الاتصال الآمن بالتطبيق')}
@@ -181,6 +243,8 @@ $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.
   $('addBtn').classList.toggle('hidden',!isAdmin);
   await load();
   $('loading').style.display='none';
+  const initialMatch=location.hash.match(/^#article-([0-9a-f-]{36})$/i);
+  if(initialMatch)openArticle(initialMatch[1],false);
 }catch(e){
   console.error(e);
   $('loading').innerHTML='<div class="rounded-2xl bg-white p-6 text-center"><div class="text-red-600 font-bold">تعذر تحميل المقالات</div><div class="mt-2 text-xs text-slate-400">'+esc(e.message)+'</div></div>';
