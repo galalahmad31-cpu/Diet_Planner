@@ -120,7 +120,7 @@
     try {
       const request = supabase
         .from('patients')
-        .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
+        .select('id,user_id,name,phone,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
         .eq('id', patientId)
         .maybeSingle();
 
@@ -376,6 +376,7 @@
 
     $('patientName').textContent = patient.name || 'بدون اسم';
     $('nameInput').value = patient.name || '';
+    $('phoneInput').value = patient.phone || '';
     $('genderInput').value = patient.gender || '';
     $('birthDateInput').value = patient.birth_date || '';
     $('ageInput').value = patient.age ?? '';
@@ -387,6 +388,7 @@
 
   const patientFieldIds = [
     'nameInput',
+    'phoneInput',
     'genderInput',
     'birthDateInput',
     'ageInput',
@@ -435,6 +437,7 @@
 
     const payload = {
       name: $('nameInput').value.trim() || 'مريض',
+      phone: $('phoneInput').value.trim() || null,
       gender: $('genderInput').value || null,
       birth_date: $('birthDateInput').value || null,
       age: $('ageInput').value !== '' ? Number($('ageInput').value) : null,
@@ -448,7 +451,7 @@
       .from('patients')
       .update(payload)
       .eq('id', patientId)
-      .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
+      .select('id,user_id,name,phone,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
       .single();
 
     if (error) {
