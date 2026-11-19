@@ -125,22 +125,42 @@ async function loadDiets(force=false){
 function renderDiets(){
   const q=$('search').value.trim().toLowerCase(),f=$('visibilityFilter').value;
   const filtered=diets.filter(d=>(!q||`${d.name} ${d.description||''} ${d.notes||''}`.toLowerCase().includes(q))&&(f==='all'||(f==='mine'&&d.created_by===user.id)||(f==='public'&&d.visibility==='public')));
-  const arr=filtered.slice(0,dietRenderLimit);$('dietGrid').innerHTML=arr.map(d=>{const mine=d.created_by===user.id,canEdit=mine||isAdmin,pub=d.visibility==='public',author=authors[d.created_by]||'';const authorText=author?`نشر بواسطة <strong class="text-slate-600">د. ${esc(author)}</strong>`:'نشر بواسطة طبيب';return `<article class="glass overflow-hidden rounded-3xl"><div class="border-b border-slate-100 p-5"><div class="flex items-start justify-between gap-3"><div><div class="flex flex-wrap gap-2"><span class="rounded-full ${pub?'bg-indigo-50 text-indigo-600':'bg-brand-50 text-brand-700'} px-2.5 py-1 text-[10px] font-extrabold">${pub?'منشور':'خاص'}</span>${mine?'<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500">ملكي</span>':''}</div><h3 class="mt-3 text-lg font-extrabold text-slate-800">${esc(d.name)}</h3><p class="mt-1 text-xs text-slate-400 line-clamp-2">${esc(d.description||'بدون وصف')}</p>${pub?`<div class="mt-3 flex items-center gap-2 text-[10px] text-slate-400"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600"><i class="fa-solid fa-user-doctor"></i></span><span>${authorText}</span></div>`:''}</div><i class="fa-solid fa-utensils text-2xl text-brand-100"></i></div><div class="mt-5 grid grid-cols-4 gap-2"><div class="rounded-xl bg-amber-50 p-2 text-center"><div class="text-[9px] text-amber-600 font-bold">سعرات</div><div class="mt-1 text-sm font-extrabold text-amber-900">${d.target_calories==null?'—':num(d.target_calories).toFixed(0)}</div></div><div class="rounded-xl bg-slate-50 p-2 text-center"><div class="text-[9px] text-slate-500 font-bold">بروتين</div><div class="mt-1 text-sm font-extrabold text-slate-800">${d.target_protein==null?'—':num(d.target_protein).toFixed(1)}g</div></div><div class="rounded-xl bg-amber-50/60 p-2 text-center"><div class="text-[9px] text-amber-700 font-bold">كارب</div><div class="mt-1 text-sm font-extrabold text-amber-900">${d.target_carb==null?'—':num(d.target_carb).toFixed(1)}g</div></div><div class="rounded-xl bg-emerald-50 p-2 text-center"><div class="text-[9px] text-emerald-700 font-bold">دهون</div><div class="mt-1 text-sm font-extrabold text-emerald-900">${d.target_fat==null?'—':num(d.target_fat).toFixed(1)}g</div></div></div></div><div class="flex items-center justify-between gap-2 bg-slate-50/70 p-4">${canEdit?`<div class="flex flex-wrap gap-2"><button data-open="${d.id}" class="rounded-xl bg-brand-600 px-3 py-2 text-[11px] font-bold text-white"><i class="fa-solid fa-pen ml-1"></i> فتح وتعديل</button><button data-duplicate="${d.id}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200"><i class="fa-solid fa-copy ml-1"></i> نسخ</button><button data-del="${d.id}" class="rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-500"><i class="fa-solid fa-trash"></i></button></div>`:`<div class="flex gap-2"><button data-open="${d.id}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200"><i class="fa-solid fa-eye ml-1"></i> عرض الدايت</button><button data-duplicate="${d.id}" class="rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-700 ring-1 ring-slate-200"><i class="fa-solid fa-copy ml-1"></i> نسخ</button></div>`}<span class="text-[10px] text-slate-400">يوم واحد</span></div></article>`}).join('');$('empty').classList.toggle('hidden',arr.length>0);$('countBadge').textContent=`${diets.length} دايت`;$('totalStat').textContent=diets.length;$('mineStat').textContent=diets.filter(d=>d.created_by===user.id).length;$('publicStat').textContent=diets.filter(d=>d.visibility==='public').length;
+  const arr=filtered.slice(0,dietRenderLimit);
+  $('dietGrid').innerHTML=arr.map(d=>{
+    const mine=d.created_by===user.id,canEdit=mine||isAdmin,pub=d.visibility==='public';
+    const author=authors[d.created_by]||d.publisher_name||'';
+    const publisher=mine?'أنت':(author?`د. ${esc(author)}`:'غير محدد');
+    return `<article class="diet-list-item">
+      <div class="diet-list-main">
+        <div class="diet-list-title-row">
+          <h3 class="diet-list-title">${esc(d.name)}</h3>
+          <span class="diet-list-status ${pub?'is-public':'is-private'}">${pub?'منشور':'خاص'}</span>
+        </div>
+        <p class="diet-list-publisher">نشر بواسطة <strong>${publisher}</strong></p>
+      </div>
+      <div class="diet-list-actions">
+        <button type="button" data-open="${d.id}" class="diet-list-btn diet-list-view"><i class="fa-solid fa-eye" aria-hidden="true"></i><span>عرض الدايت</span></button>
+        <button type="button" data-duplicate="${d.id}" class="diet-list-btn diet-list-copy"><i class="fa-solid fa-copy" aria-hidden="true"></i><span>نسخ</span></button>
+        ${canEdit?`<button type="button" data-open="${d.id}" class="diet-list-btn diet-list-edit"><i class="fa-solid fa-pen" aria-hidden="true"></i><span>تعديل</span></button><button type="button" data-del="${d.id}" class="diet-list-icon-btn" aria-label="حذف الدايت" title="حذف"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:''}
+      </div>
+    </article>`;
+  }).join('');
+  $('empty').classList.toggle('hidden',arr.length>0);
+  $('countBadge').textContent=`${diets.length} دايت`;
+  $('totalStat').textContent=diets.length;
+  $('mineStat').textContent=diets.filter(d=>d.created_by===user.id).length;
+  $('publicStat').textContent=diets.filter(d=>d.visibility==='public').length;
   const oldButton=$('loadMoreDiets');
   if(oldButton)oldButton.remove();
   if(arr.length<filtered.length){
     const button=document.createElement('button');
-    button.id='loadMoreDiets';
-    button.type='button';
+    button.id='loadMoreDiets';button.type='button';
     button.className='mx-auto mt-5 block rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50';
     button.innerHTML='<i class="fa-solid fa-chevron-down ml-1"></i> عرض المزيد';
-    button.onclick=()=>{
-      dietRenderLimit+=40;
-      renderDiets();
-    };
+    button.onclick=()=>{dietRenderLimit+=40;renderDiets()};
     $('dietGrid').insertAdjacentElement('afterend',button);
   }
-} 
+}
 function scaleHouseholdMeasure(measure,grams){if(!measure)return '—';const g=num(grams);if(!Number.isFinite(g)||g<0)return measure;const factor=g/100;const arabic={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};const frac={'½':.5,'⅓':1/3,'⅔':2/3,'¼':.25,'¾':.75,'⅕':.2,'⅖':.4,'⅗':.6,'⅘':.8,'⅙':1/6,'⅚':5/6,'⅛':.125,'⅜':.375,'⅝':.625,'⅞':.875};let text=String(measure).replace(/[٠-٩]/g,d=>arabic[d]);Object.keys(frac).forEach(ch=>text=text.replaceAll(ch,formatHouseholdNumber(frac[ch]*factor)));text=text.replace(/(^|[^\d.])(\d+(?:\.\d+)?)(?=\s|$|[^\d.])/g,(m,b,n)=>b+formatHouseholdNumber(parseFloat(n)*factor));if(text===String(measure).replace(/[٠-٩]/g,d=>arabic[d]))return `${formatHouseholdNumber(factor)} × ${text}`;return text}
 function formatHouseholdNumber(v){if(!Number.isFinite(v))return '—';if(Math.abs(v-Math.round(v))<.0001)return String(Math.round(v));return String(Math.round(v*100)/100).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1')}
 function calcTotals(){const t={kcal:0,protein:0,carb:0,fat:0,sodium:0,potassium:0,phosphorus:0};day.meals.forEach(m=>m.items.forEach(it=>{if(it.includeInCalculation===false)return;const f=foods.find(x=>x.id===String(it.food_id));if(!f)return;const factor=num(it.quantity_g)/100;t.kcal+=f.kcal*factor;t.protein+=f.protein*factor;t.carb+=f.carb*factor;t.fat+=f.fat*factor;t.sodium+=f.sodium*factor;t.potassium+=f.potassium*factor;t.phosphorus+=f.phosphorus*factor}));return t}
