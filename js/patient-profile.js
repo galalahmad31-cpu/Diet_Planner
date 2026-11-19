@@ -1031,11 +1031,41 @@
       });
     });
     window.addEventListener('message', (event) => {
-      if (event.origin !== window.location.origin || event.data?.type !== 'dp-nsp-embed-height') return;
+      if (event.origin !== window.location.origin) return;
       const frame = $('nutritionSupportFrame');
-      if (frame && event.source === frame.contentWindow) {
+      if (!frame || event.source !== frame.contentWindow) return;
+
+      if (event.data?.type === 'dp-nsp-embed-height') {
         const height = Number(event.data.height);
-        if (Number.isFinite(height)) frame.style.height = `${Math.max(700, Math.min(height + 24, 12000))}px`;
+        if (Number.isFinite(height) && height > 0) {
+          frame.style.height = `${Math.max(1, Math.min(height + 2, 12000))}px`;
+        }
+        return;
+      }
+
+      if (event.data?.type === 'dp-nsp-open-delete-modal') {
+        const modal = $('supportDayDeleteModal');
+        if (!modal) return;
+        const message = modal.querySelector('[data-delete-message]');
+        const confirm = modal.querySelector('[data-delete-confirm]');
+        const cancel = modal.querySelector('[data-delete-cancel]');
+        if (!message || !confirm || !cancel) return;
+
+        message.textContent = String(event.data.message || 'هل تريد حذف يوم المتابعة المحدد؟');
+        modal.hidden = false;
+        document.body.classList.add('support-delete-modal-open');
+        const close = (approved) => {
+          modal.hidden = true;
+          document.body.classList.remove('support-delete-modal-open');
+          confirm.onclick = null;
+          cancel.onclick = null;
+          modal.onclick = null;
+          frame.contentWindow?.postMessage({ type: 'dp-nsp-delete-modal-result', approved }, window.location.origin);
+        };
+        confirm.onclick = () => close(true);
+        cancel.onclick = () => close(false);
+        modal.onclick = (clickEvent) => { if (clickEvent.target === modal) close(false); };
+        cancel.focus();
       }
     });
     // Keep the workspace compact on first load; open a module only after an explicit selection.
