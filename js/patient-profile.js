@@ -710,7 +710,7 @@
 
   const patientFinanceFieldIds = [
     'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
-    'pfInputPaid'
+    'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollowUp'
   ];
 
   function setEditing(enabled) {
@@ -793,12 +793,36 @@
 
   const patientFinanceState = { loaded: false, loading: false, recordId: null };
 
+  function calculateSubscriptionEndDate(startValue, monthsValue) {
+    if (!startValue || !monthsValue) return '';
+    const [year, month, day] = String(startValue).slice(0, 10).split('-').map(Number);
+    const months = Number(monthsValue);
+    if (![year, month, day, months].every(Number.isFinite) || months < 1 || !Number.isInteger(months)) return '';
+    const firstOfTargetMonth = new Date(year, month - 1 + months, 1);
+    const lastDay = new Date(firstOfTargetMonth.getFullYear(), firstOfTargetMonth.getMonth() + 1, 0).getDate();
+    firstOfTargetMonth.setDate(Math.min(day, lastDay));
+    const y = firstOfTargetMonth.getFullYear();
+    const m = String(firstOfTargetMonth.getMonth() + 1).padStart(2, '0');
+    const d = String(firstOfTargetMonth.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function updateSubscriptionEndPreview(savedValue = null) {
+    const output = $('pfInputEndDate');
+    if (!output) return;
+    const value = savedValue || calculateSubscriptionEndDate($('pfInputStart')?.value, $('pfInputMonths')?.value);
+    if (!value) { output.textContent = '—'; return; }
+    const [year, month, day] = value.split('-');
+    output.textContent = `${day}/${month}/${year}`;
+  }
+
   function updateFinancePreview() {
     const amountRaw = $('pfInputAmount')?.value ?? '';
     const discountRaw = $('pfInputDiscount')?.value ?? '0';
     const amount = amountRaw === '' ? null : Number(amountRaw);
     const discount = discountRaw === '' ? 0 : Number(discountRaw);
     const output = $('pfInputDiscountedPreview');
+    updateSubscriptionEndPreview();
     if (!output) return;
     output.textContent = amount !== null && Number.isFinite(amount) && amount >= 0 &&
       Number.isFinite(discount) && discount >= 0 && discount <= 100
@@ -810,7 +834,7 @@
     const allowed = canWrite();
     [
       'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
-      'pfInputPaid'
+      'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollowUp'
     ].forEach((id) => {
       const field = $(id);
       if (field) field.disabled = !allowed || !state.isEditing || state.isSaving || patientFinanceState.loading;
@@ -867,7 +891,7 @@
     try {
       const { data, error } = await supabase
         .from('patient_finances')
-        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid')
+        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid,last_visit_date,next_follow_up_date')
         .eq('patient_id', patientId)
         .eq('user_id', state.user.id)
         .maybeSingle();
@@ -879,6 +903,9 @@
       $('pfInputAmount').value = data?.subscription_amount ?? '';
       $('pfInputDiscount').value = data?.discount_percent ?? 0;
       $('pfInputPaid').value = String(Boolean(data?.is_paid));
+      $('pfInputLastVisit').value = data?.last_visit_date || '';
+      $('pfInputNextFollowUp').value = data?.next_follow_up_date || '';
+      updateSubscriptionEndPreview(data?.subscription_end_date || null);
 
       if (empty) empty.hidden = Boolean(data);
       if (form) form.hidden = false;
@@ -945,7 +972,9 @@
       subscription_months: months,
       subscription_amount: amount,
       discount_percent: discount,
-      is_paid: $('pfInputPaid').value === 'true'
+      is_paid: $('pfInputPaid').value === 'true',
+      last_visit_date: $('pfInputLastVisit').value || null,
+      next_follow_up_date: $('pfInputNextFollowUp').value || null
     };
 
     try {
@@ -1180,6 +1209,10 @@
     });
     ['pfInputAmount', 'pfInputDiscount'].forEach((id) => {
       $(id)?.addEventListener('input', updateFinancePreview);
+    });
+    ['pfInputStart', 'pfInputMonths'].forEach((id) => {
+      $(id)?.addEventListener('input', () => updateSubscriptionEndPreview());
+      $(id)?.addEventListener('change', () => updateSubscriptionEndPreview());
     });
 
   }
