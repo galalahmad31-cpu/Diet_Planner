@@ -43,76 +43,41 @@ const db = window.DietPlannerAccess?.supabaseClient;
   }
 
   async function loadVisit() {
-    if (!visitId) {
-      showError('لم يتم تحديد الزيارة.');
+    const patientId = new URLSearchParams(window.location.search).get('patient_id')
+      || new URLSearchParams(window.location.search).get('id');
+    if (!patientId || !db) {
+      showError('لم يتم تحديد المريض.');
       return;
     }
 
     const { data, error } = await db
-      .from('patient_visits')
-      .select(`
-        id,
-        patient_id,
-        user_id,
-        visit_number,
-        visit_date,
-        patients (
-          id,
-          name,
-          energy_equation,
-          energy_gender,
-          energy_age,
-          energy_height_cm,
-          energy_weight_kg,
-          energy_activity_factor,
-          energy_bmr,
-          energy_tdee,
-          energy_adjustment,
-          energy_target_calories,
-          energy_protein_percent,
-          energy_carb_percent,
-          energy_fat_percent,
-          energy_target_protein,
-          energy_target_carb,
-          energy_target_fat,
-          energy_approved_at
-        )
-      `)
-      .eq('id', visitId)
+      .from('patients')
+      .select('id,user_id,name,energy_equation,energy_gender,energy_age,energy_height_cm,energy_weight_kg,energy_activity_factor,energy_bmr,energy_tdee,energy_adjustment,energy_target_calories,energy_protein_percent,energy_carb_percent,energy_fat_percent,energy_target_protein,energy_target_carb,energy_target_fat,energy_approved_at')
+      .eq('id', patientId)
       .maybeSingle();
 
-    if (error) {
-      console.error(error);
-      showError('تعذر تحميل بيانات الزيارة.');
+    if (error || !data) {
+      console.error('Load patient for nutrition plan failed:', error);
+      showError('تعذر تحميل ملف المريض أو لا تملك صلاحية الوصول إليه.');
       return;
     }
 
-    if (!data) {
-      showError('الزيارة غير موجودة أو لا تملك صلاحية الوصول إليها.');
-      return;
-    }
-
-    visit = data;
-
-    document.getElementById('patientName').textContent =
-      data.patients?.name || 'بدون اسم';
-
-    document.getElementById('visitNumber').textContent =
-      data.visit_number ?? '—';
-
-    document.getElementById('visitDate').textContent =
-      formatVisitDate(data.visit_date);
-
+    visit = { patient_id: data.id, patients: data };
+    window.currentPatientId = data.id;
     window.visitContext = {
-      id: data.id,
-      patient_id: data.patient_id,
-      visit_number: data.visit_number ?? null,
-      visit_date: data.visit_date ?? null,
-      energyRequirements: data.patients || null
+      patient_id: data.id,
+      energyRequirements: data
     };
 
-    document.getElementById('loadingState').classList.add('hidden');
-    document.getElementById('visitContent').classList.remove('hidden');
+    const patientName = document.getElementById('patientName');
+    if (patientName) patientName.textContent = data.name || 'بدون اسم';
+    const visitNumber = document.getElementById('visitNumber');
+    if (visitNumber) visitNumber.textContent = '—';
+    const visitDate = document.getElementById('visitDate');
+    if (visitDate) visitDate.textContent = 'ملف المريض';
+
+    document.getElementById('loadingState')?.classList.add('hidden');
+    document.getElementById('visitContent')?.classList.remove('hidden');
   }
 
   const moduleLoaders = {
@@ -175,7 +140,6 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   async function toggleModule(module) {
     const contents = {
-      assessment: document.getElementById('assessmentContent'),
       dietPlan: document.getElementById('dietPlanContent'),
       exchangePlan: document.getElementById('exchangePlanContent')
     };
@@ -185,7 +149,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     const isOpen = !content.classList.contains('hidden');
     Object.values(contents).forEach(el => el?.classList.add('hidden'));
-    const moduleCardIds = {assessment:'assessmentCard',dietPlan:'dietPlanCard',exchangePlan:'exchangePlanCard'};
+    const moduleCardIds = {dietPlan:'dietPlanCard',exchangePlan:'exchangePlanCard'};
     Object.entries(moduleCardIds).forEach(([key, cardId]) => {
       const card = document.getElementById(cardId);
       if (card) card.classList.toggle('module-active', key === module && !isOpen);
@@ -195,9 +159,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     content.classList.remove('hidden');
 
-    if (module === 'assessment') {
-      loadAssessment();
-    } else {
+    {
       const loaded = await loadModule(module);
       if (!loaded) {
         content.classList.add('hidden');
@@ -595,8 +557,6 @@ bindPrintLifecycle();
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('heightCm').addEventListener('input', calculateBMI);
-    document.getElementById('weightKg').addEventListener('input', calculateBMI);
     loadVisit();
   });/* =========================================================
  * SHARED CONFIRMATION
