@@ -13,7 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
-  <script src="js/patient-profile.js?v=20261119-remove-embedded-heading-v1" defer></script>
+  <script src="js/patient-profile.js?v=20261119-measurement-summary-v1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <link rel="stylesheet" href="css/patient-profile.css?v=20261119-remove-embedded-heading-v1">
@@ -146,6 +146,23 @@
         </div>
         <div id="measurementsLoading" class="measurements-state" hidden>جاري تحميل سجل القياسات...</div>
         <div id="measurementsError" class="measurements-state measurements-error" hidden></div>
+        <div class="measurement-summary-grid" aria-label="ملخص تغيرات الوزن ومؤشر كتلة الجسم">
+          <article class="measurement-summary-card">
+            <span class="measurement-summary-label">التغير من أول قياس</span>
+            <strong id="weightChangeOverall" class="measurement-summary-value">—</strong>
+            <small id="weightChangeOverallNote" class="measurement-summary-note">لا توجد بيانات كافية</small>
+          </article>
+          <article class="measurement-summary-card">
+            <span class="measurement-summary-label">التغير بين آخر وزنين</span>
+            <strong id="weightChangeRecent" class="measurement-summary-value">—</strong>
+            <small id="weightChangeRecentNote" class="measurement-summary-note">يلزم تسجيل قياسين</small>
+          </article>
+          <article class="measurement-summary-card">
+            <span class="measurement-summary-label">مؤشر كتلة الجسم (BMI)</span>
+            <strong id="latestMeasurementBmi" class="measurement-summary-value">—</strong>
+            <small id="latestMeasurementBmiNote" class="measurement-summary-note">يعتمد على آخر وزن والطول المسجل</small>
+          </article>
+        </div>
         <div class="measurements-table-heading">
           <div>
             <h3>سجل القياسات</h3>
