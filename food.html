@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-<link rel="stylesheet" href="css/food.css?v=20261116-foodlayout1">
+<link rel="stylesheet" href="css/food.css?v=20261119-quick-nav1">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -16,6 +16,23 @@
 <div id="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#f7fafb]">
   <div class="flex flex-col items-center gap-3"><div class="spinner"></div><span class="text-sm font-semibold text-slate-500">جاري تحميل مكتبة الأغذية...</span></div>
 </div>
+
+<nav class="quick-access-nav" dir="rtl" aria-label="التنقل السريع">
+  <div class="quick-access-track">
+    <a href="app.html" class="quick-access-card"><i class="fa-solid fa-house" aria-hidden="true"></i><span>الرئيسية</span></a>
+    <a href="patient.html" class="quick-access-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><span>قائمة المرضى</span></a>
+    <a href="food.html" class="quick-access-card active" aria-current="page"><i class="fa-solid fa-apple-whole" aria-hidden="true"></i><span>مكتبة الأغذية</span></a>
+    <a href="products.html" class="quick-access-card"><i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i><span>المنتجات الغذائية</span></a>
+    <a href="diet.html" class="quick-access-card"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>مكتبة الدايت</span></a>
+    <a href="recipe.html" class="quick-access-card"><i class="fa-solid fa-bowl-food" aria-hidden="true"></i><span>الوصفات الصحية</span></a>
+    <a href="quickcalc.html" class="quick-access-card"><i class="fa-solid fa-calculator" aria-hidden="true"></i><span>الحاسبة السريعة</span></a>
+    <a href="finance.html" class="quick-access-card"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span>اشتراكات المرضى</span></a>
+    <a href="article.html" class="quick-access-card"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>المقالات</span></a>
+    <a href="profile.html" class="quick-access-card"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i><span>الصفحة الشخصية وخطط الاشتراك</span></a>
+    <a href="feedback.html" class="quick-access-card"><i class="fa-solid fa-star" aria-hidden="true"></i><span>شاركنا رأيك</span></a>
+    <a href="about.html" class="quick-access-card"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>عن التطبيق</span></a>
+  </div>
+</nav>
 
 <main class="min-h-screen p-4 sm:p-6">
 <div class="mx-auto max-w-[1500px]">
@@ -32,7 +49,7 @@
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <a href="app.html" class="rounded-xl bg-slate-800 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-700"><i class="fa-solid fa-house ml-1"></i> الرئيسية </a>
+
     </div>
   </div>
 </header>
