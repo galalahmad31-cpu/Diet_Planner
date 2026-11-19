@@ -170,7 +170,7 @@ $('editor').addEventListener('focusin',e=>{
   const cell=e.target.closest('#editor td,#editor th');
   if(cell)selectCell(cell);
 });
-$('grid').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=articles.find(x=>x.id===b.dataset.id);if(!a)return;if(b.dataset.a==='view')view(a);if(b.dataset.a==='edit'&&isAdmin)openEditor(a);if(b.dataset.a==='delete'&&isAdmin)del(a.id)};
+$('grid').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=articles.find(x=>x.id===b.dataset.id);if(!a)return;if(b.dataset.a==='edit'&&isAdmin)openEditor(a);if(b.dataset.a==='delete'&&isAdmin)del(a.id)};
 $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.onkeydown=e=>{if(e.key==='Escape')closeEditor()};
 (async()=>{try{
   if(!supabase){throw new Error('تعذر تهيئة الاتصال الآمن بالتطبيق')}
