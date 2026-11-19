@@ -79,13 +79,18 @@
 #readerBody table{width:100%;border-collapse:collapse;margin:1.2em 0;display:block;overflow-x:auto}
 #readerBody td,#readerBody th{border:1px solid #dbe4e4;padding:8px;text-align:start;min-width:75px}
 #readerBody blockquote{margin:1.3em 0;padding:15px 18px;background:#effaf6;border-inline-start:4px solid #178f84;border-radius:12px}
-@media(max-width:1023px){
- #articleReaderPane{display:none}
- #articleReaderPane.has-article{display:block}
- #articleListPane:has(~ #articleReaderPane.has-article){display:none}
+/* Responsive reader: list first on tablets/phones; open reader only after selection. */
+@media(max-width:1199px){
+ #articleReaderPane{display:none!important}
+ #articleReaderPane.has-article{display:block!important}
+ #articleReaderPane #readerPlaceholder{display:none!important}
+ #articleWorkspace.is-reading #articleListPane{display:none!important}
+ #articleWorkspace.is-reading #articleReaderPane{display:block!important}
+ #articleWorkspace:not(.is-reading) #articleListPane{display:block!important}
 }
-@media(min-width:1024px){
+@media(min-width:1200px){
  #articleReaderPane{display:block}
+ #articleReaderPane #readerPlaceholder{display:flex}
 }
 @media(max-width:640px){
  .article-list-item{border-radius:14px}
