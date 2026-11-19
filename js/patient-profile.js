@@ -12,7 +12,8 @@
     isAdmin: false,
     hasActiveSubscription: false,
     isEditing: false,
-    isSaving: false
+    isSaving: false,
+    isCreatingVisit: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -442,6 +443,7 @@
     if (!loading || !empty || !list) return;
 
     loading.hidden = false;
+    loading.textContent = 'جاري تحميل أيام المتابعة...';
     empty.hidden = true;
     list.replaceChildren();
 
@@ -546,11 +548,6 @@
     if (panel) panel.hidden = true;
     document.querySelectorAll('[data-open-visit]').forEach(button => button.classList.remove('is-active'));
     if (frame) frame.dataset.visitId = '';
-  }
-
-  async function openVisitFromList(visit) {
-    if (!visit?.id) return;
-    openVisitEmbedded(visit);
   }
 
   function escapeHtml(value) {
@@ -1180,7 +1177,7 @@
         visit_number: button.dataset.visitNumber,
         visit_date: button.dataset.visitDate
       };
-      void openVisitFromList(visit);
+      openVisitEmbedded(visit);
     });
     $('closeVisitFrameBtn')?.addEventListener('click', closeVisitEmbedded);
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
