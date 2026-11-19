@@ -13,7 +13,7 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 /* Patient profile dashboard — clean consolidated styles */
 :root{--dp-primary:#176b63;--dp-ink:#172b3a;--dp-muted:#718096;--dp-line:#e6edf1}
 body{background:#f3f6f8;color:var(--dp-ink);font-family:'Cairo',sans-serif}
-main{max-width:1120px!important}
+main{width:100%;max-width:1440px!important;margin-inline:auto}
 header{background:#102a35!important;border-color:#24414b!important}
 header .h-16{min-height:68px}
 header a{border:1px solid #29434d}
@@ -23,7 +23,6 @@ header a{border:1px solid #29434d}
 #patientContent .w-14.h-14{background:#eaf5f2;color:var(--dp-primary);border:1px solid #d6ebe5}
 main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!important;box-shadow:0 3px 14px rgba(20,45,60,.025)!important}
 #modulesSection{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}
-#modulesSection>div{grid-column:1/-1}
 .dashboard-card{min-width:0;margin:0!important;padding:0!important;background:#fff;border:1px solid var(--dp-line);border-radius:14px;box-shadow:0 2px 9px rgba(20,45,60,.025);overflow:visible;transition:border-color .15s,box-shadow .15s}
 .dashboard-card:hover{border-color:#c4ddd6}
 .dashboard-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:76px;padding:12px;transition:background .15s}
@@ -55,7 +54,8 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #writeAccessStatus,.access-note{display:none!important}
 
 @media(max-width:1050px){#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.measurements-card .measurements-direct{min-height:70px;height:70px;padding:11px}main{padding-inline:12px!important;padding-top:16px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:1fr;gap:8px}.dashboard-details>summary{min-height:70px;padding:11px}.dashboard-panel{padding:10px}}
+@media(max-width:600px){.measurements-card .measurements-direct{min-height:68px;height:68px;padding:10px}main{padding-inline:12px!important;padding-top:14px!important}.patient-name-bar{padding:12px 14px}header .h-16{height:auto;min-height:64px;padding-block:8px}header .h-16 h1{font-size:15px}header a{padding:8px 10px!important;font-size:11px!important}#modulesSection{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.dashboard-details>summary{min-height:68px;padding:10px}.dashboard-panel{padding:10px}}
+@media(max-width:350px){#modulesSection{grid-template-columns:1fr}}
 
 /* Explicit visibility states for edit mode */
 #saveArea.hidden{display:none!important}
@@ -107,34 +107,15 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #closePatientFinance{background:rgba(255,255,255,.16)!important;color:#fff!important;border:1px solid rgba(255,255,255,.3)!important}
 
 
-/* Dashboard palette — explicit card classes, unified contrast */
-.patient-dashboard .dashboard-details>summary{border-radius:13px!important;color:#fff!important}
-.measurements-card .dashboard-details>summary{background:linear-gradient(135deg,#174c78,#287db2)!important}
-.measurements-card .dashboard-card-head h3,.measurements-card .dashboard-card-head p{color:#fff!important}
-.measurements-card .dashboard-icon.blue{background:rgba(255,255,255,.17)!important;color:#fff!important}
-.measurements-card .details-chevron{color:#fff!important}
-.plans-card .dashboard-details>summary{background:linear-gradient(135deg,#17633d,#26965d)!important}
-.plans-card .dashboard-card-head h3,.plans-card .dashboard-card-head p{color:#fff!important}
-.plans-card .dashboard-icon.green{background:rgba(255,255,255,.17)!important;color:#fff!important}
-.plans-card .details-chevron{color:#fff!important}
-.patient-finance-card .finance-card-trigger{background:linear-gradient(135deg,#123b50,#176b63)!important;border-radius:13px;color:#fff!important}
-.patient-finance-card .finance-card-trigger h3,.patient-finance-card .finance-card-trigger p,.patient-finance-card .details-chevron{color:#fff!important}
-.patient-dashboard .dashboard-details>summary:hover,.patient-finance-card .finance-card-trigger:hover{filter:brightness(1.08)}
-.patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
-
-/* FINAL card colors: patient-profile stylesheet loads after theme.css */
-#modulesSection .measurements-card .dashboard-details>summary{background:linear-gradient(120deg,#174c78,#287db2)!important}
+/* Unified dashboard card palette */
 #modulesSection .plans-card .dashboard-details>summary{background:linear-gradient(120deg,#17633d,#26965d)!important}
-#modulesSection .patient-finance-card .finance-card-trigger{background:linear-gradient(120deg,#45266f,#7654bd)!important}
-#modulesSection .measurements-card summary h3,#modulesSection .measurements-card summary p,
-#modulesSection .plans-card summary h3,#modulesSection .plans-card summary p,
-#modulesSection .patient-finance-card .finance-card-trigger h3,#modulesSection .patient-finance-card .finance-card-trigger p{color:#fff!important}
-#modulesSection .measurements-card summary .dashboard-icon,
-#modulesSection .plans-card summary .dashboard-icon,
+#modulesSection .plans-card .dashboard-card-head h3,#modulesSection .plans-card .dashboard-card-head p{color:#fff!important}
+#modulesSection .plans-card .dashboard-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
+#modulesSection .patient-finance-card .finance-card-trigger{background:linear-gradient(120deg,#45266f,#7654bd)!important;border-radius:13px;color:#fff!important}
+#modulesSection .patient-finance-card .finance-card-trigger h3,#modulesSection .patient-finance-card .finance-card-trigger p,#modulesSection .patient-finance-card .details-chevron{color:#fff!important}
 #modulesSection .patient-finance-card .dashboard-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
-#modulesSection .measurements-card summary .details-chevron,
-#modulesSection .plans-card summary .details-chevron,
-#modulesSection .patient-finance-card .details-chevron{color:#fff!important}
+#modulesSection .plans-card .dashboard-details>summary:hover,#modulesSection .patient-finance-card .finance-card-trigger:hover{filter:brightness(1.08)}
+.patient-finance-dialog{animation:patientModalIn .12s ease-out!important}
 
 /* Direct measurements card navigation */
 .measurements-card .dashboard-card-direct-link{display:flex;align-items:center;gap:12px;width:100%;text-decoration:none;cursor:pointer}
@@ -202,215 +183,37 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #loadingState.hidden,#patientContent.hidden,#errorState.hidden{display:none!important}
 
 
-/* Patient data: closed collapsible panel with compact actions in its heading. */
-#modulesSection .patient-data-card {
-  grid-column:1 / -1;
-  padding:14px 16px !important;
-  overflow:visible;
-  border-color:#dce8eb;
-}
-.patient-data-heading {
-  display:flex;
-  flex-direction:row;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-}
-.patient-data-details {
-  display:block;
-  flex:1 1 auto;
-  min-width:0;
-}
-.patient-data-details > .patient-data-summary {align-items:center}
-.patient-data-actions {
-  align-self:flex-start;
-  flex:0 0 auto;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:flex-start;
-  gap:6px;
-  margin:0!important;
-  padding:0!important;
-}
-.patient-data-actions #editButton {
-  margin:0!important;
-}
-.patient-data-actions .patient-save-actions {
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  gap:6px;
-  margin:0!important;
-}
-.patient-data-summary {
-  list-style:none;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-height:48px;
-  cursor:pointer;
-  user-select:none;
-}
-.patient-data-summary::-webkit-details-marker {display:none}
-.patient-data-summary .dashboard-icon {
-  width:36px;height:36px;flex:0 0 36px;
-  background:#e8f5f1!important;color:#176b63!important;
-}
-.patient-data-title {
-  display:flex;flex-direction:column;gap:2px;min-width:0;
-}
-.patient-data-title strong {color:#163541;font-size:13px;font-weight:900}
-.patient-data-title small {color:#82919a;font-size:9px}
-.patient-data-chevron {
-  margin-inline-start:auto;
-  color:#80939b;font-size:11px;
-  transition:transform .18s ease;
-}
-.patient-data-details[open] .patient-data-chevron {transform:rotate(180deg);color:#176b63}
-.patient-data-content {
-  padding:14px 2px 2px;
-  margin-top:8px;
-  border-top:1px solid var(--dp-line);
-}
-.patient-data-actions {
-  display:flex;align-items:center;justify-content:flex-end;
-  flex:0 0 auto;gap:6px;
-}
-.patient-edit-button {
-  min-height:31px;padding:6px 10px;
-  border:1px solid #d7e9e3;border-radius:8px;
-  background:#eaf5f2;color:#176b63;
-  font:800 10px Cairo,sans-serif;white-space:nowrap;cursor:pointer;
-}
-.patient-edit-button:hover {background:#dcefe9}
-.patient-edit-button:disabled {opacity:.45;cursor:not-allowed}
-.patient-save-actions {
-  display:flex;align-items:center;gap:6px;
-  margin:0!important;
-}
-.patient-save-actions button {
-  min-height:31px;padding:6px 10px;
-  border:0;border-radius:8px;
-  font:800 10px Cairo,sans-serif;white-space:nowrap;
-}
-.patient-save-actions #savePatientButton {background:#16834a;color:#fff}
-.patient-save-actions #cancelEditButton {background:#edf2f5;color:#53636d}
-.patient-data-fields {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-.patient-data-fields>div {min-width:0}
-.patient-data-fields input,
-.patient-data-fields select,
-.patient-data-fields textarea {
-  width:100%;min-width:0;box-sizing:border-box;
-  min-height:39px;padding:8px 10px;
-  background:#f8fbfc;border-color:#e0e9ed;font-size:12px;
-}
-.patient-data-fields textarea {min-height:68px;resize:vertical}
-@media(max-width:520px) {
-  #modulesSection .patient-data-card {padding:11px!important}
-  .patient-data-heading {gap:7px}
-  .patient-data-summary {gap:7px;min-height:42px}
-  .patient-data-summary .dashboard-icon {width:31px;height:31px;flex-basis:31px;font-size:14px}
-  .patient-data-title strong {font-size:11px}
-  .patient-data-title small {font-size:8px}
-  .patient-data-actions {gap:4px}
-  .patient-edit-button,.patient-save-actions button {min-height:29px;padding:5px 7px;font-size:9px}
-  .patient-data-fields {gap:9px}
-  .patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea {font-size:11px;padding:7px}
-  .patient-data-fields textarea {min-height:64px}
-}
-@media(max-width:350px) {
-  .patient-data-heading {align-items:flex-start}
-  .patient-data-actions {flex-direction:row;align-items:flex-start}
-  .patient-save-actions {flex-direction:row}
-}
-
-
-/* Keep patient edit controls anchored beside the heading, even when details expand. */
-#modulesSection .patient-data-heading {
-  align-items:flex-start !important;
-}
-#modulesSection .patient-data-actions,
-#modulesSection .patient-data-actions .patient-save-actions {
-  align-self:flex-start !important;
-  display:flex !important;
-  flex-direction:row !important;
-  align-items:center !important;
-  justify-content:flex-start !important;
-  margin:0 !important;
-  padding:0 !important;
-  gap:6px !important;
-}
-#modulesSection .patient-data-actions #editButton {
-  margin:0 !important;
-}
-#modulesSection .patient-data-actions button {
-  flex:0 0 auto !important;
-  white-space:nowrap;
-}
-@media(max-width:520px) {
-  #modulesSection .patient-data-heading {gap:6px}
-  #modulesSection .patient-data-actions,
-  #modulesSection .patient-data-actions .patient-save-actions {gap:4px!important}
-  #modulesSection .patient-data-actions button {padding-inline:6px!important;font-size:9px!important}
-}
-
-
-/* Patient controls are part of the collapsible summary row, not a sibling column. */
-#modulesSection .patient-data-heading {display:block!important;margin:0!important;padding:0!important;border:0!important}
-#modulesSection .patient-data-details {width:100%;min-width:0}
-#modulesSection .patient-data-summary {
-  display:flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  width:100%;
-  gap:9px!important;
-}
-#modulesSection .patient-data-summary .patient-data-title {flex:0 1 auto}
-#modulesSection .patient-data-summary .patient-data-actions {
-  position:static!important;
-  align-self:center!important;
-  display:inline-flex!important;
-  flex:0 0 auto!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:5px!important;
-  margin-inline-start:auto!important;
-  padding:0!important;
-}
-#modulesSection .patient-data-summary .patient-data-chevron {
-  flex:0 0 auto;
-  margin-inline-start:0!important;
-}
-#modulesSection .patient-data-summary .patient-data-actions button {
-  min-height:29px;
-  padding:5px 8px;
-  font-size:9px;
-}
-#modulesSection #saveArea[hidden],
-#modulesSection #editButton[hidden] {display:none!important}
-#modulesSection .patient-data-actions .patient-save-actions {
-  display:inline-flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  gap:5px!important;
-  margin:0!important;
-}
-@media(max-width:520px) {
-  #modulesSection .patient-data-summary {gap:5px!important}
-  #modulesSection .patient-data-title strong {font-size:10px}
-  #modulesSection .patient-data-title small {font-size:7px}
-  #modulesSection .patient-data-summary .patient-data-actions {gap:3px!important}
-  #modulesSection .patient-data-summary .patient-data-actions button {padding:4px 6px;font-size:8px}
-}
-
-
-
+/* Patient identity and compact editable details disclosure */
+.patient-name-bar{padding:13px 17px}
+#patientContent{display:block;min-width:0}
+#patientName{margin:0 0 5px!important;line-height:1.45}
+.patient-data-heading{display:block;margin:0!important;padding:0!important;border:0!important}
+.patient-data-details{display:block;width:100%;min-width:0}
+.patient-data-summary{list-style:none;display:flex;align-items:center;gap:7px;min-height:34px;cursor:pointer;user-select:none}
+.patient-data-summary::-webkit-details-marker{display:none}
+.patient-data-summary .dashboard-icon{width:27px;height:27px;flex:0 0 27px;font-size:12px;background:#e8f5f1!important;color:#176b63!important;border-radius:8px}
+.patient-data-title{display:flex;flex-direction:column;gap:1px;min-width:0}
+.patient-data-title strong{font-size:10px;font-weight:900;color:#176b63}
+.patient-data-title small{font-size:8px;color:#82919a}
+.patient-data-actions{display:flex;align-items:center;gap:5px;margin-inline-start:auto!important;flex:0 0 auto}
+.patient-data-actions #editButton{margin:0!important}
+.patient-data-actions .patient-save-actions{display:inline-flex;align-items:center;gap:5px;margin:0!important}
+.patient-data-chevron{margin-inline-start:0;color:#80939b;font-size:10px;transition:transform .18s ease}
+.patient-data-details[open] .patient-data-chevron{transform:rotate(180deg);color:#176b63}
+.patient-data-content{padding:12px 2px 2px;margin-top:6px;border-top:1px solid var(--dp-line)}
+.patient-edit-button,.patient-save-actions button{min-height:29px;padding:5px 9px;border-radius:8px;font:800 9px Cairo,sans-serif;white-space:nowrap;cursor:pointer}
+.patient-edit-button{border:1px solid #d7e9e3;background:#eaf5f2;color:#176b63}
+.patient-edit-button:disabled{opacity:.45;cursor:not-allowed}
+.patient-save-actions button{border:0}
+.patient-save-actions #savePatientButton{background:#16834a;color:#fff}
+.patient-save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
+.patient-data-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.patient-data-fields>div{min-width:0}
+.patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea{width:100%;min-width:0;box-sizing:border-box;min-height:37px;padding:7px 9px;background:#f8fbfc;border-color:#e0e9ed;font-size:11px}
+.patient-data-fields textarea{min-height:62px;resize:vertical}
+#saveArea[hidden],#editButton[hidden]{display:none!important}
+@media(max-width:760px){.patient-data-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.patient-name-bar{padding:11px 12px}.patient-data-summary{min-height:32px;gap:5px}.patient-data-title strong{font-size:9px}.patient-data-title small{font-size:7px}.patient-data-actions,.patient-data-actions .patient-save-actions{gap:3px!important}.patient-data-actions button{min-height:27px;padding:4px 6px;font-size:8px}.patient-data-fields{gap:8px}.patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea{font-size:10px;padding:6px}.patient-data-fields textarea{min-height:58px}}
 /* Patient profile: one Food Library-style green brand card and swipe navigation */
 html,body{max-width:100%;overflow-x:hidden}
 .patient-profile-page-header{
