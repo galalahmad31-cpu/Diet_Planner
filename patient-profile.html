@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
-  <script src="js/patient-profile.js?v=20261119-patient-labels1" defer></script>
+  <script src="js/patient-profile.js?v=20261119-patient-phone1" defer></script>
 
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <link rel="stylesheet" href="css/patient-profile.css?v=20261117-dashboard-order1">
@@ -80,6 +80,7 @@
           <div class="patient-data-content">
             <div class="patient-fields patient-data-fields">
               <div><label>اسم المريض</label><input id="nameInput" disabled></div>
+              <div><label>رقم الهاتف</label><input id="phoneInput" type="tel" inputmode="tel" autocomplete="tel" maxlength="25" placeholder="أدخل رقم الهاتف" dir="ltr" disabled></div>
               <div><label>النوع</label><select id="genderInput" disabled><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
               <div><label>تاريخ الميلاد</label><input id="birthDateInput" type="date" disabled></div>
               <div><label>العمر (سنة)</label><input id="ageInput" type="number" disabled></div>
