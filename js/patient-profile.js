@@ -360,17 +360,78 @@
 
   async function deleteMeasurement(index) {
     const entry = measurementState.logs[index];
-    if (!entry || !state.user || !window.confirm('هل تريد حذف قياس الوزن المحدد؟')) return;
-    try {
-      const { error } = await supabase.from('weight_logs')
-        .delete().eq('id', entry.id).eq('patient_id', patientId);
-      if (error) throw error;
-      measurementState.logs.splice(index, 1);
-      renderMeasurements();
-    } catch (error) {
-      console.error('Delete patient measurement failed:', error);
-      alert('تعذر حذف القياس من قاعدة البيانات.');
+    if (!entry) return;
+
+    if (!state.user?.id) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'تسجيل الدخول مطلوب',
+        text: 'يجب تسجيل الدخول قبل حذف القياسات.',
+        confirmButtonText: 'حسنًا',
+        buttonsStyling: false,
+        customClass: {
+          popup: 'patient-measurement-swal',
+          title: 'patient-measurement-swal-title',
+          htmlContainer: 'patient-measurement-swal-text',
+          confirmButton: 'patient-measurement-swal-confirm'
+        },
+        heightAuto: false
+      });
+      return;
     }
+
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'تأكيد حذف القياس',
+      text: 'هل تريد حذف قياس الوزن المحدد؟ لا يمكن التراجع عن هذا الإجراء.',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف القياس',
+      cancelButtonText: 'إلغاء',
+      reverseButtons: true,
+      focusCancel: true,
+      buttonsStyling: false,
+      heightAuto: false,
+      allowOutsideClick: () => !Swal.isLoading(),
+      customClass: {
+        popup: 'patient-measurement-swal',
+        title: 'patient-measurement-swal-title',
+        htmlContainer: 'patient-measurement-swal-text',
+        actions: 'patient-measurement-swal-actions',
+        confirmButton: 'patient-measurement-swal-danger',
+        cancelButton: 'patient-measurement-swal-cancel'
+      },
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        try {
+          const { error } = await supabase.from('weight_logs')
+            .delete()
+            .eq('id', entry.id)
+            .eq('patient_id', patientId);
+          if (error) throw error;
+          return true;
+        } catch (error) {
+          console.error('Delete patient measurement failed:', error);
+          Swal.showValidationMessage('تعذر حذف القياس من قاعدة البيانات. حاول مرة أخرى.');
+          return false;
+        }
+      }
+    });
+
+    if (!result.isConfirmed) return;
+
+    measurementState.logs = measurementState.logs.filter(log => log.id !== entry.id);
+    renderMeasurements();
+
+    await Swal.fire({
+      toast: true,
+      position: 'top',
+      icon: 'success',
+      title: 'تم حذف القياس بنجاح',
+      showConfirmButton: false,
+      timer: 1800,
+      timerProgressBar: true,
+      heightAuto: false
+    });
   }
 
   async function loadVisits() {
