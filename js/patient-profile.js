@@ -381,25 +381,26 @@
     }
 
     const result = await Swal.fire({
-      icon: 'warning',
-      title: 'تأكيد حذف القياس',
-      text: 'هل تريد حذف قياس الوزن المحدد؟ لا يمكن التراجع عن هذا الإجراء.',
+      title: 'حذف القياس',
+      text: 'هل أنت متأكد من حذف القياس المحدد؟',
       showCancelButton: true,
-      confirmButtonText: 'نعم، احذف القياس',
+      confirmButtonText: 'حذف',
       cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#ffffff',
       reverseButtons: true,
-      focusCancel: true,
-      buttonsStyling: false,
+      width: '290px',
+      padding: '.85rem 1rem .7rem',
+      customClass: {
+        popup: 'visit-delete-popup',
+        title: 'visit-delete-title',
+        htmlContainer: 'visit-delete-text',
+        confirmButton: 'visit-delete-confirm',
+        cancelButton: 'visit-delete-cancel'
+      },
+      buttonsStyling: true,
       heightAuto: false,
       allowOutsideClick: () => !Swal.isLoading(),
-      customClass: {
-        popup: 'patient-measurement-swal',
-        title: 'patient-measurement-swal-title',
-        htmlContainer: 'patient-measurement-swal-text',
-        actions: 'patient-measurement-swal-actions',
-        confirmButton: 'patient-measurement-swal-danger',
-        cancelButton: 'patient-measurement-swal-cancel'
-      },
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         try {
