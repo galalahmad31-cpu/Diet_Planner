@@ -280,93 +280,59 @@
   text-decoration:none;
 }
 .dashboard-notifications-content{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  padding-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  padding-top:10px;
 }
-.dashboard-notification-item{
+.dashboard-notification-row{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:11px;
   min-width:0;
-  min-height:66px;
-  padding:10px 12px;
-  border:1px solid #e8efee;
-  border-radius:14px;
-  background:#fbfdfd;
-  color:inherit;
-  text-decoration:none;
-  transition:border-color .18s,background .18s;
+  padding:12px 4px;
+  border-bottom:1px solid #edf2f1;
 }
-.dashboard-notification-item:hover{
-  border-color:#c6dfdc;
-  background:#f5fbfa;
-}
-.dashboard-notification-icon{
+.dashboard-notification-row:last-child{border-bottom:0}
+.dashboard-notification-row-icon{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:35px;
-  height:35px;
-  flex:0 0 35px;
-  border-radius:11px;
-  background:#eaf5f4;
-  color:#25877e;
-  font-size:14px;
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  border-radius:10px;
+  background:#eaf4fb;
+  color:#397ca8;
+  font-size:13px;
 }
-.dashboard-notification-item.today .dashboard-notification-icon{background:#eaf4fb;color:#397ca8}
-.dashboard-notification-item.tomorrow .dashboard-notification-icon{background:#f0edff;color:#7654bd}
-.dashboard-notification-item.subscription .dashboard-notification-icon{background:#fff5e2;color:#b7791f}
-.dashboard-notification-copy{min-width:0;flex:1 1 auto}
-.dashboard-notification-copy strong{
-  display:block;
-  font-size:11px;
-  line-height:1.5;
-  color:#283b40;
+.dashboard-notification-row.subscription .dashboard-notification-row-icon{
+  background:#fff5e2;
+  color:#b7791f;
 }
-.dashboard-notification-copy span{
-  display:block;
-  margin-top:2px;
-  font-size:10px;
-  line-height:1.5;
-  color:#809196;
-  overflow-wrap:anywhere;
-}
-.dashboard-notification-count{
-  display:inline-flex;
-  min-width:25px;
-  height:25px;
-  align-items:center;
-  justify-content:center;
-  padding:0 6px;
-  border-radius:9px;
-  background:#edf5f4;
-  color:#287e77;
-  font-size:11px;
-  font-weight:900;
-  font-variant-numeric:tabular-nums;
-}
+.dashboard-notification-row-details{display:flex;flex:1 1 auto;flex-direction:column;gap:3px;min-width:0}
+.dashboard-notification-patient{color:#263b40;font-size:12px;font-weight:900;line-height:1.5}
+.dashboard-notification-action{color:#667b7d;font-size:11px;font-weight:600;line-height:1.6;overflow-wrap:anywhere}
+.dashboard-notification-date{flex:0 0 auto;color:#829497;font-size:10px;font-weight:800;white-space:nowrap;direction:ltr}
 .dashboard-notifications-empty,
 .dashboard-notifications-loading{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:9px;
   min-height:64px;
   color:#85969a;
   font-size:11px;
   text-align:center;
 }
-@media(min-width:768px){
-  .dashboard-notifications-content{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
 @media(max-width:767px){
   .dashboard-services-strip{gap:8px}
   .dashboard-service-card{flex-basis:145px;min-height:108px}
   .dashboard-notifications-section{padding:13px;border-radius:16px}
-  .dashboard-notifications-content{grid-template-columns:1fr;gap:7px}
-  .dashboard-notification-item{min-height:58px;padding:8px 10px}
+  .dashboard-notification-row{gap:9px;padding:11px 2px}
+  .dashboard-notification-row-icon{width:31px;height:31px;flex-basis:31px}
+  .dashboard-notification-patient{font-size:11px}
+  .dashboard-notification-action{font-size:10px}
+  .dashboard-notification-date{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){
   .dashboard-services-strip{scroll-behavior:auto}
