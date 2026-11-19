@@ -91,7 +91,7 @@ function render(){
  $('empty').classList.toggle('hidden',visible.length>0);
  $('articleCount').textContent=visible.length+' مقال';
  visible.forEach(a=>{
-  const pub=a.visibility==='public',detailUrl='article-view.html?id='+encodeURIComponent(a.id);
+  const pub=a.visibility==='public',detailUrl='article.html?id='+encodeURIComponent(a.id);
   const el=document.createElement('article');
   el.className='article-list-item'+(selectedArticleId===a.id?' is-selected':'');
   el.innerHTML=`<a href="${detailUrl}" data-open-article="${esc(a.id)}" class="article-list-link">
@@ -103,6 +103,48 @@ function render(){
   $('grid').appendChild(el);
  });
  if(selectedArticleId&&!visible.some(a=>a.id===selectedArticleId))closeArticle(true);
+}
+function setMeta(name,content,property=false){
+ let el=document.head.querySelector(property?'meta[property="'+name+'"]':'meta[name="'+name+'"]');
+ if(!el){el=document.createElement('meta');el.setAttribute(property?'property':'name',name);document.head.appendChild(el)}
+ el.content=content;
+}
+function setCanonical(url){
+ let el=document.querySelector('link[rel="canonical"]');
+ if(!el){el=document.createElement('link');el.rel='canonical';document.head.appendChild(el)}
+ el.href=url;
+}
+function resetArticleSeo(){
+ document.title='مقالات التغذية العلاجية | Diet Planner';
+ setMeta('description','مقالات علمية في التغذية العلاجية والتغذية الإكلينيكية، مراجعات مبنية على الأدلة وإرشادات عملية لأخصائيي التغذية.');
+ setMeta('og:type','website',true);
+ setMeta('og:title','مقالات التغذية العلاجية | Diet Planner',true);
+ setMeta('og:description','مكتبة مفتوحة من المقالات العلمية في التغذية العلاجية والتغذية الإكلينيكية.',true);
+ setMeta('og:url',location.origin+'/article.html',true);
+ setCanonical(location.origin+'/article.html');
+ const schema=$('articleJsonLd');if(schema)schema.remove();
+}
+function updateArticleSeo(a){
+ const url=location.origin+'/article.html?id='+encodeURIComponent(a.id);
+ const description=safe(a.content||'').replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim().slice(0,155)||a.title;
+ document.title=(a.title||'مقال علمي')+' | مقالات التغذية العلاجية - Diet Planner';
+ setMeta('description',description);
+ setMeta('robots','index,follow,max-image-preview:large');
+ setMeta('og:type','article',true);
+ setMeta('og:title',document.title,true);
+ setMeta('og:description',description,true);
+ setMeta('og:url',url,true);
+ setCanonical(url);
+ const old=$('articleJsonLd');if(old)old.remove();
+ const schema=document.createElement('script');schema.id='articleJsonLd';schema.type='application/ld+json';
+ schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Article','headline':a.title,'author':{'@type':'Person','name':a.author_name||'Diet Planner'},'datePublished':a.published_at||a.created_at||a.updated_at,'dateModified':a.updated_at||a.published_at||a.created_at,'mainEntityOfPage':url,'publisher':{'@type':'Organization','name':'Diet Planner'},'articleBody':$('readerBody').textContent.slice(0,5000)});
+ document.head.appendChild(schema);
+}
+function articleIdFromLocation(){
+ const queryId=new URLSearchParams(location.search).get('id');
+ if(queryId&&/^[0-9a-f-]{36}$/i.test(queryId))return queryId;
+ const legacy=location.hash.match(/^#article-([0-9a-f-]{36})$/i);
+ return legacy?legacy[1]:null;
 }
 function openArticle(id,updateHistory=true){
  const a=articles.find(x=>x.id===id&& (isAdmin||x.visibility==='public'));
@@ -117,13 +159,16 @@ function openArticle(id,updateHistory=true){
  $('readerDate').dateTime=published||'';
  $('readerBody').innerHTML=safe(a.content||'');
  syncTextDirection($('readerBody'));
- $('openStandaloneArticle').href='article-view.html?id='+encodeURIComponent(a.id);
  document.querySelectorAll('.article-list-item').forEach(el=>el.classList.toggle('is-selected',el.querySelector('[data-open-article]')?.dataset.openArticle===a.id));
  $('articleReaderPane').classList.add('has-article');
  $('articleWorkspace').classList.add('is-reading');
+ updateArticleSeo(a);
  if(updateHistory){
-  const url=new URL(location.href);url.hash='article-'+a.id;
+  const url=new URL(location.href);url.searchParams.set('id',a.id);url.hash='';
   history.pushState({articleId:a.id},'',url);
+ }else if(location.hash.startsWith('#article-')){
+  const url=new URL(location.href);url.searchParams.set('id',a.id);url.hash='';
+  history.replaceState({articleId:a.id},'',url);
  }
 }
 function closeArticle(updateHistory=true){
@@ -133,7 +178,11 @@ function closeArticle(updateHistory=true){
  $('articleReaderPane').classList.remove('has-article');
  $('articleWorkspace').classList.remove('is-reading');
  document.querySelectorAll('.article-list-item').forEach(el=>el.classList.remove('is-selected'));
- if(updateHistory&&location.hash.startsWith('#article-'))history.pushState({},'',location.pathname+location.search);
+ if(updateHistory&&(new URLSearchParams(location.search).has('id')||location.hash.startsWith('#article-'))){
+  const url=new URL(location.href);url.searchParams.delete('id');url.hash='';
+  history.pushState({},'',url);
+ }
+ resetArticleSeo();
 }
 
 function openEditor(a=null){if(!isAdmin)return;editingId=a?.id||null;$('modalTitle').textContent=a?'تعديل المقال':'إضافة مقال';$('title').value=a?.title||'';$('author').value=a?.author_name||profile?.full_name||'';$('editor').innerHTML=safe(a?.content||'');syncTextDirection($('editor'));$('public').checked=a?.visibility==='public';$('pubDate').textContent=a?.published_at?date(a.published_at):'سيُحدد عند النشر';$('updDate').textContent=a?.updated_at?date(a.updated_at):'عند الحفظ';state();$('editModal').classList.remove('hidden');document.body.classList.add('overflow-hidden')}
@@ -232,8 +281,8 @@ $('grid').onclick=e=>{
 };
 $('backToArticles').onclick=()=>closeArticle(true);
 window.addEventListener('popstate',()=>{
- const match=location.hash.match(/^#article-([0-9a-f-]{36})$/i);
- if(match)openArticle(match[1],false);else closeArticle(false);
+ const id=articleIdFromLocation();
+ if(id)openArticle(id,false);else closeArticle(false);
 });
 $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.onkeydown=e=>{if(e.key==='Escape')closeEditor()};
 (async()=>{try{
@@ -245,8 +294,9 @@ $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.
   $('addBtn').classList.toggle('hidden',!isAdmin);
   await load();
   $('loading').style.display='none';
-  const initialMatch=location.hash.match(/^#article-([0-9a-f-]{36})$/i);
-  if(initialMatch)openArticle(initialMatch[1],false);
+  const initialId=articleIdFromLocation();
+  if(initialId)openArticle(initialId,false);
+  else resetArticleSeo();
 }catch(e){
   console.error(e);
   $('loading').innerHTML='<div class="rounded-2xl bg-white p-6 text-center"><div class="text-red-600 font-bold">تعذر تحميل المقالات</div><div class="mt-2 text-xs text-slate-400">'+esc(e.message)+'</div></div>';
