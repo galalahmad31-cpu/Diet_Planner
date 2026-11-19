@@ -364,9 +364,6 @@ body.support-delete-modal-open{overflow:hidden}
 .followup-day-delete:hover{background:#c65a5a;color:#fff}
 .visit-embedded-panel{margin-top:13px;border:1px solid #e1e9e5;border-radius:12px;background:#f7faf8;overflow:hidden}
 .visit-embedded-panel[hidden]{display:none!important}
-.visit-embedded-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border-bottom:1px solid #e5ece8;background:#fff}
-.visit-embedded-heading strong{color:#34483d;font-size:11px;font-weight:900}
-.visit-embedded-heading button{padding:6px 10px;border:1px solid #dfe9e3;border-radius:8px;background:#f7faf8;color:#4d6d5b;font:800 9px Cairo,sans-serif;cursor:pointer}
 #visitFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:#f8fafc}
 @media(max-width:640px){
  .followup-days-card{padding:9px}
@@ -376,7 +373,7 @@ body.support-delete-modal-open{overflow:hidden}
  .followup-add-button{min-height:32px;padding:0 9px;font-size:9px}
  .followup-days-list{gap:6px}
  .followup-day-row{padding:5px 6px}
- .visit-embedded-heading{padding:9px}
+
 }
 
 /* Patient-level energy and macro calculator — scoped to its own tab. */
