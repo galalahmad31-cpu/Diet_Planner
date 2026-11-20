@@ -28,12 +28,10 @@
   const titles = Object.fromEntries(pages.map(([href, label]) => [href, label]));
   titles["patient-profile.html"] = "ملف المريض";
   titles["visit.html"] = "الخطة الغذائية";
-  titles["nutritionsupport.html"] = "الدعم الغذائي";
   titles["nutritionsupport-patient.html"] = "الدعم الغذائي";
   titles["admin.html"] = "لوحة الإدارة";
   titles["article-view.html"] = "المقال";
   titles["privacy.html"] = "سياسة الخصوصية";
-  titles["weightم.html"] = "متابعة الوزن";
 
   function buildHeader() {
     const header = document.createElement("header");
@@ -72,10 +70,9 @@
       const link = document.createElement("a");
       link.className = "dp-app-header__link";
       link.href = href;
-      if (path === "weightم.html" && href === "app.html") link.id = "dashboardBtn";
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html")) {
+      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html")) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
       }
