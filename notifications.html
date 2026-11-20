@@ -11,15 +11,15 @@
 <script>
 tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']},colors:{brand:{50:'#eef7f6',100:'#d9efec',500:'#178f84',600:'#11786f',700:'#0d625b',800:'#0b504b'}}}}}
 </script>
-<link rel="stylesheet" href="css/notifications.css">
+<link rel="stylesheet" href="css/notifications.css?v=20261120-central-notifications-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
-<link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
+<link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v6">
   <script src="js/theme.js?v=20261120-central-v11"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen notifications-page">
 
 <div id="loading" class="loading">
   <div class="flex flex-col items-center gap-3">
@@ -50,8 +50,8 @@ tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']},colors
   </div>
 </header>
 
-<section class="mt-6 glass rounded-3xl p-3 sm:p-4">
-  <div class="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1.5">
+<section class="mt-6 glass rounded-3xl p-3 sm:p-4 notifications-tabs">
+  <div class="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1.5 notifications-tab-list">
     <button data-tab="today" class="tab-btn active rounded-xl px-2 py-3 text-xs sm:text-sm font-extrabold transition">
       <i class="fa-solid fa-calendar-day ml-1"></i> متابعات اليوم
       <span id="todayCount" class="mr-1 inline-flex min-w-6 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[10px]">0</span>
