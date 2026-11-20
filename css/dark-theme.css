@@ -1323,6 +1323,68 @@ html[data-theme="dark"] .rich-link-icon{
   color:var(--dp-accent)!important;
 }
 
+/* Dashboard surfaces: these were hard-coded light in app.css and must
+   resolve through the same semantic tokens as every other page. */
+html[data-theme="dark"] .dashboard-notifications-section,
+html[data-theme="dark"] .dashboard-announcements-section,
+html[data-theme="dark"] .dashboard-announcement-card,
+html[data-theme="dark"] .dp-announcement-dialog,
+html[data-theme="dark"] .dashboard-notification-row,
+html[data-theme="dark"] .dashboard-strip-arrow{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 8px 24px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] .dashboard-notifications-header,
+html[data-theme="dark"] .dashboard-notification-row{
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .dashboard-notifications-section :is(h1,h2,h3,h4,strong,.dashboard-notification-patient),
+html[data-theme="dark"] .dashboard-announcements-section :is(h1,h2,h3,h4,strong),
+html[data-theme="dark"] .dashboard-announcement-card :is(h1,h2,h3,h4,strong){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .dashboard-notifications-section :is(p,small,span,.dashboard-notification-action,.dashboard-notification-date),
+html[data-theme="dark"] .dashboard-announcements-section :is(p,small,span),
+html[data-theme="dark"] .dashboard-announcement-card :is(p,small,span){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .dashboard-all-notifications{color:var(--dp-accent)!important}
+html[data-theme="dark"] .dashboard-notification-row-icon,
+html[data-theme="dark"] .dashboard-announcement-card-top,
+html[data-theme="dark"] .dashboard-announcement-type{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-accent)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .dashboard-strip-arrow{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .dashboard-strip-arrow:hover{
+  background:var(--dp-surface-3)!important;
+  border-color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .dashboard-announcement-dialog,
+html[data-theme="dark"] .dp-announcement-dialog :is(input,select,textarea){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+
+/* Shared application surfaces used by multiple page modules. */
+html[data-theme="dark"] body :is(.filter-panel,.search-panel,.stats-card,.stat-card,.form-card,.content-card,.section-card,.table-container,.table-wrapper,.empty-state,.empty-formula,.modal-content,.modal-dialog,.dropdown-menu,.popover-content){
+  background-color:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body :is(.filter-panel,.search-panel,.stats-card,.stat-card,.form-card,.content-card,.section-card,.table-container,.table-wrapper,.empty-state,.modal-content,.modal-dialog,.dropdown-menu,.popover-content) :is(h1,h2,h3,h4,strong,label){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body :is(.filter-panel,.search-panel,.stats-card,.stat-card,.form-card,.content-card,.section-card,.table-container,.table-wrapper,.empty-state,.modal-content,.modal-dialog,.dropdown-menu,.popover-content) :is(p,small,span){
+  color:var(--dp-text-2)!important;
+}
+
 /* Normalize remaining generic white utility surfaces and their contents. */
 html[data-theme="dark"] body :is(.bg-white,.bg-white\/95,.bg-white\/90){
   background-color:var(--dp-surface)!important;
