@@ -413,6 +413,7 @@
         await access.getAccessStatus();
 
       if (!status.authenticated || !status.user) {
+        renderAdminCard(false);
         renderVisitorDashboard();
         return;
       }
@@ -425,6 +426,7 @@
       }
 
       await renderAccountName(status.user, status.isAdmin === true);
+      renderAdminCard(status.isAdmin);
       // Load the dashboard notification summary after authentication.
       await loadDashboardNotifications(status.user.id);
     } catch (error) {
