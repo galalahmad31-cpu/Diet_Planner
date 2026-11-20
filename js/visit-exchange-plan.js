@@ -11,6 +11,7 @@ G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='mea
 const dbx=window.DietPlannerAccess?.supabaseClient;
   if (!dbx) console.error("Diet Planner access layer is unavailable to the exchange-plan module.");
 function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));}
+function normalizePlanNotes(value){return String(value??'').replace(/\r\n?/g,'\n').replace(/(?:\\\\n|\\n|\/n)/gi,'\n');}
 const n=v=>Number.isFinite(Number(v))?Number(v):0,rnd=(v,d=2)=>Number(n(v).toFixed(d)),esc=escapeHtml;
 const isUuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v??''));
 async function currentExchangeUser(){return await window.DietPlannerAccess?.getCurrentUser?.()||null;}
@@ -26,7 +27,7 @@ function vals(g){const a=S.r[g.k];if(g.v){const x=g.v[a.sub]||Object.values(g.v)
 function manual(){return ['fruit','veg','milk','legumes'].reduce((a,k)=>{const g=G.find(x=>x.k===k),r=S.r[k],v=vals(g),c=n(r.count);a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;a.kcal+=c*v.kcal;return a},{kcal:0,carb:0,pro:0,fat:0})}
 function calc(){const m=manual();S.r.starch.count=Math.max(0,rnd((S.t.carb-m.carb)/15,2));const mp=m.pro+S.r.starch.count*2;const mv=vals(G.find(g=>g.k==='meat'));S.r.meat.count=Math.max(0,rnd((S.t.pro-mp)/7,2));S.r.fat.count=Math.max(0,rnd((S.t.fat-m.fat-S.r.meat.count*mv.fat)/5,2))}
 function total(){return G.reduce((a,g)=>{const r=S.r[g.k],v=vals(g),c=n(r.count);a.kcal+=c*v.kcal;a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;return a},{kcal:0,carb:0,pro:0,fat:0})}
-function setButtons(){const has=!!S.plan;const save=document.getElementById('exchangeSaveBtn'),edit=document.getElementById('exchangeEditBtn'),del=document.getElementById('exchangeDeleteBtn'),note=document.getElementById('exchangePlanNotes');if(save)save.disabled=!S.editing;if(edit)edit.disabled=!has||S.editing;if(del)del.disabled=!has||S.editing;if(note){note.disabled=!S.editing;if(document.activeElement!==note)note.value=S.notes}}
+function setButtons(){const has=!!S.plan;const save=document.getElementById('exchangeSaveBtn'),edit=document.getElementById('exchangeEditBtn'),del=document.getElementById('exchangeDeleteBtn'),note=document.getElementById('exchangePlanNotes');if(save)save.disabled=!S.editing;if(edit)edit.disabled=!has||S.editing;if(del)del.disabled=!has||S.editing;if(note){note.disabled=!S.editing;if(document.activeElement!==note)note.value=normalizePlanNotes(S.notes)}}
 function updateRingSummary(t){
  const metrics=[
   {key:'cal',value:t.kcal,target:S.t.cal,digits:0},
@@ -147,7 +148,7 @@ function printAll(){
 function buildPrintAll(){
  const container=document.getElementById('printPlanContent');
  if(!container)return;
- container.innerHTML=`<section class="print-day"><h2 class="print-day-title">تفاصيل الخطة الغذائية</h2><div class="print-plan-notes">${esc(S.notes||'لا توجد تفاصيل مسجلة.').replace(/\n/g,'<br>')}</div></section>`;
+ container.innerHTML=`<section class="print-day"><h2 class="print-day-title">تفاصيل الخطة الغذائية</h2><div class="print-plan-notes">${esc(normalizePlanNotes(S.notes)||'لا توجد تفاصيل مسجلة.').replace(/\n/g,'<br>')}</div></section>`;
 }
 function executePrintAll(){
  const docName=document.getElementById('settingDocName')?.value?.trim()||'';
@@ -178,9 +179,10 @@ async function save(options={}){
   return {plan_id:planId,group_name:g.n,subgroup_name:g.subs?(r.sub||null):null,exchange_count:c,kcal:rnd(c*v.kcal),carb:rnd(c*v.carb),protein:rnd(c*v.pro),fat:rnd(c*v.fat)};
  });
  const note=document.getElementById('exchangePlanNotes');
- const noteUpdate=await dbx.from('nutrition_plans').update({notes:String(note?.value??S.notes).trim()}).eq('id',planId);
+ const normalizedNotes=normalizePlanNotes(note?.value??S.notes).trim();
+ const noteUpdate=await dbx.from('nutrition_plans').update({notes:normalizedNotes}).eq('id',planId);
  if(noteUpdate.error){status('تعذر حفظ نص الخطة: '+noteUpdate.error.message,true);return false}
- S.notes=String(note?.value??S.notes).trim();
+ S.notes=normalizedNotes;
  const del=await dbx.from('exchange_values').delete().eq('plan_id',planId);
  if(del.error){status('تعذر تحديث خطة البدائل: '+del.error.message,true);return false}
  const ins=await dbx.from('exchange_values').insert(rows);
@@ -256,7 +258,7 @@ async function init(requestedPlanId=null){
    if(selectedName.includes('الجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
    const isFreshNumberedPlan=/^الخطة\s+\d+\s+-/.test(selectedName);
    S.plan=selectedPlan.id;
-   S.notes=String(selectedPlan.notes||'');
+   S.notes=normalizePlanNotes(selectedPlan.notes);
    await loadExchangeValues();
    S.editing=isFreshNumberedPlan || !S.saved;
   }else{S.plan=null;S.notes='';S.editing=true;}
