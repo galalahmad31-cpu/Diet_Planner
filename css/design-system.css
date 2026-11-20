@@ -122,6 +122,51 @@ body:has(.dashboard-services-section) header.glass #logoutBtn{
   color:var(--dp-primary-dark)!important;
 }
 
+/* Dashboard header authentication actions — contrast-safe
+   Scoped to the branded public dashboard header; auth behavior is unchanged. */
+body:has(.dashboard-services-section) header.glass #headerActions #loginCta,
+body:has(.dashboard-services-section) header.glass #headerActions #registerCta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:9px 16px;
+  border-radius:12px;
+  font-weight:700;
+  line-height:1.35;
+  text-decoration:none;
+  transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+body:has(.dashboard-services-section) header.glass #headerActions #loginCta{
+  color:#FFFFFF!important;
+  background:rgba(255,255,255,.10)!important;
+  border:1px solid rgba(255,255,255,.82)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+body:has(.dashboard-services-section) header.glass #headerActions #loginCta:hover{
+  color:#174D43!important;
+  background:#FFFFFF!important;
+  border-color:#FFFFFF!important;
+}
+body:has(.dashboard-services-section) header.glass #headerActions #registerCta{
+  color:#174D43!important;
+  background:#FFFFFF!important;
+  border:1px solid #FFFFFF!important;
+  box-shadow:0 2px 8px rgba(8,48,40,.16);
+}
+body:has(.dashboard-services-section) header.glass #headerActions #registerCta:hover{
+  color:#123D35!important;
+  background:#EAF5F2!important;
+  border-color:#EAF5F2!important;
+}
+body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta):focus-visible{
+  outline:3px solid #FFFFFF!important;
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta){transition:none}
+}
+
 /* Dark mode inherits the semantic palette from css/theme.css. */
 html[data-theme="dark"] body{background:var(--dp-bg);color:var(--dp-text)}
 html[data-theme="dark"] :where(h1,h2,h3,h4,h5,h6){color:var(--dp-text)}
