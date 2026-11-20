@@ -12,7 +12,7 @@
     document.documentElement.style.colorScheme = initial;
   } catch (_) {}
   const script = document.createElement("script");
-  script.src = "js/theme-manager.js?v=20261120-central-v7";
+  script.src = "js/theme-manager.js?v=20261120-central-v8";
   script.async = false;
   document.head.appendChild(script);
 })();
