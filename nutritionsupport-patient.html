@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/tailwind.css">
-  <link rel="stylesheet" href="css/nutritionsupport-patient.css?v=20261120-support-grid-v2">
+  <link rel="stylesheet" href="css/nutritionsupport-patient.css?v=20261120-volume-grid-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -233,32 +233,32 @@
 </svg>
 </button>
 <div class="hidden p-4 md:p-6 space-y-6 bg-white" id="en-volume-content">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100 no-print">
-<div>
+<div class="en-volume-fields en-volume-fields--primary no-print">
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Weight (kg) - EN
                             </label>
 <input class="weight-input-ltr" id="en-weight" inputmode="decimal" data-calc="en" placeholder="Enter Weight" type="text"/>
 </div>
-<div>
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Feeding Option
                             </label>
 <input id="en-option" data-calc="en" placeholder="Enter feeding option e.g. Breast milk, Preterm formula" type="text"/>
 </div>
-<div>
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Frequency (Every ... hours)
                             </label>
-<div class="flex items-center gap-2">
+<div class="en-volume-frequency">
 <span>Every</span>
 <input id="en-hours" data-calc="en" type="number" value="3"/>
 <span>Hours</span>
 </div>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 p-6 rounded-xl border border-blue-100 no-print">
-<div>
+<div class="en-volume-fields en-volume-fields--fortification no-print">
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Fortification?
                             </label>
@@ -267,27 +267,27 @@
 <option value="yes">Yes</option>
 </select>
 </div>
-<div class="hidden space-y-2" id="fortifier-box">
+<div class="en-volume-field en-volume-field--instructions hidden space-y-2" id="fortifier-box">
 <label class="block text-sm font-bold mb-1">
                                 Fortification Instructions
                             </label>
 <textarea id="en-fort-instructions" data-calc="en" placeholder="e.g. Add 1 sachet to 25ml" rows="2"></textarea>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-indigo-50 p-6 rounded-xl no-print">
-<div>
+<div class="en-volume-fields en-volume-fields--rates no-print">
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Initiation (ml/kg/d)
                             </label>
 <input id="en-init-rate" data-calc="en" type="number" value="20"/>
 </div>
-<div>
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Advancement (ml/kg/d)
                             </label>
 <input id="en-advance" data-calc="en" type="number" value="20"/>
 </div>
-<div>
+<div class="en-volume-field">
 <label class="block text-sm font-bold mb-1">
                                 Goal Volume (ml/kg/d)
                             </label>
