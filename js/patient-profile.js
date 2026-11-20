@@ -1440,12 +1440,8 @@
     });
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableBody')?.addEventListener('click', (event) => {
-      const save = event.target.closest('[data-measurement-save]');
-      const cancel = event.target.closest('[data-measurement-cancel]');
       const remove = event.target.closest('[data-measurement-delete]');
-      if (save) void saveMeasurementEntry();
-      else if (cancel) $('inlineMeasurementRow')?.remove();
-      else if (remove) void deleteMeasurement(Number(remove.dataset.measurementDelete));
+      if (remove) void deleteMeasurement(Number(remove.dataset.measurementDelete));
     });
     $('patientFinanceDetails')?.addEventListener('toggle', (event) => {
       if (event.currentTarget.open) void loadPatientFinance();
