@@ -34,11 +34,28 @@ function showToast(msg,type='success'){
  t.innerHTML='<i class="fa-solid '+(type==='error'?'fa-circle-exclamation':'fa-circle-check')+'"></i> <span class="mr-2">'+escapeHtml(msg)+'</span>';
  c.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
-function openConfirmModal(title,text,callback){
- document.getElementById('confirmTitle').textContent=title; document.getElementById('confirmText').textContent=text;
- confirmCallback=callback; document.getElementById('confirmModal').classList.remove('hidden');
+function ensureDietModalPortal(id,className){
+ const modal=document.getElementById(id);
+ if(!modal)return null;
+ if(modal.parentElement!==document.body)document.body.appendChild(modal);
+ if(className)modal.classList.add(className);
+ modal.setAttribute('role','dialog');
+ modal.setAttribute('aria-modal','true');
+ return modal;
 }
-function closeConfirmModal(){document.getElementById('confirmModal').classList.add('hidden');confirmCallback=null;}
+function openConfirmModal(title,text,callback){
+ const modal=ensureDietModalPortal('confirmModal','diet-action-modal-layer');
+ if(!modal)return;
+ document.getElementById('confirmTitle').textContent=title;
+ document.getElementById('confirmText').textContent=text;
+ confirmCallback=callback;
+ modal.classList.remove('hidden');
+}
+function closeConfirmModal(){
+ const modal=document.getElementById('confirmModal');
+ if(modal)modal.classList.add('hidden');
+ confirmCallback=null;
+}
 function scaleHouseholdMeasure(measure,grams){
  if(!measure)return'—'; const g=Number(grams); if(!Number.isFinite(g)||g<0)return measure;
  const factor=g/100, arabic={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
@@ -325,8 +342,19 @@ function deleteDay(id){
  });
 }
 
-function openAddMealModal(id){targetMealDayId=id;document.getElementById('newMealNameInput').value='';document.getElementById('addMealModal').classList.remove('hidden');}
-function closeAddMealModal(){document.getElementById('addMealModal').classList.add('hidden');targetMealDayId=null;}
+function openAddMealModal(id){
+ const modal=ensureDietModalPortal('addMealModal','diet-action-modal-layer');
+ if(!modal)return;
+ targetMealDayId=id;
+ document.getElementById('newMealNameInput').value='';
+ modal.classList.remove('hidden');
+ document.getElementById('newMealNameInput').focus({preventScroll:true});
+}
+function closeAddMealModal(){
+ const modal=document.getElementById('addMealModal');
+ if(modal)modal.classList.add('hidden');
+ targetMealDayId=null;
+}
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
