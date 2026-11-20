@@ -6,6 +6,12 @@
 - `js/auth-access.js` initializes the shared Supabase client and exposes `window.DietPlannerAccess`.
 - `js/theme.js` manages theme behavior. CSS assets live in `css/`; `npm run build:css` builds Tailwind CSS.
 
+## Shared application shell
+- `js/app-header.js` owns the single branded application header and navigation for application pages.
+- `css/app-header.css` owns its shared responsive presentation; each page contains only a `data-dp-app-header` mount point.
+- Page-specific header controls are retained in a `data-dp-page-actions` slot and moved into the shared header at mount time, preserving their existing element IDs and event bindings.
+- Authentication/recovery pages (`login.html`, `forgot-password.html`, `update-password.html`) remain outside the application shell. Embedded visit and nutrition-support views suppress the shell when `?embed=1` is active.
+
 ## Page/script map
 - Public entry/auth routing: `index.html` → `js/auth-access.js`; authenticated dashboard routing is handled by `js/auth-access.js`.
 - Main dashboard: `app.html` → `js/auth-access.js`, `js/app-dashboard.js`; `index.html` also contains a public-facing dashboard/entry layout and loads the dashboard script. Keep their routing and access behavior distinct unless regression-tested.
