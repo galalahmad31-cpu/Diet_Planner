@@ -230,7 +230,7 @@
   }
 
   async function cancelPending() {
-    const sb = window.DietPlannerAccess?.supabaseClient;
+    const sb = getSupabaseClient();
     const sub = state.currentSubscription;
     if (!sub || sub.status !== 'pending') return;
     const ok = await new Promise(resolve => { state.confirm = resolve; $('confirmTitle').textContent = 'تأكيد الإلغاء'; $('confirmMessage').textContent = 'هل أنت متأكد من إلغاء طلب الاشتراك؟'; $('confirmOverlay').style.display = 'flex'; });
