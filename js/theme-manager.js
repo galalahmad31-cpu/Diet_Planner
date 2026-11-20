@@ -28,6 +28,18 @@
     button.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
     button.title = dark ? "Light mode" : "Dark mode";
   };
+  const syncEmbeddedFrames = (theme) => {
+    if (window.parent !== window) return;
+    document.querySelectorAll("iframe").forEach((frame) => {
+      if (!frame.dataset.dpThemeSyncBound) {
+        frame.dataset.dpThemeSyncBound = "true";
+        frame.addEventListener("load", () => {
+          frame.contentWindow?.postMessage({ type: "dp-theme-sync", theme: root.dataset.theme }, window.location.origin);
+        });
+      }
+      frame.contentWindow?.postMessage({ type: "dp-theme-sync", theme }, window.location.origin);
+    });
+  };
   const apply = (theme) => {
     const next = valid(theme) ? theme : "light";
     root.dataset.theme = next;
@@ -35,7 +47,14 @@
     setMeta("color-scheme", next);
     setMeta("theme-color", next === "dark" ? "#101B19" : "#F1F5F4");
     updateToggle();
+    syncEmbeddedFrames(next);
   };
+  // Embedded same-origin pages follow the parent theme even when opened before
+  // the parent's preference has been persisted or restored.
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.source !== window.parent) return;
+    if (event.data?.type === "dp-theme-sync" && valid(event.data.theme)) apply(event.data.theme);
+  });
   const save = (theme) => {
     try { localStorage.setItem(STORAGE_KEY, theme); } catch (_) {}
     apply(theme);
@@ -57,10 +76,10 @@
   // Versioning here prevents stale page-level URLs from retaining an old theme.
   const ensureCentralStylesheets = () => {
     const files = [
-      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v9"],
-      ["light-theme.css", "css/light-theme.css?v=20261120-central-v9"],
-      ["components.css", "css/components.css?v=20261120-central-v9"],
-      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v9"]
+      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v10"],
+      ["light-theme.css", "css/light-theme.css?v=20261120-central-v10"],
+      ["components.css", "css/components.css?v=20261120-central-v10"],
+      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v10"]
     ];
     const allLinks = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
     files.forEach(([filename, href]) => {
