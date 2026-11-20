@@ -8,6 +8,14 @@
   --dp-primary:#087F6B;
   --dp-primary-hover:#066B5B;
   --dp-primary-dark:#174D43;
+  --dp-success:#16845B;
+  --dp-warning:#D99A24;
+  --dp-danger:#C64B4B;
+  --dp-info:#2879A5;
+  --dp-radius-sm:10px;
+  --dp-radius-md:14px;
+  --dp-radius-lg:18px;
+  --dp-font:'Cairo','IBM Plex Sans Arabic',Tahoma,sans-serif;
   --dp-bg:#F1F5F4;
   --dp-surface:#FFFFFF;
   --dp-surface-2:#F8FBFA;
@@ -27,6 +35,13 @@
 
 html[data-theme="dark"]{
   color-scheme:dark;
+  --dp-primary:#35B69A;
+  --dp-primary-hover:#52C8AA;
+  --dp-primary-dark:#174D43;
+  --dp-success:#34B27B;
+  --dp-warning:#E5B54A;
+  --dp-danger:#E47777;
+  --dp-info:#68A9D0;
   --dp-bg:#0d1514;
   --dp-surface:#17211f;
   --dp-surface-2:#1d2927;
