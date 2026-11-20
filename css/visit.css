@@ -890,6 +890,12 @@ body #foodModal.diet-food-modal-layer{
 }
 body #foodModal.diet-food-modal-layer.hidden{display:none!important}
 body #foodModal.diet-food-modal-layer:not(.hidden){display:flex!important}
+body #fixedMealsModal.diet-fixed-meals-modal-layer{
+  position:fixed!important;inset:0!important;z-index:2147483647!important;
+  isolation:isolate;pointer-events:auto;
+}
+body #fixedMealsModal.diet-fixed-meals-modal-layer.hidden{display:none!important}
+body #fixedMealsModal.diet-fixed-meals-modal-layer:not(.hidden){display:flex!important}
 body .day-details-modal[hidden]{display:none!important}
 body .day-details-modal{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
