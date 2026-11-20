@@ -57,7 +57,7 @@ function renderExchanges(){
   });
 
   $('exchangeRows').innerHTML=filtered.map(x=>`
-    <tr class="border-b border-slate-100 hover:bg-slate-50/80">
+    <tr class="dp-themed-table-row border-b border-slate-100">
       <td class="px-4 py-4 font-extrabold text-brand-700">${esc(x.group_name)}</td>
       <td class="px-4 py-4 font-bold text-slate-800">${esc(x.subgroup_name)}</td>
       <td class="exchange-cell px-4 py-4 text-slate-800 font-medium">${esc(x.exchange_name)}</td>
@@ -102,7 +102,7 @@ function render(){
   });
   const visibleFoods=filtered.slice(0,visibleFoodCount);
   $('foodRows').innerHTML=visibleFoods.map(f=>`
-  <tr class="border-b border-slate-100 hover:bg-slate-50/80">
+  <tr class="dp-themed-table-row border-b border-slate-100">
     <td class="px-3 py-3"><div class="font-bold text-slate-800">${esc(f.name_ar)}</div>${f.name_en?`<div class="mt-0.5 text-[10px] text-slate-400" dir="ltr">${esc(f.name_en)}</div>`:''}</td>
     <td class="px-3 py-3 text-slate-600">${esc(f.household)}</td>
     <td class="px-3 py-3 text-center font-bold">${f.kcal}</td><td class="px-3 py-3 text-center">${f.carb}</td><td class="px-3 py-3 text-center">${f.protein}</td><td class="px-3 py-3 text-center">${f.fat}</td>
