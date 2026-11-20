@@ -148,7 +148,18 @@ html[data-theme="dark"] :where(.glass,.card,.main-container,.patient-name-bar,.d
 .dashboard-notification-action,
 .dashboard-notification-date,
 .dashboard-announcement-card p,
-.dashboard-announcement-card-footer{
+.dashboard-announcement-card-footer,
+.articles-heading p,
+.article-card-meta,
+.article-card-footer,
+.announcement-admin-meta,
+.formula-section-title small,
+.formula-title-wrap span,
+.metric small,
+.qc-tab small,
+.field-hint,
+.auth-bottom-note,
+.editor:empty::before{
   color:var(--dp-text-2);
 }
 
