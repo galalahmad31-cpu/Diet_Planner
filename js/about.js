@@ -2,6 +2,8 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
 const state = {
   isAdmin: false,
+  isAuthenticated: false,
+  hasActiveSubscription: false,
   sections: [],
   deletingId: null,
   linkEditorId: null,
@@ -22,6 +24,33 @@ function escapeHtml(value) {
 function setAdminUI() {
   const button = $("addSectionBtn");
   if (button) button.classList.toggle("hidden", !state.isAdmin);
+}
+
+function renderAccountActions() {
+  const container = $("aboutAccountActions");
+  if (!container) return;
+
+  if (state.isAuthenticated) {
+    const hasAppAccess = state.isAdmin || state.hasActiveSubscription;
+    const destination = hasAppAccess ? "app.html" : "profile.html";
+    const label = hasAppAccess ? "الانتقال إلى التطبيق" : "الانتقال إلى حسابك";
+
+    container.innerHTML = `
+      <a href="${destination}" class="about-account-action about-account-action-primary">
+        ${label}
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      </a>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <a href="login.html" class="about-account-action about-account-action-primary">
+      تسجيل الدخول
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    </a>
+    <a href="login.html#register" class="about-account-action about-account-action-secondary">
+      إنشاء حساب
+    </a>`;
 }
 
 function showEmpty(message) {
@@ -226,10 +255,13 @@ async function initializeUser() {
     ? await access.getAccessStatus()
     : null;
 
-  state.isAdmin = accessStatus?.authenticated === true &&
-    accessStatus?.isAdmin === true;
+  state.isAuthenticated = accessStatus?.authenticated === true;
+  state.isAdmin = state.isAuthenticated && accessStatus?.isAdmin === true;
+  state.hasActiveSubscription = state.isAuthenticated &&
+    accessStatus?.hasActiveSubscription === true;
 
   setAdminUI();
+  renderAccountActions();
   return true;
 }
 
