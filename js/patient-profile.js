@@ -126,7 +126,7 @@
     try {
       const request = supabase
         .from('patients')
-        .select('id,user_id,name,phone,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
+        .select('id,user_id,name,phone,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,energy_target_calories,energy_target_protein,energy_target_carb,energy_target_fat,energy_approved_at,created_at,updated_at')
         .eq('id', patientId)
         .maybeSingle();
 
