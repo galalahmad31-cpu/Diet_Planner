@@ -67,8 +67,8 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     dietPlan: {
-      preloaded: true,
-      ready: () => !!window.dietPlan?.init
+      src: 'js/visit-diet-plan.js?v=20261120-day-popup-v2',
+      ready: () => typeof window.dietPlan?.init === 'function'
     },
     exchangePlan: {
       src: 'js/visit-exchange-plan.js?v=20261120-exchange-rings-v3',
@@ -89,14 +89,6 @@ const db = window.DietPlannerAccess?.supabaseClient;
       return Promise.resolve(true);
     }
 
-    if (config.preloaded) {
-      const reason = window.__dpDietPlanLoadError || 'ملف الوحدة لم ينشئ window.dietPlan.init';
-      const error = new Error('Gram diet module unavailable: ' + reason);
-      console.error(error);
-      showError('تعذر تهيئة وحدة خطة الجرامات. ' + reason);
-      return Promise.resolve(false);
-    }
-
     if (modulePromises[module]) {
       return modulePromises[module];
     }
@@ -109,7 +101,10 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
       script.onload = () => {
         if (!config.ready()) {
-          reject(new Error(`Module loaded but did not initialize: ${module}`));
+          const reason = module === 'dietPlan' && window.__dpDietPlanLoadError
+            ? window.__dpDietPlanLoadError
+            : `ملف الوحدة لم يوفّر واجهة التهيئة المطلوبة: ${module}`;
+          reject(new Error(reason));
           return;
         }
 
