@@ -62,12 +62,8 @@
         </div>
         <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
-      <div class="dp-app-header__context">
+      <div class="dp-app-header__context" hidden>
         <div id="headerActions" class="dp-header-account-actions">
-          <div id="accountInfo" class="dp-header-account-info hidden">
-            <span id="doctorName" class="dp-header-account-name" aria-live="polite"></span>
-
-          </div>
           <div class="dp-header-auth-actions">
             <a id="loginCta" class="hidden" href="${appBasePath}login.html">تسجيل الدخول</a>
             <a id="registerCta" class="hidden" href="${appBasePath}login.html#register">إنشاء حساب</a>
@@ -107,19 +103,15 @@
 
 
   function renderAccount(user) {
-    const info = document.getElementById("accountInfo");
-    const name = document.getElementById("doctorName");
     const logout = document.getElementById("logoutBtn");
     const login = document.getElementById("loginCta");
     const register = document.getElementById("registerCta");
+    const context = document.querySelector(".dp-app-header__context");
     const signedIn = Boolean(user?.id);
-    info?.classList.toggle("hidden", !signedIn);
     logout?.classList.toggle("hidden", !signedIn);
     login?.classList.toggle("hidden", signedIn);
     register?.classList.toggle("hidden", signedIn);
-    if (name) name.textContent = signedIn
-      ? (user.user_metadata?.full_name || user.user_metadata?.name || user.email || "حساب المستخدم")
-      : "";
+    if (context) context.hidden = signedIn;
   }
 
   function bindAccountActions() {
@@ -155,8 +147,12 @@
     const header = buildHeader();
     const context = header.querySelector(".dp-app-header__context");
     if (placeholder) {
-      const title = placeholder.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim();
-      header.querySelector(".dp-app-header__page-title").textContent = title;
+      const title = (placeholder.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim()).trim();
+      const activeLink = header.querySelector(".dp-app-header__link.is-active");
+      const activeLabel = activeLink?.querySelector("span")?.textContent.trim();
+      const pageTitle = header.querySelector(".dp-app-header__page-title");
+      if (title && title !== activeLabel) pageTitle.textContent = title;
+      else pageTitle.remove();
       const actions = document.querySelector("[data-dp-page-actions]");
       if (actions) {
         if (actions.dataset.placement === "title") {
@@ -170,12 +166,15 @@
       }
       placeholder.replaceWith(header);
     } else {
-      header.querySelector(".dp-app-header__page-title").textContent =
-        titles[path] || document.title.split("|")[0].trim();
+      const title = (titles[path] || document.title.split("|")[0].trim()).trim();
+      const activeLink = header.querySelector(".dp-app-header__link.is-active");
+      const activeLabel = activeLink?.querySelector("span")?.textContent.trim();
+      const pageTitle = header.querySelector(".dp-app-header__page-title");
+      if (title && title !== activeLabel) pageTitle.textContent = title;
+      else pageTitle.remove();
       const main = document.querySelector("main");
       document.body.insertBefore(header, main || document.body.firstChild);
     }
-    context.hidden = false;
     bindAccountActions();
     document.body.classList.add("dp-has-app-header");
   }
