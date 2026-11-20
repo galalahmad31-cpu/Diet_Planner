@@ -184,18 +184,27 @@
 
   async function loadPlans() {
     const container = $('profilePlansList');
+    if (!container) return;
+
+    container.innerHTML = '<div class="profile-plans-loading"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الخطط...</div>';
     try {
-      const { data, error } = await supabase
+      const request = supabase
         .from('subscription_plans')
         .select('id,name,price,duration_days,description,payment_method,is_free_trial')
         .eq('is_active', true)
         .order('price', { ascending: true });
+
+      const timeout = new Promise((_, reject) => {
+        window.setTimeout(() => reject(new Error('انتهت مهلة تحميل الخطط. تحقق من الاتصال ثم أعد المحاولة.')), 15000);
+      });
+      const { data, error } = await Promise.race([request, timeout]);
       if (error) throw error;
+
       state.plans = Array.isArray(data) ? data : [];
       renderPlans();
     } catch (error) {
       console.error('Subscription plans loading failed:', error);
-      if (container) container.innerHTML = '<div class="profile-plans-empty">تعذر تحميل خطط الاشتراك حاليًا.</div>';
+      container.innerHTML = '<div class="profile-plans-empty">تعذر تحميل خطط الاشتراك. تحقق من الاتصال ثم <button type="button" data-plans-retry style="color:var(--dp-primary,#159b78);font-weight:800;text-decoration:underline">أعد المحاولة</button>.</div>';
     }
   }
 
@@ -402,6 +411,8 @@
 
   function bindEvents() {
     $('profilePlansList')?.addEventListener('click', (event) => {
+      const retry = event.target.closest('[data-plans-retry]');
+      if (retry) { loadPlans(); return; }
       const button = event.target.closest('[data-plan-action="details"]');
       if (button) openPlanDetails(button.dataset.planId);
     });
