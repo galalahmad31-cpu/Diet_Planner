@@ -21,7 +21,7 @@
 .dp-app-header__brand-row{
   display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:13px;
 }
-.dp-app-header__page-meta{display:flex;align-items:center;justify-content:flex-start;gap:9px;min-width:0;max-width:58%}
+.dp-app-header__page-meta{display:flex;align-items:center;justify-content:flex-start;gap:7px;flex:0 1 auto;min-width:0;max-width:none}
 .dp-app-header__brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:#fff;text-decoration:none}
 .dp-app-header__logo{
   display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;
@@ -32,11 +32,12 @@
 .dp-app-header__brand-copy strong{font-size:19px;font-weight:900;letter-spacing:-.2px;color:#fff}
 .dp-app-header__brand-copy small{font-size:11px;font-weight:700;color:rgba(255,255,255,.82)}
 .dp-app-header__page-title{
-  display:block;flex:0 1 auto;min-width:0;max-width:calc(100% - 98px);
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:0 1 auto;min-width:max-content;max-width:none;
   padding:7px 12px;border:1px solid rgba(255,255,255,.16);
   border-radius:12px;background:rgba(255,255,255,.09);color:#fff;
   font-size:12px;font-weight:800;text-align:center;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;
+  overflow:visible;text-overflow:clip;overflow-wrap:normal;
 }
 .dp-app-header__nav{width:100%;overflow:hidden}
 .dp-app-header__track{
@@ -124,8 +125,8 @@
   .dp-app-header__brand{gap:9px}
   .dp-app-header__brand-copy strong{font-size:16px}
   .dp-app-header__brand-copy small{font-size:10px}
-  .dp-app-header__page-meta{max-width:58%;gap:5px}
-  .dp-app-header__page-title{max-width:calc(100% - 62px);padding:6px 8px;font-size:10px;white-space:nowrap}
+  .dp-app-header__page-meta{max-width:none;gap:5px;flex:0 1 auto}
+  .dp-app-header__page-title{max-width:none;min-width:max-content;padding:6px 8px;font-size:10px;white-space:nowrap}
   .dp-app-header__track{gap:6px}
   .dp-app-header__link{min-height:36px;padding:7px 10px;font-size:10px;border-radius:10px}
   .dp-app-header__context{gap:7px;margin-top:8px;padding-top:8px}
