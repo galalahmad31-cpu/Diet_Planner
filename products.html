@@ -70,6 +70,14 @@
         <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl">
                 <div data-dp-app-header data-page-title="المنتجات الغذائية"></div>
+                <div data-dp-page-actions>
+                    <div id="adminToolbar" class="hidden items-center justify-end gap-2">
+                        <button id="addProductBtn" type="button" class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-extrabold text-emerald-800 shadow-sm hover:bg-emerald-50">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            إضافة منتج
+                        </button>
+                    </div>
+                </div>
                 <section class="mt-6 glass rounded-3xl p-4 sm:p-5 shadow-sm">
                     <div class="grid grid-cols-1 gap-3 md:grid-cols-4">
                         <div>
@@ -325,7 +333,7 @@
         </div>
         <script src="js/auth-access.js?v=20261118-subscription-gate-v2">
         </script>
-        <script src="js/products.js?v=20260928-1">
+        <script src="js/products.js?v=20261120-products-fix-v1">
         </script>
     </body>
 </html>
