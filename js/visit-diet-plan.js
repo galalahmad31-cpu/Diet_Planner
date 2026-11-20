@@ -777,8 +777,7 @@ function ensureDayDetailsModal(){
    </header>
    <div id="dayDetailsContent" class="day-details-content"></div>
   </section>`;
- const host=document.getElementById('daysContainer');
- if(host)host.appendChild(modal);else document.body.appendChild(modal);
+ document.body.appendChild(modal);
  modal.addEventListener('click',event=>{
   if(event.target===modal||event.target.closest('[data-day-modal-close]'))closeDayDetails();
  });
@@ -813,6 +812,9 @@ function openDayDetails(id){
  activeDayDetailsId=String(day.id);
  modal.hidden=false;
  document.body.style.overflow='hidden';
+ if(new URLSearchParams(location.search).get('embed')==='1'&&window.parent!==window){
+  window.parent.postMessage({type:'dp-plan-embed-modal',open:true},location.origin);
+ }
  renderActiveDayDetails();
  modal.querySelector('.day-details-close')?.focus();
 }
@@ -823,6 +825,9 @@ function closeDayDetails(){
  modal.hidden=true;
  activeDayDetailsId=null;
  document.body.style.overflow=dayDetailsPreviousOverflow;
+ if(new URLSearchParams(location.search).get('embed')==='1'&&window.parent!==window){
+  window.parent.postMessage({type:'dp-plan-embed-modal',open:false},location.origin);
+ }
  const trigger=closingId?document.querySelector(`[data-day-open="${CSS.escape(closingId)}"]`):null;
  trigger?.focus();
 }
