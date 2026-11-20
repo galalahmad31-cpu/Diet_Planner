@@ -2024,7 +2024,7 @@ html[data-theme="dark"] body:has(#section-en) :is(
 }
 html[data-theme="dark"] body:has(#section-en) :is(
   #section-en .bg-white,#section-tpn .bg-white,
-  #en-volume-content,#en-calories-content,
+  #en-volume-content,#en-calories-content,#glu-remaining-info,
   .tab-content .bg-white,.print-settings-head,
   .print-settings-body,.print-settings-actions
 ){
@@ -2033,11 +2033,8 @@ html[data-theme="dark"] body:has(#section-en) :is(
   border-color:var(--dp-border)!important;
 }
 html[data-theme="dark"] body:has(#section-en) :is(
-  #section-en .bg-gray-50,#section-en .bg-blue-50,
-  #section-en .bg-indigo-50,#section-en .bg-purple-50,
-  #section-tpn .bg-gray-50,#section-tpn .bg-blue-50,
-  #section-tpn .bg-blue-100,#section-tpn .bg-indigo-50,
-  #section-tpn .bg-amber-50,#section-tpn .bg-emerald-50,
+  #section-en :is(.bg-gray-50,.bg-blue-50,.bg-blue-100,.bg-blue-200,.bg-indigo-50,.bg-indigo-100,.bg-indigo-900,.bg-purple-50,.bg-purple-100,.bg-emerald-50,.bg-emerald-100),
+  #section-tpn :is(.bg-gray-50,.bg-blue-50,.bg-blue-100,.bg-blue-200,.bg-indigo-50,.bg-indigo-100,.bg-indigo-900,.bg-amber-50,.bg-amber-100,.bg-emerald-50,.bg-emerald-100),
   .support-tab,.day-item,.day-edit-btn,.component-select,
   #patient-collapse-btn,.table-custom tbody td,
   .print-cancel-btn,.delete-confirm-cancel
@@ -2047,6 +2044,7 @@ html[data-theme="dark"] body:has(#section-en) :is(
   border-color:var(--dp-border)!important;
 }
 html[data-theme="dark"] body:has(#section-en) :is(
+  .support-brand h1,.support-patient-top h2,.selected-patient-head h2,
   .day-edit-title,.detail-top h2,.days-toolbar h3,
   .support-content h1,.support-content h2,.support-content h3,
   .support-content h4,.support-content label,
