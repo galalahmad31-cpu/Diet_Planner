@@ -83,7 +83,7 @@
   async function loadJobs() {
     if (!client) return setState("تعذر الاتصال بقاعدة البيانات.");
     setState("جاري تحميل الوظائف...", true);
-    const { data, error } = await client.from(PAGE).select("*").order("created_at", { ascending: false });
+    const { data, error } = await client.from(PAGE).select("id,title,specialty,organization_name,location_city,country_code,employment_type,workplace_type,description,requirements,salary_min,salary_max,salary_currency,salary_period,application_url,contact_email,contact_phone,status,published_at,expires_at,created_at,updated_at").order("created_at", { ascending: false });
     if (error) {
       console.error("Admin jobs load failed:", error);
       return setState("تعذر تحميل الوظائف. تحقق من الصلاحيات والاتصال.");
