@@ -21,7 +21,7 @@
 - Diet/calculation: `diet.html` → `js/diet.js`; `quickcalc.html` → `js/quickcalc.js`
 - Food/recipes/products: `food.html` → `js/food.js`; `recipe.html` → `js/recipe.js`; `products.html` → `js/products.js`
 - Finance/weight: `finance.html` → `js/finance.js`; the repository's standalone weight page uses the Arabic-named `weightم.html`, `css/weightم.css`, and `js/weightم.js`.
-- Nutrition support: `nutritionsupport.html` → `js/nutritionsupport.js`; `nutritionsupport-patient.html` → `js/nutritionsupport-patient.js`
+- Nutrition support: the standalone `nutritionsupport.html` page is retained temporarily but is no longer exposed in shared navigation; patient-linked nutrition support remains in `nutritionsupport-patient.html` → `js/nutritionsupport-patient.js`.
 - Subscriptions: `subscription_plans_index.html` → `js/subscription_plans_index.js`; `subscription_plansم.html` → `js/subscription_plansم.js`.
 - Other modules include profile, articles, feedback, notifications, about, and password recovery/update pages.
 
