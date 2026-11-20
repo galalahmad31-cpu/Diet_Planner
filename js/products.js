@@ -1022,14 +1022,6 @@ async function init() {
       adminToolbar.setAttribute('aria-hidden', String(!state.isAdmin));
     }
 
-    if (!state.isAdmin) {
-      const ok = await access.hasFeature(status.user.id,'product');
-      if (ok !== true) {
-        setState('هذه الخدمة غير متاحة في اشتراكك الحالي.');
-        return;
-      }
-    }
-
     await loadData();
     populateCategories();
     render();
