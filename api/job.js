@@ -119,8 +119,8 @@ module.exports = async function handler(req, res) {
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="/css/design-tokens.css"><link rel="stylesheet" href="/css/light-theme.css"><link rel="stylesheet" href="/css/dark-theme.css"><link rel="stylesheet" href="/css/components.css"><link rel="stylesheet" href="/css/app-header.css?v=20261121-central-header-v9"><link rel="stylesheet" href="/css/jobs.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/auth-access.js" defer></script><script src="/js/theme.js" defer></script><script src="/js/app-header.js?v=20261121-central-account-v7" defer></script>
+<link rel="stylesheet" href="/css/design-tokens.css"><link rel="stylesheet" href="/css/light-theme.css"><link rel="stylesheet" href="/css/dark-theme.css"><link rel="stylesheet" href="/css/components.css"><link rel="stylesheet" href="/css/app-header.css?v=20261121-collapsible-nav-v10"><link rel="stylesheet" href="/css/jobs.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/auth-access.js" defer></script><script src="/js/theme.js" defer></script><script src="/js/app-header.js?v=20261121-collapsible-nav-v8" defer></script>
 </head>
 <body><main class="jobs-page">
 <div data-dp-app-header data-page-title="تفاصيل الوظيفة"></div>
