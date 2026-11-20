@@ -26,8 +26,14 @@
     return trial ? 'تعذر بدء التجربة المجانية حاليًا. تم تسجيل المحاولة.' : 'تعذر إنشاء طلب الاشتراك حاليًا.';
   }
 
+  function getSupabaseClient() {
+    const client = window.DietPlannerAccess?.supabaseClient;
+    if (!client) throw new Error('لم يتم تهيئة اتصال قاعدة البيانات. أعد تحميل الصفحة.');
+    return client;
+  }
+
   async function loadUser() {
-    const sb = window.DietPlannerAccess?.supabaseClient;
+    const sb = getSupabaseClient();
     if (!sb) throw new Error('تعذر تهيئة اتصال قاعدة البيانات. أعد تحميل الصفحة.');
     const { data, error } = await sb.auth.getUser();
     if (error) throw error;
@@ -37,8 +43,7 @@
   }
 
   async function loadData() {
-    const sb = window.DietPlannerAccess?.supabaseClient;
-    if (!sb) throw new Error('لم يتم تهيئة اتصال قاعدة البيانات.');
+    const sb = getSupabaseClient();
 
     const [plansResult, subsResult] = await Promise.all([
       sb.from('subscription_plans')
@@ -145,7 +150,7 @@
   }
 
   async function submitSubscription() {
-    const sb = window.DietPlannerAccess?.supabaseClient;
+    const sb = getSupabaseClient();
     const plan = state.plans.find(p => p.id === state.selectedPlanId);
     if (!state.user || !plan) return;
 
@@ -199,7 +204,7 @@
   }
 
   async function replacePendingProof() {
-    const sb = window.DietPlannerAccess?.supabaseClient;
+    const sb = getSupabaseClient();
     const sub = state.currentSubscription;
     const file = $('paymentProof').files[0];
     if (!sub || sub.status !== 'pending') return toast('لا يمكن تعديل إثبات الدفع الآن.');
@@ -242,8 +247,8 @@
   }
 
   async function logout() {
-    const sb = window.DietPlannerAccess?.supabaseClient;
-    if (!sb) return toast('تعذر الاتصال بالخادم. أعد تحميل الصفحة.');
+    let sb;
+    try { sb = getSupabaseClient(); } catch (error) { return toast(error.message); }
     const { error } = await sb.auth.signOut();
     if (error) return toast('تعذر تسجيل الخروج.');
     window.location.replace('index.html');
