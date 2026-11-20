@@ -40,7 +40,7 @@
     header.setAttribute("dir", "rtl");
     header.innerHTML = `
       <div class="dp-app-header__brand-row">
-        <a class="dp-app-header__brand" href="app.html" aria-label="Diet Planner - الرئيسية">
+        <a class="dp-app-header__brand" href="/app.html" aria-label="Diet Planner - الرئيسية">
           <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
           <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>د. أحمد جلال</small></span>
         </a>
@@ -61,8 +61,8 @@
 
           </div>
           <div class="dp-header-auth-actions">
-            <a id="loginCta" class="hidden" href="login.html">تسجيل الدخول</a>
-            <a id="registerCta" class="hidden" href="login.html#register">إنشاء حساب</a>
+            <a id="loginCta" class="hidden" href="/login.html">تسجيل الدخول</a>
+            <a id="registerCta" class="hidden" href="/login.html#register">إنشاء حساب</a>
           </div>
         </div>
       </div>`;
@@ -70,7 +70,7 @@
     pages.forEach(([href, label, icon]) => {
       const link = document.createElement("a");
       link.className = "dp-app-header__link";
-      link.href = href;
+      link.href = "/" + href;
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
       if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || (/^[0-9a-f-]{36}$/i.test(path) && href === "jobs.html")) {
