@@ -1,0 +1,774 @@
+/* Diet Planner — centralized dark theme rules.
+   Semantic tokens are defined in design-tokens.css.
+   Page-specific layout and behavior remain untouched. */
+
+html[data-theme="dark"] body{
+  background-color:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .glass,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .main-container,
+html[data-theme="dark"] .nav-card,
+html[data-theme="dark"] .qc-panel,
+html[data-theme="dark"] .editor,
+html[data-theme="dark"] .content{
+  color:var(--dp-text);
+}
+
+/* ---------- Universal neutral surfaces ---------- */
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-white\/95,
+html[data-theme="dark"] .bg-white\/90,
+html[data-theme="dark"] .bg-white\/88,
+html[data-theme="dark"] .bg-white\/86,
+html[data-theme="dark"] .bg-white\/84,
+html[data-theme="dark"] .bg-white\/60{
+  background-color:var(--dp-surface)!important;
+}
+
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .bg-gray-50{
+  background-color:var(--dp-surface-2)!important;
+}
+html[data-theme="dark"] .bg-slate-100,
+html[data-theme="dark"] .bg-gray-100{
+  background-color:var(--dp-surface-3)!important;
+}
+html[data-theme="dark"] .bg-slate-200,
+html[data-theme="dark"] .bg-gray-200{
+  background-color:#354A43!important;
+}
+
+/* ---------- Universal text ---------- */
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-gray-900,
+html[data-theme="dark"] .text-gray-800,
+html[data-theme="dark"] .text-gray-700{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-gray-500{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .text-slate-400,
+html[data-theme="dark"] .text-gray-400{
+  color:var(--dp-muted)!important;
+}
+html[data-theme="dark"] .text-slate-300,
+html[data-theme="dark"] .text-gray-300{
+  color:#718984!important;
+}
+
+/* ---------- Universal borders ---------- */
+html[data-theme="dark"] .border-slate-50,
+html[data-theme="dark"] .border-slate-100,
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-300,
+html[data-theme="dark"] .border-gray-100,
+html[data-theme="dark"] .border-gray-200,
+html[data-theme="dark"] .border-gray-300{
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] hr{border-color:var(--dp-border)!important}
+
+/* ---------- Forms ---------- */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{
+  background-color:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{
+  color:#718984!important;
+}
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] select:disabled,
+html[data-theme="dark"] textarea:disabled{
+  background:#172622!important;
+  color:#829a95!important;
+  border-color:#2f433f!important;
+}
+html[data-theme="dark"] option{
+  background:#172622!important;
+  color:#F1F7F4!important;
+}
+
+/* ---------- Common custom surfaces ---------- */
+html[data-theme="dark"] .glass,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .main-container,
+html[data-theme="dark"] .nav-card{
+  background:var(--dp-surface)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 10px 28px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] .header,
+html[data-theme="dark"] .toolbar,
+html[data-theme="dark"] .tabs,
+html[data-theme="dark"] .support-header,
+html[data-theme="dark"] .support-patient-area,
+html[data-theme="dark"] .selected-patient-area,
+html[data-theme="dark"] .support-days,
+html[data-theme="dark"] .support-tabs{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .error-modal,
+html[data-theme="dark"] .confirm-modal,
+html[data-theme="dark"] .patient-modal,
+html[data-theme="dark"] .delete-confirm-box,
+html[data-theme="dark"] .print-settings-modal,
+html[data-theme="dark"] .print-completion-modal{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .field label,
+html[data-theme="dark"] .form-group label,
+html[data-theme="dark"] .patient-form-field label{
+  color:var(--dp-text-2)!important;
+}
+
+/* ---------- Tables ---------- */
+html[data-theme="dark"] table{color:var(--dp-text)!important}
+html[data-theme="dark"] thead,
+html[data-theme="dark"] th{
+  background:#20332E!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] td{
+  border-color:var(--dp-border)!important;
+  color:var(--dp-text)!important;
+}
+
+/* ---------- Common light accent surfaces ---------- */
+html[data-theme="dark"] .bg-blue-50{background:#172d39!important}
+html[data-theme="dark"] .bg-cyan-50{background:#163035!important}
+html[data-theme="dark"] .bg-sky-50{background:#172d3b!important}
+html[data-theme="dark"] .bg-emerald-50{background:#173027!important}
+html[data-theme="dark"] .bg-green-50{background:#173027!important}
+html[data-theme="dark"] .bg-amber-50{background:#3a2d17!important}
+html[data-theme="dark"] .bg-yellow-50{background:#3a2d17!important}
+html[data-theme="dark"] .bg-orange-50{background:#38261a!important}
+html[data-theme="dark"] .bg-red-50{background:#351d23!important}
+html[data-theme="dark"] .bg-rose-50{background:#351d23!important}
+html[data-theme="dark"] .bg-purple-50{background:#29233d!important}
+html[data-theme="dark"] .bg-violet-50{background:#29233d!important}
+html[data-theme="dark"] .bg-indigo-50{background:#202746!important}
+
+html[data-theme="dark"] .text-blue-700,
+html[data-theme="dark"] .text-blue-800,
+html[data-theme="dark"] .text-blue-900{color:#7dd3fc!important}
+html[data-theme="dark"] .text-sky-700,
+html[data-theme="dark"] .text-sky-800,
+html[data-theme="dark"] .text-sky-900{color:#7dd3fc!important}
+html[data-theme="dark"] .text-emerald-600,
+html[data-theme="dark"] .text-emerald-700,
+html[data-theme="dark"] .text-emerald-800,
+html[data-theme="dark"] .text-emerald-900{color:#6ee7b7!important}
+html[data-theme="dark"] .text-green-700,
+html[data-theme="dark"] .text-green-800{color:#6ee7b7!important}
+html[data-theme="dark"] .text-amber-600,
+html[data-theme="dark"] .text-amber-700,
+html[data-theme="dark"] .text-amber-800{color:#fbbf24!important}
+html[data-theme="dark"] .text-red-600,
+html[data-theme="dark"] .text-red-700,
+html[data-theme="dark"] .text-red-800{color:#fda4af!important}
+html[data-theme="dark"] .text-rose-600,
+html[data-theme="dark"] .text-rose-700{color:#fda4af!important}
+html[data-theme="dark"] .text-purple-700,
+html[data-theme="dark"] .text-purple-800,
+html[data-theme="dark"] .text-purple-900,
+html[data-theme="dark"] .text-violet-700{color:#c4b5fd!important}
+html[data-theme="dark"] .text-indigo-700,
+html[data-theme="dark"] .text-indigo-800{color:#a5b4fc!important}
+
+/* ---------- Gradients used by generated diet/legacy UI ---------- */
+html[data-theme="dark"] .from-slate-50{
+  --tw-gradient-from:#20332E!important;
+  --tw-gradient-to:rgba(29,41,39,0)!important;
+}
+html[data-theme="dark"] .to-white{
+  --tw-gradient-to:#172622!important;
+}
+html[data-theme="dark"] .bg-gradient-to-b.from-slate-50{
+  background-image:linear-gradient(to bottom,#20332E,#172622)!important;
+}
+html[data-theme="dark"] .bg-gradient-to-b{
+  --tw-gradient-to:#172622!important;
+}
+
+/* ---------- Loading / overlays ---------- */
+html[data-theme="dark"] .loading,
+html[data-theme="dark"] #loading,
+html[data-theme="dark"] #loadingScreen{
+  background:#101B19!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .modal-bg,
+html[data-theme="dark"] .modal-backdrop,
+html[data-theme="dark"] .confirm-backdrop,
+html[data-theme="dark"] .error-overlay{
+  background:rgba(2,8,7,.78)!important;
+}
+html[data-theme="dark"] .spinner{
+  border-color:#24443f!important;
+  border-top-color:#20A88A!important;
+}
+
+/* ---------- Buttons / controls ---------- */
+html[data-theme="dark"] button.bg-white,
+html[data-theme="dark"] a.bg-white,
+html[data-theme="dark"] .btn-outline,
+html[data-theme="dark"] .back-btn,
+html[data-theme="dark"] .icon-btn,
+html[data-theme="dark"] .close{
+  background:#20332E!important;
+  color:#55C5A4!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .btn-danger,
+html[data-theme="dark"] .patient-delete-cancel,
+html[data-theme="dark"] .delete-confirm-cancel,
+html[data-theme="dark"] .print-cancel-btn{
+  background:#26332f!important;
+  color:#C1D0CA!important;
+}
+html[data-theme="dark"] .tab-btn.active,
+html[data-theme="dark"] .support-tab.active{
+  background:#173a34!important;
+  color:#55C5A4!important;
+}
+html[data-theme="dark"] .support-tab.tpn.active{
+  background:#292d4d!important;
+  color:#c4b5fd!important;
+}
+
+/* ---------- Login / auth ---------- */
+html[data-theme="dark"] body:has(.auth-form),
+html[data-theme="dark"] body:has(.site-link){
+  background:#101B19!important;
+}
+html[data-theme="dark"] body:has(.auth-form) .card{
+  background:#172622!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .tabs button,
+html[data-theme="dark"] .google-btn{
+  background:#20332E!important;
+  color:#C1D0CA!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .tabs button.active{
+  background:#243b37!important;
+  color:#55C5A4!important;
+}
+html[data-theme="dark"] .msg.error{background:#351d23!important;color:#fda4af!important}
+html[data-theme="dark"] .msg.success{background:#173027!important;color:#6ee7b7!important}
+
+/* ---------- Dashboard / application ---------- */
+html[data-theme="dark"] .nav-card .icon-box{
+  filter:brightness(.82) saturate(.9);
+}
+html[data-theme="dark"] .page-header{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .page-header h1,
+html[data-theme="dark"] .page-header-icon{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .page-header-icon{
+  background:#0f7168!important;
+  color:#fff!important;
+}
+
+/* ---------- Quick calculator ---------- */
+html[data-theme="dark"] .qc-tab{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .qc-tab small,
+html[data-theme="dark"] .qc-panel label{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #sub-content-quick-calc > .border{
+  background:var(--dp-surface)!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] #sub-content-quick-calc > .border > [id$="-content"]{
+  background:linear-gradient(180deg,#20332E 0%,#172622 110px)!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .qc-panel{
+  background:#20332E!important;
+  border-color:#35514b!important;
+}
+html[data-theme="dark"] .iv-line-row{
+  background:linear-gradient(180deg,#1d2a28,#20332E)!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .qc-result{
+  background:linear-gradient(180deg,#1d302d,#172622)!important;
+  border-color:#3e6f66!important;
+}
+html[data-theme="dark"] .qc-note{
+  background:#172622!important;
+  color:#C1D0CA!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .highlight-box{
+  background:#15302d!important;
+  color:#d9efeb!important;
+  border-color:#3f837a!important;
+}
+
+/* ---------- Visit / gram plan ---------- */
+html[data-theme="dark"] .assessment-section,
+html[data-theme="dark"] .calc-card,
+html[data-theme="dark"] #calculatorContent,
+html[data-theme="dark"] #dietPlanContent,
+html[data-theme="dark"] #exchangePlanContent{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .module-card.assessment-module{
+  background:linear-gradient(180deg,#16332f,#172622 62%)!important;
+  border-color:#2d6960!important;
+}
+html[data-theme="dark"] .module-card.calculator-module{
+  background:linear-gradient(180deg,#182d3a,#172622 62%)!important;
+  border-color:#315e75!important;
+}
+html[data-theme="dark"] .module-card.diet-module{
+  background:linear-gradient(180deg,#193127,#172622 62%)!important;
+  border-color:#356b4c!important;
+}
+html[data-theme="dark"] .embedded-diet-plan{
+  background:#101B19!important;
+  color:#F1F7F4!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .day-card{
+  background:#172622!important;
+  border-color:#354A43!important;
+  color:#E4EEE9!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .meal-header{
+  background:#172622!important;
+  color:#F1F7F4!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .bg-white{
+  background:#172622!important;
+  color:#E4EEE9!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .bg-slate-50{
+  background:#20332E!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .bg-slate-100{
+  background:#26332f!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .border-slate-50,
+html[data-theme="dark"] .embedded-diet-plan .border-slate-100,
+html[data-theme="dark"] .embedded-diet-plan .border-slate-200{
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .embedded-diet-plan input,
+html[data-theme="dark"] .embedded-diet-plan select,
+html[data-theme="dark"] .embedded-diet-plan textarea{
+  background:#172622!important;
+  color:#F1F7F4!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .embedded-diet-plan .bg-gradient-to-b.from-slate-50{
+  background-image:linear-gradient(to bottom,#20332E,#172622)!important;
+}
+
+/* ---------- Diet library ---------- */
+html[data-theme="dark"] #editor > div,
+html[data-theme="dark"] #foodPicker > div{
+  background:#172622!important;
+  color:#F1F7F4!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] #editor > div > .sticky,
+html[data-theme="dark"] #foodPicker > div > div{
+  background:#20332E!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .diet-table,
+html[data-theme="dark"] .diet-table td,
+html[data-theme="dark"] .food-row{
+  background:#172622!important;
+  color:#D2DFD8!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .diet-table thead{
+  background:#20332E!important;
+}
+html[data-theme="dark"] .food-name-cell{
+  color:#F1F7F4!important;
+}
+html[data-theme="dark"] .food-name-en{
+  color:#91A69C!important;
+}
+html[data-theme="dark"] #foodPicker #foodSearch,
+html[data-theme="dark"] #foodPicker #selectedFoodGrams{
+  background:#172622!important;
+  color:#F1F7F4!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] #foodPicker #selectedFoodBox{
+  background:#17312d!important;
+  border-color:#3d756c!important;
+}
+
+/* ---------- Food library ---------- */
+html[data-theme="dark"] .products-table th:first-child,
+html[data-theme="dark"] .products-table td:first-child{
+  background:#172622!important;
+}
+html[data-theme="dark"] .products-table thead th:first-child{
+  background:#20332E!important;
+}
+html[data-theme="dark"] .table-wrap::-webkit-scrollbar-track{
+  background:#20332E!important;
+}
+html[data-theme="dark"] .table-wrap::-webkit-scrollbar-thumb{
+  background:#40574E!important;
+}
+
+/* ---------- Patient / profile / support custom cards ---------- */
+html[data-theme="dark"] .patient-card{
+  background:#20332E!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .patient-card:hover{
+  background:#20312d!important;
+}
+html[data-theme="dark"] .patient-readonly-card{
+  background:#172622!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .patient-data-toggle{
+  background:#17332f!important;
+  color:#55C5A4!important;
+}
+html[data-theme="dark"] .patient-modal-overlay,
+html[data-theme="dark"] .patient-delete-confirm,
+html[data-theme="dark"] .delete-confirm-overlay,
+html[data-theme="dark"] .print-settings-overlay,
+html[data-theme="dark"] .print-completion-overlay{
+  background:rgba(2,8,7,.82)!important;
+}
+html[data-theme="dark"] .patient-form-field input,
+html[data-theme="dark"] .patient-form-field select,
+html[data-theme="dark"] .patient-form-field textarea{
+  background:#101a18!important;
+}
+html[data-theme="dark"] .day-item{
+  background:#20332E!important;
+  color:#c0d1cc!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .day-item.active{
+  background:#173a34!important;
+  color:#55C5A4!important;
+  border-color:#2d8176!important;
+}
+
+/* ---------- Nutrition Support ---------- */
+html[data-theme="dark"] .support-brand h1,
+html[data-theme="dark"] .support-patient-top h2,
+html[data-theme="dark"] .selected-patient-head h2,
+html[data-theme="dark"] .days-toolbar h3{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #section-en,
+html[data-theme="dark"] #section-tpn{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #section-en .bg-purple-50,
+html[data-theme="dark"] #section-en .bg-blue-50,
+html[data-theme="dark"] #section-en .bg-indigo-50{
+  background:#17302c!important;
+  border-color:#315c55!important;
+}
+html[data-theme="dark"] #section-tpn .bg-blue-50,
+html[data-theme="dark"] #section-tpn .bg-blue-100,
+html[data-theme="dark"] #section-tpn .bg-gray-50{
+  background:#202646!important;
+  border-color:#454c78!important;
+}
+html[data-theme="dark"] #section-en .text-purple-700,
+html[data-theme="dark"] #section-en .text-purple-800,
+html[data-theme="dark"] #section-en .text-purple-900{
+  color:#55C5A4!important;
+}
+html[data-theme="dark"] #section-tpn .text-blue-700,
+html[data-theme="dark"] #section-tpn .text-blue-800,
+html[data-theme="dark"] #section-tpn .text-blue-900{
+  color:#c4b5fd!important;
+}
+html[data-theme="dark"] .table-custom{
+  background:#172622!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .table-custom td{
+  background:#172622!important;
+  color:#D2DFD8!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .table-custom tbody tr:nth-child(even) td{
+  background:#1b2926!important;
+}
+html[data-theme="dark"] .table-custom tbody tr:hover td{
+  background:#293D37!important;
+}
+html[data-theme="dark"] .bg-low-risk{
+  background:#123026!important;
+  color:#b9ead9!important;
+  border-color:#2d8d72!important;
+}
+html[data-theme="dark"] .bg-mod-risk{
+  background:#332b17!important;
+  color:#f4d98b!important;
+  border-color:#b88725!important;
+}
+html[data-theme="dark"] .bg-high-risk{
+  background:#351d21!important;
+  color:#ffb8c0!important;
+  border-color:#c55260!important;
+}
+html[data-theme="dark"] .monitoring-section{
+  background:#142a24!important;
+  border-color:#31554c!important;
+}
+html[data-theme="dark"] #glu-remaining-info{
+  background:#162320!important;
+  border-color:#334844!important;
+  color:#a9bdb8!important;
+}
+html[data-theme="dark"] .delete-confirm-box,
+html[data-theme="dark"] .print-settings-modal,
+html[data-theme="dark"] .print-completion-modal{
+  background:#17221f!important;
+}
+
+/* ---------- Subscription pages ---------- */
+html[data-theme="dark"] .subscription-status-card,
+html[data-theme="dark"] .method,
+html[data-theme="dark"] .selected-plan-info{
+  background:#20332E!important;
+  color:#D2DFD8!important;
+  border-color:#354A43!important;
+}
+html[data-theme="dark"] .subscription-status-card strong{
+  color:#55C5A4!important;
+}
+html[data-theme="dark"] .error-details{
+  background:#351d23!important;
+  border-color:#70404a!important;
+  color:#f5c3ca!important;
+}
+
+/* ---------- Article editor ---------- */
+html[data-theme="dark"] .editor table td,
+html[data-theme="dark"] .editor table th,
+html[data-theme="dark"] .content table td,
+html[data-theme="dark"] .content table th{
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .editor table th,
+html[data-theme="dark"] .content table th,
+html[data-theme="dark"] .editor blockquote,
+html[data-theme="dark"] .content blockquote{
+  background:#17302c!important;
+  color:#D2DFD8!important;
+  border-color:#3d756c!important;
+}
+
+/* ---------- About / privacy / update-password ---------- */
+html[data-theme="dark"] .editor{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .toolbar button{
+  background:#20332E!important;
+  color:#C1D0CA!important;
+  border-color:#40574E!important;
+}
+html[data-theme="dark"] .toolbar button:hover{
+  background:#293D37!important;
+}
+html[data-theme="dark"] .site-link a{color:#55C5A4!important}
+
+/* ---------- SVG weight chart ---------- */
+html[data-theme="dark"] .chart-grid{stroke:#354A43!important}
+html[data-theme="dark"] .chart-axis,
+html[data-theme="dark"] .chart-date{fill:#91A69C!important}
+html[data-theme="dark"] .chart-dot{stroke:#172622!important}
+html[data-theme="dark"] .chart-tooltip{
+  background:#172622!important;
+  color:#F1F7F4!important;
+}
+
+/* ---------- Scrollbars ---------- */
+html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-track,
+html[data-theme="dark"] .table-wrap::-webkit-scrollbar-track{
+  background:#20332E!important;
+}
+html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb,
+html[data-theme="dark"] .table-wrap::-webkit-scrollbar-thumb{
+  background:#40574E!important;
+}
+
+/* ---------- Theme toggle ---------- */
+.dp-theme-toggle{
+  position:fixed;
+  z-index:99999;
+  right:18px;
+  bottom:18px;
+  width:46px;
+  height:46px;
+  border:1px solid rgba(23,143,132,.28);
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.94);
+  color:#126f67;
+  box-shadow:0 8px 24px rgba(15,71,67,.14);
+  cursor:pointer;
+  font-size:19px;
+  line-height:1;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+html[data-theme="dark"] .dp-theme-toggle{
+  background:#20332E;
+  color:#55C5A4;
+  border-color:#40574E;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.dp-theme-toggle:hover{transform:translateY(-2px)}
+.dp-theme-toggle:focus-visible{
+  outline:3px solid rgba(23,143,132,.22);
+  outline-offset:2px;
+}
+@media(max-width:640px){
+  .dp-theme-toggle{right:14px;bottom:14px;width:43px;height:43px;border-radius:14px}
+}
+
+/* ---------- Print is always light ---------- */
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body,
+  html[data-theme="dark"] body *{
+    color-scheme:light!important;
+  }
+}
+
+/* ---------- Tailwind opacity variants ---------- */
+html[data-theme="dark"] .bg-slate-50\/60,
+html[data-theme="dark"] .bg-slate-50\/70{background:var(--dp-surface-2)!important}
+html[data-theme="dark"] .bg-emerald-50\/70{background:#173027!important}
+html[data-theme="dark"] .bg-amber-50\/60{background:#3a2d17!important}
+
+
+/* =========================================================
+   Central dark-theme compatibility layer
+   Loaded after page styles by theme.js; fixes only shared
+   branded surfaces and custom components not using tokens.
+   ========================================================= */
+
+/* Preserve the green brand treatment and readable white copy. */
+html[data-theme="dark"] body:has(.dashboard-services-section) header.glass,
+html[data-theme="dark"] header.header,
+html[data-theme="dark"] .patient-profile-page-header,
+html[data-theme="dark"] .profile-page-header,
+html[data-theme="dark"] .finance-page-header,
+html[data-theme="dark"] .about-branded-header,
+html[data-theme="dark"] .patient-page-header,
+html[data-theme="dark"] .feedback-branded-header,
+html[data-theme="dark"] .food-page-header,
+html[data-theme="dark"] .recipe-page-header,
+html[data-theme="dark"] .support-header{
+  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%)!important;
+  color:#F1F7F4!important;
+  border-color:transparent!important;
+}
+html[data-theme="dark"] body:has(.dashboard-services-section) header.glass :is(h1,h2,h3),
+html[data-theme="dark"] body:has(.dashboard-services-section) header.glass .brand-sub,
+html[data-theme="dark"] body:has(.dashboard-services-section) header.glass #accountInfo,
+html[data-theme="dark"] body:has(.dashboard-services-section) header.glass #doctorName,
+html[data-theme="dark"] :is(.patient-profile-page-header,.profile-page-header,.finance-page-header,.about-branded-header,.patient-page-header,.feedback-branded-header,.food-page-header,.recipe-page-header,.support-header) :is(h1,h2,h3,p,span,small,strong){
+  color:#F1F7F4!important;
+}
+
+/* The dashboard hero is also a branded surface, never dark-on-green. */
+html[data-theme="dark"] body:has(.dashboard-services-section) main section .bg-gradient-to-l :is(h1,h2,h3,p){
+  color:#F1F7F4!important;
+}
+
+/* Dashboard custom cards and announcement dialog. */
+html[data-theme="dark"] .dashboard-announcements-section{
+  background:var(--dp-surface)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .dashboard-announcement-card,
+html[data-theme="dark"] .dp-announcement-dialog{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .dashboard-announcement-card h4,
+html[data-theme="dark"] .dashboard-notification-patient,
+html[data-theme="dark"] .dp-announcement-dialog h3{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .dashboard-announcement-card p,
+html[data-theme="dark"] .dashboard-announcement-card-footer,
+html[data-theme="dark"] .dashboard-notification-action,
+html[data-theme="dark"] .dashboard-notification-date,
+html[data-theme="dark"] .dp-announcement-dialog p,
+html[data-theme="dark"] .dp-announcement-dialog-date{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .dp-announcement-close{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+
+/* Article detail page includes an inline light stylesheet. */
+html[data-theme="dark"] .article-body{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .article-body :is(h1,h2,h3,h4,h5,h6,strong){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .article-body blockquote{
+  background:#173D34!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-primary)!important;
+}
+html[data-theme="dark"] .article-body a{color:#55C5A4!important}
+html[data-theme="dark"] .article-body th,
+html[data-theme="dark"] .article-body td{
+  border-color:var(--dp-border)!important;
+}
