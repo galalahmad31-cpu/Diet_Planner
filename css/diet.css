@@ -264,7 +264,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
  .diet-brand-logo{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:18px}
  .diet-brand-copy h1{font-size:18px!important}
  .diet-brand-copy p{font-size:10px}
- .diet-page-label{font-size:9px;padding:4px 8px}
+
  .diet-create-btn{min-height:30px;padding:5px 8px;font-size:9px}
  .diet-page-header .quick-access-nav{margin-top:7px;padding:7px 0 2px!important}
  .diet-page-header .quick-access-track{gap:7px!important}
