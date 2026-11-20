@@ -1431,7 +1431,6 @@ html[data-theme="dark"] .recipe-modal {
     background: rgba(0, 0, 0, 0.68);
 }
 
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
 /* Final contrast pass — dark mode */
 html[data-theme="dark"] #mix-result{
   background:#1d4038!important;
@@ -1439,43 +1438,6 @@ html[data-theme="dark"] #mix-result{
   border:1px solid #3e7568!important;
 }
 
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-yellow-100{
-  background:#3a3218!important;
-  color:#f5d978!important;
-  border:1px solid #66572a!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-blue-900{
-  background:#28357a!important;
-  color:#f0f3ff!important;
-  border:1px solid #4858ad!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-blue-100{
-  background:#20333b!important;
-  color:#bfe8f0!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .text-blue-200{
-  color:#b9d4ff!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .text-blue-800,
-html[data-theme="dark"] #section-tpn .text-blue-900{
-  color:#a9d8ff!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .peer-checked\:bg-blue-600{
-  background:#4f7ff5!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
 /* Dark-mode refinement: keep clinical colors, but use the global dark palette as the base. */
 html[data-theme="dark"] #section-tpn .bg-indigo-900{
   background:#202b29!important;
@@ -1483,60 +1445,6 @@ html[data-theme="dark"] #section-tpn .bg-indigo-900{
   border:1px solid #344843!important;
 }
 
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-indigo-900 .border-indigo-700{
-  border-color:#3b514d!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-emerald-50,
-html[data-theme="dark"] #section-tpn .bg-emerald-100{
-  background:#18302b!important;
-  border-color:#36544d!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .text-emerald-900,
-html[data-theme="dark"] #section-tpn .text-emerald-800{
-  color:#9be6d0!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-blue-200{
-  background:#243331!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-amber-50,
-html[data-theme="dark"] #section-tpn .bg-amber-100{
-  background:#332b19!important;
-  border-color:#5b4b2a!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .text-amber-900,
-html[data-theme="dark"] #section-tpn .text-amber-800{
-  color:#f1d99b!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-white{
-  background:var(--dp-surface)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .border{
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .text-yellow-400{
-  color:#f5d76e!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
 /* =========================================================
    GLOBAL DARK MODE — Nutrition Support Patient
    Page-specific colors must not override theme.css.
@@ -1544,258 +1452,6 @@ html[data-theme="dark"] #section-tpn .text-yellow-400{
 html[data-theme="dark"] body{
   background:var(--dp-bg)!important;
   color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .container-main{
-  background:var(--dp-surface)!important;
-  border-color:var(--dp-border)!important;
-  box-shadow:0 20px 55px rgba(0,0,0,.28)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .detail-patient-area,
-html[data-theme="dark"] .support-days,
-html[data-theme="dark"] .day-edit-toolbar{
-  background:var(--dp-surface)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .detail-top h2,
-html[data-theme="dark"] .days-toolbar h3,
-html[data-theme="dark"] .day-edit-title{
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-edit-btn{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text-2)!important;
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-edit-btn:hover{
-  background:var(--dp-surface-3)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-list{
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-row,
-html[data-theme="dark"] .day-item{
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-item{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-item:hover,
-html[data-theme="dark"] .day-item.active{
-  background:var(--dp-surface-3)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .support-tab{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text-2)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .support-tab:hover{
-  background:var(--dp-surface-3)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .day-edit-toolbar{
-  background:var(--dp-surface-2)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .support-day-locked #section-en input,
-html[data-theme="dark"] .support-day-locked #section-en select,
-html[data-theme="dark"] .support-day-locked #section-en textarea,
-html[data-theme="dark"] .support-day-locked #section-tpn input,
-html[data-theme="dark"] .support-day-locked #section-tpn select,
-html[data-theme="dark"] .support-day-locked #section-tpn textarea{
-  background:#111c1a!important;
-  color:var(--dp-muted)!important;
-  border-color:var(--dp-input-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en .bg-blue-50,
-html[data-theme="dark"] #section-en .bg-indigo-50,
-html[data-theme="dark"] #section-en .bg-purple-50{
-  background:#1a2927!important;
-  border-color:#30413e!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .bg-gray-50,
-html[data-theme="dark"] #section-tpn .bg-blue-50,
-html[data-theme="dark"] #section-tpn .bg-blue-100{
-  background:#1b252f!important;
-  border-color:#354252!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en .bg-purple-100,
-html[data-theme="dark"] #section-en .bg-purple-100:hover{
-  background:#203a35!important;
-  color:#d8eeea!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en .bg-white,
-html[data-theme="dark"] #section-tpn .bg-white,
-html[data-theme="dark"] .tab-content .bg-white{
-  background:var(--dp-surface)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .table-custom{
-  background:var(--dp-surface)!important;
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .table-custom td{
-  background:var(--dp-surface)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en .table-custom tbody tr:nth-child(even) td{
-  background:#1c2b28!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en .table-custom tbody tr:hover td{
-  background:#233632!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .table-custom tbody tr:nth-child(even) td{
-  background:#202734!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-tpn .table-custom tbody tr:hover td{
-  background:#27303e!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .bg-low-risk{
-  background:#143126!important;
-  color:#c7ead9!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .bg-mod-risk{
-  background:#332b16!important;
-  color:#f3dfad!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .bg-high-risk{
-  background:#351b1d!important;
-  color:#f3c6c8!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .highlight-box{
-  background:#1b302d!important;
-  border-color:#36534e!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .monitoring-section{
-  background:#192823!important;
-  border-color:#30453f!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .component-select,
-html[data-theme="dark"] #glu-remaining-info{
-  background:var(--dp-input)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-input-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #patient-collapse-btn{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text-2)!important;
-  border-color:var(--dp-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #patient-collapse-btn:hover{
-  background:var(--dp-surface-3)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en input,
-html[data-theme="dark"] #section-en select,
-html[data-theme="dark"] #section-en textarea,
-html[data-theme="dark"] #section-tpn input,
-html[data-theme="dark"] #section-tpn select,
-html[data-theme="dark"] #section-tpn textarea{
-  background:var(--dp-input)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-input-border)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] #section-en input::placeholder,
-html[data-theme="dark"] #section-en textarea::placeholder,
-html[data-theme="dark"] #section-tpn input::placeholder,
-html[data-theme="dark"] #section-tpn textarea::placeholder{
-  color:var(--dp-muted)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .delete-confirm-title,
-html[data-theme="dark"] .print-settings-head h3,
-html[data-theme="dark"] .print-completion-modal h3{
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .delete-confirm-text,
-html[data-theme="dark"] .print-settings-head p,
-html[data-theme="dark"] .print-field label,
-html[data-theme="dark"] .print-completion-modal p{
-  color:var(--dp-text-2)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .delete-confirm-cancel,
-html[data-theme="dark"] .print-cancel-btn{
-  background:var(--dp-surface-3)!important;
-  color:var(--dp-text)!important;
-}
-
-/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
-html[data-theme="dark"] .print-field input{
-  background:var(--dp-input)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-input-border)!important;
 }
 
 /* =========================================================
@@ -2439,4 +2095,135 @@ html[data-theme="dark"] body.notifications-page .notification-card .bg-red-50{
 html[data-theme="dark"] body.notifications-page #loading{
   background:var(--dp-bg)!important;
   color:var(--dp-text)!important;
+}
+
+/* Nutrition Support Patient — one page-scoped dark palette.
+   Uses the same central tokens as every other application page. */
+html[data-theme="dark"] body:has(#section-en){
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(
+  .support-days,.support-tabs,.day-edit-toolbar,.support-content,
+  .tab-content,.monitoring-section,.highlight-box,.table-custom,
+  .print-settings-modal,.print-completion-modal,.delete-confirm-box
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 2px 12px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(
+  #en-volume-content,#en-calories-content,#section-tpn .bg-white,
+  #section-en .bg-white,.tab-content .bg-white,
+  .print-settings-head,.print-settings-body,.print-settings-actions
+){
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(
+  .day-edit-title,.detail-top h2,.days-toolbar h3,
+  .support-content h1,.support-content h2,.support-content h3,
+  .support-content h4,.support-content label,
+  .table-custom td,.table-custom th,.delete-confirm-title,
+  .print-settings-head h3,.print-field label,.print-completion-modal h3
+){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(
+  .support-content p,.support-content small,.support-content .text-gray-500,
+  .support-content .text-slate-500,.day-empty,.print-settings-head p,
+  .print-completion-modal p,.delete-confirm-text
+){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(input,select,textarea){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(input,textarea)::placeholder{
+  color:var(--dp-muted)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(input,select,textarea):disabled{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-muted)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(
+  .support-tab,.day-item,.day-edit-btn,.component-select,
+  #patient-collapse-btn,.table-custom tbody td,
+  .print-cancel-btn,.delete-confirm-cancel
+){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) :is(
+  .support-tab.active,.day-item.active,.day-item:hover,
+  .day-edit-btn:hover,#patient-collapse-btn:hover
+){
+  background:var(--dp-primary)!important;
+  color:#fff!important;
+  border-color:var(--dp-primary)!important;
+}
+html[data-theme="dark"] body:has(#section-en) .day-save-btn,
+html[data-theme="dark"] body:has(#section-en) .days-add button,
+html[data-theme="dark"] body:has(#section-en) .print-confirm-btn,
+html[data-theme="dark"] body:has(#section-en) .print-completion-btn{
+  background:var(--dp-primary)!important;
+  color:#fff!important;
+}
+html[data-theme="dark"] body:has(#section-en) .table-custom th{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #section-en :is(
+  .bg-purple-100,.bg-purple-50,.bg-blue-50,.bg-indigo-50,
+  .bg-emerald-50,.bg-emerald-100
+),
+html[data-theme="dark"] body:has(#section-en) #section-tpn :is(
+  .bg-gray-50,.bg-blue-50,.bg-blue-100,.bg-emerald-50,.bg-emerald-100,
+  .bg-indigo-900,.bg-white
+){
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #section-en :is(
+  .text-purple-700,.text-purple-800,.text-purple-900,
+  .text-blue-700,.text-blue-800,.text-blue-900,.text-emerald-700
+),
+html[data-theme="dark"] body:has(#section-en) #section-tpn :is(
+  .text-blue-700,.text-blue-800,.text-blue-900,
+  .text-emerald-700,.text-emerald-800,.text-emerald-900
+){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(#section-en) .highlight-box{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) .bg-low-risk{
+  background:#143126!important;color:#c7ead9!important;
+}
+html[data-theme="dark"] body:has(#section-en) .bg-mod-risk{
+  background:#332b16!important;color:#f3dfad!important;
+}
+html[data-theme="dark"] body:has(#section-en) .bg-high-risk{
+  background:#351b1d!important;color:#f3c6c8!important;
+}
+html[data-theme="dark"] body:has(#section-en) #mix-result{
+  background:#1d4038!important;color:#a9f0d6!important;border-color:#3e7568!important;
+}
+html[data-theme="dark"] body:has(#section-en) .delete-confirm-icon{
+  background:#3b2529!important;color:#f3a8b0!important;
+}
+@media print{
+  html[data-theme="dark"] body:has(#section-en),
+  html[data-theme="dark"] body:has(#section-en) :is(.support-days,.support-tabs,.day-edit-toolbar,.support-content,.tab-content){
+    background:#fff!important;color:#111!important;
+    box-shadow:none!important;
+  }
 }
