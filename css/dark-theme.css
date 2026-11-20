@@ -1043,7 +1043,8 @@ html[data-theme="dark"] .plan-details-dialog,
 html[data-theme="dark"] .plan-detail-line,
 html[data-theme="dark"] .profile-selected-plan-info,
 html[data-theme="dark"] .profile-subscribe-modal,
-html[data-theme="dark"] .profile-subscribe-dialog{
+html[data-theme="dark"] .profile-subscribe-dialog,
+html[data-theme="dark"] .profile-inline-email{
   background:var(--dp-surface-2)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
@@ -1053,7 +1054,8 @@ html[data-theme="dark"] .plan-details-dialog :is(h2,h3,h4,strong),
 html[data-theme="dark"] .profile-subscribe-modal :is(h2,h3,h4,strong){color:var(--dp-text)!important}
 html[data-theme="dark"] .profile-plan-tile :is(p,small,span),
 html[data-theme="dark"] .plan-detail-line :is(p,small,span),
-html[data-theme="dark"] .profile-subscribe-modal :is(p,small,span){color:var(--dp-text-2)!important}
+html[data-theme="dark"] .profile-subscribe-modal :is(p,small,span),
+html[data-theme="dark"] .profile-inline-email :is(span,div,small){color:var(--dp-text-2)!important}
 
 /* Finance, admin and notifications */
 html[data-theme="dark"] body:has(.finance-page-header) .glass,
