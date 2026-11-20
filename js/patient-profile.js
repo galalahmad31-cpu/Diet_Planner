@@ -647,7 +647,6 @@
       if (typeof method === 'function') method(event);
     };
     document.addEventListener('input', runInputAction);
-    document.addEventListener('keyup', runInputAction);
   }
 
   async function openPlanEmbedded(planId = null, planType = '') {
