@@ -52,7 +52,13 @@
     document.body.appendChild(button);
     updateToggle();
   };
-  // Apply before first paint; CSS ordering is declared by HTML, never rearranged at runtime.
+  // Keep the centralized theme stylesheet after page styles so semantic colors win.
+  const normalizeThemeStylesheetOrder = () => {
+    const link = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'))
+      .find((node) => (node.getAttribute("href") || "").includes("theme.css"));
+    if (link && link.parentNode) link.parentNode.appendChild(link);
+  };
+  // Apply the saved mode immediately; stylesheet ordering is normalized before UI initialization.
   apply(stored());
   const media = window.matchMedia?.("(prefers-color-scheme: dark)");
   media?.addEventListener?.("change", (event) => {
@@ -68,7 +74,11 @@
     set: save,
     toggle: () => save(root.dataset.theme === "dark" ? "light" : "dark")
   };
+  const initialize = () => {
+    normalizeThemeStylesheetOrder();
+    createToggle();
+  };
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", createToggle, { once: true });
-  } else createToggle();
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else initialize();
 })();
