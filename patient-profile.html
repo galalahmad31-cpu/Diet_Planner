@@ -13,14 +13,14 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
-  <script src="js/patient-profile.js?v=20261120-direct-patient-plan-v5" defer></script>
+  <script src="js/patient-profile.js?v=20261120-patient-exchange-v1" defer></script>
 
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v14">
-  <link rel="stylesheet" href="css/visit.css?v=20261120-direct-patient-plan-v3">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261120-direct-patient-plan-v1">
+  <link rel="stylesheet" href="css/visit.css?v=20261120-patient-exchange-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261120-patient-exchange-v1">
   <script src="js/theme.js?v=20261120-central-v14" defer></script>
   
   <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v7">
@@ -230,7 +230,7 @@
               <div id="visitsEmpty" class="followup-state" hidden>لا توجد خطط غذائية مسجلة لهذا المريض.</div>
               <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
             </div>
-            <button type="button" id="addPlanButton" class="followup-add-button">＋ إضافة خطة</button>
+            <div class="followup-plan-actions"><button type="button" id="addPlanButton" class="followup-add-button">＋ خطة بالجرامات</button><button type="button" id="addExchangePlanButton" class="followup-add-button followup-add-exchange-button">＋ خطة بالبدائل</button></div>
           </div>
         </section>
         <section id="planWorkspacePanel" class="patient-plan-workspace-panel" aria-label="محرر الخطة الغذائية المحددة" hidden>
@@ -275,6 +275,137 @@
             
                 <!-- Module dialogs and print containers -->
             
+                        <div id="exchangePlanContent" class="hidden w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                            <div class="exchange-plan-module p-3 sm:p-5">
+                                <section class="bg-white border border-violet-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                                    <div class="flex items-center justify-between gap-3 mb-3">
+
+                                        <div id="exchangePlanStatus" class="text-[10px] font-bold text-slate-400">
+                                        </div>
+                                    </div>
+                                    <div class="exchange-day-summary" aria-label="ملخص اليوم">
+  <h3 class="exchange-day-summary-title">ملخص اليوم</h3>
+  <div class="exchange-rings-grid">
+    <article class="exchange-ring-metric exchange-ring-calories">
+      <span class="exchange-ring-label">السعرات</span>
+      <div class="exchange-ring" data-ring="cal" role="img" aria-label="السعرات المحققة من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalCal">0</strong><span>kcal</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetCal">—</b></span><strong id="exchangePercentCal">—</strong></div>
+    </article>
+    <article class="exchange-ring-metric exchange-ring-carbs">
+      <span class="exchange-ring-label">الكربوهيدرات</span>
+      <div class="exchange-ring" data-ring="carb" role="img" aria-label="الكربوهيدرات المحققة من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalCarb">0</strong><span>g</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetCarb">—</b></span><strong id="exchangePercentCarb">—</strong></div>
+    </article>
+    <article class="exchange-ring-metric exchange-ring-protein">
+      <span class="exchange-ring-label">البروتين</span>
+      <div class="exchange-ring" data-ring="pro" role="img" aria-label="البروتين المحقق من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalPro">0</strong><span>g</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetPro">—</b></span><strong id="exchangePercentPro">—</strong></div>
+    </article>
+    <article class="exchange-ring-metric exchange-ring-fat">
+      <span class="exchange-ring-label">الدهون</span>
+      <div class="exchange-ring" data-ring="fat" role="img" aria-label="الدهون المحققة من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalFat">0</strong><span>g</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetFat">—</b></span><strong id="exchangePercentFat">—</strong></div>
+    </article>
+  </div>
+</div>
+                                    <div class="flex justify-end mt-3 no-print">
+                                        <button type="button" data-action="exchangePlan.openPrintSettings" id="exchangePrintBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-sm">
+                                            <i class="fa-solid fa-print ml-1">
+                                            </i>
+                                            طباعة
+                                        </button>
+                                    </div>
+                                    <div class="mt-4 p-3 rounded-xl bg-violet-50 border border-violet-100 text-[10px] text-violet-800 leading-6">
+                                        <b>
+                                            طريقة الحساب:
+                                        </b>
+                                        الفاكهة + الخضروات + اللبن + البقوليات تُدخل يدويًا، ثم تُحسب النشويات من الكارب، واللحوم من البروتين، والدهون من الدهون.
+                                    </div>
+                                    <div class="exchange-scroll mt-4 border border-slate-200 rounded-2xl">
+                                        <table class="w-full text-right text-[11px]">
+                                            <thead class="bg-slate-50">
+                                                <tr class="text-slate-500 font-bold border-b border-slate-200">
+                                                    <th class="py-3 px-3">
+                                                        المجموعة
+                                                    </th>
+                                                    <th class="py-3 px-3">
+                                                        المجموعة الفرعية
+                                                    </th>
+                                                    <th class="py-3 px-3 text-center">
+                                                        عدد الحصص
+                                                    </th>
+                                                    <th class="py-3 px-3 text-center">
+                                                        السعرات
+                                                    </th>
+                                                    <th class="py-3 px-3 text-center">
+                                                        الكارب
+                                                    </th>
+                                                    <th class="py-3 px-3 text-center">
+                                                        البروتين
+                                                    </th>
+                                                    <th class="py-3 px-3 text-center">
+                                                        الدهون
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="exchangeValuesBody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                                        <button type="button" data-action="exchangePlan.save" id="exchangeSaveBtn" class="flex-1 bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs py-2.5 rounded-xl disabled:opacity-40">
+                                            <i class="fa-solid fa-floppy-disk ml-1">
+                                            </i>
+                                            حفظ
+                                        </button>
+                                        <button type="button" data-action="exchangePlan.edit" id="exchangeEditBtn" class="sm:w-28 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-extrabold text-xs py-2.5 rounded-xl" disabled>
+                                            <i class="fa-solid fa-pen ml-1">
+                                            </i>
+                                            تعديل
+                                        </button>
+                                        <button type="button" data-action="exchangePlan.deletePlan" id="exchangeDeleteBtn" class="sm:w-28 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold text-xs py-2.5 rounded-xl" disabled>
+                                            <i class="fa-solid fa-trash ml-1">
+                                            </i>
+                                            حذف
+                                        </button>
+                                    </div>
+                                </section>
+                                <section class="mt-5 bg-white border border-violet-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3">
+                                        <div>
+                                            <h3 class="font-black text-slate-800 text-sm">
+                                                أيام الخطة الغذائية
+                                            </h3>
+                                            <p class="text-[10px] text-slate-400 mt-1">
+                                                أضف الأيام ثم الوجبات والأصناف يدويًا.
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <button type="button" data-action="exchangePlan.addDay" class="bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl">
+                                                <i class="fa-solid fa-plus ml-1">
+                                                </i>
+                                                إضافة يوم
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="exchangeDaysContainer" class="mt-4 space-y-4">
+                                    </div>
+                                    <div id="exchangeDaysEmpty" class="mt-4 py-8 text-center text-xs font-bold text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+                                        لا توجد أيام مضافة بعد.
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+
           </div>
         </section>
       </div>
