@@ -6,7 +6,7 @@
 
 (function(){
 const G=[{k:'fruit',n:'الفاكهة',m:1,kcal:60,carb:15,pro:0,fat:0},{k:'veg',n:'الخضروات غير النشوية',m:1,kcal:25,carb:5,pro:2,fat:0},{k:'milk',n:'اللبن والزبادي',m:1,subs:['خالى الدسم','متوسط الدسم','غني الدسم'],v:{'خالى الدسم':[100,12,8,2],'متوسط الدسم':[120,12,8,5],'غني الدسم':[160,12,8,8]}},{k:'legumes',n:'البقوليات',m:1,kcal:115,carb:15,pro:7,fat:0},{k:'starch',n:'النشويات',m:0,kcal:80,carb:15,pro:2,fat:0},{k:'meat',n:'اللحوم',m:0,subs:['خالية الدهون','متوسطة الدهون','غنية الدهون'],v:{'خالية الدهون':[45,0,7,3],'متوسطة الدهون':[75,0,7,5],'غنية الدهون':[100,0,7,8]}},{k:'fat',n:'الدهون',m:0,kcal:45,carb:0,pro:0,fat:5}];
-const S={ready:false,plan:null,saved:false,editing:false,t:{cal:0,pro:0,carb:0,fat:0},r:{},days:[],savedDays:[],dayEditing:{},itemContext:null,confirm:null};
+const S={ready:false,plan:null,saved:false,editing:false,notes:'',t:{cal:0,pro:0,carb:0,fat:0},r:{},confirm:null};
 G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
 const dbx=window.DietPlannerAccess?.supabaseClient;
   if (!dbx) console.error("Diet Planner access layer is unavailable to the exchange-plan module.");
@@ -26,7 +26,7 @@ function vals(g){const a=S.r[g.k];if(g.v){const x=g.v[a.sub]||Object.values(g.v)
 function manual(){return ['fruit','veg','milk','legumes'].reduce((a,k)=>{const g=G.find(x=>x.k===k),r=S.r[k],v=vals(g),c=n(r.count);a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;a.kcal+=c*v.kcal;return a},{kcal:0,carb:0,pro:0,fat:0})}
 function calc(){const m=manual();S.r.starch.count=Math.max(0,rnd((S.t.carb-m.carb)/15,2));const mp=m.pro+S.r.starch.count*2;const mv=vals(G.find(g=>g.k==='meat'));S.r.meat.count=Math.max(0,rnd((S.t.pro-mp)/7,2));S.r.fat.count=Math.max(0,rnd((S.t.fat-m.fat-S.r.meat.count*mv.fat)/5,2))}
 function total(){return G.reduce((a,g)=>{const r=S.r[g.k],v=vals(g),c=n(r.count);a.kcal+=c*v.kcal;a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;return a},{kcal:0,carb:0,pro:0,fat:0})}
-function setButtons(){const has=!!S.plan;document.getElementById('exchangeSaveBtn').disabled=!S.editing;document.getElementById('exchangeEditBtn').disabled=!has||S.editing;document.getElementById('exchangeDeleteBtn').disabled=!has||S.editing}
+function setButtons(){const has=!!S.plan;document.getElementById('exchangeSaveBtn').disabled=!S.editing;document.getElementById('exchangeEditBtn').disabled=!has||S.editing;document.getElementById('exchangeDeleteBtn').disabled=!has||S.editing;const note=document.getElementById('exchangePlanNotes');if(note){note.disabled=!S.editing;note.value=S.notes}}
 function updateRingSummary(t){
  const metrics=[
   {key:'cal',value:t.kcal,target:S.t.cal,digits:0},
@@ -93,7 +93,7 @@ async function ensureExchangePlan(skipAuth=false){
  S.plan=createdPlanId;
  return S.plan;
 }
-async function loadDays(){if(!S.plan){S.days=[];S.savedDays=[];renderDays();return}const {data:dr,error:de}=await dbx.from('plan_days').select('id,plan_id,day_number,day_name').eq('plan_id',S.plan).order('day_number',{ascending:true});if(de){throw new Error('تعذر تحميل أيام خطة البدائل: '+de.message);}const ids=(dr||[]).map(x=>x.id);let ms=[];if(ids.length){const r=await dbx.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});if(r.error){throw new Error('تعذر تحميل وجبات الخطة: '+r.error.message);}ms=r.data||[]}const mids=ms.map(x=>x.id);let its=[];if(mids.length){const r=await dbx.from('plan_items').select('id,meal_id,food_id,quantity_g,household_measure,frequency,item_name').in('meal_id',mids);if(r.error){throw new Error('تعذر تحميل أصناف الخطة: '+r.error.message);}its=r.data||[]}S.days=(dr||[]).map(d=>({id:d.id,title:d.day_name||'اليوم',meals:ms.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',items:its.filter(i=>i.meal_id===m.id).map(i=>({id:i.id,name:i.item_name||'',measure:i.household_measure||'',repeat:i.frequency||''}))}))}));S.savedDays=clone(S.days);S.dayEditing={};renderDays()}
+function renderDays(){const container=document.getElementById('exchangeDaysContainer');if(container)container.replaceChildren();const empty=document.getElementById('exchangeDaysEmpty');if(empty)empty.hidden=true}
 function clone(v){return JSON.parse(JSON.stringify(v||[]))}
 function dayEditing(id){return!!S.dayEditing[String(id)]}
 function renderDays(){
@@ -257,7 +257,7 @@ function buildPrintAll(){
  const container=document.getElementById('printPlanContent');
  if(!container)return;
  if(!S.days.length){container.innerHTML='<p class="print-note">لا توجد أيام غذائية مسجلة.</p>';return;}
- container.innerHTML=S.days.map((d,di)=>`<section class="print-day"><h2 class="print-day-title">${esc(d.title||`اليوم ${di+1}`)}</h2>${(d.meals||[]).length?(d.meals||[]).map(m=>`<div class="print-meal"><h3 class="print-meal-title">${esc(m.name||'وجبة')}</h3><table><thead><tr><th>الصنف</th><th style="width:28%;text-align:center">المقياس المنزلي</th><th style="width:24%;text-align:center">التكرار</th></tr></thead><tbody>${(m.items||[]).length?(m.items||[]).map(it=>`<tr><td>${esc(it.name||'—')}</td><td style="text-align:center">${esc(it.measure||'—')}</td><td style="text-align:center">${esc(it.repeat||'—')}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center">لا توجد أصناف مسجلة.</td></tr>'}</tbody></table></div>`).join(''):'<p class="print-note">لا توجد وجبات مسجلة.</p>'}</section>`).join('');
+ container.innerHTML=`<section class="print-day"><h2 class="print-day-title">تفاصيل الخطة الغذائية</h2><div class="print-plan-notes">${esc(S.notes||'لا توجد تفاصيل مسجلة.').replace(/\n/g,'<br>')}</div></section>`;
 }
 function executePrintAll(){
  const docName=document.getElementById('settingDocName')?.value?.trim()||'';
@@ -287,11 +287,15 @@ async function save(options={}){
   const r=S.r[g.k],v=vals(g),c=n(r.count);
   return {plan_id:planId,group_name:g.n,subgroup_name:g.subs?(r.sub||null):null,exchange_count:c,kcal:rnd(c*v.kcal),carb:rnd(c*v.carb),protein:rnd(c*v.pro),fat:rnd(c*v.fat)};
  });
+ const note=document.getElementById('exchangePlanNotes');
+ const noteUpdate=await dbx.from('nutrition_plans').update({notes:String(note?.value??S.notes).trim()}).eq('id',planId);
+ if(noteUpdate.error){status('تعذر حفظ نص الخطة: '+noteUpdate.error.message,true);return false}
+ S.notes=String(note?.value??S.notes).trim();
  const del=await dbx.from('exchange_values').delete().eq('plan_id',planId);
  if(del.error){status('تعذر تحديث خطة البدائل: '+del.error.message,true);return false}
  const ins=await dbx.from('exchange_values').insert(rows);
  if(ins.error){status('تعذر حفظ خطة البدائل: '+ins.error.message,true);return false}
- S.plan=planId;S.saved=true;S.editing=false;render();await loadDays();setButtons();status('تم حفظ خطة البدائل بنجاح');return true;
+ S.plan=planId;S.saved=true;S.editing=false;render();setButtons();status('تم حفظ خطة البدائل بنجاح');return true;
 }
 async function saveAndPrintFromSettings(){
  const pb=document.getElementById('executePrintBtn');
@@ -300,14 +304,6 @@ async function saveAndPrintFromSettings(){
   if(!(await canWriteExchangePlan())){status('حفظ وطباعة خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return false}
   const planId=await ensureExchangePlan(true);
   if(!planId){status('اعتمد السعرات والماكروز أولاً من الحاسبة',true);return false}
-
-  const hasDayChanges=S.days.some(d=>String(d.id).startsWith('local-day-'))||Object.values(S.dayEditing).some(Boolean);
-  if(hasDayChanges){
-   if(!(await saveDaysToDb()))return false;
-   S.savedDays=clone(S.days);
-   Object.keys(S.dayEditing).forEach(k=>S.dayEditing[k]=false);
-   renderDays();
-  }
 
   if(S.editing){
    if(!(await save({skipAuth:true})))return false;
@@ -372,7 +368,7 @@ function setupExchangePlanEvents(){
 }
 async function init(requestedPlanId=null){
  S.ready=false;
- S.plan=null;S.saved=false;S.editing=false;S.t={cal:0,pro:0,carb:0,fat:0};S.days=[];S.savedDays=[];S.dayEditing={};S.confirm=null;
+ S.plan=null;S.saved=false;S.editing=false;S.notes='';S.t={cal:0,pro:0,carb:0,fat:0};S.confirm=null;
  G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
  setupExchangePlanEvents();
  try{
@@ -390,10 +386,10 @@ async function init(requestedPlanId=null){
    if(selectedName.includes('الجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
    const isFreshNumberedPlan=/^الخطة\s+\d+\s+-/.test(selectedName);
    S.plan=selectedPlan.id;
+   S.notes=String(selectedPlan.notes||'');
    await loadExchangeValues();
    S.editing=isFreshNumberedPlan || !S.saved;
-   await loadDays();
-  }else{S.plan=null;S.editing=true;}
+  }else{S.plan=null;S.notes='';S.editing=true;}
   render();renderDays();setButtons();
   S.ready=true;
  }catch(error){
@@ -404,5 +400,5 @@ async function init(requestedPlanId=null){
  }
 }
 async function confirmAction(){const cb=S.confirm;if(!cb)return false;closeConfirm();await cb();return true}
-window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,addDay,editDay,saveDay,deleteDay,setDayTitle,setMealName,addMeal,deleteMeal,moveMeal,addItem,setItemField,deleteItem,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
+window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
 })();
