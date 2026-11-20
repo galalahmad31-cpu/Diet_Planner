@@ -26,7 +26,7 @@ function vals(g){const a=S.r[g.k];if(g.v){const x=g.v[a.sub]||Object.values(g.v)
 function manual(){return ['fruit','veg','milk','legumes'].reduce((a,k)=>{const g=G.find(x=>x.k===k),r=S.r[k],v=vals(g),c=n(r.count);a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;a.kcal+=c*v.kcal;return a},{kcal:0,carb:0,pro:0,fat:0})}
 function calc(){const m=manual();S.r.starch.count=Math.max(0,rnd((S.t.carb-m.carb)/15,2));const mp=m.pro+S.r.starch.count*2;const mv=vals(G.find(g=>g.k==='meat'));S.r.meat.count=Math.max(0,rnd((S.t.pro-mp)/7,2));S.r.fat.count=Math.max(0,rnd((S.t.fat-m.fat-S.r.meat.count*mv.fat)/5,2))}
 function total(){return G.reduce((a,g)=>{const r=S.r[g.k],v=vals(g),c=n(r.count);a.kcal+=c*v.kcal;a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;return a},{kcal:0,carb:0,pro:0,fat:0})}
-function setButtons(){const has=!!S.plan;document.getElementById('exchangeSaveBtn').disabled=!S.editing;document.getElementById('exchangeEditBtn').disabled=!has||S.editing;document.getElementById('exchangeDeleteBtn').disabled=!has||S.editing;const note=document.getElementById('exchangePlanNotes');if(note){note.disabled=!S.editing;note.value=S.notes}}
+function setButtons(){const has=!!S.plan;const save=document.getElementById('exchangeSaveBtn'),edit=document.getElementById('exchangeEditBtn'),del=document.getElementById('exchangeDeleteBtn'),note=document.getElementById('exchangePlanNotes');if(save)save.disabled=!S.editing;if(edit)edit.disabled=!has||S.editing;if(del)del.disabled=!has||S.editing;if(note){note.disabled=!S.editing;if(document.activeElement!==note)note.value=S.notes}}
 function updateRingSummary(t){
  const metrics=[
   {key:'cal',value:t.kcal,target:S.t.cal,digits:0},
@@ -57,7 +57,34 @@ function updateDisplay(){
   if(inp&&document.activeElement!==inp)inp.value=r.count;
  });
 }
-function render(){calc();document.getElementById('exchangeTargetCal').textContent=S.t.cal?rnd(S.t.cal,0)+' kcal':'—';document.getElementById('exchangeTargetPro').textContent=S.t.pro?rnd(S.t.pro,1)+' g':'—';document.getElementById('exchangeTargetCarb').textContent=S.t.carb?rnd(S.t.carb,1)+' g':'—';document.getElementById('exchangeTargetFat').textContent=S.t.fat?rnd(S.t.fat,1)+' g':'—';const b=document.getElementById('exchangeValuesBody');b.innerHTML=G.map(g=>{const r=S.r[g.k],v=vals(g),c=n(r.count);let sub='—';if(g.subs)sub='<select data-sub="'+g.k+'" '+(S.editing?'':'disabled')+' class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-bold">'+g.subs.map(s=>'<option value="'+esc(s)+'" '+(r.sub===s?'selected':'')+'>'+esc(s)+'</option>').join('')+'</select>';const cnt=g.m?'<input data-count="'+g.k+'" '+(S.editing?'':'disabled')+' type="number" min="0" step="0.5" inputmode="decimal" value="'+r.count+'" class="w-20 mx-auto block text-center bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-extrabold text-violet-700">':'<span class="font-black text-violet-700">'+rnd(r.count,2)+'</span>';return '<tr data-ex-row="'+g.k+'" class="border-b border-slate-100 last:border-0"><td class="py-2.5 px-3 font-black">'+esc(g.n)+'</td><td class="py-2.5 px-3">'+sub+'</td><td class="py-2.5 px-3 text-center">'+cnt+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.kcal,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.carb,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.pro,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.fat,1)+'</td></tr>'}).join('');updateDisplay();setButtons()}
+function render(){
+ calc();
+ const root=document.getElementById('exchangePlanContent');
+ if(!root)throw new Error('مكوّن خطة البدائل غير موجود في صفحة المريض (exchangePlanContent).');
+ const targets={
+  exchangeTargetCal:S.t.cal?rnd(S.t.cal,0)+' kcal':'—',
+  exchangeTargetPro:S.t.pro?rnd(S.t.pro,1)+' g':'—',
+  exchangeTargetCarb:S.t.carb?rnd(S.t.carb,1)+' g':'—',
+  exchangeTargetFat:S.t.fat?rnd(S.t.fat,1)+' g':'—'
+ };
+ Object.entries(targets).forEach(([id,value])=>{const el=root.querySelector('#'+id);if(el)el.textContent=value});
+ let body=root.querySelector('#exchangeValuesBody');
+ if(!body){
+  const table=root.querySelector('.exchange-scroll table');
+  if(!table)throw new Error('جدول حصص البدائل غير موجود داخل مكوّن الخطة.');
+  body=table.tBodies[0]||table.createTBody();
+  body.id='exchangeValuesBody';
+ }
+ body.innerHTML=G.map(g=>{
+  const r=S.r[g.k],v=vals(g),c=n(r.count);
+  let sub='—';
+  if(g.subs)sub='<select data-sub="'+g.k+'" '+(S.editing?'':'disabled')+' class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-bold">'+g.subs.map(s=>'<option value="'+esc(s)+'" '+(r.sub===s?'selected':'')+'>'+esc(s)+'</option>').join('')+'</select>';
+  const cnt=g.m?'<input data-count="'+g.k+'" '+(S.editing?'':'disabled')+' type="number" min="0" step="0.5" inputmode="decimal" value="'+r.count+'" class="w-20 mx-auto block text-center bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-extrabold text-violet-700">':'<span class="font-black text-violet-700">'+rnd(r.count,2)+'</span>';
+  return '<tr data-ex-row="'+g.k+'" class="border-b border-slate-100 last:border-0"><td class="py-2.5 px-3 font-black">'+esc(g.n)+'</td><td class="py-2.5 px-3">'+sub+'</td><td class="py-2.5 px-3 text-center">'+cnt+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.kcal,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.carb,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.pro,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.fat,1)+'</td></tr>';
+ }).join('');
+ updateDisplay();
+ setButtons();
+}
 async function findPlans(){
  const c=ctx();
  if(!c.patient_id)throw new Error('لم يتم تحديد المريض لخطة البدائل.');
@@ -93,8 +120,7 @@ async function ensureExchangePlan(skipAuth=false){
  S.plan=createdPlanId;
  return S.plan;
 }
-function renderDays(){const container=document.getElementById('exchangeDaysContainer');if(container)container.replaceChildren();const empty=document.getElementById('exchangeDaysEmpty');if(empty)empty.hidden=true}
-function renderDays(){const container=document.getElementById('exchangeDaysContainer');if(container)container.replaceChildren();const empty=document.getElementById('exchangeDaysEmpty');if(empty)empty.hidden=true}
+function renderDays(){/* Legacy day-based editor removed: exchange plans use free-form notes. */}
 function openPrintSettings(){
   const modal=document.getElementById('printSettingsModal');
   const pb=document.getElementById('executePrintBtn');
@@ -173,23 +199,6 @@ async function saveAndPrintFromSettings(){
 function edit(){if(!S.plan)return;S.editing=true;render();status('وضع التعديل')}
 async function deletePlan(){if(!(await canWriteExchangePlan())){status('حذف خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return;}if(!S.plan)return;const deletedPlanId=S.plan;openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',deletedPlanId);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete() .eq('plan_id',deletedPlanId);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',deletedPlanId);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();setButtons();status('تم حذف خطة البدائل بنجاح');window.dispatchEvent(new CustomEvent('dp-exchange-plan-deleted',{detail:{planId:deletedPlanId}}))}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
 function setupExchangePlanEvents(){
- const container=document.getElementById('exchangeDaysContainer');
- if(!container||container.dataset.eventsReady==='1')return;
- container.dataset.eventsReady='1';
- container.addEventListener('click',event=>{
-  const el=event.target.closest('[data-xaction]');
-  if(!el||!container.contains(el))return;
-  const action=el.dataset.xaction,dayId=el.dataset.dayId,mealId=el.dataset.mealId,itemId=el.dataset.itemId;
-  if(action==='edit-day')editDay(dayId);
-  else if(action==='save-day')saveDay(dayId);
-  else if(action==='delete-day')deleteDay(dayId);
-  else if(action==='move-meal-up')moveMeal(dayId,mealId,-1);
-  else if(action==='move-meal-down')moveMeal(dayId,mealId,1);
-  else if(action==='add-item')addItem(dayId,mealId);
-  else if(action==='delete-meal')deleteMeal(dayId,mealId);
-  else if(action==='delete-item')deleteItem(dayId,mealId,itemId);
-  else if(action==='add-meal')addMeal(dayId);
- });
  const notes=document.getElementById('exchangePlanNotes');
  if(notes&&notes.dataset.eventsReady!=='1'){
   notes.dataset.eventsReady='1';
@@ -202,27 +211,17 @@ function setupExchangePlanEvents(){
   valuesBody.dataset.eventsReady='1';
   valuesBody.addEventListener('input',event=>{
    const el=event.target.closest('[data-count]');
-   if(!el)return;
+   if(!el||!S.r[el.dataset.count])return;
    S.r[el.dataset.count].count=Math.max(0,n(el.value));
    updateDisplay();
   });
   valuesBody.addEventListener('change',event=>{
    const el=event.target.closest('[data-sub]');
-   if(!el)return;
+   if(!el||!S.r[el.dataset.sub])return;
    S.r[el.dataset.sub].sub=el.value;
    updateDisplay();
   });
  }
- container.addEventListener('input',event=>{
-  const el=event.target.closest('[data-xaction]');
-  if(!el||!container.contains(el))return;
-  const {xaction:action,dayId,mealId,itemId}=el.dataset;
-  if(action==='set-day-title')setDayTitle(dayId,el.value);
-  else if(action==='set-meal-name')setMealName(dayId,mealId,el.value);
-  else if(action==='set-item-name')setItemField(dayId,mealId,itemId,'name',el.value);
-  else if(action==='set-item-measure')setItemField(dayId,mealId,itemId,'measure',el.value);
-  else if(action==='set-item-repeat')setItemField(dayId,mealId,itemId,'repeat',el.value);
- });
 }
 async function init(requestedPlanId=null){
  S.ready=false;
