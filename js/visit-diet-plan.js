@@ -197,7 +197,10 @@ async function saveDay(id){
   showToast('لم يتم تحديد المريض','error');
   return;
  }
- if(!(await canWriteVisitData()))return;
+ if(!(await canWriteVisitData())){
+  showToast('حفظ الخطة الغذائية متاح أثناء الاشتراك المدفوع فقط','error');
+  return;
+ }
 
  const user=await currentUser();
  if(!user){
@@ -297,7 +300,10 @@ function deleteDay(id){
   try{
    if(isPersistedDayId(day.id)){
     if(!activeCloudPlanId)throw new Error('لم يتم تحديد الخطة المحفوظة لهذا اليوم');
-    if(!(await canWriteVisitData()))return;
+    if(!(await canWriteVisitData())){
+     showToast('حذف أيام الخطة متاح أثناء الاشتراك المدفوع فقط','error');
+     return;
+    }
     const {data,error}=await sb.rpc('delete_nutrition_plan_day',{
      p_plan_id:activeCloudPlanId,
      p_day_id:day.id
