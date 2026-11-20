@@ -606,7 +606,6 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
   background:transparent;color:var(--dp-text);font-size:13px;font-weight:900;
 }
 .visit-main-shell .embedded-diet-plan #daysContainer .day-title-input:focus{border-bottom-color:var(--dp-primary);outline:0}
-.visit-main-shell .embedded-diet-plan #daysContainer .day-card-meta{color:var(--dp-muted);font-size:10px;white-space:nowrap}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions{display:flex;align-items:center;gap:5px}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions button{
   display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:32px;
