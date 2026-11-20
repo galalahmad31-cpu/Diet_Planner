@@ -17,7 +17,7 @@
   };
 
   const $ = (id) => document.getElementById(id);
-  let newPlanSessionCounter = 0;
+  let dietPlanModulePromise = null;
 
   function setLink(id, page) {
     const element = $(id);
@@ -557,12 +557,13 @@
       list.appendChild(row);
     });
 
-    const activeFrame = $('planFrame');
-    if (activeFrame?.dataset.planId) {
-      const stillExists = data.some(item => String(item.id) === String(activeFrame.dataset.planId));
+    const activePanel = $('planEmbeddedPanel');
+    const activePlanId = activePanel?.dataset.planId || '';
+    if (activePlanId) {
+      const stillExists = data.some(item => String(item.id) === String(activePlanId));
       if (!stillExists) closePlanEmbedded();
       else list.querySelectorAll('[data-open-plan]').forEach(button => {
-        button.classList.toggle('is-active', button.dataset.openPlan === activeFrame.dataset.planId);
+        button.classList.toggle('is-active', button.dataset.openPlan === activePlanId);
       });
     }
 
@@ -580,59 +581,119 @@
     return data;
   }
 
-  function openPlanEmbedded(planId = null, planType = '') {
+  async function loadDietPlanModule() {
+    if (typeof window.dietPlan?.openPlan === 'function') return true;
+    if (dietPlanModulePromise) return dietPlanModulePromise;
+
+    dietPlanModulePromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'js/visit-diet-plan.js?v=20261120-direct-patient-plan-v1';
+      script.async = true;
+      script.onload = () => {
+        if (typeof window.dietPlan?.openPlan !== 'function') {
+          reject(new Error(window.__dpDietPlanLoadError || 'تعذر تهيئة محرر الخطة الغذائية.'));
+          return;
+        }
+        resolve(true);
+      };
+      script.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
+      document.head.appendChild(script);
+    }).catch(error => {
+      dietPlanModulePromise = null;
+      console.error('Direct diet-plan module load failed:', error);
+      return false;
+    });
+
+    return dietPlanModulePromise;
+  }
+
+  function bindDietPlanActions() {
+    const workspace = $('planWorkspace');
+    if (!workspace || workspace.dataset.actionsBound === 'true') return;
+    workspace.dataset.actionsBound = 'true';
+
+    workspace.addEventListener('click', async (event) => {
+      const confirmButton = event.target.closest('#confirmOkBtn');
+      if (confirmButton) {
+        event.preventDefault();
+        await window.dietPlan?.confirmAction?.();
+        return;
+      }
+
+      const target = event.target.closest('[data-action]');
+      if (!target || !workspace.contains(target)) return;
+      const action = target.dataset.action || '';
+      if (action === 'executeActivePrint') {
+        event.preventDefault();
+        window.dietPlan?.executePrint?.();
+        return;
+      }
+      if (!action.startsWith('dietPlan.')) return;
+      const method = window.dietPlan?.[action.slice('dietPlan.'.length)];
+      if (typeof method !== 'function') return;
+      event.preventDefault();
+      method(event);
+    });
+
+    const runInputAction = (event) => {
+      const target = event.target.closest('[data-action-input]');
+      if (!target || !workspace.contains(target)) return;
+      const method = window.dietPlan?.[target.dataset.actionInput];
+      if (typeof method === 'function') method(event);
+    };
+    workspace.addEventListener('input', runInputAction);
+    workspace.addEventListener('keyup', runInputAction);
+  }
+
+  async function openPlanEmbedded(planId = null, planType = '') {
     const panel = $('planEmbeddedPanel');
-    const frame = $('planFrame');
-    if (!panel || !frame || !patientId) return;
+    const content = $('dietPlanContent');
+    if (!panel || !content || !patientId) return;
 
     panel.hidden = false;
-    const details = $('followupDaysDetails');
-    
+    content.classList.remove('hidden');
+    panel.dataset.planId = planId ? String(planId) : '';
+    window.currentPatientId = state.patient?.id || patientId;
+
     document.querySelectorAll('[data-open-plan]').forEach(button => {
       button.classList.toggle('is-active', button.dataset.openPlan === String(planId || ''));
     });
 
-    const url = new URL('visit.html', window.location.href);
-    url.searchParams.set('visit_ui', Date.now().toString(36));
-    url.searchParams.set('patient_id', patientId);
-    url.searchParams.set('embed', '1');
-    if (planId) url.searchParams.set('plan_id', planId);
-    if (planType) url.searchParams.set('plan_type', planType);
-    if (planId && String(planType).includes('الجرامات')) {
-      url.searchParams.set('auto_open_grams', '1');
+    bindDietPlanActions();
+    const loaded = await loadDietPlanModule();
+    if (!loaded) {
+      const status = $('visitsLoading');
+      if (status) {
+        status.hidden = false;
+        status.textContent = 'تعذر تحميل محرر الخطة الغذائية. أعد تحميل الصفحة وحاول مرة أخرى.';
+      }
+      return;
     }
 
-    // Every explicit add-plan action gets a fresh iframe session, so an old
-    // activeCloudPlanId can never leak into the next new plan.
-    const key = planId ? 'plan:' + planId : 'new:' + (++newPlanSessionCounter);
-    if (!planId) {
-      url.searchParams.set('new_plan', '1');
-      url.searchParams.set('plan_session', String(newPlanSessionCounter));
+    try {
+      await window.dietPlan.openPlan(planId, !planId);
+    } catch (error) {
+      console.error('Open direct nutrition plan failed:', error);
+      const status = $('visitsLoading');
+      if (status) {
+        status.hidden = false;
+        status.textContent = error?.message || 'تعذر فتح الخطة الغذائية.';
+      }
     }
-
-    const nextUrl = url.toString();
-    if (frame.dataset.planKey !== key || frame.dataset.planUrl !== nextUrl) {
-      frame.dataset.planKey = key;
-      frame.dataset.planId = planId || '';
-      frame.dataset.planUrl = nextUrl;
-      frame.style.height = '1px';
-      frame.src = nextUrl;
-    }
-    // Keep the selected plan in place; do not auto-scroll the page.
   }
 
   function closePlanEmbedded() {
     const panel = $('planEmbeddedPanel');
-    const frame = $('planFrame');
-    if (panel) panel.hidden = true;
-    const details = $('followupDaysDetails');
-    
-    document.querySelectorAll('[data-open-plan]').forEach(button => button.classList.remove('is-active'));
-    if (frame) {
-      frame.dataset.planId = '';
-      frame.dataset.planKey = '';
-      frame.dataset.planUrl = '';
+    if (panel) {
+      panel.hidden = true;
+      delete panel.dataset.planId;
     }
+    window.dietPlan?.closeDayDetails?.();
+    window.dietPlan?.closeFoodModal?.();
+    window.dietPlan?.closeFixedMeals?.();
+    window.dietPlan?.closeAddMealModal?.();
+    window.dietPlan?.closeConfirmModal?.();
+    document.querySelectorAll('[data-open-plan]').forEach(button => button.classList.remove('is-active'));
   }
 
   function formatPlanDate(date) {
@@ -672,7 +733,7 @@
         .eq('id', plan.id).eq('patient_id', patientId);
       if (error) throw error;
 
-      if (String($('planFrame')?.dataset.planId || '') === String(plan.id)) closePlanEmbedded();
+      if (String($('planEmbeddedPanel')?.dataset.planId || '') === String(plan.id)) closePlanEmbedded();
       await loadNutritionPlans();
     } catch (error) {
       console.error('Delete nutrition plan failed:', error);
@@ -1148,67 +1209,6 @@
     window.addEventListener('message', (event) => {
       if (event.origin !== window.location.origin) return;
 
-      const planFrame = $('planFrame');
-      if (planFrame && event.source === planFrame.contentWindow) {
-        if (event.data?.type === 'dp-plan-embed-height') {
-          const height = Number(event.data.height);
-          if (Number.isFinite(height) && height > 0) {
-            planFrame.dataset.contentHeight = String(Math.max(1, Math.min(height, 16000)));
-            if (planFrame.dataset.modalOpen !== 'true') {
-              planFrame.style.height = Math.max(1, Math.min(height, 16000)) + 'px';
-            }
-          }
-          return;
-        }
-        if (event.data?.type === 'dp-plan-embed-modal') {
-          if (event.data.open === true) {
-            if (planFrame.dataset.modalOpen !== 'true') {
-              planFrame.dataset.modalPreviousStyle = planFrame.getAttribute('style') ?? '__DP_NO_INLINE_STYLE__';
-              planFrame.dataset.modalPreviousBodyOverflow = document.body.style.overflow;
-              planFrame.dataset.modalOpen = 'true';
-            }
-
-            document.body.style.overflow = 'hidden';
-            Object.assign(planFrame.style, {
-              position: 'fixed',
-              top: '0',
-              right: '0',
-              bottom: '0',
-              left: '0',
-              width: '100vw',
-              height: '100dvh',
-              maxWidth: 'none',
-              margin: '0',
-              border: '0',
-              zIndex: '2147483000'
-            });
-          } else if (planFrame.dataset.modalOpen === 'true') {
-            planFrame.dataset.modalOpen = 'false';
-
-            const previousStyle = planFrame.dataset.modalPreviousStyle;
-            if (previousStyle === '__DP_NO_INLINE_STYLE__') {
-              planFrame.removeAttribute('style');
-            } else {
-              planFrame.setAttribute('style', previousStyle || '');
-            }
-
-            const contentHeight = Number(planFrame.dataset.contentHeight);
-            if (contentHeight > 0) {
-              planFrame.style.height = Math.min(contentHeight, 16000) + 'px';
-            }
-
-            document.body.style.overflow = planFrame.dataset.modalPreviousBodyOverflow || '';
-            delete planFrame.dataset.modalPreviousStyle;
-            delete planFrame.dataset.modalPreviousBodyOverflow;
-          }
-          return;
-        }
-        if (event.data?.type === 'dp-plan-close') {
-          closePlanEmbedded();
-          return;
-        }
-      }
-
       const frame = $('nutritionSupportFrame');
       if (!frame || event.source !== frame.contentWindow) return;
 
@@ -1250,7 +1250,7 @@
   }
 
   function bindEvents() {
-    bindPatientModuleTabs();
+    bindPatientModuleTabs();\n    bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
       event.preventDefault();
