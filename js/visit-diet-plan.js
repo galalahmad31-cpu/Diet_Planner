@@ -854,7 +854,7 @@ function renderDays(){
     <button type="button" class="day-list-delete" onclick="window.dietPlan.deleteDay('${escapeHtml(d.id)}')" title="حذف اليوم" aria-label="حذف اليوم"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
    </div>
   </article>`;
- }).join('')`:'<div class="day-empty-state">لا توجد أيام غذائية بعد. أضف يومًا جديدًا للبدء.</div>';
+ }).join('')}`:'<div class="day-empty-state">لا توجد أيام غذائية بعد. أضف يومًا جديدًا للبدء.</div>';
 
  const modal=document.getElementById('dayDetailsModal');
  if(activeDayDetailsId){
