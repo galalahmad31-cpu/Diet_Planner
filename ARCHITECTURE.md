@@ -15,7 +15,7 @@
 ## Page/script map
 - Public entry/auth routing: `index.html` → `js/auth-access.js`; authenticated dashboard routing is handled by `js/auth-access.js`.
 - Main dashboard: `app.html` → `js/auth-access.js`, `js/app-dashboard.js`; `index.html` also contains a public-facing dashboard/entry layout and loads the dashboard script. Keep their routing and access behavior distinct unless regression-tested.
-- Admin: `admin.html` → `js/admin.js`, `js/admin-roles.js`
+- Admin: `admin.html` → `js/admin.js` (subscription management and inline user-role editing)
 - Patient records: `patient.html` → `js/patient.js`; `patient-profile.html` → `js/patient-profile.js`
 - Visits: `visit.html` → `js/visit.js`, `js/visit-calculator.js`, `js/visit-diet-plan.js`, `js/visit-exchange-plan.js`
 - Diet/calculation: `diet.html` → `js/diet.js`; `quickcalc.html` → `js/quickcalc.js`
