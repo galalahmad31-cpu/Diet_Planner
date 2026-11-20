@@ -1,0 +1,1 @@
+create index job_posts_created_by_idx on public.job_posts (created_by);
