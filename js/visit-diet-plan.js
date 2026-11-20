@@ -330,12 +330,22 @@ function closeAddMealModal(){document.getElementById('addMealModal').classList.a
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
+function ensureFoodModalPortal(){
+ const modal=document.getElementById('foodModal');
+ if(!modal)return null;
+ if(modal.parentElement!==document.body)document.body.appendChild(modal);
+ modal.classList.add('diet-food-modal-layer');
+ return modal;
+}
+
 async function openFoodModal(did,mid){
  await ensureAllFoods();
+ const modal=ensureFoodModalPortal();
+ if(!modal)return;
  currentModalContext={dayId:did,mealId:mid};const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);
  document.getElementById('modalMealTitle').textContent=m?`إضافة صنف لـ (${m.name})`:'إضافة صنف للوجبة';
  document.getElementById('foodSearchInput').value='';document.getElementById('selectedFoodId').value='';document.getElementById('foodGramsInput').value='100';document.getElementById('foodModalHouseholdBox').classList.add('hidden');
- filterFoodList();document.getElementById('foodModal').classList.remove('hidden');
+ filterFoodList();modal.classList.remove('hidden');
 }
 function closeFoodModal(){document.getElementById('foodModal').classList.add('hidden');currentModalContext={dayId:null,mealId:null};}
 function updateFoodModalHousehold(){const f=foodDatabase.find(x=>x.id===document.getElementById('selectedFoodId').value),g=parseFloat(document.getElementById('foodGramsInput').value),box=document.getElementById('foodModalHouseholdBox');if(f?.household&&Number.isFinite(g)){document.getElementById('foodModalHousehold').textContent=scaleHouseholdMeasure(f.household,g);box.classList.remove('hidden')}else box.classList.add('hidden');}
