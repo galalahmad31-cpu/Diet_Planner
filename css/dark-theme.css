@@ -1230,3 +1230,104 @@ html[data-theme="dark"] .support-day-locked :is(input,select,textarea){
   color:var(--dp-muted)!important;
   border-color:var(--dp-border)!important;
 }
+
+/* =========================================================
+   Central dark-mode completion — product cards and navigation
+   These rules intentionally live here, not in page stylesheets.
+   ========================================================= */
+
+/* Keep every shared quick-navigation link above decorative layers
+   and reliably clickable on touch and pointer devices. */
+html body .quick-access-nav{position:relative;z-index:40}
+html body .quick-access-track{position:relative;z-index:1;pointer-events:auto}
+html body .quick-access-card{
+  position:relative;
+  z-index:2;
+  pointer-events:auto;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+html body .quick-access-card:focus-visible{
+  outline:2px solid var(--dp-accent);
+  outline-offset:2px;
+}
+
+/* Product library: override legacy page-level hard-coded light surfaces. */
+html[data-theme="dark"] body:has(.products-page-header) main>.mx-auto>section,
+html[data-theme="dark"] body:has(.products-page-header) #state{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #categoryFilter,
+html[data-theme="dark"] #subcategoryFilter,
+html[data-theme="dark"] #searchInput,
+html[data-theme="dark"] .field-input,
+html[data-theme="dark"] .rich-link-input,
+html[data-theme="dark"] .rich-editor-surface,
+html[data-theme="dark"] .rich-editor-toolbar :is(button,select,input),
+html[data-theme="dark"] body:has(.products-page-header) :is(input,select,textarea){
+  background-color:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] body:has(.products-page-header) :is(input,textarea)::placeholder{
+  color:var(--dp-muted)!important;
+}
+html[data-theme="dark"] .product-modern{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 5px 18px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] .product-modern :is(h2,h3,h4,strong,.formula-title-wrap strong){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .product-modern :is(p,small,span,.product-description,.product-usage p,.product-usage small,.formula-title-wrap span,.metric span,.metric small,.formula-notes){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .product-modern :is(.product-category-pill,.product-usage,.product-formulas,.formula-showcase,.metric,.formula-notes,.empty-formula){
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .product-modern .product-symbol,
+html[data-theme="dark"] .product-modern .usage-icon,
+html[data-theme="dark"] .product-modern .formula-mark,
+html[data-theme="dark"] .product-modern .formula-section-title>i{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .product-modern .product-category-pill,
+html[data-theme="dark"] .product-modern .formula-section-title{
+  color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .product-modern .nutrition-metrics :is(.metric-kcal,.metric-carb,.metric-protein,.metric-fat){
+  background:var(--dp-surface-3)!important;
+}
+html[data-theme="dark"] .product-modern .nutrition-metrics :is(.metric-kcal,.metric-carb,.metric-protein,.metric-fat) strong{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .rich-link-dialog,
+html[data-theme="dark"] .admin-modal,
+html[data-theme="dark"] .admin-modal>form>.mt-7.flex.flex-col-reverse{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .rich-editor-toolbar{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .rich-link-icon{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-accent)!important;
+}
+
+/* Normalize remaining generic white utility surfaces and their contents. */
+html[data-theme="dark"] body :is(.bg-white,.bg-white\/95,.bg-white\/90){
+  background-color:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body :is(.bg-white,.bg-white\/95,.bg-white\/90) :is(h1,h2,h3,h4,p,span,label,strong,small){
+  color:inherit;
+}
