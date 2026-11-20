@@ -138,7 +138,13 @@
       header.querySelector(".dp-app-header__page-title").textContent = title;
       const actions = document.querySelector("[data-dp-page-actions]");
       if (actions) {
-        context.append(...actions.childNodes);
+        if (actions.dataset.placement === "title") {
+          const pageMeta = header.querySelector(".dp-app-header__page-meta");
+          const logout = pageMeta.querySelector(".dp-app-header__logout");
+          pageMeta.insertBefore(actions.firstElementChild || actions.firstChild, logout);
+        } else {
+          context.append(...actions.childNodes);
+        }
         actions.remove();
       }
       placeholder.replaceWith(header);
