@@ -19,6 +19,7 @@
   let offset = 0;
   let hasMore = true;
   let loading = false;
+  let searchTimer = null;
   let jobs = [];
 
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -80,7 +81,7 @@
     $("jobsCount").textContent = query || specialty
       ? `عرض ${filtered.length} من ${jobs.length} وظيفة محمّلة`
       : `تم تحميل ${jobs.length} وظيفة`;
-    $("jobsLoadMore").hidden = !hasMore || Boolean(query || specialty);
+    $("jobsLoadMore").hidden = !hasMore;
   }
 
   async function loadJobs(reset = false) {
@@ -109,6 +110,11 @@
         .range(offset, offset + PAGE_SIZE - 1);
       const specialty = $("jobsSpecialty").value;
       if (specialty) request = request.eq("specialty", specialty);
+      const search = $("jobsSearch").value.trim().replace(/[(),.*%_\'"\\\\]/g, " ").replace(/\\s+/g, " ").slice(0, 80);
+      if (search) {
+        const pattern = "%" + search + "%";
+        request = request.or("title.ilike." + pattern + ",organization_name.ilike." + pattern + ",location_city.ilike." + pattern);
+      }
       const { data, error } = await request;
       if (error) throw error;
       const rows = data || [];
@@ -119,7 +125,9 @@
       if (!jobs.length) {
         $("jobsList").innerHTML = "";
         $("jobsEmpty").hidden = false;
-        $("jobsEmpty").querySelector("p").textContent = "لا توجد وظائف منشورة حاليًا.";
+        $("jobsEmpty").querySelector("p").textContent = $("jobsSearch").value.trim() || $("jobsSpecialty").value
+          ? "لا توجد وظائف مطابقة لبحثك أو التخصص المحدد."
+          : "لا توجد وظائف منشورة حاليًا.";
       }
     } catch (error) {
       console.error("Public jobs load failed:", error);
@@ -138,7 +146,10 @@
     $("jobsCount").textContent = "";
   }
 
-  $("jobsSearch").addEventListener("input", render);
+  $("jobsSearch").addEventListener("input", () => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => loadJobs(true), 300);
+  });
   $("jobsSpecialty").addEventListener("change", () => loadJobs(true));
   $("jobsLoadMore").addEventListener("click", () => loadJobs(false));
   loadJobs(true);
