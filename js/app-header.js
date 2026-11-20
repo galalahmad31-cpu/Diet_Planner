@@ -20,6 +20,7 @@
     ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"],
     ["finance.html", "اشتراكات المرضى", "fa-wallet"],
     ["article.html", "المقالات", "fa-newspaper"],
+    ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
     ["profile.html", "الصفحة الشخصية", "fa-user-doctor"],
     ["feedback.html", "شاركنا رأيك", "fa-star"],
     ["about.html", "عن التطبيق", "fa-circle-info"],
@@ -31,6 +32,7 @@
   titles["nutritionsupport-patient.html"] = "الدعم الغذائي";
   titles["admin.html"] = "لوحة الإدارة";
   titles["article-view.html"] = "المقال";
+  titles["jobs.html"] = "الوظائف الطبية";
   titles["privacy.html"] = "سياسة الخصوصية";
 
   function buildHeader() {
