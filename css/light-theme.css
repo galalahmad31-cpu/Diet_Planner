@@ -1,0 +1,4 @@
+/* Diet Planner — light theme semantic defaults. */
+:root{color-scheme:light}
+html,body{min-height:100%}
+body{background:var(--dp-bg);color:var(--dp-text)}
