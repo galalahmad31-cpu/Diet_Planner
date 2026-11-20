@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-<link rel="stylesheet" href="css/profile.css?v=20261119-profile-plan-name-only2">
+<link rel="stylesheet" href="css/profile.css?v=20261120-profile-inline-edit-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -57,15 +57,41 @@
     <div class="mb-5 flex items-center gap-2 border-b border-slate-100 pb-4">
       <i class="fa-solid fa-id-card text-brand-600"></i><h2 class="font-black text-slate-800">بيانات الطبيب</h2>
     </div>
-    <div class="space-y-4">
-      <div><div class="mb-1 text-[11px] font-bold text-slate-400">الاسم</div><div id="doctorName" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-extrabold text-slate-800">—</div></div>
-      <div><div class="mb-1 text-[11px] font-bold text-slate-400">التخصص</div><div id="doctorSpecialty" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-extrabold text-slate-800">—</div></div>
+    <div id="profileReadView" class="space-y-4">
+      <div><div class="mb-1 text-[11px] font-bold text-slate-400">الاسم</div><div id="doctorName" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-extrabold text-slate-800 break-words">—</div></div>
+      <div><div class="mb-1 text-[11px] font-bold text-slate-400">التخصص</div><div id="doctorSpecialty" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-extrabold text-slate-800 break-words">—</div></div>
       <div><div class="mb-1 text-[11px] font-bold text-slate-400">رقم الهاتف</div><div id="doctorPhone" dir="ltr" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 text-right">—</div></div>
-      <div><div class="mb-1 text-[11px] font-bold text-slate-400">البريد الإلكتروني</div><div id="doctorEmail" dir="ltr" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 text-right">—</div></div>
-      <button id="editProfileBtn" class="mt-2 w-full rounded-xl bg-brand-600 px-4 py-3 text-xs font-extrabold text-white hover:bg-brand-700">
+      <div><div class="mb-1 text-[11px] font-bold text-slate-400">البريد الإلكتروني</div><div id="doctorEmail" dir="ltr" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 text-right break-all">—</div></div>
+      <button id="editProfileBtn" type="button" class="mt-2 w-full rounded-xl bg-brand-600 px-4 py-3 text-xs font-extrabold text-white hover:bg-brand-700">
         <i class="fa-solid fa-pen-to-square ml-1"></i> تعديل البيانات
       </button>
     </div>
+
+    <form id="profileEditForm" class="profile-inline-editor profile-form" hidden novalidate>
+      <label class="profile-inline-field">
+        <span>الاسم</span>
+        <input id="editDoctorName" type="text" autocomplete="name" placeholder="اسم الطبيب" required>
+      </label>
+      <label class="profile-inline-field">
+        <span>التخصص</span>
+        <input id="editDoctorSpecialty" type="text" autocomplete="organization-title" placeholder="التخصص">
+      </label>
+      <label class="profile-inline-field">
+        <span>رقم الهاتف</span>
+        <input id="editDoctorPhone" dir="ltr" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx">
+      </label>
+      <div class="profile-inline-email">
+        <span>البريد الإلكتروني</span>
+        <div id="editDoctorEmail" dir="ltr">—</div>
+        <small>لا يمكن تعديل البريد الإلكتروني من هذه الصفحة.</small>
+      </div>
+      <div class="profile-inline-actions">
+        <button id="saveProfileBtn" type="submit" class="profile-inline-save">
+          <i class="fa-solid fa-check ml-1"></i> حفظ التعديلات
+        </button>
+        <button id="cancelProfileBtn" type="button" class="profile-inline-cancel">إلغاء</button>
+      </div>
+    </form>
   </div>
 
   <div class="glass rounded-3xl p-5 sm:p-6">
@@ -158,55 +184,12 @@
 </div>
 <div id="subscriptionToast" class="profile-subscription-toast" role="status" aria-live="polite"></div>
 
-<!-- EDIT PROFILE MODAL -->
-<div id="editProfileModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-  <div class="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl sm:p-6">
-    <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4">
-      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-        <i class="fa-solid fa-user-doctor"></i>
-      </div>
-      <div>
-        <h3 class="font-black text-slate-800">تعديل بيانات الطبيب</h3>
-        <p class="mt-1 text-[11px] font-semibold text-slate-400">يمكنك تعديل الاسم والتخصص ورقم الهاتف</p>
-      </div>
-    </div>
 
-    <div class="space-y-4">
-      <label class="block">
-        <span class="mb-1 block text-[11px] font-bold text-slate-500">الاسم</span>
-        <input id="editDoctorName" type="text" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800" placeholder="اسم الطبيب">
-      </label>
-
-      <label class="block">
-        <span class="mb-1 block text-[11px] font-bold text-slate-500">التخصص</span>
-        <input id="editDoctorSpecialty" type="text" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800" placeholder="التخصص">
-      </label>
-
-      <label class="block">
-        <span class="mb-1 block text-[11px] font-bold text-slate-500">رقم الهاتف</span>
-        <input id="editDoctorPhone" dir="ltr" type="tel" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800 text-left" placeholder="01xxxxxxxxx">
-      </label>
-
-      <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
-        <div class="mb-1 text-[10px] font-bold text-slate-400">البريد الإلكتروني</div>
-        <div id="editDoctorEmail" dir="ltr" class="text-sm font-bold text-slate-700 text-left">—</div>
-        <div class="mt-1 text-[10px] font-semibold text-slate-400">البريد الإلكتروني لا يمكن تعديله من هذه الصفحة.</div>
-      </div>
-    </div>
-
-    <div class="mt-5 flex gap-2">
-      <button id="saveProfileBtn" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-xs font-extrabold text-white hover:bg-brand-700">
-        <i class="fa-solid fa-check ml-1"></i> حفظ التعديلات
-      </button>
-      <button id="cancelProfileBtn" class="rounded-xl bg-slate-100 px-4 py-3 text-xs font-bold text-slate-600 hover:bg-slate-200">إلغاء</button>
-    </div>
-  </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
 <script src="js/subscription_plansم.js?v=20261119-profile-inline-modal-v2" defer></script>
-<script src="js/profile.js?v=20261119-profile-pending-cancel2" defer></script>
+<script src="js/profile.js?v=20261120-profile-inline-edit-v1" defer></script>
   
 </body>
 </html>
