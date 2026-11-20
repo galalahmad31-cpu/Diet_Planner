@@ -1254,7 +1254,8 @@
   }
 
   function bindEvents() {
-    bindPatientModuleTabs();\n    bindDietPlanActions();
+    bindPatientModuleTabs();
+    bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
       event.preventDefault();
