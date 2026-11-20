@@ -680,83 +680,6 @@ function isPersistedDayId(id){
  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id||''));
 }
 
-async function savePlan(){
-  if(!(await canWriteVisitData())){
-    showToast('حفظ الخطة الغذائية متاح أثناء الاشتراك المدفوع فقط','error');
-    return false;
-  }
-
-  const user=await currentUser();
-  if(!user||!(window.currentPatientId||patientId)){
-    showToast('لم يتم تحديد المريض أو المستخدم','error');
-    return false;
-  }
-
-  try{
-    const localDays=Array.isArray(savedDaysData)
-      ? savedDaysData
-      : (Array.isArray(daysData)?daysData:[]);
-
-    // Validate food references before starting the atomic database operation.
-    const missingFoods=[];
-    localDays.forEach(day=>(day.meals||[]).forEach(meal=>(meal.items||[]).forEach(item=>{
-      if(!item.foodId)return;
-      if(!foodDatabase.some(f=>String(f.id)===String(item.foodId))){
-        missingFoods.push(String(item.foodId));
-      }
-    })));
-
-    if(missingFoods.length){
-      throw new Error(
-        'الصنف غير موجود في مكتبة الأغذية: '+
-        [...new Set(missingFoods)].join(', ')
-      );
-    }
-
-    const currentPatientId=window.currentPatientId||patientId;
-    let planId=activeCloudPlanId || null;
-
-    // Never send a stale plan id to the RPC. The database accepts an id only
-    // when it belongs to this patient and this exact plan type.
-    if(planId){
-      const {data:matchingPlan,error:matchingPlanError}=await sb.from('nutrition_plans').select('id,plan_name')
-        .eq('id',planId).eq('patient_id',currentPatientId).maybeSingle();
-      if(matchingPlanError)throw matchingPlanError;
-      if(!matchingPlan){
-        if(isNewPlan){activeCloudPlanId=null;activePlanName=null;planId=null;}
-        else throw new Error('معرّف الخطة لا يطابق المريض الحالي. أعد فتح الخطة من شريط الخطط قبل الحفظ.');
-      }else{
-        if(String(matchingPlan.plan_name||'').includes('البدائل'))throw new Error('هذه الخطة مخصصة للبدائل وليست خطة الجرامات.');
-        activePlanName=matchingPlan.plan_name;
-      }
-    }
-
-    const planData={
-      id:planId,
-      patient_id:currentPatientId,
-      plan_name:activePlanName || 'الخطة الغذائية باستخدام الجرامات',
-      start_date:activePlanStartDate || new Date().toISOString().slice(0,10),
-      notes:null
-    };
-
-    const daysPayload=localDays.map(serializePlanDay);
-
-    const {data:savedPlanId,error}=await sb.rpc('save_nutrition_plan',{
-      p_plan:planData,
-      p_days:daysPayload
-    });
-
-    if(error) throw new Error('فشل حفظ الخطة: '+error.message);
-    activeCloudPlanId=savedPlanId;
-    return true;
-  }catch(e){
-    console.error('Nutrition plan save failed:',e);
-    window.__lastNutritionPlanSaveError=e?.message||String(e);
-    showToast(window.__lastNutritionPlanSaveError,'error');
-    return false;
-  }
-}
-
 function renderDayCard(d,di){
  const calc=calculateDay(d);
  const targetCal=num(patientInfo.targetCal);
@@ -1019,6 +942,6 @@ function init(){
  return dietInitPromise;
 }
 
-window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, savePlan, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
+window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
 window.__dpDietPlanLoadError = null;
 })();
