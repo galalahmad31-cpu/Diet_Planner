@@ -108,8 +108,8 @@
   #headerActions.dp-header-account-actions{gap:10px;flex-wrap:wrap}
   .dp-header-account-info{gap:9px;flex-wrap:wrap}
   #doctorName.dp-header-account-name{max-width:calc(100vw - 145px);padding:8px 11px;font-size:14px}
-  .dp-app-header__context #logoutBtn{min-width:96px;min-height:44px;padding:9px 13px;font-size:13px}
-  .dp-app-header__context #logoutBtn i{font-size:15px}
+  .dp-app-header__logout{min-width:88px;min-height:36px;padding:7px 10px;font-size:11px}
+  .dp-app-header__logout i{font-size:13px}
   .dp-header-auth-actions{gap:8px}
   .dp-header-auth-actions a{min-height:42px;padding:9px 13px;font-size:12px}
 }
