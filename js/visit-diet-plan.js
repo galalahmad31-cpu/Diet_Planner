@@ -347,16 +347,25 @@ function calculateDay(day){
  (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{if(it.includeInCalculation===false)return;const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
  return {cal,pro,carb,fat,sod,pot,pho};
 }
-function metricCard(label,value,unit,target,pctv,kind){
+function metricRing(label,value,unit,target,kind){
  const targetValue=num(target);
+ const currentValue=num(value);
  const hasTarget=targetValue>0;
- const safePct=hasTarget?Math.max(0,Math.min(100,Number(pctv)||0)):0;
- return `<div class="day-metric day-metric-${kind}">
-  <div class="day-metric-heading"><span>${label}</span>${hasTarget?`<small>الهدف ${Math.round(targetValue)} ${unit}</small>`:'<small>لا يوجد هدف محدد</small>'}</div>
-  <div class="day-metric-value"><strong>${Number(value).toLocaleString('en-US')}</strong><span>${unit}</span></div>
-  <div class="day-metric-track" aria-hidden="true"><span style="width:${safePct}%"></span></div>
-  <div class="day-metric-foot">${hasTarget?`<span>${Math.round(Number(value)/targetValue*100)}% من الهدف</span>`:'<span>حدد الهدف للمقارنة</span>'}</div>
- </div>`;
+ const rawPercent=hasTarget?Math.round(currentValue/targetValue*100):0;
+ const ringPercent=hasTarget?Math.max(0,Math.min(100,rawPercent)):0;
+ return `<article class="day-ring-metric day-ring-${kind}" role="group" aria-label="${label}">
+  <strong class="day-ring-label">${label}</strong>
+  <div class="day-ring" role="img" aria-label="${label}: ${Math.round(currentValue)} ${unit}${hasTarget?`, ${rawPercent}% من الهدف ${Math.round(targetValue)} ${unit}`: ', لم يحدد الهدف'}" style="--ring-progress:${ringPercent}%">
+   <div class="day-ring-center">
+    <strong>${Math.round(currentValue).toLocaleString('en-US')}</strong>
+    <span>${unit}</span>
+   </div>
+  </div>
+  <div class="day-ring-meta">
+   <strong>${hasTarget?`${rawPercent}%`:'—'}</strong>
+   <small>${hasTarget?`من ${Math.round(targetValue).toLocaleString('en-US')} ${unit}`:'لم يحدد الهدف'}</small>
+  </div>
+ </article>`;
 }
 
 async function syncFixedMeals(){
@@ -669,14 +678,8 @@ function renderDays(){
   const targetPro=num(patientInfo.targetPro);
   const targetCarb=num(patientInfo.targetCarb);
   const targetFat=num(patientInfo.targetFat);
-  const calPctRaw=targetCal>0?Math.round(calc.cal/targetCal*100):0;
-  const calPct=Math.max(0,Math.min(100,calPctRaw));
-  const proPct=targetPro>0?Math.min(100,calc.pro/targetPro*100):0;
-  const carbPct=targetCarb>0?Math.min(100,calc.carb/targetCarb*100):0;
-  const fatPct=targetFat>0?Math.min(100,calc.fat/targetFat*100):0;
   const meals=d.meals||[];
   const itemCount=meals.reduce((sum,meal)=>sum+(meal.items||[]).length,0);
-  const progressLabel=targetCal>0?`تم تحقيق ${calPctRaw}% من هدف السعرات`:'لم يتم تحديد هدف السعرات';
 
   return `<section class="day-card" data-day-id="${escapeHtml(d.id)}">
    <header class="day-card-header">
@@ -704,23 +707,11 @@ function renderDays(){
       <small>${itemCount} أصناف مضافة</small>
      </div>
      <div class="day-summary-layout">
-      <div class="day-progress-block">
-       <div class="day-progress-ring" role="img" aria-label="${progressLabel}" style="--day-progress:${calPct}%">
-        <div class="day-progress-ring-center">
-         <strong>${Math.round(calc.cal).toLocaleString('en-US')}</strong>
-         <span>kcal محققة</span>
-        </div>
-       </div>
-       <div class="day-progress-copy">
-        <span>تحقيق هدف السعرات</span>
-        <strong>${targetCal>0?`${calPctRaw}%`:'—'}</strong>
-        <small>${targetCal>0?`من ${Math.round(targetCal).toLocaleString('en-US')} kcal`:'لم يحدد الهدف بعد'}</small>
-       </div>
-      </div>
-      <div class="day-metrics-grid">
-       ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'protein')}
-       ${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'carbs')}
-       ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'fat')}
+      <div class="day-rings-grid" aria-label="تحقيق الأهداف الغذائية">
+       ${metricRing('السعرات',calc.cal,'kcal',targetCal,'calories')}
+       ${metricRing('الكربوهيدرات',calc.carb,'g',targetCarb,'carbs')}
+       ${metricRing('البروتين',calc.pro,'g',targetPro,'protein')}
+       ${metricRing('الدهون',calc.fat,'g',targetFat,'fat')}
       </div>
      </div>
      <div class="day-micros-row" aria-label="المعادن">
