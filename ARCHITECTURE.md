@@ -16,8 +16,8 @@
 - Public entry/auth routing: `index.html` → `js/auth-access.js`; authenticated dashboard routing is handled by `js/auth-access.js`.
 - Main dashboard: `app.html` → `js/auth-access.js`, `js/app-dashboard.js`; `index.html` also contains a public-facing dashboard/entry layout and loads the dashboard script. Keep their routing and access behavior distinct unless regression-tested.
 - Admin: `admin.html` → `js/admin.js` (subscription management and inline user-role editing)
-- Patient records: `patient.html` → `js/patient.js`; `patient-profile.html` → `js/patient-profile.js`
-- Visits: `visit.html` → `js/visit.js`, `js/visit-calculator.js`, `js/visit-diet-plan.js`, `js/visit-exchange-plan.js`
+- Patient records and patient-linked plan workspace: `patient.html` → `js/patient.js`; `patient-profile.html` → `js/patient-profile.js`, which loads `js/visit-diet-plan.js` and `js/visit-exchange-plan.js` directly for the selected plan.
+- Legacy standalone visit workspace: `visit.html` → `js/visit.js` and the same reusable diet-plan modules. Retain this route until all external links and workflows are verified; do not duplicate plan logic in the profile page.
 - Diet/calculation: `diet.html` → `js/diet.js`; `quickcalc.html` → `js/quickcalc.js`
 - Food/recipes/products: `food.html` → `js/food.js`; `recipe.html` → `js/recipe.js`; `products.html` → `js/products.js`
 - Finance/weight: `finance.html` → `js/finance.js`; the repository's standalone weight page uses the Arabic-named `weightم.html`, `css/weightم.css`, and `js/weightم.js`.
