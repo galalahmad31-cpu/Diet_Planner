@@ -85,5 +85,5 @@ body{padding-top:0}
 .doctors-table .doctor-col-actions{width:12%}
 .doctors-table th,.doctors-table td{white-space:nowrap}
 .doctors-table td:first-child{white-space:normal;overflow-wrap:anywhere}
-.doctors-table .actions-cell{justify-content:flex-start}
+.doctors-table td.actions-cell{display:table-cell;white-space:normal}.doctors-table td.actions-cell .icon-btn{margin-inline-start:4px}
 .doctors-table .badge{white-space:nowrap}
