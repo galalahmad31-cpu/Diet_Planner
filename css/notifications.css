@@ -1,9 +1,95 @@
+/* Notifications page — layout only. All colors resolve through shared design tokens. */
 *{box-sizing:border-box}
-body{margin:0;font-family:Cairo,sans-serif;background:radial-gradient(circle at 90% 0%,rgba(23,143,132,.10),transparent 28%),radial-gradient(circle at 5% 95%,rgba(23,143,132,.07),transparent 25%),#f7fafb;color:#17252a}
-.glass{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(226,232,240,.9)}
-.card{transition:.2s}
-.card:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(15,71,67,.08)}
-.tab-btn.active{background:#fff;color:#11786f;box-shadow:0 4px 12px rgba(15,71,67,.08)}
-.loading{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:#f7fafb}
-.spinner{width:36px;height:36px;border:3px solid #d9efec;border-top-color:#178f84;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+body.notifications-page{
+  min-width:320px;
+  margin:0;
+  font-family:var(--dp-font);
+  background:var(--dp-bg);
+  color:var(--dp-text);
+}
+.notifications-page .glass{
+  background:var(--dp-surface);
+  border:1px solid var(--dp-border);
+  box-shadow:0 8px 24px var(--dp-shadow);
+}
+.notifications-page .notifications-tabs{padding:14px}
+.notifications-page .notifications-tab-list{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  padding:6px;
+  border-radius:16px;
+  background:var(--dp-surface-2);
+}
+.notifications-page .tab-btn{
+  min-width:0;
+  min-height:48px;
+  padding:10px 8px;
+  border:1px solid transparent;
+  border-radius:12px;
+  background:transparent;
+  color:var(--dp-text-2);
+  line-height:1.5;
+  white-space:normal;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+.notifications-page .tab-btn.active{
+  background:var(--dp-tab-active-bg);
+  color:var(--dp-tab-active-text);
+  border-color:var(--dp-tab-border);
+  box-shadow:0 2px 8px var(--dp-shadow);
+}
+.notifications-page .tab-btn:focus-visible{
+  outline:2px solid var(--dp-accent);
+  outline-offset:2px;
+}
+.notifications-page #notifications{
+  display:grid;
+  gap:12px;
+}
+.notifications-page .notification-card{
+  min-width:0;
+  border-radius:20px;
+  padding:18px;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.notifications-page .notification-card:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 28px var(--dp-shadow);
+}
+.notifications-page .notification-card :is(h3,p,span,div){overflow-wrap:anywhere}
+.notifications-page .notification-card .notification-copy{min-width:0}
+.notifications-page .notification-date{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:10px;
+}
+.notifications-page #empty{
+  padding:clamp(28px,6vw,52px) 18px;
+}
+.notifications-page #loading{
+  z-index:1000;
+}
+.notifications-page .spinner{
+  width:36px;
+  height:36px;
+  border:3px solid var(--dp-border);
+  border-top-color:var(--dp-primary);
+  border-radius:50%;
+  animation:notifications-spin .8s linear infinite;
+}
+@keyframes notifications-spin{to{transform:rotate(360deg)}}
+@media(max-width:520px){
+  .notifications-page main{padding-inline:12px}
+  .notifications-page header.glass{padding:16px}
+  .notifications-page .notifications-tabs{padding:10px}
+  .notifications-page .notifications-tab-list{gap:4px;padding:4px}
+  .notifications-page .tab-btn{font-size:11px;padding:8px 4px;min-height:54px}
+  .notifications-page .notification-card{padding:14px}
+  .notifications-page .notification-card>.flex{gap:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .notifications-page .tab-btn,.notifications-page .notification-card{transition:none}
+  .notifications-page .notification-card:hover{transform:none}
+}
