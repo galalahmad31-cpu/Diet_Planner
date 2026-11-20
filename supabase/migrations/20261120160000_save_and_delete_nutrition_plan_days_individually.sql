@@ -16,6 +16,7 @@ declare
   v_requested_plan_id uuid;
   v_day_id uuid;
   v_requested_day_id uuid;
+  v_plan_name text;
   v_day_number integer;
   v_meal jsonb;
   v_item jsonb;
@@ -30,6 +31,7 @@ begin
 
   v_patient_id := nullif(p_plan->>'patient_id', '')::uuid;
   v_requested_plan_id := nullif(p_plan->>'id', '')::uuid;
+  v_plan_name := coalesce(nullif(btrim(p_plan->>'plan_name'), ''), 'الخطة الغذائية');
   if v_patient_id is null then raise exception 'patient_id is required'; end if;
 
   if not v_is_admin then
