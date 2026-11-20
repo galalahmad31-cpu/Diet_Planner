@@ -194,14 +194,18 @@
         .eq('is_active', true)
         .order('price', { ascending: true });
 
-      const timeout = new Promise((_, reject) => {
-        window.setTimeout(() => reject(new Error('انتهت مهلة تحميل الخطط. تحقق من الاتصال ثم أعد المحاولة.')), 15000);
-      });
-      const { data, error } = await Promise.race([request, timeout]);
-      if (error) throw error;
-
-      state.plans = Array.isArray(data) ? data : [];
-      renderPlans();
+      let timeoutId;
+      try {
+        const timeout = new Promise((_, reject) => {
+          timeoutId = window.setTimeout(() => reject(new Error('انتهت مهلة تحميل الخطط. تحقق من الاتصال ثم أعد المحاولة.')), 15000);
+        });
+        const { data, error } = await Promise.race([request, timeout]);
+        if (error) throw error;
+        state.plans = Array.isArray(data) ? data : [];
+        renderPlans();
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
     } catch (error) {
       console.error('Subscription plans loading failed:', error);
       container.innerHTML = '<div class="profile-plans-empty">تعذر تحميل خطط الاشتراك. تحقق من الاتصال ثم <button type="button" data-plans-retry style="color:var(--dp-primary,#159b78);font-weight:800;text-decoration:underline">أعد المحاولة</button>.</div>';
