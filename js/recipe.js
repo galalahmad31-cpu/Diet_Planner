@@ -531,7 +531,8 @@
         const accessStatus = await window.DietPlannerAccess?.getAccessStatus?.();
 
         if (!accessStatus?.authenticated || !accessStatus.user) {
-            location.replace('index.html');
+            window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'الوصفات الصحية متاحة للمشتركين فقط. سجّل الدخول ثم اشترك للوصول إليها.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});
+            $('loading')?.remove();
             return;
         }
 
@@ -541,7 +542,8 @@
         if (!isAdmin) {
             const active = await window.DietPlannerAccess.hasActiveSubscription(currentUser.id);
             if (active !== true) {
-                location.replace('subscription_plans_index.html');
+                window.DietPlannerAccess?.showAccessPrompt?.({title:'هذه الصفحة للمشتركين',message:'الوصفات الصحية متاحة باشتراك نشط فقط. يمكنك مراجعة خطط الاشتراك من صفحتك الشخصية.',actionLabel:'عرض خطط الاشتراك',actionHref:'profile.html'});
+                $('loading')?.remove();
                 return;
             }
             hasActiveSubscription = true;
