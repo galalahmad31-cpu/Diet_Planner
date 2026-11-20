@@ -163,3 +163,25 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
  .profile-subscribe-actions,.profile-confirm-actions{gap:7px}
  .profile-subscribe-btn{font-size:11px;padding:8px 9px}
 }
+
+/* Inline profile editor: layout only; colors are supplied by shared theme tokens. */
+.profile-inline-editor[hidden]{display:none!important}
+.profile-inline-editor{display:grid;gap:14px;margin-top:2px}
+.profile-inline-field{display:grid;gap:6px;min-width:0}
+.profile-inline-field>span,.profile-inline-email>span{font-size:11px;font-weight:800;color:#71827d}
+.profile-inline-field input{
+  display:block;width:100%;min-width:0;min-height:44px;padding:10px 12px;
+  border:1px solid #dce7e3;border-radius:11px;background:#fff;color:#243b35;
+  font:700 13px Cairo,sans-serif;box-sizing:border-box
+}
+.profile-inline-field input:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3px rgba(23,143,132,.12)}
+.profile-inline-email{display:grid;gap:5px;min-width:0;padding:11px 12px;border:1px solid #e3ece8;border-radius:11px;background:#f7faf8}
+.profile-inline-email>div{overflow-wrap:anywhere;text-align:left;font-size:13px;font-weight:800;color:#425b53}
+.profile-inline-email small{font-size:10px;color:#82918c}
+.profile-inline-actions{display:flex;gap:9px;margin-top:2px}
+.profile-inline-actions button{min-height:43px;padding:9px 14px;border:0;border-radius:11px;font:800 12px Cairo,sans-serif;cursor:pointer}
+.profile-inline-save{flex:1;background:#16866d;color:#fff}
+.profile-inline-save:hover{background:#116d59}
+.profile-inline-save:disabled{opacity:.6;cursor:not-allowed}
+.profile-inline-cancel{flex:0 0 auto;min-width:84px;background:#eef3f1;color:#60736d}
+@media(max-width:420px){.profile-inline-actions{flex-direction:column}.profile-inline-cancel{width:100%}}
