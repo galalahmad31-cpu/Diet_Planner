@@ -66,6 +66,7 @@
 
     const editButton = $('editButton');
     const addPlanButton = $('addPlanButton');
+    const addExchangePlanButton = $('addExchangePlanButton');
     updateMeasurementWriteAccess();
     updatePatientFinanceWriteAccess();
 
@@ -78,14 +79,13 @@
         : 'تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط';
     }
 
-    if (addPlanButton) {
-      addPlanButton.disabled = !canWrite || state.isCreatingPlan;
-      addPlanButton.classList.toggle('opacity-50', !canWrite);
-      addPlanButton.classList.toggle('cursor-not-allowed', !canWrite);
-      addPlanButton.title = canWrite
-        ? 'إضافة خطة غذائية'
-        : 'إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط';
-    }
+    [addPlanButton, addExchangePlanButton].forEach(button => {
+      if (!button) return;
+      button.disabled = !canWrite || state.isCreatingPlan;
+      button.classList.toggle('opacity-50', !canWrite);
+      button.classList.toggle('cursor-not-allowed', !canWrite);
+      button.title = canWrite ? 'إضافة خطة غذائية' : 'إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط';
+    });
 
     const accessBox = $('writeAccessStatus');
     if (accessBox) {
@@ -607,6 +607,28 @@
     return dietPlanModulePromise;
   }
 
+  let exchangePlanModulePromise = null;
+
+  async function loadExchangePlanModule() {
+    if (typeof window.exchangePlan?.init === 'function') return true;
+    if (exchangePlanModulePromise) return exchangePlanModulePromise;
+    exchangePlanModulePromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'js/visit-exchange-plan.js?v=20261120-patient-exchange-v1';
+      script.async = true;
+      script.onload = () => typeof window.exchangePlan?.init === 'function'
+        ? resolve(true)
+        : reject(new Error('تعذر تهيئة محرر خطة البدائل.'));
+      script.onerror = () => reject(new Error('تعذر تحميل محرر خطة البدائل.'));
+      document.head.appendChild(script);
+    }).catch(error => {
+      exchangePlanModulePromise = null;
+      console.error('Direct exchange-plan module load failed:', error);
+      return false;
+    });
+    return exchangePlanModulePromise;
+  }
+
   function bindDietPlanActions() {
     if (document.documentElement.dataset.dpDirectDietActionsBound === 'true') return;
     document.documentElement.dataset.dpDirectDietActionsBound = 'true';
@@ -621,7 +643,8 @@
       const confirmButton = event.target.closest('#confirmOkBtn');
       if (confirmButton && isDietPlanElement(confirmButton)) {
         event.preventDefault();
-        await window.dietPlan?.confirmAction?.();
+        if (await window.exchangePlan?.hasPendingConfirm?.()) await window.exchangePlan.confirmAction();
+        else await window.dietPlan?.confirmAction?.();
         return;
       }
 
@@ -630,7 +653,15 @@
       const action = target.dataset.action || '';
       if (action === 'executeActivePrint') {
         event.preventDefault();
-        window.dietPlan?.executePrint?.();
+        if (confirmButton.dataset.printMode === 'exchange') await window.exchangePlan?.saveAndPrintFromSettings?.();
+        else window.dietPlan?.executePrint?.();
+        return;
+      }
+      if (action.startsWith('exchangePlan.')) {
+        const method = window.exchangePlan?.[action.slice('exchangePlan.'.length)];
+        if (typeof method !== 'function') return;
+        event.preventDefault();
+        method(event);
         return;
       }
       if (!action.startsWith('dietPlan.')) return;
@@ -651,31 +682,34 @@
 
   async function openPlanWorkspace(planId = null, planType = '') {
     const panel = $('planWorkspacePanel');
-    const content = $('dietPlanContent');
-    if (!panel || !content || !patientId) return;
+    const gramsContent = $('dietPlanContent');
+    const exchangeContent = $('exchangePlanContent');
+    if (!panel || !gramsContent || !exchangeContent || !patientId) return;
 
+    const isExchange = String(planType || '').includes('البدائل');
     panel.hidden = false;
-    content.classList.remove('hidden');
+    gramsContent.classList.toggle('hidden', isExchange);
+    exchangeContent.classList.toggle('hidden', !isExchange);
     panel.dataset.planId = planId ? String(planId) : '';
+    panel.dataset.planType = isExchange ? 'exchange' : 'grams';
     window.currentPatientId = state.patient?.id || patientId;
+    window.currentPatientEnergy = state.patient || {};
 
     document.querySelectorAll('[data-open-plan]').forEach(button => {
       button.classList.toggle('is-active', button.dataset.openPlan === String(planId || ''));
     });
 
     bindDietPlanActions();
-    const loaded = await loadDietPlanModule();
-    if (!loaded) {
-      const status = $('visitsLoading');
-      if (status) {
-        status.hidden = false;
-        status.textContent = 'تعذر تحميل محرر الخطة الغذائية. أعد تحميل الصفحة وحاول مرة أخرى.';
-      }
-      return;
-    }
-
     try {
-      await window.dietPlan.openPlan(planId, !planId);
+      if (isExchange) {
+        const loaded = await loadExchangePlanModule();
+        if (!loaded) throw new Error('تعذر تحميل محرر خطة البدائل.');
+        await window.exchangePlan.init(planId || null);
+      } else {
+        const loaded = await loadDietPlanModule();
+        if (!loaded) throw new Error('تعذر تحميل محرر الخطة الغذائية.');
+        await window.dietPlan.openPlan(planId, !planId);
+      }
     } catch (error) {
       console.error('Open direct nutrition plan failed:', error);
       const status = $('visitsLoading');
@@ -691,8 +725,12 @@
     if (panel) {
       panel.hidden = true;
       delete panel.dataset.planId;
+      delete panel.dataset.planType;
+      $('dietPlanContent')?.classList.add('hidden');
+      $('exchangePlanContent')?.classList.add('hidden');
     }
     window.dietPlan?.closeDayDetails?.();
+    window.exchangePlan?.closeConfirmModal?.();
     window.dietPlan?.closeFoodModal?.();
     window.dietPlan?.closeFixedMeals?.();
     window.dietPlan?.closeAddMealModal?.();
@@ -762,6 +800,35 @@
     } catch (error) {
       console.error('Create nutrition plan failed:', error);
       await Swal.fire('تعذر إضافة الخطة', error.message || 'حدث خطأ أثناء إنشاء الخطة الغذائية.', 'error');
+    } finally {
+      state.isCreatingPlan = false;
+      updateWriteControls();
+    }
+  }
+
+  async function addExchangeNutritionPlan() {
+    if (!canWrite()) {
+      alert('إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط.');
+      return;
+    }
+    if (state.isCreatingPlan || !patientId) return;
+    state.isCreatingPlan = true;
+    updateWriteControls();
+    try {
+      const { data: planId, error } = await supabase.rpc('create_nutrition_plan', { p_patient_id: patientId });
+      if (error) throw error;
+      if (!planId) throw new Error('لم يتم استلام معرّف الخطة الجديدة.');
+      const { error: renameError } = await supabase
+        .from('nutrition_plans')
+        .update({ plan_name: 'الخطة الغذائية باستخدام البدائل' })
+        .eq('id', planId)
+        .eq('patient_id', patientId);
+      if (renameError) throw renameError;
+      await loadNutritionPlans();
+      await openPlanWorkspace(planId, 'الخطة الغذائية باستخدام البدائل');
+    } catch (error) {
+      console.error('Create exchange nutrition plan failed:', error);
+      await Swal.fire('تعذر إضافة خطة البدائل', error.message || 'حدث خطأ أثناء إنشاء الخطة.', 'error');
     } finally {
       state.isCreatingPlan = false;
       updateWriteControls();
@@ -1266,6 +1333,7 @@
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     $('addPlanButton')?.addEventListener('click', addNutritionPlan);
+    $('addExchangePlanButton')?.addEventListener('click', addExchangeNutritionPlan);
     $('visitsList')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-open-plan]');
       if (!button) return;
