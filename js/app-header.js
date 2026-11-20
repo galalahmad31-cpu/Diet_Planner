@@ -22,7 +22,9 @@
     ["article.html", "المقالات", "fa-newspaper"],
     ["profile.html", "الصفحة الشخصية", "fa-user-doctor"],
     ["feedback.html", "شاركنا رأيك", "fa-star"],
-    ["about.html", "عن التطبيق", "fa-circle-info"]
+    ["about.html", "عن التطبيق", "fa-circle-info"],
+    ["notifications.html", "الإشعارات", "fa-bell"],
+    ["nutritionsupport.html", "الدعم الغذائي", "fa-notes-medical"]
   ];
   const titles = Object.fromEntries(pages.map(([href, label]) => [href, label]));
   titles["patient-profile.html"] = "ملف المريض";
@@ -60,7 +62,7 @@
 
     const candidates = [...oldHeader.querySelectorAll('[id],button,[class*="page-label"]')];
     candidates.forEach(node => {
-      if (node.closest("nav")) return;
+      if (node.closest("nav") && !node.id) return;
       if ([...moved].some(parent => parent === node || parent.contains(node))) return;
       if (node.matches('[class*="page-label"]')) {
         const label = node.textContent.trim();
@@ -95,9 +97,10 @@
       const link = document.createElement("a");
       link.className = "dp-app-header__link";
       link.href = href;
+      if (path === "weightم.html" && href === "app.html") link.id = "dashboardBtn";
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      if (path === href) {
+      if (path === href || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html")) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
       }
