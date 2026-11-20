@@ -72,3 +72,18 @@ body{padding-top:0}
  .announcement-form .field.full{grid-column:auto}
  .announcement-form-options{grid-column:auto;flex-direction:column;gap:10px}
 }
+
+
+/* Doctors table: fixed RTL column order shared by header and rendered rows. */
+.doctors-table{direction:rtl;table-layout:fixed;min-width:1080px;width:100%}
+.doctors-table .doctor-col-user{width:22%}
+.doctors-table .doctor-col-role{width:8%}
+.doctors-table .doctor-col-plan{width:16%}
+.doctors-table .doctor-col-start,.doctors-table .doctor-col-end{width:11%}
+.doctors-table .doctor-col-patients{width:10%}
+.doctors-table .doctor-col-status{width:10%}
+.doctors-table .doctor-col-actions{width:12%}
+.doctors-table th,.doctors-table td{white-space:nowrap}
+.doctors-table td:first-child{white-space:normal;overflow-wrap:anywhere}
+.doctors-table .actions-cell{justify-content:flex-start}
+.doctors-table .badge{white-space:nowrap}
