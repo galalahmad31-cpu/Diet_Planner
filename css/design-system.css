@@ -11,6 +11,22 @@ body{
 }
 button,input,select,textarea{font-family:var(--dp-font)}
 h1,h2,h3,h4,h5,h6{color:var(--dp-text)}
+body{font-size:14px;line-height:1.65}
+.title h1,.page-header h1,.page-title{
+  font-size:clamp(22px,2.2vw,26px);
+  line-height:1.35;
+  font-weight:800;
+}
+.dashboard-section-heading h3,.measurements-table-heading h3,.section-title{
+  font-size:17px;
+  line-height:1.45;
+  font-weight:800;
+}
+.text-slate-400,.text-gray-400{color:var(--dp-muted)}
+.text-slate-500,.text-gray-500{color:var(--dp-text-2)}
+.bg-slate-50,.bg-gray-50{background-color:var(--dp-surface-2)}
+.bg-slate-100,.bg-gray-100{background-color:var(--dp-surface-3)}
+.border-slate-100,.border-slate-200,.border-gray-100,.border-gray-200{border-color:var(--dp-border)}
 a{ -webkit-tap-highlight-color:transparent }
 :where(input,select,textarea){
   color:var(--dp-text);
