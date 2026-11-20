@@ -1221,11 +1221,6 @@ html[data-theme="dark"] .table-custom tbody tr:nth-child(even) td,
 html[data-theme="dark"] .table-custom tbody tr:hover td{
   background:var(--dp-surface-3)!important;
 }
-html[data-theme="dark"] .day-item.active{
-  background:#173a34!important;
-  color:#8DE0C7!important;
-  border-color:var(--dp-accent)!important;
-}
 html[data-theme="dark"] .day-save-btn{
   background:var(--dp-primary)!important;
   color:#fff!important;
