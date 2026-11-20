@@ -1,7 +1,6 @@
 (() => {
   'use strict';
 
-  const sb = window.DietPlannerAccess?.supabaseClient;
   const $ = (id) => document.getElementById(id);
   const state = { user: null, plans: [], subscriptions: [], selectedPlanId: null, currentSubscription: null, confirm: null, toastTimer: null };
 
@@ -28,7 +27,8 @@
   }
 
   async function loadUser() {
-    if (!sb) throw new Error('Supabase client is unavailable');
+    const sb = window.DietPlannerAccess?.supabaseClient;
+    if (!sb) throw new Error('تعذر تهيئة اتصال قاعدة البيانات. أعد تحميل الصفحة.');
     const { data, error } = await sb.auth.getUser();
     if (error) throw error;
     if (!data?.user) { window.location.replace('index.html'); return false; }
@@ -37,13 +37,21 @@
   }
 
   async function loadData() {
-    const plansResult = await sb.from('subscription_plans').select('*').eq('is_active', true).order('price', { ascending: true });
-    if (plansResult.error) throw plansResult.error;
+    const sb = window.DietPlannerAccess?.supabaseClient;
+    if (!sb) throw new Error('لم يتم تهيئة اتصال قاعدة البيانات.');
 
-    const subsResult = await sb.from('subscriptions')
-      .select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,is_free_trial')
-      .eq('user_id', state.user.id)
-      .order('created_at', { ascending: false });
+    const [plansResult, subsResult] = await Promise.all([
+      sb.from('subscription_plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('price', { ascending: true }),
+      sb.from('subscriptions')
+        .select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,is_free_trial')
+        .eq('user_id', state.user.id)
+        .order('created_at', { ascending: false })
+    ]);
+
+    if (plansResult.error) throw plansResult.error;
     if (subsResult.error) throw subsResult.error;
 
     state.plans = plansResult.data || [];
@@ -55,7 +63,7 @@
   }
 
   function activeSubscription() {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(new Date());
     return state.subscriptions.find(s => s.status === 'paid' && s.start_date && s.expiry_date && s.start_date <= today && s.expiry_date >= today) || null;
   }
 
@@ -70,7 +78,7 @@
     if (!c) return;
     const active = activeSubscription();
     const pending = pendingSubscription();
-    if (!state.plans.length) { c.innerHTML = '<div class="empty">لا توجد خطط اشتراك متاحة حاليًا.</div>'; return; }
+    if (!state.plans.length) { c.innerHTML = '<div class="empty"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><strong>لا توجد خطط متاحة حاليًا</strong><span>لم يتم نشر أي خطة اشتراك نشطة حتى الآن.</span></div>'; return; }
 
     c.innerHTML = state.plans.map(plan => {
       const isActive = active?.plan_id === plan.id;
@@ -137,6 +145,7 @@
   }
 
   async function submitSubscription() {
+    const sb = window.DietPlannerAccess?.supabaseClient;
     const plan = state.plans.find(p => p.id === state.selectedPlanId);
     if (!state.user || !plan) return;
 
@@ -190,6 +199,7 @@
   }
 
   async function replacePendingProof() {
+    const sb = window.DietPlannerAccess?.supabaseClient;
     const sub = state.currentSubscription;
     const file = $('paymentProof').files[0];
     if (!sub || sub.status !== 'pending') return toast('لا يمكن تعديل إثبات الدفع الآن.');
@@ -215,6 +225,7 @@
   }
 
   async function cancelPending() {
+    const sb = window.DietPlannerAccess?.supabaseClient;
     const sub = state.currentSubscription;
     if (!sub || sub.status !== 'pending') return;
     const ok = await new Promise(resolve => { state.confirm = resolve; $('confirmTitle').textContent = 'تأكيد الإلغاء'; $('confirmMessage').textContent = 'هل أنت متأكد من إلغاء طلب الاشتراك؟'; $('confirmOverlay').style.display = 'flex'; });
@@ -231,6 +242,8 @@
   }
 
   async function logout() {
+    const sb = window.DietPlannerAccess?.supabaseClient;
+    if (!sb) return toast('تعذر الاتصال بالخادم. أعد تحميل الصفحة.');
     const { error } = await sb.auth.signOut();
     if (error) return toast('تعذر تسجيل الخروج.');
     window.location.replace('index.html');
@@ -253,16 +266,30 @@
 
   $('logoutBtn')?.addEventListener('click', logout);
 
-  document.addEventListener('DOMContentLoaded', async () => {
+  async function initialize() {
+    const container = $('plans');
     try {
       if (!(await loadUser())) return;
       await loadData();
+      const requestedPlanId = new URLSearchParams(window.location.search).get('plan');
+      if (requestedPlanId && state.plans.some(plan => String(plan.id) === requestedPlanId)) {
+        openSubscribe(requestedPlanId);
+      }
     } catch (error) {
       console.error('subscription index initialization failed:', error);
-      const c = $('plans');
-      if (c) c.innerHTML = '<div class="empty">تعذر تحميل صفحة الاشتراكات. أعد تحميل الصفحة.</div>';
+      if (container) {
+        const detail = String(error?.message || error || 'خطأ غير معروف');
+        container.innerHTML = `<div class="load-error" role="alert"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><strong>تعذر تحميل خطط الاشتراك</strong><p>${esc(detail)}</p><button class="retry-btn" type="button" data-action="retry-load">إعادة المحاولة</button></div>`;
+      }
     }
-  });
+  }
+
+  // The script is deferred, but this guard also supports direct/dynamic loading.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize, { once: true });
+  } else {
+    initialize();
+  }
 
   window.openSubscribeModal = openSubscribe;
   window.closeSubscribeModal = closeModal;
