@@ -167,7 +167,9 @@
     if (loadState === "error" || loadState === "unavailable") {
       const message = document.createElement("div");
       message.className = "dashboard-notifications-empty";
-      message.textContent = "تعذر تحميل الإشعارات حاليًا.";
+      message.textContent = loadState === "unavailable"
+        ? "سجّل الدخول لعرض إشعارات المرضى ومهام المتابعة."
+        : "تعذر تحميل الإشعارات حاليًا.";
       host.appendChild(message);
       host.dataset.loadState = loadState;
       return;
@@ -404,6 +406,7 @@
       console.error(
         "auth-access.js must load before app-dashboard.js."
       );
+      renderDashboardNotifications([], "error");
       return;
     }
 
@@ -415,6 +418,7 @@
       if (!status.authenticated || !status.user) {
         renderAdminCard(false);
         renderVisitorDashboard();
+        renderDashboardNotifications([], "unavailable");
         return;
       }
 
