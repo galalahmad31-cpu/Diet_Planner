@@ -542,7 +542,9 @@
 
       const title = document.createElement('strong');
       title.className = 'followup-day-title';
-      title.textContent = plan.plan_name || 'خطة غذائية';
+      const planDate = plan.start_date || plan.created_at;
+      const dateLabel = planDate ? new Date(planDate).toLocaleDateString('en-GB') : 'بدون تاريخ';
+      title.textContent = `الخطة ${planNumber} - ${dateLabel}`;
       openButton.append(number, title);
 
       const deleteButton = document.createElement('button');
