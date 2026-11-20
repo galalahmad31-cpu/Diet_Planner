@@ -583,89 +583,6 @@
        FORTIFIER
        ========================================================= */
 
-    function toggleFortifier() {
-
-        const isYes =
-            document.getElementById('en-fort-choice').value === 'yes';
-
-        document
-            .getElementById('fortifier-box')
-            .classList.toggle('hidden', !isYes);
-
-        document
-            .getElementById('res-en-fort-display')
-            .classList.toggle('hidden', !isYes);
-
-    }
-
-
-    /* =========================================================
-       ENTERAL CALCULATION
-       ========================================================= */
-
-    function calculateEN() {
-
-        const wStr =
-            document.getElementById('en-weight').value;
-
-        const w =
-            parseFloat(wStr) || 0;
-
-        const h =
-            parseFloat(
-                document.getElementById('en-hours').value
-            ) || 1;
-
-        const init =
-            parseFloat(
-                document.getElementById('en-init-rate').value
-            ) || 0;
-
-        const adv =
-            parseFloat(
-                document.getElementById('en-advance').value
-            ) || 0;
-
-        const goal =
-            parseFloat(
-                document.getElementById('en-goal').value
-            ) || 0;
-
-        const feedOptVal =
-            document.getElementById('en-option').value || "-";
-
-
-        const freq =
-            24 / h;
-
-
-        document.getElementById('res-en-start').innerText =
-            ((init * w) / freq).toFixed(1);
-
-        document.getElementById('res-en-inc').innerText =
-            ((adv * w) / freq).toFixed(1);
-
-        document.getElementById('res-en-max').innerText =
-            ((goal * w) / freq).toFixed(1);
-
-        document.getElementById('res-en-interval').innerText =
-            h;
-
-        document.getElementById('res-en-interval-2').innerText =
-            h;
-
-        document.getElementById('res-en-final-option').innerText =
-            feedOptVal;
-
-        document.getElementById('res-en-fort-text').innerText =
-            document.getElementById('en-fort-instructions').value || "None";
-
-
-        calculateCalorieBased();
-
-    }
-
-
     /* =========================================================
        TPN CALCULATION
        ========================================================= */
@@ -1355,7 +1272,6 @@
     function smartPrint() {
 
         const hasEN =
-            (parseFloat(document.getElementById('en-weight')?.value) || 0) > 0 ||
             (parseFloat(document.getElementById('cb-weight')?.value) || 0) > 0;
 
         const hasTPN =
@@ -1403,7 +1319,6 @@
         document.getElementById('printHeaderAddress').textContent = address;
 
         const hasEN =
-            (parseFloat(document.getElementById('en-weight')?.value) || 0) > 0 ||
             (parseFloat(document.getElementById('cb-weight')?.value) || 0) > 0;
         const hasTPN =
             (parseFloat(document.getElementById('tpn-weight')?.value) || 0) > 0;
@@ -1475,8 +1390,7 @@ function restoreDayState(state){
 
   // Restore the complete state first, then recalculate once.
   switchTab(st.__tab==='tpn'?'tpn':'en');
-  try { toggleFortifier(); } catch(error) { console.error('Fortifier restore failed:',error); }
-  try { calculateEN(); } catch(error) { console.error('EN restore failed:',error); }
+  try { calculateCalorieBased(); } catch(error) { console.error('Enteral calorie restore failed:',error); }
   try { toggleGlucoseInputMode(); } catch(error) { console.error('Glucose mode restore failed:',error); }
   try { calculateTPN(); } catch(error) { console.error('TPN restore failed:',error); }
   try { runGlucoseMixing(); } catch(error) { console.error('Glucose mixing restore failed:',error); }
@@ -1814,9 +1728,6 @@ async function loadPatientData(){
           case 'tab-tpn':
             switchTab('tpn');
             break;
-          case 'accordion-en-volume':
-            toggleENAccordion('en-volume-content','en-volume-arrow');
-            break;
           case 'accordion-en-calories':
             toggleENAccordion('en-calories-content','en-calories-arrow');
             break;
@@ -1853,9 +1764,6 @@ async function loadPatientData(){
       if(!el) return;
 
       switch(el.dataset.calc){
-        case 'en':
-          calculateEN();
-          break;
         case 'calorie':
           calculateCalorieBased();
           break;
@@ -1876,10 +1784,6 @@ async function loadPatientData(){
       if(!el) return;
 
       switch(el.dataset.action){
-        case 'fortifier-change':
-          toggleFortifier();
-          calculateEN();
-          break;
         case 'glucose-mode-change':
           toggleGlucoseMode();
           break;
