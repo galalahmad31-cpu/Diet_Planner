@@ -379,29 +379,10 @@
                                         </button>
                                     </div>
                                 </section>
-                                <section class="mt-5 bg-white border border-violet-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3">
-                                        <div>
-                                            <h3 class="font-black text-slate-800 text-sm">
-                                                أيام الخطة الغذائية
-                                            </h3>
-                                            <p class="text-[10px] text-slate-400 mt-1">
-                                                أضف الأيام ثم الوجبات والأصناف يدويًا.
-                                            </p>
-                                        </div>
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <button type="button" data-action="exchangePlan.addDay" class="bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl">
-                                                <i class="fa-solid fa-plus ml-1">
-                                                </i>
-                                                إضافة يوم
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div id="exchangeDaysContainer" class="mt-4 space-y-4">
-                                    </div>
-                                    <div id="exchangeDaysEmpty" class="mt-4 py-8 text-center text-xs font-bold text-slate-400 border border-dashed border-slate-200 rounded-2xl">
-                                        لا توجد أيام مضافة بعد.
-                                    </div>
+                                <section class="exchange-notes-section">
+                                  <label for="exchangePlanNotes" class="exchange-notes-label">تفاصيل الخطة الغذائية</label>
+                                  <textarea id="exchangePlanNotes" class="exchange-plan-notes" rows="12" disabled placeholder="اكتب تفاصيل الخطة الغذائية بحرية...\nيمكنك كتابة الوجبات والكميات والملاحظات بالطريقة التي تناسبك."></textarea>
+                                  <p class="exchange-notes-hint">تتسع مساحة الكتابة تلقائيًا مع زيادة المحتوى.</p>
                                 </section>
                             </div>
                         </div>
