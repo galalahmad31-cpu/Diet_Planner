@@ -962,20 +962,79 @@ html[data-theme="dark"] .editor blockquote,
 html[data-theme="dark"] .content blockquote,
 html[data-theme="dark"] .article-reader-content blockquote{background:#173a34!important;color:var(--dp-text-2)!important;border-color:var(--dp-accent)!important}
 
-/* Feedback */
-html[data-theme="dark"] body:has(.feedback-branded-header) .glass,
-html[data-theme="dark"] .feedback-main-card,
-html[data-theme="dark"] .feedback-reviews-card,
-html[data-theme="dark"] .feedback-form{
-  background:var(--dp-surface-2)!important;
+/* Feedback page — centralized surfaces, typography and controls.
+   Layout remains in feedback.css; all theme colors come from shared tokens. */
+html[data-theme="dark"] body:has(.feedback-branded-header),
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackPage{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-main-card,
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-reviews-card,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackComposerContent,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackLoginPrompt,
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-comment-section,
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-rating-panel,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackForm>div:first-of-type,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackEmpty,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackList>article,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackDeleteModal>div>div{
+  background:var(--dp-surface)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
+  box-shadow:0 8px 24px var(--dp-shadow)!important;
 }
-html[data-theme="dark"] .feedback-main-card :is(h2,h3,h4,strong),
-html[data-theme="dark"] .feedback-reviews-card :is(h2,h3,h4,strong){color:var(--dp-text)!important}
-html[data-theme="dark"] .feedback-main-card :is(p,small,span),
-html[data-theme="dark"] .feedback-reviews-card :is(p,small,span){color:var(--dp-text-2)!important}
-
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-comment-section,
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackForm>div:first-of-type{
+  background:var(--dp-surface-2)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) :is(
+  #feedbackPage h1,#feedbackPage h2,#feedbackPage h3,
+  #feedbackPage label,#feedbackPage strong,#feedbackPage b,
+  #feedbackPage .feedback-reviews-card .text-slate-800
+){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) :is(
+  #feedbackPage p,#feedbackPage small,#feedbackPage .text-slate-700,
+  #feedbackPage .text-slate-600,#feedbackPage .text-slate-500,
+  #feedbackPage .text-slate-400,#feedbackPage .feedback-page-label
+){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) :is(
+  #feedbackComment,#feedbackPage input,#feedbackPage textarea,
+  #feedbackPage select
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackComment::placeholder{
+  color:var(--dp-muted)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackComment:focus{
+  border-color:var(--dp-accent)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--dp-accent) 18%,transparent)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-branded-header .feedback-access-card.active{
+  background:var(--dp-primary)!important;
+  border-color:var(--dp-accent)!important;
+  color:#fff!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) .feedback-branded-header .feedback-access-card.active i{
+  color:#fff!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) .star-button{
+  color:var(--dp-muted);
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) .star-button[aria-checked="true"],
+html[data-theme="dark"] body:has(.feedback-branded-header) .star-button.is-active{
+  color:var(--dp-warning)!important;
+}
+html[data-theme="dark"] body:has(.feedback-branded-header) #feedbackStatus{
+  color:var(--dp-text)!important;
+}
 /* Account profile and subscription details */
 html[data-theme="dark"] body:has(.profile-page-header) .glass,
 html[data-theme="dark"] .profile-plans-section,
