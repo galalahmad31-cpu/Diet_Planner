@@ -703,14 +703,42 @@ body.support-delete-modal-open{overflow:hidden}
   #patientEnergyPanel #calcTab .activity-row button{width:100%}
   #patientEnergyPanel #calcTab .energy-results{grid-template-columns:repeat(2,minmax(0,1fr))}
   #patientEnergyPanel #calcTab .energy-results .primary{grid-column:1/-1}
-  #patientEnergyPanel #calcTab .macro-cards{grid-template-columns:1fr}
-  #patientEnergyPanel #calcTab .macro-item{grid-template-columns:1fr auto}
-  #patientEnergyPanel #calcTab .macro-grams{
-    grid-column:auto;
-    padding:0;
-    border:0;
-    justify-content:flex-end;
+  /* Keep all three macro cards in one compact row on tablet and mobile. */
+  #patientEnergyPanel #calcTab .macro-cards{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+    align-items:stretch;
   }
+  #patientEnergyPanel #calcTab .macro-item{
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:7px 4px;
+    padding:10px 7px;
+  }
+  #patientEnergyPanel #calcTab .macro-name{
+    min-width:0;
+    gap:4px;
+    font-size:10px;
+    white-space:nowrap;
+  }
+  #patientEnergyPanel #calcTab .macro-percent{gap:2px;font-size:9px}
+  #patientEnergyPanel #calcTab .macro-percent input{
+    width:40px;
+    min-width:0;
+    height:32px;
+    padding:0 2px;
+    font-size:12px;
+  }
+  #patientEnergyPanel #calcTab .macro-grams{
+    grid-column:1/-1;
+    min-width:0;
+    padding-top:6px;
+    border-top:1px solid var(--dp-border, #e7ece9);
+    justify-content:center;
+    gap:4px;
+  }
+  #patientEnergyPanel #calcTab .macro-grams strong{font-size:17px}
+  #patientEnergyPanel #calcTab .macro-grams small{font-size:9px}
   #patientEnergyPanel #calcTab .macro-footer{
     align-items:stretch;
     flex-direction:column;
