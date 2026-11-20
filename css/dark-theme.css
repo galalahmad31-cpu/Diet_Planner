@@ -2188,3 +2188,90 @@ html[data-theme="dark"] .visit-embedded #daysContainer .day-title-input{
   html[data-theme="dark"] .diet-preview,
   html[data-theme="dark"] .embedded-diet-plan{background:#fff!important;color:#111827!important}
 }
+
+
+/* Patient energy calculator: central theme owns every nested surface. */
+html[data-theme="dark"] #patientEnergyPanel{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab :where(
+  .energy-workspace,.macro-workspace,.patient-inputs>div,
+  .activity-row,.energy-results>div,.energy-results .primary,
+  .schofield-note,.target-energy,.target-adjustment,.macro-item,
+  .equation-switch
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab :where(
+  .workspace-heading h3,.energy-results strong,.energy-results .primary strong,
+  .target-energy strong,.macro-name,.macro-grams strong,
+  .macro-section-label,.result-equation strong
+){color:var(--dp-text)!important}
+html[data-theme="dark"] #patientEnergyPanel #calcTab :where(
+  .workspace-step,.workspace-heading p,.energy-results small,
+  .energy-results em,.target-energy small,.target-adjustment label,
+  .target-adjustment label small,.macro-section-label span,
+  .macro-percent,.macro-grams small,.macro-footer>span,
+  .patient-inputs label,.activity-row label
+){color:var(--dp-text-2)!important}
+html[data-theme="dark"] #patientEnergyPanel #calcTab :where(
+  .patient-inputs input,.patient-inputs select,.activity-row select,
+  .target-adjustment input,.macro-percent input
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab :where(
+  #eqBtnMifflin.bg-white,#eqBtnSchofield.bg-white
+){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-accent)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab .energy-results .primary,
+html[data-theme="dark"] #patientEnergyPanel #calcTab .target-energy{
+  background:color-mix(in srgb,var(--dp-success) 13%,var(--dp-surface))!important;
+  border-color:var(--dp-success)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab .schofield-note{
+  background:var(--dp-surface-2)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-grams,
+html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-footer{
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-alert{
+  background:#351d23!important;
+  color:#fda4af!important;
+  border-color:#6b343d!important;
+}
+
+/* Embedded meal-plan editor: cover dynamically rendered day cards and tables. */
+html[data-theme="dark"].visit-embedded #daysContainer :where(
+  .day-card,.day-card-body,.day-summary,.day-meal,.meal-card,
+  .meal-row,.meal-table-wrap,.day-macros-grid>div
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"].visit-embedded #daysContainer :where(
+  .day-summary-heading strong,.day-macros-grid strong,
+  .day-micros-row strong,.day-micros-row b
+){color:var(--dp-text)!important}
+html[data-theme="dark"].visit-embedded #daysContainer :where(
+  .day-summary-heading span,.day-macros-grid span,
+  .day-micros-row small,.day-card-meta
+){color:var(--dp-text-2)!important}
+html[data-theme="dark"].visit-embedded #daysContainer :where(
+  .day-title-input,input,select,textarea
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
