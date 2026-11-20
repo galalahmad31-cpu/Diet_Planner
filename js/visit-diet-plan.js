@@ -175,7 +175,15 @@ function updateTargets(){
 
 function isDayEditing(id){return!!dayEditModes[String(id)];}
 function setDayEditMode(id,editing){
- dayEditModes[String(id)]=!!editing; const card=document.querySelector(`[data-day-id="${CSS.escape(String(id))}"]`); if(!card)return;
+ dayEditModes[String(id)]=!!editing;
+ const card=document.querySelector(`[data-day-id="${CSS.escape(String(id))}"]`);
+ const status=document.querySelector(`[data-day-row="${CSS.escape(String(id))}"] .day-list-status`);
+ if(status){
+  status.textContent=editing?'تعديلات غير محفوظة':'محفوظ';
+  status.classList.toggle('is-pending',!!editing);
+  status.classList.toggle('is-saved',!editing);
+ }
+ if(!card)return;
  card.classList.toggle('day-locked',!editing);
  card.querySelectorAll('input,select,textarea').forEach(e=>e.disabled=!editing);
  card.querySelectorAll('button').forEach(b=>{if(b.classList.contains('day-action-always'))return;b.disabled=!editing;});
