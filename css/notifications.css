@@ -93,3 +93,48 @@ body.notifications-page{
   .notifications-page .tab-btn,.notifications-page .notification-card{transition:none}
   .notifications-page .notification-card:hover{transform:none}
 }
+
+/* Notification semantic colors are supplied only by the central theme tokens. */
+.notifications-page .notifications-count-badge{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+  border:1px solid var(--dp-border);
+  font-size:11px;
+  font-weight:900;
+  line-height:1.2;
+}
+.notifications-page .notifications-current-count{
+  background:var(--dp-primary)!important;
+  color:#fff!important;
+  border:1px solid var(--dp-primary);
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.notifications-page .notification-tone{
+  background:var(--dp-notification-neutral-bg)!important;
+  color:var(--dp-notification-neutral-text)!important;
+  border:1px solid var(--dp-border);
+}
+.notifications-page .notification-tone-info{
+  background:var(--dp-notification-info-bg)!important;
+  color:var(--dp-notification-info-text)!important;
+}
+.notifications-page .notification-tone-warning{
+  background:var(--dp-notification-warning-bg)!important;
+  color:var(--dp-notification-warning-text)!important;
+}
+.notifications-page .notification-tone-danger{
+  background:var(--dp-notification-danger-bg)!important;
+  color:var(--dp-notification-danger-text)!important;
+}
+.notifications-page .notifications-empty-icon{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-primary)!important;
+}
+.notifications-page .notification-error-panel{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border:1px solid var(--dp-border);
+}
+.notifications-page .notification-error-title{color:var(--dp-danger)!important}
+.notifications-page .notification-error-detail{color:var(--dp-text-2)!important}
