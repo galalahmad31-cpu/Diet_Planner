@@ -1002,11 +1002,17 @@ async function init() {
 
     const status = await access.getAccessStatus();
     if (!status?.authenticated || !status.user) {
-      location.replace('index.html');
+      window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'المنتجات الغذائية متاحة للمشتركين فقط. سجّل الدخول ثم اشترك للوصول إليها.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});
+      $('loading')?.remove();
       return;
     }
 
     state.isAdmin = status.isAdmin === true;
+    if (!state.isAdmin && status.hasActiveSubscription !== true) {
+      window.DietPlannerAccess?.showAccessPrompt?.({title:'هذه الصفحة للمشتركين',message:'المنتجات الغذائية متاحة باشتراك نشط فقط. يمكنك مراجعة خطط الاشتراك من صفحتك الشخصية.',actionLabel:'عرض خطط الاشتراك',actionHref:'profile.html'});
+      $('loading')?.remove();
+      return;
+    }
 
     // The verified profile role is the single source of truth for this admin-only toolbar.
     const adminToolbar = $('adminToolbar');
