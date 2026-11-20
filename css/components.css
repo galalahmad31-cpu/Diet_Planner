@@ -219,3 +219,86 @@ body:has(.dashboard-services-section) main section .bg-gradient-to-l p{
   color:#EAF5F2;
 }
 
+
+
+/* =========================================================
+   Central semantic surfaces — patient workspace & plan editor
+   Geometry stays page-owned; color, contrast and elevation
+   are controlled only by the shared theme tokens.
+   ========================================================= */
+:where(
+  .patient-name-bar,
+  .dashboard-card,
+  .patient-module-tab,
+  .patient-module-panel,
+  .measurements-table-wrap,
+  .followup-days-card,
+  .visit-embedded-panel,
+  .assessment-section,
+  .calc-card,
+  .calc-result-neutral,
+  .calc-result-bmr,
+  .calc-result-tdee,
+  .calc-result-group,
+  .day-card,
+  .day-panel,
+  .day-summary-card,
+  .support-day-delete-box
+){
+  background-color:var(--dp-surface);
+  color:var(--dp-text);
+  border-color:var(--dp-border);
+}
+:where(
+  .dashboard-card-head h3,
+  .patient-finance-heading strong,
+  .patient-data-title strong,
+  .patient-module-tab-copy strong,
+  .measurements-table-heading h3,
+  .followup-days-heading strong,
+  .day-summary-heading strong,
+  .day-card-title,
+  .assessment-section h3,
+  .assessment-section h4
+){color:var(--dp-text)}
+:where(
+  .dashboard-card-head p,
+  .patient-finance-heading small,
+  .patient-data-title small,
+  .patient-module-tab-copy small,
+  .measurements-access-status,
+  .measurements-table td,
+  .followup-state,
+  .day-card-meta,
+  .day-summary-heading span
+){color:var(--dp-text-2)}
+:where(
+  .patient-fields input,.patient-fields select,.patient-fields textarea,
+  .patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea,
+  .patient-finance-fields input,.patient-finance-fields select,
+  .inline-measurement-row input,.inline-measurement-row select,
+  #daysContainer .day-title-input,
+  #daysContainer input,#daysContainer select,#daysContainer textarea
+){
+  background:var(--dp-input);
+  color:var(--dp-text);
+  border-color:var(--dp-input-border);
+}
+:where(.patient-module-tab,.patient-module-panel,.dashboard-card,.followup-days-card,.assessment-section,.calc-card,.day-card){
+  box-shadow:0 2px 12px var(--dp-shadow);
+}
+:where(.measurements-table th,#daysContainer .day-table th){
+  background:var(--dp-surface-3);
+  color:var(--dp-text-2);
+  border-color:var(--dp-border);
+}
+:where(.measurements-table td,#daysContainer .day-table td){
+  border-color:var(--dp-border);
+}
+:where(.patient-module-tab:hover,.dashboard-details>summary:hover,.dashboard-details[open]>summary){
+  background:var(--dp-surface-2);
+}
+.patient-module-tab.is-active{
+  background:color-mix(in srgb,var(--dp-primary) 14%,var(--dp-surface));
+  border-color:var(--dp-primary);
+}
