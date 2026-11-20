@@ -16,7 +16,6 @@ declare
   v_requested_plan_id uuid;
   v_day_id uuid;
   v_requested_day_id uuid;
-  v_plan_name text;
   v_day_number integer;
   v_meal jsonb;
   v_item jsonb;
@@ -31,9 +30,7 @@ begin
 
   v_patient_id := nullif(p_plan->>'patient_id', '')::uuid;
   v_requested_plan_id := nullif(p_plan->>'id', '')::uuid;
-  v_plan_name := coalesce(nullif(btrim(p_plan->>'plan_name'), ''), 'الخطة الغذائية');
   if v_patient_id is null then raise exception 'patient_id is required'; end if;
-  if v_plan_name like '%البدائل%' then raise exception 'This endpoint only saves gram-based plans'; end if;
 
   if not v_is_admin then
     if not (select public.has_active_subscription(v_user_id)) then
@@ -129,15 +126,13 @@ declare
   v_user_id uuid := (select auth.uid());
   v_is_admin boolean := (select public.is_admin());
   v_patient_id uuid;
-  v_plan_name text;
 begin
   if v_user_id is null then raise exception 'Authentication required'; end if;
   if p_plan_id is null or p_day_id is null then raise exception 'plan_id and day_id are required'; end if;
 
-  select np.patient_id,np.plan_name into v_patient_id,v_plan_name
+  select np.patient_id into v_patient_id
   from public.nutrition_plans np where np.id=p_plan_id for update;
   if v_patient_id is null then raise exception 'Plan not found'; end if;
-  if coalesce(v_plan_name,'') like '%البدائل%' then raise exception 'This endpoint only deletes days from gram-based plans'; end if;
 
   if not v_is_admin then
     if not (select public.has_active_subscription(v_user_id)) then
