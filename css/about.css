@@ -61,3 +61,24 @@
 .about-account-action:focus-visible{outline:3px solid var(--dp-accent);outline-offset:3px}
 @media(max-width:560px){.about-account-actions-inner{width:100%}.about-account-action{flex:1 1 auto}}
 @media(prefers-reduced-motion:reduce){.about-account-action{transition:none}}
+
+/* About content cards: two-column ordered grid */
+.about-sections-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch;
+  gap:16px;
+  width:100%;
+}
+.about-sections-grid>.section-card{
+  min-width:0;
+  height:100%;
+  margin:0;
+}
+.about-sections-grid .content-display{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+@media(max-width:640px){
+  .about-sections-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+}
