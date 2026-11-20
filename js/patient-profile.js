@@ -1163,18 +1163,43 @@
         if (event.data?.type === 'dp-plan-embed-modal') {
           if (event.data.open === true) {
             if (planFrame.dataset.modalOpen !== 'true') {
-              planFrame.dataset.modalPreviousHeight = planFrame.style.height || '';
+              planFrame.dataset.modalPreviousStyle = planFrame.getAttribute('style') ?? '__DP_NO_INLINE_STYLE__';
+              planFrame.dataset.modalPreviousBodyOverflow = document.body.style.overflow;
               planFrame.dataset.modalOpen = 'true';
             }
-            planFrame.style.height = Math.max(480, Math.min(window.innerHeight, 1200)) + 'px';
-            planFrame.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+            document.body.style.overflow = 'hidden';
+            Object.assign(planFrame.style, {
+              position: 'fixed',
+              top: '0',
+              right: '0',
+              bottom: '0',
+              left: '0',
+              width: '100vw',
+              height: '100dvh',
+              maxWidth: 'none',
+              margin: '0',
+              border: '0',
+              zIndex: '2147483000'
+            });
           } else if (planFrame.dataset.modalOpen === 'true') {
             planFrame.dataset.modalOpen = 'false';
+
+            const previousStyle = planFrame.dataset.modalPreviousStyle;
+            if (previousStyle === '__DP_NO_INLINE_STYLE__') {
+              planFrame.removeAttribute('style');
+            } else {
+              planFrame.setAttribute('style', previousStyle || '');
+            }
+
             const contentHeight = Number(planFrame.dataset.contentHeight);
-            planFrame.style.height = contentHeight > 0
-              ? Math.min(contentHeight, 16000) + 'px'
-              : (planFrame.dataset.modalPreviousHeight || '1px');
-            delete planFrame.dataset.modalPreviousHeight;
+            if (contentHeight > 0) {
+              planFrame.style.height = Math.min(contentHeight, 16000) + 'px';
+            }
+
+            document.body.style.overflow = planFrame.dataset.modalPreviousBodyOverflow || '';
+            delete planFrame.dataset.modalPreviousStyle;
+            delete planFrame.dataset.modalPreviousBodyOverflow;
           }
           return;
         }
