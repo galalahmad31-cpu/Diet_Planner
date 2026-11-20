@@ -653,7 +653,7 @@
       const action = target.dataset.action || '';
       if (action === 'executeActivePrint') {
         event.preventDefault();
-        if (confirmButton.dataset.printMode === 'exchange') await window.exchangePlan?.saveAndPrintFromSettings?.();
+        if (target.dataset.printMode === 'exchange') await window.exchangePlan?.saveAndPrintFromSettings?.();
         else window.dietPlan?.executePrint?.();
         return;
       }
@@ -665,6 +665,11 @@
         return;
       }
       if (!action.startsWith('dietPlan.')) return;
+      if (action === 'dietPlan.closeConfirmModal' && await window.exchangePlan?.hasPendingConfirm?.()) {
+        event.preventDefault();
+        window.exchangePlan.closeConfirmModal();
+        return;
+      }
       const method = window.dietPlan?.[action.slice('dietPlan.'.length)];
       if (typeof method !== 'function') return;
       event.preventDefault();
