@@ -293,66 +293,98 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 .module-card{position:relative;overflow:hidden;}
 .module-card::after{content:"";position:absolute;inset-inline:0;bottom:0;height:3px;opacity:.0;transition:opacity .18s ease;}
 .assessment-module::after{background:#14b8a6}.calculator-module::after{background:#0ea5e9}.diet-module::after{background:#22c55e}.exchange-module::after{background:#8b5cf6}
-.exchange-plan-module{width:100%;max-width:100%;min-width:0;font-family:'Cairo',sans-serif;box-sizing:border-box}
-#exchangePlanContent,#exchangePlanContent .exchange-plan-module,#exchangePlanContent .exchange-plan-module>section{min-width:0;max-width:100%;box-sizing:border-box}
-.exchange-plan-module .exchange-day-summary{width:100%;min-width:0;padding:16px;border:1px solid var(--dp-border,#e2e8f0);border-radius:16px;background:var(--dp-surface,#fff)}
+/* Exchange workspace: constrain every grid/flex ancestor and keep wide data inside its own scroller. */
+#visitContent{grid-template-columns:minmax(0,1fr);min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+#visitContent>*,
+#visitContent .visit-module-section,
+#visitContent #moduleContent,
+#visitContent #exchangePlanContent,
+#visitContent #exchangePlanContent>*,
+#visitContent .exchange-plan-module,
+#visitContent .exchange-plan-module>section{
+  min-width:0;max-width:100%;width:100%;box-sizing:border-box
+}
+.exchange-plan-module{font-family:'Cairo',sans-serif}
+.exchange-plan-module .exchange-day-summary{
+  width:100%;min-width:0;box-sizing:border-box;padding:16px;
+  border:1px solid var(--dp-border,#e2e8f0);border-radius:16px;background:var(--dp-surface,#fff)
+}
 .exchange-plan-module .exchange-day-summary-title{margin:0 0 14px;color:var(--dp-text,#0f172a);font-size:14px;font-weight:900}
-.exchange-plan-module .exchange-rings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0}
-.exchange-plan-module .exchange-ring-metric{display:grid;justify-items:center;align-content:start;gap:8px;min-width:0;padding:12px 6px;border:1px solid var(--dp-border,#e2e8f0);border-radius:13px;background:var(--dp-surface-2,#f8fafc)}
-.exchange-plan-module .exchange-ring-label{color:var(--dp-text-2,#475569);font-size:12px;font-weight:900;text-align:center;white-space:nowrap}
-.exchange-plan-module .exchange-ring{--ring-progress:0;--ring-color:var(--dp-primary,#0f9674);display:grid;place-items:center;width:clamp(64px,9vw,96px);aspect-ratio:1;padding:6px;border-radius:50%;background:conic-gradient(var(--ring-color) calc(var(--ring-progress)*1%),var(--dp-surface-3,#e2e8f0) 0)}
-.exchange-plan-module .exchange-ring-center{display:flex;width:100%;height:100%;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid var(--dp-border,#e2e8f0);border-radius:50%;background:var(--dp-surface,#fff);overflow:hidden}
-.exchange-plan-module .exchange-ring-center strong{max-width:100%;padding:0 2px;color:var(--dp-text,#0f172a);font-size:clamp(13px,1.7vw,19px);font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.exchange-plan-module .exchange-rings-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+  width:100%;min-width:0;max-width:100%;box-sizing:border-box
+}
+.exchange-plan-module .exchange-ring-metric{
+  display:grid;justify-items:center;align-content:start;gap:8px;min-width:0;max-width:100%;
+  padding:12px 6px;border:1px solid var(--dp-border,#e2e8f0);border-radius:13px;
+  background:var(--dp-surface-2,#f8fafc);box-sizing:border-box
+}
+.exchange-plan-module .exchange-ring-label{color:var(--dp-text-2,#475569);font-size:12px;font-weight:900;text-align:center;white-space:normal;overflow-wrap:anywhere}
+.exchange-plan-module .exchange-ring{
+  --ring-progress:0;--ring-color:var(--dp-primary,#0f9674);
+  display:grid;place-items:center;width:clamp(54px,9vw,96px);max-width:100%;aspect-ratio:1;
+  padding:6px;border-radius:50%;
+  background:conic-gradient(var(--ring-color) calc(var(--ring-progress)*1%),var(--dp-surface-3,#e2e8f0) 0);
+  box-sizing:border-box
+}
+.exchange-plan-module .exchange-ring-center{
+  display:flex;width:100%;height:100%;min-width:0;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;border:1px solid var(--dp-border,#e2e8f0);
+  border-radius:50%;background:var(--dp-surface,#fff);overflow:hidden;box-sizing:border-box
+}
+.exchange-plan-module .exchange-ring-center strong{
+  max-width:100%;padding:0 2px;color:var(--dp-text,#0f172a);
+  font-size:clamp(12px,1.7vw,19px);font-weight:900;line-height:1.1;
+  font-variant-numeric:tabular-nums;white-space:nowrap
+}
 .exchange-plan-module .exchange-ring-center span{color:var(--dp-muted,#64748b);font-size:9px;font-weight:800}
-.exchange-plan-module .exchange-ring-meta{display:grid;justify-items:center;gap:3px;min-width:0;text-align:center}
-.exchange-plan-module .exchange-ring-meta>span{color:var(--dp-muted,#64748b);font-size:9px;line-height:1.4}
+.exchange-plan-module .exchange-ring-meta{display:grid;justify-items:center;gap:3px;min-width:0;max-width:100%;text-align:center}
+.exchange-plan-module .exchange-ring-meta>span{color:var(--dp-muted,#64748b);font-size:9px;line-height:1.4;overflow-wrap:anywhere}
 .exchange-plan-module .exchange-ring-meta b{color:var(--dp-text-2,#475569);font-weight:800}
 .exchange-plan-module .exchange-ring-meta>strong{color:var(--ring-color,var(--dp-primary));font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
 .exchange-plan-module .exchange-ring-calories{--ring-color:var(--dp-warning,#d97706)}
 .exchange-plan-module .exchange-ring-carbs{--ring-color:var(--dp-info,#0284c7)}
 .exchange-plan-module .exchange-ring-protein{--ring-color:var(--dp-accent,#0f9674)}
 .exchange-plan-module .exchange-ring-fat{--ring-color:var(--dp-success,#16a34a)}
-.exchange-plan-module .exchange-scroll{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}
-.exchange-plan-module .exchange-scroll table{width:100%;min-width:720px;table-layout:auto;border-collapse:collapse}
-.exchange-plan-module .exchange-scroll th,.exchange-plan-module .exchange-scroll td{white-space:nowrap}
-.exchange-plan-module .exchange-plan-module input,.exchange-plan-module select{max-width:100%;box-sizing:border-box}
-.exchange-plan-module #exchangeDaysContainer,.exchange-plan-module #exchangeDaysContainer>div{width:100%;max-width:100%;min-width:0}
-.exchange-plan-module #exchangeDaysContainer .overflow-x-auto{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}
-.exchange-plan-module #exchangeDaysContainer table{min-width:640px}
+.exchange-plan-module .exchange-scroll,
+.exchange-plan-module #exchangeDaysContainer .overflow-x-auto{
+  display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box
+}
+.exchange-plan-module .exchange-scroll table{
+  width:100%;min-width:720px;max-width:none;table-layout:auto;border-collapse:collapse
+}
+.exchange-plan-module .exchange-scroll th,
+.exchange-plan-module .exchange-scroll td{white-space:nowrap}
+.exchange-plan-module #exchangeDaysContainer,
+.exchange-plan-module #exchangeDaysContainer>div{
+  width:100%;max-width:100%;min-width:0;box-sizing:border-box
+}
+.exchange-plan-module #exchangeDaysContainer table{width:100%;min-width:640px;max-width:none;table-layout:auto}
+.exchange-plan-module input,
+.exchange-plan-module select,
+.exchange-plan-module textarea{max-width:100%;min-width:0;box-sizing:border-box}
 @media(max-width:640px){
- .exchange-plan-module .exchange-day-summary{padding:11px}
- .exchange-plan-module .exchange-rings-grid{gap:6px}
- .exchange-plan-module .exchange-ring-metric{padding:9px 3px;gap:6px}
- .exchange-plan-module .exchange-ring-label{font-size:10px}
- .exchange-plan-module .exchange-ring{width:clamp(54px,16vw,72px);padding:5px}
- .exchange-plan-module .exchange-ring-center strong{font-size:13px}
- .exchange-plan-module .exchange-ring-meta>span{font-size:8px}
- .exchange-plan-module .exchange-ring-meta>strong{font-size:10px}
- .exchange-plan-module .exchange-scroll table{min-width:680px;font-size:10px}
- .exchange-plan-module .exchange-scroll th,.exchange-plan-module .exchange-scroll td{padding:7px 6px!important}
- .exchange-plan-module #exchangeDaysContainer table{min-width:620px}
+  .exchange-plan-module .exchange-day-summary{padding:11px}
+  .exchange-plan-module .exchange-rings-grid{gap:6px}
+  .exchange-plan-module .exchange-ring-metric{padding:9px 3px;gap:6px}
+  .exchange-plan-module .exchange-ring-label{font-size:10px}
+  .exchange-plan-module .exchange-ring{width:clamp(48px,15vw,68px);padding:5px}
+  .exchange-plan-module .exchange-ring-center strong{font-size:12px}
+  .exchange-plan-module .exchange-ring-meta>span{font-size:8px}
+  .exchange-plan-module .exchange-ring-meta>strong{font-size:10px}
+  .exchange-plan-module .exchange-scroll table{min-width:680px;font-size:10px}
+  .exchange-plan-module .exchange-scroll th,
+  .exchange-plan-module .exchange-scroll td{padding:7px 6px!important}
+  .exchange-plan-module #exchangeDaysContainer table{min-width:620px}
 }
 @media(max-width:360px){
- .exchange-plan-module .exchange-rings-grid{gap:4px}
- .exchange-plan-module .exchange-ring-metric{padding:8px 2px}
- .exchange-plan-module .exchange-ring{width:52px;padding:4px}
- .exchange-plan-module .exchange-ring-label{font-size:9px}
+  .exchange-plan-module .exchange-rings-grid{gap:4px}
+  .exchange-plan-module .exchange-ring-metric{padding:8px 2px}
+  .exchange-plan-module .exchange-ring{width:46px;padding:4px}
+  .exchange-plan-module .exchange-ring-label{font-size:9px}
 }
-.module-card.module-active::after{opacity:1}
-.module-card.module-active{box-shadow:0 8px 24px rgba(15,23,42,.08)}
 
-/* Original style block 5 */
-/* Compact four-tab navigation */
-#assessmentCard,#dietPlanCard,#exchangePlanCard{padding:.6rem!important}
-#assessmentCard h4,#dietPlanCard h4,#exchangePlanCard h4{font-size:.68rem!important;line-height:1.35!important}
-#assessmentCard p,#dietPlanCard p,#exchangePlanCard p{font-size:.55rem!important;line-height:1.3!important}
-#assessmentCard .w-9,#dietPlanCard .w-9,#exchangePlanCard .w-9{width:1.9rem!important;height:1.9rem!important;font-size:.75rem!important}
-@media(min-width:640px){
-#assessmentCard,#dietPlanCard,#exchangePlanCard{padding:.75rem!important}
-#assessmentCard h4,#dietPlanCard h4,#exchangePlanCard h4{font-size:.78rem!important}
-#assessmentCard p,#dietPlanCard p,#exchangePlanCard p{font-size:.62rem!important}
-}
-/* Exchange-plan responsive layout is centralized in the exchange workspace rules above. */
 
 /* Assessment is intentionally excluded from the dietary-plan workflow */
 #assessmentCard,#assessmentContent{display:none!important}
