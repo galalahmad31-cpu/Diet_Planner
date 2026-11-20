@@ -331,7 +331,7 @@ async function savePrivacyPolicy(){
 
 function switchTab(tab){
  state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
- ['requests','plans','doctors','announcements','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors();if(tab==='announcements')loadAnnouncements();if(tab==='privacy')loadPrivacyPolicy()
+ ['requests','plans','doctors','announcements','jobs','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors();if(tab==='announcements')loadAnnouncements();if(tab==='privacy')loadPrivacyPolicy()
 }
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
