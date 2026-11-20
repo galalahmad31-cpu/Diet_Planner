@@ -803,11 +803,19 @@ body.support-delete-modal-open{overflow:hidden}
  .followup-plan-actions .followup-add-button{width:100%;padding-inline:8px;font-size:10px}
 }
 
+/* Exchange plan uses the shared semantic palette in both themes. */
+#exchangePlanContent .exchange-plan-panel{background:var(--dp-surface)!important;border:1px solid var(--dp-border)!important;box-shadow:none!important}
+#exchangePlanContent .exchange-method-note{background:var(--dp-surface-2)!important;border:1px solid var(--dp-border)!important;color:var(--dp-text-2)!important}
+#exchangePlanContent .exchange-method-note b{color:var(--dp-text)!important}
+#exchangePlanContent .exchange-save-button{background:var(--dp-primary)!important;color:#fff!important;border:1px solid var(--dp-primary)!important}
+#exchangePlanContent .exchange-save-button:hover:not(:disabled){background:var(--dp-primary-hover)!important}
+#exchangePlanContent .exchange-save-button:disabled{opacity:.45;cursor:not-allowed}
+#exchangePlanContent .exchange-value-emphasis{color:var(--dp-accent)!important}
+
 /* Exchange plan: one spacious, auto-growing free-text editor. */
 #exchangePlanContent{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important}
 #exchangePlanContent>.exchange-plan-module{padding:0!important}
 #exchangePlanContent .exchange-plan-module>section:first-child{background:var(--dp-surface)!important;border:1px solid var(--dp-border)!important;border-radius:14px!important;box-shadow:none!important;padding:clamp(12px,2vw,20px)!important}
-#exchangePlanContent .exchange-plan-module>section:first-child .exchange-day-summary{margin:0 0 12px!important}
 #exchangePlanContent .exchange-plan-module>section:first-child .exchange-scroll{border-radius:10px!important}
 #exchangePlanContent .exchange-notes-section{margin-top:12px;padding:0;border:0;background:transparent}
 #exchangePlanContent .exchange-notes-label{display:block;margin:0 0 8px;color:var(--dp-text);font-size:13px;font-weight:900}
