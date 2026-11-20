@@ -2327,3 +2327,71 @@ html[data-theme="dark"].visit-embedded body>main{
     color:#111827!important;
   }
 }
+
+
+/* Central dark palette — recipe index, editor and reader.
+   Layout stays in recipe.css; this file is the sole dark color authority. */
+html[data-theme="dark"] #grid.recipe-list>.recipe-list-row{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 1px 4px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] #grid.recipe-list>.recipe-list-row:nth-child(even){
+  background:var(--dp-surface-2)!important;
+}
+html[data-theme="dark"] #grid.recipe-list>.recipe-list-row:hover{
+  background:var(--dp-surface-3)!important;
+  border-color:var(--dp-primary)!important;
+}
+html[data-theme="dark"] #grid .recipe-list-logo{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] #grid .recipe-list-name h2{color:var(--dp-text)!important}
+html[data-theme="dark"] #grid .recipe-list-name span,
+html[data-theme="dark"] #grid .recipe-list-basis,
+html[data-theme="dark"] #grid .recipe-list-author{color:var(--dp-text-2)!important}
+html[data-theme="dark"] #grid .recipe-list-calories{color:var(--dp-success)!important}
+html[data-theme="dark"] #grid .recipe-list-calories i{color:var(--dp-warning)!important}
+html[data-theme="dark"] #grid .recipe-list-view{
+  background:var(--dp-primary)!important;
+  border-color:var(--dp-primary)!important;
+  color:#fff!important;
+}
+html[data-theme="dark"] #grid .recipe-list-icon-btn{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #grid .recipe-list-delete{color:var(--dp-danger)!important}
+html[data-theme="dark"] #search,
+html[data-theme="dark"] .recipe-modal .field-input,
+html[data-theme="dark"] .recipe-modal .rich-editor{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] .recipe-modal>div>div,
+html[data-theme="dark"] .recipe-modal .bg-slate-50,
+html[data-theme="dark"] .recipe-modal .nutrition-basis,
+html[data-theme="dark"] .recipe-modal .editor-shell,
+html[data-theme="dark"] .recipe-modal .editor-toolbar{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .recipe-modal .editor-toolbar{background:var(--dp-surface-2)!important}
+html[data-theme="dark"] .recipe-modal :is(h2,h3,.font-extrabold){color:var(--dp-text)!important}
+html[data-theme="dark"] .recipe-modal :is(.text-slate-500,.text-slate-400,.recipe-text){color:var(--dp-text-2)!important}
+html[data-theme="dark"] .recipe-modal :is(.bg-slate-100,.bg-red-50){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .recipe-modal :is(.border-b,.nutrition-item,.nutrition-basis){border-color:var(--dp-border)!important}
+html[data-theme="dark"] .recipe-modal .nutrition-item{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #search::placeholder,
+html[data-theme="dark"] .recipe-modal .field-input::placeholder{color:var(--dp-muted)!important;opacity:1}
