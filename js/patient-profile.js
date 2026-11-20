@@ -1153,7 +1153,28 @@
         if (event.data?.type === 'dp-plan-embed-height') {
           const height = Number(event.data.height);
           if (Number.isFinite(height) && height > 0) {
-            planFrame.style.height = `${Math.max(1, Math.min(height, 16000))}px`;
+            planFrame.dataset.contentHeight = String(Math.max(1, Math.min(height, 16000)));
+            if (planFrame.dataset.modalOpen !== 'true') {
+              planFrame.style.height = Math.max(1, Math.min(height, 16000)) + 'px';
+            }
+          }
+          return;
+        }
+        if (event.data?.type === 'dp-plan-embed-modal') {
+          if (event.data.open === true) {
+            if (planFrame.dataset.modalOpen !== 'true') {
+              planFrame.dataset.modalPreviousHeight = planFrame.style.height || '';
+              planFrame.dataset.modalOpen = 'true';
+            }
+            planFrame.style.height = Math.max(480, Math.min(window.innerHeight, 1200)) + 'px';
+            planFrame.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          } else if (planFrame.dataset.modalOpen === 'true') {
+            planFrame.dataset.modalOpen = 'false';
+            const contentHeight = Number(planFrame.dataset.contentHeight);
+            planFrame.style.height = contentHeight > 0
+              ? Math.min(contentHeight, 16000) + 'px'
+              : (planFrame.dataset.modalPreviousHeight || '1px');
+            delete planFrame.dataset.modalPreviousHeight;
           }
           return;
         }
