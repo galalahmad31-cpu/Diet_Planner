@@ -100,7 +100,7 @@
       if (path === "weightم.html" && href === "app.html") link.id = "dashboardBtn";
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      if (path === href || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html")) {
+      if (path === href || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || (path === "nutritionsupport-patient.html" && href === "nutritionsupport.html")) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
       }
@@ -119,7 +119,10 @@
       const title = placeholder.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim();
       header.querySelector(".dp-app-header__page-title").textContent = title;
       const actions = document.querySelector("[data-dp-page-actions]");
-      if (actions) context.append(...actions.childNodes);
+      if (actions) {
+        context.append(...actions.childNodes);
+        actions.remove();
+      }
       placeholder.replaceWith(header);
     } else if (oldHeader) {
       preservePageControls(oldHeader, context);
