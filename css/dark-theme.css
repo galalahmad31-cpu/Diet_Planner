@@ -813,129 +813,6 @@ html[data-theme="dark"] .patient-status--active{background:#173a2d!important;col
 html[data-theme="dark"] .patient-status--expired{background:#3a2027!important;color:#F2A0A7!important}
 html[data-theme="dark"] .patient-status--unknown{background:#3a321d!important;color:#E5C77A!important}
 
-/* ---------- Page-surface normalization: patient profile ---------- */
-html[data-theme="dark"] .patient-name-bar,
-html[data-theme="dark"] .dashboard-card,
-html[data-theme="dark"] .patient-module-panel,
-html[data-theme="dark"] .measurements-table-wrap,
-html[data-theme="dark"] .followup-days-card,
-html[data-theme="dark"] .visit-embedded-panel{
-  background:var(--dp-surface)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-border)!important;
-  box-shadow:0 5px 20px var(--dp-shadow)!important;
-}
-html[data-theme="dark"] #patientName,
-html[data-theme="dark"] .dashboard-card-head h3,
-html[data-theme="dark"] .patient-finance-heading strong,
-html[data-theme="dark"] .measurements-table-heading h3,
-html[data-theme="dark"] .followup-days-heading strong{
-  color:var(--dp-text)!important;
-}
-html[data-theme="dark"] .dashboard-card-head p,
-html[data-theme="dark"] .patient-finance-heading small,
-html[data-theme="dark"] .patient-fields label,
-html[data-theme="dark"] .patient-data-title small,
-html[data-theme="dark"] .patient-module-tab-copy small,
-html[data-theme="dark"] .measurements-access-status,
-html[data-theme="dark"] .measurements-table-heading p,
-html[data-theme="dark"] .followup-state,
-html[data-theme="dark"] .followup-day-title{
-  color:var(--dp-text-2)!important;
-}
-html[data-theme="dark"] .dashboard-details>summary,
-html[data-theme="dark"] .dashboard-details[open]>summary,
-html[data-theme="dark"] .dashboard-details>summary:hover,
-html[data-theme="dark"] .patient-finance-details[open]>.patient-finance-summary{
-  background:var(--dp-surface-2)!important;
-}
-html[data-theme="dark"] .dashboard-icon.teal,
-html[data-theme="dark"] .dashboard-icon.blue,
-html[data-theme="dark"] .dashboard-icon.green,
-html[data-theme="dark"] .dashboard-icon.purple,
-html[data-theme="dark"] .patient-data-summary .dashboard-icon{
-  background:#1b3b35!important;
-  color:#78D5BE!important;
-}
-html[data-theme="dark"] .patient-fields input,
-html[data-theme="dark"] .patient-fields select,
-html[data-theme="dark"] .patient-fields textarea,
-html[data-theme="dark"] .patient-data-fields input,
-html[data-theme="dark"] .patient-data-fields select,
-html[data-theme="dark"] .patient-data-fields textarea,
-html[data-theme="dark"] .patient-finance-fields input:disabled,
-html[data-theme="dark"] .patient-finance-fields select:disabled{
-  background:var(--dp-input)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-input-border)!important;
-}
-html[data-theme="dark"] .patient-finance-content,
-html[data-theme="dark"] .patient-data-content,
-html[data-theme="dark"] .patient-finance-details,
-html[data-theme="dark"] .patient-module-panel,
-html[data-theme="dark"] .measurements-table td,
-html[data-theme="dark"] .measurements-table th{
-  border-color:var(--dp-border)!important;
-}
-html[data-theme="dark"] .patient-finance-readonly output,
-html[data-theme="dark"] .patient-finance-empty,
-html[data-theme="dark"] .measurements-table tbody tr,
-html[data-theme="dark"] .measurements-table tbody tr:nth-child(even),
-html[data-theme="dark"] .followup-day-row{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text-2)!important;
-  border-color:var(--dp-border)!important;
-}
-html[data-theme="dark"] .patient-finance-discounted output,
-html[data-theme="dark"] .followup-day-row:has(.followup-day-open.is-active){
-  background:#173a34!important;
-  color:#A6E6D3!important;
-  border-color:#287f70!important;
-}
-html[data-theme="dark"] .patient-module-tab{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-border)!important;
-  box-shadow:none!important;
-}
-html[data-theme="dark"] .patient-module-tab:hover{background:var(--dp-surface-3)!important}
-html[data-theme="dark"] .patient-module-tab.is-active{
-  background:#173a34!important;
-  border-color:#287f70!important;
-  box-shadow:inset 0 0 0 1px #287f70!important;
-}
-html[data-theme="dark"] .patient-module-tab.is-active .patient-module-tab-copy strong,
-html[data-theme="dark"] .patient-data-title strong,
-html[data-theme="dark"] .patient-data-chevron,
-html[data-theme="dark"] .followup-day-open.is-active .followup-day-title{
-  color:#78D5BE!important;
-}
-html[data-theme="dark"] .measurements-table th{background:var(--dp-surface-3)!important;color:var(--dp-text-2)!important}
-html[data-theme="dark"] .measurements-table td{background:var(--dp-surface-2)!important;color:var(--dp-text-2)!important}
-html[data-theme="dark"] .measurements-table tbody tr:hover{background:var(--dp-surface-3)!important}
-html[data-theme="dark"] .inline-measurement-row,
-html[data-theme="dark"] .inline-measurement-row td{background:#173a34!important}
-html[data-theme="dark"] .inline-measurement-row input,
-html[data-theme="dark"] .inline-measurement-row select{background:var(--dp-input)!important;color:var(--dp-text)!important;border-color:var(--dp-input-border)!important}
-html[data-theme="dark"] .followup-day-number{background:#203d35!important;color:#9BE1C9!important;border-color:var(--dp-border)!important}
-html[data-theme="dark"] .followup-day-open.is-active .followup-day-number{background:var(--dp-primary)!important;color:#fff!important}
-html[data-theme="dark"] .followup-day-delete{background:#352329!important;border-color:#633a43!important;color:#F29A9A!important}
-html[data-theme="dark"] .embedded-calculator,
-html[data-theme="dark"] .energy-workspace,
-html[data-theme="dark"] .macro-workspace,
-html[data-theme="dark"] .workspace-step,
-html[data-theme="dark"] .target-energy,
-html[data-theme="dark"] .macro-cards,
-html[data-theme="dark"] .macro-item{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-border)!important;
-}
-html[data-theme="dark"] .energy-workspace :is(h1,h2,h3,h4,strong,label),
-html[data-theme="dark"] .macro-workspace :is(h1,h2,h3,h4,strong,label){color:var(--dp-text)!important}
-html[data-theme="dark"] .energy-workspace :is(p,small,.workspace-step),
-html[data-theme="dark"] .macro-workspace :is(p,small,.workspace-step){color:var(--dp-text-2)!important}
-
 /* ---------- Page-surface normalization: nutrition support ---------- */
 html[data-theme="dark"] .support-patient-area,
 html[data-theme="dark"] .selected-patient-area,
@@ -1932,56 +1809,6 @@ html[data-theme="dark"] body :is(
   color:var(--dp-text-2)!important;
 }
 
-/* Patient profile and clinical calculator */
-html[data-theme="dark"] #patientName,
-html[data-theme="dark"] .dashboard-card-head h3,
-html[data-theme="dark"] .patient-finance-heading strong,
-html[data-theme="dark"] .patient-data-title strong,
-html[data-theme="dark"] .patient-module-tab-copy strong,
-html[data-theme="dark"] .measurement-summary-value,
-html[data-theme="dark"] .patient-fields label,
-html[data-theme="dark"] .patient-data-fields label{
-  color:var(--dp-text)!important;
-}
-html[data-theme="dark"] #visitsList>div,
-html[data-theme="dark"] .patient-fields input,
-html[data-theme="dark"] .patient-fields select,
-html[data-theme="dark"] .patient-fields textarea,
-html[data-theme="dark"] .patient-data-fields input,
-html[data-theme="dark"] .patient-data-fields select,
-html[data-theme="dark"] .patient-data-fields textarea,
-html[data-theme="dark"] .patient-finance-fields input,
-html[data-theme="dark"] .patient-finance-fields select{
-  background:var(--dp-input)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-input-border)!important;
-}
-html[data-theme="dark"] .patient-finance-discounted output,
-html[data-theme="dark"] .patient-finance-readonly output,
-html[data-theme="dark"] .patient-finance-empty,
-html[data-theme="dark"] .patient-finance-error,
-html[data-theme="dark"] .patient-finance-success-toast{
-  background:var(--dp-surface-2)!important;
-  color:var(--dp-text-2)!important;
-  border-color:var(--dp-border)!important;
-}
-html[data-theme="dark"] .patient-module-tab.is-active{
-  background:var(--dp-primary)!important;
-  color:#fff!important;
-  border-color:var(--dp-accent)!important;
-}
-html[data-theme="dark"] .patient-module-tab.is-active :is(strong,small,.dashboard-icon){
-  color:#fff!important;
-}
-html[data-theme="dark"] .patient-module-tab.is-active .dashboard-icon{
-  background:rgba(255,255,255,.14)!important;
-}
-html[data-theme="dark"] .measurement-summary-label,
-html[data-theme="dark"] .measurement-summary-note,
-html[data-theme="dark"] .patient-module-tab-copy small{
-  color:var(--dp-text-2)!important;
-}
-
 /* Food library, product library and data tables */
 html[data-theme="dark"] .products-table th:first-child,
 html[data-theme="dark"] .products-table td:first-child,
@@ -2106,7 +1933,7 @@ html[data-theme="dark"] :where(
   border-color:var(--dp-border)!important;
 }
 html[data-theme="dark"] :where(
-  .patient-module-tab.is-active,.patient-module-tab:hover,
+  .patient-module-tab:hover,
   .dashboard-details>summary:hover,.dashboard-details[open]>summary,
   #daysContainer .day-card-head,#daysContainer .day-card-header,
   #daysContainer .day-meal-header,.meal-header
@@ -2114,6 +1941,15 @@ html[data-theme="dark"] :where(
   background:var(--dp-surface-3)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active{
+  background:var(--dp-tab-active-bg)!important;
+  color:var(--dp-tab-active-text)!important;
+  border-color:var(--dp-primary)!important;
+  box-shadow:inset 0 0 0 1px var(--dp-primary)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active .patient-module-tab-copy :is(strong,small){
+  color:var(--dp-tab-active-text)!important;
 }
 html[data-theme="dark"] :where(
   .dashboard-card-head h3,.patient-finance-heading strong,
@@ -2275,3 +2111,89 @@ html[data-theme="dark"].visit-embedded #daysContainer :where(
   color:var(--dp-text)!important;
   border-color:var(--dp-input-border)!important;
 }
+
+
+/* ---------- Central patient workspace + embedded plan theme ---------- */
+html[data-theme="dark"] :where(
+  .patient-name-bar,.dashboard-card,.patient-module-panel,.measurements-table-wrap,
+  .followup-days-card,.visit-embedded-panel,.measurement-summary-card,
+  .patient-finance-content,.patient-data-content
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .patient-module-tab{
+  background:var(--dp-tab-bg)!important;
+  color:var(--dp-tab-text)!important;
+  border-color:var(--dp-tab-border)!important;
+}
+html[data-theme="dark"] .patient-module-tab :is(strong,small){
+  color:var(--dp-tab-text)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active :is(strong,small){
+  color:var(--dp-tab-active-text)!important;
+}
+html[data-theme="dark"] .patient-module-tab-copy small,
+html[data-theme="dark"] .measurement-summary-label,
+html[data-theme="dark"] .measurement-summary-note{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active .patient-module-tab-copy small{
+  color:var(--dp-tab-active-text)!important;
+}
+html[data-theme="dark"].visit-embedded,
+html[data-theme="dark"].visit-embedded body,
+html[data-theme="dark"].visit-embedded body>main,
+html[data-theme="dark"].visit-embedded #visitContent,
+html[data-theme="dark"].visit-embedded .embedded-diet-plan,
+html[data-theme="dark"].visit-embedded #dietPlanContent,
+html[data-theme="dark"].visit-embedded #exchangePlanContent{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"].visit-embedded #visitContent :where(
+  .bg-white,.day-card,.day-card-body,.day-summary,.day-meal,.meal-card,
+  .meal-row,.meal-table-wrap,.day-empty-state,.day-macros-grid>div,
+  .assessment-section,.assessment-body,.assessment-labs,.assessment-clinical,
+  .assessment-dietary,.exchange-plan-module
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:none;
+}
+html[data-theme="dark"].visit-embedded #visitContent :where(
+  .day-summary-heading strong,.day-macros-grid strong,.day-micros-row strong,
+  .day-micros-row b,.meal-food-name,.module-card h4
+){color:var(--dp-text)!important}
+html[data-theme="dark"].visit-embedded #visitContent :where(
+  .day-summary-heading span,.day-macros-grid span,.day-micros-row small,
+  .day-card-meta,.meal-items-count,.meal-items-table td,.meal-items-table th,
+  .day-empty-state,.module-card p
+){color:var(--dp-text-2)!important}
+html[data-theme="dark"].visit-embedded #visitContent :where(
+  #daysContainer input,#daysContainer select,#daysContainer textarea,
+  #daysContainer .day-title-input,#daysContainer .day-note-input,
+  #daysContainer .meal-title-input,#daysContainer .meal-items-table input,
+  .exchange-plan-module input,.exchange-plan-module select,
+  .exchange-plan-module textarea
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"].visit-embedded #visitContent :where(
+  .meal-items-table th,.day-macros-grid>div>div:last-child,
+  .day-card-head,.day-card-header,.day-meal-header,.meal-header
+){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"].visit-embedded #visitContent :where(
+  .day-card,.day-card-body,.day-summary,.day-meal,.meal-card,
+  .meal-row,.meal-table-wrap,.day-macros-grid>div,
+  .assessment-section,.assessment-body,.assessment-labs,
+  .assessment-clinical,.assessment-dietary
+){border-color:var(--dp-border)!important}
