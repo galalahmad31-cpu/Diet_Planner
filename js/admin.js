@@ -2,7 +2,7 @@
 'use strict';
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
-const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,activeTab:'requests',requestSearch:'',requestStatus:'all'};
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all'};
 let confirmAction=null;
 
 const $=id=>document.getElementById(id);
@@ -28,6 +28,7 @@ async function requireAdmin(){
  if(!sb||!access){location.replace('index.html');return false}
  const accessStatus=await access.getAccessStatus();
  if(!accessStatus?.authenticated || !accessStatus.isAdmin){location.replace('index.html');return false}
+ state.currentUserId=accessStatus.user?.id||null;
  $('adminContent').style.display='block';return true
 }
 
@@ -35,7 +36,7 @@ async function loadAll(){
  const [p,s,prof,pat]=await Promise.all([
   sb.from('subscription_plans').select('*').order('created_at',{ascending:true}),
   sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot').order('created_at',{ascending:false}),
-  sb.from('profiles').select('id,full_name,email,phone,role,created_at').eq('role','user').order('created_at',{ascending:false}),
+  sb.from('profiles').select('id,full_name,email,phone,role,created_at').order('created_at',{ascending:false}),
   sb.from('patients').select('id,user_id,subscription_id')
  ]);
  if(p.error)throw p.error;if(s.error)throw s.error;if(prof.error)throw prof.error;if(pat.error)throw pat.error;
@@ -90,6 +91,8 @@ function isActivePaidSub(s){
   return userSubs.find(isActivePaidSub)||userSubs.find(s=>s.status==='pending')||userSubs[0]||null;
  }
 function patientCountForSub(sub){return sub?state.patients.filter(p=>p.subscription_id===sub.id).length:state.patients.filter(p=>p.user_id===sub?.user_id).length}
+function roleLabel(role){return role==='admin'?'Admin':'User'}
+function roleOptions(selected){return `<option value="user" ${selected==='user'?'selected':''}>User</option><option value="admin" ${selected==='admin'?'selected':''}>Admin</option>`}
 function renderDoctors(){
  const q=($('doctorSearch').value||'').trim().toLowerCase();
  const doctors=state.profiles.filter(p=>!q||[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q)));
@@ -97,9 +100,10 @@ function renderDoctors(){
  const body=$('doctorsBody');if(!doctors.length){setState('doctor','لا توجد نتائج.');return}
  body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);const max=s?.max_patients_snapshot;
  return `<tr><td><span class="name">${esc(p.full_name||'بدون اسم')}</span><span class="meta">${esc(p.email||'')}</span></td>
+ <td><span class="badge ${p.role==='admin'?'active':'off'}">${roleLabel(p.role)}</span></td>
  <td>${s?esc(planName(s.plan_id)):'—'}</td><td>${date(s?.start_date)}</td><td>${date(s?.expiry_date)}</td>
  <td>${count} / ${max==null?'∞':esc(max)}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
- <td class="actions-cell">${s?'<button class="icon-btn" title="تعديل الاشتراك" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>':'—'}</td></tr>`}).join('');
+ <td class="actions-cell">${s?'<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>':'<button class="icon-btn" title="تعديل الدور" data-edit-role="'+esc(p.id)+'" '+(p.id===state.currentUserId?'disabled':'')+'><i class="fa-solid fa-user-shield"></i></button>'}</td></tr>`}).join('');
  setState('doctor','',true)
 }
 
@@ -127,8 +131,10 @@ async function savePlan(id){
  closeModal();toast('تم حفظ الخطة');await loadAll()
 }
 function subForm(s){
+ const profile=state.profiles.find(p=>p.id===s.user_id);
  return `<form id="subForm"><div class="grid">
  <div class="field"><label>اسم الطبيب في سجل الاشتراك</label><input id="s_name" value="${esc(s.full_name||'')}"></div>
+ <div class="field"><label for="s_role">الدور</label><select id="s_role" ${profile&&profile.id!==state.currentUserId?'':'disabled'}>${roleOptions(profile?.role||'user')}</select></div>
  <div class="field"><label>الخطة</label><select id="s_plan">${state.plans.map(p=>`<option value="${p.id}" ${p.id===s.plan_id?'selected':''}>${esc(p.name)} — ${money(p.price)}</option>`).join('')}</select></div>
  <div class="field"><label>الحالة</label><select id="s_status"><option value="pending" ${s.status==='pending'?'selected':''}>قيد المراجعة</option><option value="paid" ${s.status==='paid'?'selected':''}>مفعّلة</option><option value="canceled" ${s.status==='canceled'?'selected':''}>ملغاة</option></select></div>
  <div class="field"><label>تاريخ الطلب</label><input value="${esc(dateTime(s.created_at))}" disabled></div>
@@ -139,6 +145,10 @@ function subForm(s){
 function openSub(s){openModal('تعديل الاشتراك',subForm(s));$('subForm').addEventListener('submit',async e=>{e.preventDefault();await saveSub(s)});$('cancelModal').onclick=closeModal}
 async function saveSub(s){
  const selectedPlan=state.plans.find(p=>p.id===$('s_plan').value);
+ const profile=state.profiles.find(p=>p.id===s.user_id);
+ if(!profile){toast('تعذر تحديد حساب المستخدم المرتبط بالاشتراك.');return}
+ const newRole=$('s_role').value;
+ if(!['user','admin'].includes(newRole)){toast('الدور المحدد غير صالح.');return}
  if(!selectedPlan){toast('الخطة المحددة غير موجودة');return}
  const payload={
   full_name:$('s_name').value.trim()||null,
@@ -155,7 +165,25 @@ async function saveSub(s){
  }
  const r=await sb.from('subscriptions').update(payload).eq('id',s.id);
  if(r.error){toast(r.error.message||'تعذر تعديل الاشتراك');return}
- closeModal();toast('تم تعديل الاشتراك');await loadAll()
+ if(newRole!==profile.role){
+  const roleResult=await sb.rpc('admin_set_profile_role',{target_user_id:s.user_id,new_role:newRole});
+  if(roleResult.error){toast('تم حفظ الاشتراك، لكن تعذر تغيير الدور: '+(roleResult.error.message||'خطأ غير معروف'));await loadAll();return}
+  profile.role=newRole;
+ }
+ closeModal();toast('تم حفظ الاشتراك والدور بنجاح');await loadAll()
+}
+function openRoleEditor(profile){
+ openModal('تعديل دور المستخدم',`<form id="roleForm"><div class="field"><label for="roleOnlySelect">الدور</label><select id="roleOnlySelect">${roleOptions(profile.role)}</select></div><div class="modal-foot"><button class="btn btn-primary" type="submit">حفظ الدور</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`);
+ $('cancelModal').onclick=closeModal;
+ $('roleForm').addEventListener('submit',async event=>{
+  event.preventDefault();const newRole=$('roleOnlySelect').value;
+  if(newRole===profile.role){closeModal();return}
+  if(!window.confirm(`تأكيد تغيير دور ${profile.full_name||profile.email||'المستخدم'} إلى ${roleLabel(newRole)}؟`))return;
+  const button=$('roleForm').querySelector('[type="submit"]');button.disabled=true;
+  const result=await sb.rpc('admin_set_profile_role',{target_user_id:profile.id,new_role:newRole});
+  if(result.error){button.disabled=false;toast(result.error.message||'تعذر تغيير الدور.');return}
+  profile.role=newRole;closeModal();toast('تم تغيير دور المستخدم بنجاح.');await loadAll();
+ });
 }
 function deleteSubscription(s){
  askConfirm('حذف الاشتراك','هل أنت متأكد من حذف اشتراك <b>'+esc(s.full_name||'هذا الطبيب')+'</b>؟<br>سيتم حذف سجل الاشتراك نهائيًا. هذه العملية لا تحذف حساب الطبيب أو مرضاه.',async()=>{
@@ -331,8 +359,10 @@ $('plansBody').onclick=e=>{
  if(edit){const p=state.plans.find(x=>x.id===edit.dataset.editPlan);if(p)openPlan(p)}else if(del){const p=state.plans.find(x=>x.id===del.dataset.delPlan);if(p)deletePlan(p)}
 };
 $('doctorsBody').onclick=e=>{
- const edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-del-sub]');
- if(edit){const s=state.subs.find(x=>x.id===edit.dataset.editSub);if(s)openSub(s)}else if(del){const s=state.subs.find(x=>x.id===del.dataset.delSub);if(s)deleteSubscription(s)}
+ const edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-del-sub]'),role=e.target.closest('[data-edit-role]');
+ if(edit){const s=state.subs.find(x=>x.id===edit.dataset.editSub);if(s)openSub(s)}
+ else if(del){const s=state.subs.find(x=>x.id===del.dataset.delSub);if(s)deleteSubscription(s)}
+ else if(role){const profile=state.profiles.find(x=>x.id===role.dataset.editRole);if(profile&&profile.id!==state.currentUserId)openRoleEditor(profile)}
 };
 
 (async function init(){try{if(await requireAdmin())await loadAll()}catch(e){console.error(e);['request','plan','doctor'].forEach(x=>setState(x,e.message||'حدث خطأ'))}})();
