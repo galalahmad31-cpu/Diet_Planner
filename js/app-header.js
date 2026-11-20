@@ -45,7 +45,12 @@
           <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
           <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>د. أحمد جلال</small></span>
         </a>
-        <span class="dp-app-header__page-title"></span>
+        <div class="dp-app-header__page-meta">
+          <span class="dp-app-header__page-title"></span>
+          <button id="logoutBtn" type="button" class="dp-app-header__logout hidden" title="تسجيل الخروج" aria-label="تسجيل الخروج">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>خروج</span>
+          </button>
+        </div>
       </div>
       <nav class="dp-app-header__nav" aria-label="التنقل الرئيسي">
         <div class="dp-app-header__track"></div>
@@ -75,16 +80,6 @@
         link.setAttribute("aria-current", "page");
       }
       track.append(link);
-      if (href === "app.html") {
-        const logout = document.createElement("button");
-        logout.id = "logoutBtn";
-        logout.type = "button";
-        logout.className = "dp-app-header__logout hidden";
-        logout.title = "تسجيل الخروج";
-        logout.setAttribute("aria-label", "تسجيل الخروج");
-        logout.innerHTML = '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>خروج</span>';
-        track.append(logout);
-      }
     });
     return header;
   }
