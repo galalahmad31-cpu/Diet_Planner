@@ -53,8 +53,14 @@
           </button>
         </div>
       </div>
-      <nav class="dp-app-header__nav" aria-label="التنقل الرئيسي">
-        <div class="dp-app-header__track"></div>
+      <nav class="dp-app-header__nav is-collapsed" aria-label="التنقل الرئيسي">
+        <div class="dp-app-header__nav-top">
+          <button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-app-header-track">
+            <span>التنقل بين الصفحات</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
       <div class="dp-app-header__context">
         <div id="headerActions" class="dp-header-account-actions">
@@ -80,6 +86,21 @@
         link.setAttribute("aria-current", "page");
       }
       track.append(link);
+    });
+    const toggle = header.querySelector(".dp-app-header__toggle");
+    const nav = header.querySelector(".dp-app-header__nav");
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      nav.classList.toggle("is-expanded", !expanded);
+      nav.classList.toggle("is-collapsed", expanded);
+    });
+    track.addEventListener("click", event => {
+      if (event.target.closest(".dp-app-header__link")) {
+        toggle.setAttribute("aria-expanded", "false");
+        nav.classList.remove("is-expanded");
+        nav.classList.add("is-collapsed");
+      }
     });
     return header;
   }
