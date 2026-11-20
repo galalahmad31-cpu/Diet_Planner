@@ -2089,3 +2089,102 @@ html[data-theme="dark"] :is(button,.btn-primary,.dashboard-primary-btn,.measurem
 html[data-theme="dark"] :is(button,.btn-primary,.dashboard-primary-btn,.measurements-add-button,.followup-add-button).bg-green-600{
   color:#fff!important;
 }
+
+
+/* Dark theme semantic correction layer for legacy page components.
+   This block intentionally lives only in the central theme file. */
+html[data-theme="dark"] :where(
+  .patient-name-bar,.dashboard-card,.patient-module-tab,.patient-module-panel,
+  .measurements-table-wrap,.followup-days-card,.visit-embedded-panel,
+  .assessment-section,.calc-card,.calc-result-neutral,.calc-result-bmr,
+  .calc-result-tdee,.calc-result-group,.day-card,.day-panel,.day-summary-card,
+  .support-day-delete-box,.support-day-delete-modal .support-day-delete-box,
+  .visit-module-grid .module-card,.embedded-calculator .calc-card
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] :where(
+  .patient-module-tab.is-active,.patient-module-tab:hover,
+  .dashboard-details>summary:hover,.dashboard-details[open]>summary,
+  #daysContainer .day-card-head,#daysContainer .day-card-header,
+  #daysContainer .day-meal-header,.meal-header
+){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] :where(
+  .dashboard-card-head h3,.patient-finance-heading strong,
+  .patient-data-title strong,.patient-module-tab-copy strong,
+  .measurements-table-heading h3,.followup-days-heading strong,
+  .day-summary-heading strong,.day-card-title,
+  .assessment-section h3,.assessment-section h4,
+  #daysContainer .day-macros-grid strong
+){color:var(--dp-text)!important}
+html[data-theme="dark"] :where(
+  .dashboard-card-head p,.patient-finance-heading small,
+  .patient-data-title small,.patient-module-tab-copy small,
+  .measurements-access-status,.measurements-table td,
+  .followup-state,.day-card-meta,.day-summary-heading span,
+  #daysContainer .day-macros-grid span,#daysContainer .day-micros-row
+){color:var(--dp-text-2)!important}
+html[data-theme="dark"] :where(
+  .patient-fields input,.patient-fields select,.patient-fields textarea,
+  .patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea,
+  .patient-finance-fields input,.patient-finance-fields select,
+  .inline-measurement-row input,.inline-measurement-row select,
+  #daysContainer .day-title-input,#daysContainer input,
+  #daysContainer select,#daysContainer textarea
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] :where(
+  .measurements-table th,#daysContainer .day-table th,
+  #daysContainer .day-macros-grid>div>div:last-child
+){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] :where(
+  .measurements-table td,#daysContainer .day-table td,
+  .patient-finance-content,.patient-data-fields,
+  .patient-module-panel,.followup-days-card
+){border-color:var(--dp-border)!important}
+html[data-theme="dark"] html.visit-embedded,
+html[data-theme="dark"] html.visit-embedded body,
+html[data-theme="dark"].visit-embedded,
+html[data-theme="dark"].visit-embedded body{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .embedded-diet-plan,
+html[data-theme="dark"] .visit-embedded #visitContent,
+html[data-theme="dark"] .visit-embedded .visit-content{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .visit-embedded .day-card,
+html[data-theme="dark"] .visit-embedded #daysContainer>div,
+html[data-theme="dark"] .visit-embedded .assessment-section,
+html[data-theme="dark"] .visit-embedded .assessment-body,
+html[data-theme="dark"] .visit-embedded .assessment-labs,
+html[data-theme="dark"] .visit-embedded .assessment-clinical,
+html[data-theme="dark"] .visit-embedded .assessment-dietary{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .visit-embedded #daysContainer .day-title-input{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+@media print{
+  html[data-theme="dark"] .diet-preview,
+  html[data-theme="dark"] .embedded-diet-plan{background:#fff!important;color:#111827!important}
+}
