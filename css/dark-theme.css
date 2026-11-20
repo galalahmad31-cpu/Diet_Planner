@@ -2130,6 +2130,81 @@ html[data-theme="dark"] body:has(#section-en) .delete-confirm-icon{
   }
 }
 
+/* Embedded patient-visit diet modals — use the same central semantic palette.
+   These dialogs live outside #visitContent, so the visit-content adapter cannot reach them. */
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodModal>div,#addMealModal>div,#confirmModal>div,
+  #fixedMealsModal>div,#printSettingsModal>div
+){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border:1px solid var(--dp-border)!important;
+  box-shadow:0 18px 48px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodModal h3,#addMealModal h3,#confirmModal h3,
+  #fixedMealsModal h3,#printSettingsModal h3,
+  #foodModal label
+){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodSearchInput,#foodGramsInput,#newMealNameInput,
+  #fixedMealsSearch,#settingDocName,#settingDocSpec,
+  #settingClinicName,#settingAddress
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+  caret-color:var(--dp-accent);
+}
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodSearchInput,#foodGramsInput,#newMealNameInput,
+  #fixedMealsSearch,#settingDocName,#settingDocSpec,
+  #settingClinicName,#settingAddress
+)::placeholder{color:var(--dp-muted)!important;opacity:1}
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodModal .border-slate-100,#foodModal .border-slate-200,
+  #addMealModal .border-slate-100,#confirmModal .border-slate-100,
+  #fixedMealsModal .border-slate-100,#printSettingsModal .border-slate-100
+){border-color:var(--dp-border)!important}
+html[data-theme="dark"] #foodDropdownList{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #foodDropdownList .food-result{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #foodDropdownList .food-result:hover,
+html[data-theme="dark"] #foodDropdownList .food-result.bg-emerald-100\/70{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #foodModalHouseholdBox{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #foodModalHouseholdBox :is(div){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodModal .bg-slate-100,#confirmModal .bg-slate-100,
+  #fixedMealsModal .bg-slate-50,#fixedMealsModal .bg-white
+){
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .embedded-diet-modals :is(
+  #foodModal button,#addMealModal button,#confirmModal button,
+  #fixedMealsModal button,#printSettingsModal button
+):focus-visible{
+  outline:2px solid var(--dp-accent)!important;
+  outline-offset:2px;
+}
+
 /* EN volume form surfaces — resolve legacy light-only field groups via central tokens. */
 html[data-theme="dark"] body:has(#section-en) .container-main,
 html[data-theme="dark"] body:has(#section-en) #en-volume-content,
