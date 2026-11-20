@@ -321,112 +321,162 @@
     }
   }
 
-  function openMeasurementEntry() {
-    if (!canWrite()) {
-      alert('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط.');
-      return;
-    }
-    if ($('inlineMeasurementRow')) {
-      $('inlineMeasurementRow').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-    const body = $('weightTableBody');
-    if (!body) return;
-    if (!measurementState.loaded) {
-      void loadMeasurements().then(() => { if (measurementState.loaded) openMeasurementEntry(); });
-      return;
-    }
-    const row = document.createElement('tr');
-    row.id = 'inlineMeasurementRow';
-    row.className = 'inline-measurement-row';
-    const now = new Date();
-    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    row.innerHTML = `
-      <td><input type="date" id="inlineDate" value="${localDate}" aria-label="تاريخ القياس"></td>
-      <td><input type="number" step="0.1" min="0.1" id="inlineWeight" placeholder="كجم" aria-label="الوزن"></td>
-      <td><input type="number" step="0.1" min="0" max="100" id="inlineBodyFat" placeholder="%" aria-label="نسبة الدهون"></td>
-      <td><input type="number" step="0.1" min="0" max="100" id="inlineMuscle" placeholder="%" aria-label="نسبة العضلات"></td>
-      <td><input type="number" step="0.1" min="0" max="100" id="inlineWater" placeholder="%" aria-label="نسبة الماء"></td>
-      <td><input type="number" step="0.1" min="0.1" id="inlineWaist" placeholder="سم" aria-label="محيط الوسط"></td>
-      <td><input type="number" step="0.1" min="0.1" id="inlineHip" placeholder="سم" aria-label="محيط الأرداف"></td>
-      <td><select id="inlineAdherence" aria-label="الالتزام"><option value="">—</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></td>
-      <td><textarea id="inlineMeasurementNotes" rows="3" placeholder="اكتب المشكلة أو الصعوبة التي واجهتك مع الدايت..." aria-label="ملاحظات المريض"></textarea></td>
-      <td class="no-print"><div class="measurement-inline-actions"><button type="button" data-measurement-save class="measurement-save">حفظ</button><button type="button" data-measurement-cancel class="measurement-cancel">إلغاء</button></div></td>`;
-    body.prepend(row);
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    $('inlineWeight')?.focus();
+  function measurementPopupClasses() {
+    return {
+      popup: 'patient-measurement-swal',
+      title: 'patient-measurement-swal-title',
+      htmlContainer: 'patient-measurement-swal-text',
+      confirmButton: 'patient-measurement-swal-confirm',
+      cancelButton: 'patient-measurement-swal-cancel',
+      input: 'patient-measurement-swal-input'
+    };
   }
 
-  async function saveMeasurementEntry() {
-    if (!canWrite()) return;
-    const date = $('inlineDate')?.value;
-    const weight = Number.parseFloat($('inlineWeight')?.value);
-    const waistRaw = $('inlineWaist')?.value ?? '';
-    const hipRaw = $('inlineHip')?.value ?? '';
-    const waist = waistRaw === '' ? null : Number.parseFloat(waistRaw);
-    const hip = hipRaw === '' ? null : Number.parseFloat(hipRaw);
-    const adherence = $('inlineAdherence')?.value || '';
-    const notes = $('inlineMeasurementNotes')?.value.trim() || '';
-    const readPercent = id => { const raw = $(id)?.value ?? ''; const value = raw === '' ? null : Number.parseFloat(raw); return { raw, value }; };
-    const bodyFat = readPercent('inlineBodyFat'), muscle = readPercent('inlineMuscle'), water = readPercent('inlineWater');
-    const invalidPercent = item => item.raw !== '' && (!Number.isFinite(item.value) || item.value < 0 || item.value > 100);
-    if (!date || !Number.isFinite(weight) || weight <= 0 ||
-        invalidPercent(bodyFat) || invalidPercent(muscle) || invalidPercent(water) ||
-        (waistRaw !== '' && (!Number.isFinite(waist) || waist <= 0)) ||
-        (hipRaw !== '' && (!Number.isFinite(hip) || hip <= 0))) {
-      if (window.Swal && typeof window.Swal.fire === 'function') {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'راجع بيانات القياس',
-          text: 'تأكد من إدخال تاريخ القياس والوزن بصورة صحيحة، وراجع نسب الدهون والعضلات والماء (من 0 إلى 100%) ومحيطات الجسم إذا أدخلتها.',
-          confirmButtonText: 'حسنًا',
-          buttonsStyling: false,
-          customClass: {
-            popup: 'patient-measurement-swal',
-            title: 'patient-measurement-swal-title',
-            htmlContainer: 'patient-measurement-swal-text',
-            confirmButton: 'patient-measurement-swal-confirm'
-          },
-          allowOutsideClick: true,
-          heightAuto: false
-        });
-      } else {
-        alert('راجع بيانات القياس: تأكد من التاريخ والوزن والقياسات المدخلة.');
-      }
+  function showMeasurementError(message, title = 'تعذر إتمام العملية') {
+    const text = String(message || 'حدث خطأ غير متوقع. حاول مرة أخرى.');
+    if (window.Swal?.fire) {
+      return window.Swal.fire({
+        icon: 'error',
+        title,
+        text,
+        confirmButtonText: 'حسنًا',
+        buttonsStyling: false,
+        customClass: measurementPopupClasses(),
+        heightAuto: false
+      });
+    }
+    const errorBox = $('measurementsError');
+    if (errorBox) {
+      errorBox.textContent = `${title}: ${text}`;
+      errorBox.hidden = false;
+    }
+    return Promise.resolve();
+  }
+
+  function openMeasurementEntry() {
+    if (!canWrite()) {
+      void showMeasurementError('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط.', 'الصلاحية غير متاحة');
       return;
     }
-    const saveButton = document.querySelector('[data-measurement-save]');
-    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'جارٍ الحفظ...'; }
-    try {
-      const { data, error } = await supabase.from('weight_logs').insert({
-        patient_id: patientId,
-        weight,
-        measurement_date: date,
-        body_fat_percent: bodyFat.value,
-        muscle_percent: muscle.value,
-        water_percent: water.value,
-        waist_cm: waist,
-        hip_cm: hip,
-        diet_adherence: adherence || null,
-        notes: notes || null
-      }).select('id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
-      if (error) throw error;
+    if (!measurementState.loaded) {
+      void loadMeasurements().then(() => {
+        if (measurementState.loaded) openMeasurementEntry();
+      });
+      return;
+    }
+    if (!window.Swal?.fire) {
+      void showMeasurementError('تعذر تحميل نافذة الإدخال. حدّث الصفحة ثم حاول مرة أخرى.');
+      return;
+    }
+
+    const now = new Date();
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    window.Swal.fire({
+      title: 'إضافة قياس جديد',
+      html: `
+        <div class="measurement-form-grid" dir="rtl">
+          <label>تاريخ القياس<input id="swalMeasurementDate" type="date" value="${localDate}"></label>
+          <label>الوزن (كجم) <b>*</b><input id="swalMeasurementWeight" type="number" min="0.1" step="0.1" placeholder="مثال: 75"></label>
+          <label>نسبة الدهون (%)<input id="swalMeasurementFat" type="number" min="0" max="100" step="0.1" placeholder="اختياري"></label>
+          <label>نسبة العضلات (%)<input id="swalMeasurementMuscle" type="number" min="0" max="100" step="0.1" placeholder="اختياري"></label>
+          <label>نسبة الماء (%)<input id="swalMeasurementWater" type="number" min="0" max="100" step="0.1" placeholder="اختياري"></label>
+          <label>محيط الوسط (سم)<input id="swalMeasurementWaist" type="number" min="0.1" step="0.1" placeholder="اختياري"></label>
+          <label>محيط الأرداف (سم)<input id="swalMeasurementHip" type="number" min="0.1" step="0.1" placeholder="اختياري"></label>
+          <label>الالتزام الغذائي<select id="swalMeasurementAdherence"><option value="">لم يحدد</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></label>
+          <label class="measurement-form-notes">ملاحظات المريض<textarea id="swalMeasurementNotes" rows="3" placeholder="ما الصعوبات أو المشكلات التي واجهتك مع النظام الغذائي؟"></textarea></label>
+        </div>
+        <p class="measurement-form-hint">الحقول المعلّمة بنجمة إلزامية. باقي القياسات اختيارية.</p>`,
+      showCancelButton: true,
+      confirmButtonText: 'حفظ القياس',
+      cancelButtonText: 'إلغاء',
+      reverseButtons: true,
+      focusConfirm: false,
+      buttonsStyling: false,
+      customClass: measurementPopupClasses(),
+      heightAuto: false,
+      allowOutsideClick: () => !window.Swal.isLoading(),
+      preConfirm: async () => {
+        const value = id => document.getElementById(id)?.value?.trim() ?? '';
+        const numeric = id => value(id) === '' ? null : Number(value(id));
+        const payload = {
+          date: value('swalMeasurementDate'),
+          weight: numeric('swalMeasurementWeight'),
+          bodyFat: numeric('swalMeasurementFat'),
+          muscle: numeric('swalMeasurementMuscle'),
+          water: numeric('swalMeasurementWater'),
+          waist: numeric('swalMeasurementWaist'),
+          hip: numeric('swalMeasurementHip'),
+          adherence: value('swalMeasurementAdherence') || null,
+          notes: value('swalMeasurementNotes') || null
+        };
+        const validPercent = number => number === null || (Number.isFinite(number) && number >= 0 && number <= 100);
+        if (!payload.date || !Number.isFinite(payload.weight) || payload.weight <= 0) {
+          window.Swal.showValidationMessage('أدخل تاريخ القياس والوزن بصورة صحيحة.');
+          return false;
+        }
+        if (![payload.bodyFat, payload.muscle, payload.water].every(validPercent)) {
+          window.Swal.showValidationMessage('النسب المئوية يجب أن تكون بين 0 و100%.');
+          return false;
+        }
+        if ([payload.waist, payload.hip].some(number => number !== null && (!Number.isFinite(number) || number <= 0))) {
+          window.Swal.showValidationMessage('محيطات الجسم يجب أن تكون أرقامًا أكبر من صفر.');
+          return false;
+        }
+        const confirmButton = window.Swal.getConfirmButton();
+        if (confirmButton) { confirmButton.disabled = true; confirmButton.textContent = 'جارٍ الحفظ...'; }
+        try {
+          const { data, error } = await supabase.from('weight_logs').insert({
+            patient_id: patientId,
+            weight: payload.weight,
+            measurement_date: payload.date,
+            body_fat_percent: payload.bodyFat,
+            muscle_percent: payload.muscle,
+            water_percent: payload.water,
+            waist_cm: payload.waist,
+            hip_cm: payload.hip,
+            diet_adherence: payload.adherence,
+            notes: payload.notes
+          }).select('id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
+          if (error) throw error;
+          return data;
+        } catch (error) {
+          console.error('Save patient measurement failed:', error);
+          const message = error?.message || error?.details || error?.hint || 'تحقق من صلاحيات الحفظ واتصال قاعدة البيانات.';
+          window.Swal.showValidationMessage(`فشل الحفظ: ${message}`);
+          const confirmButton = window.Swal.getConfirmButton();
+          if (confirmButton) { confirmButton.disabled = false; confirmButton.textContent = 'حفظ القياس'; }
+          return false;
+        }
+      }
+    }).then(result => {
+      if (!result.isConfirmed || !result.value) return;
+      const item = result.value;
       measurementState.logs.push({
-        id: data.id, date: data.measurement_date, createdAt: data.created_at || '', weight: Number(data.weight),
-        bodyFat: data.body_fat_percent == null ? null : Number(data.body_fat_percent),
-        muscle: data.muscle_percent == null ? null : Number(data.muscle_percent),
-        water: data.water_percent == null ? null : Number(data.water_percent),
-        waist: data.waist_cm == null ? null : Number(data.waist_cm),
-        hip: data.hip_cm == null ? null : Number(data.hip_cm),
-        adherence: data.diet_adherence || '', notes: data.notes || ''
+        id: item.id,
+        date: item.measurement_date,
+        createdAt: item.created_at || '',
+        weight: Number(item.weight),
+        bodyFat: item.body_fat_percent == null ? null : Number(item.body_fat_percent),
+        muscle: item.muscle_percent == null ? null : Number(item.muscle_percent),
+        water: item.water_percent == null ? null : Number(item.water_percent),
+        waist: item.waist_cm == null ? null : Number(item.waist_cm),
+        hip: item.hip_cm == null ? null : Number(item.hip_cm),
+        adherence: item.diet_adherence || '',
+        notes: item.notes || ''
       });
       measurementState.logs.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.createdAt).localeCompare(String(b.createdAt)));
       renderMeasurements();
-    } catch (error) {
-      console.error('Save patient measurement failed:', error);
-      alert('تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.');
-      if (saveButton) { saveButton.disabled = false; saveButton.textContent = 'حفظ'; }
-    }
+      window.Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'success',
+        title: 'تم حفظ القياس بنجاح',
+        showConfirmButton: false,
+        timer: 1800,
+        timerProgressBar: true,
+        heightAuto: false
+      });
+    });
   }
 
   async function deleteMeasurement(index) {
