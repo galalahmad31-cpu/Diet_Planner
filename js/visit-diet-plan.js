@@ -29,7 +29,7 @@ const FIXED_DIET_CACHE_TTL=5*60*1000;
 function num(v){return Number.isFinite(Number(v))?Number(v):0;}
 function cloneDays(v){try{return JSON.parse(JSON.stringify(v||[]));}catch{return[];}}
 function showToast(msg,type='success'){
- const c=document.getElementById('toastContainer'); if(!c)return;
+ const c=document.getElementById('dietPlanToastContainer'); if(!c)return;
  const t=document.createElement('div'); t.className=(type==='error'?'bg-rose-600':'bg-emerald-600')+' text-white font-bold text-xs px-4 py-3 rounded-xl shadow-lg';
  t.innerHTML='<i class="fa-solid '+(type==='error'?'fa-circle-exclamation':'fa-circle-check')+'"></i> <span class="mr-2">'+escapeHtml(msg)+'</span>';
  c.appendChild(t); setTimeout(()=>t.remove(),3000);
