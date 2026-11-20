@@ -15,7 +15,10 @@ const state = {
   isAdmin: false,
   editor: { mode: null, productId: null, formulas: [] },
   pendingDelete: null,
-  categoryManagerType: null
+  categoryManagerType: null,
+  pageSize: 20,
+  totalCount: 0,
+  isLoading: false
 };
 
 const $ = id => document.getElementById(id);
@@ -502,10 +505,15 @@ function productFormulaRows(productId) {
 
 function render() {
   const rows = filtered();
-  $('resultCount').textContent = 'عرض ' + rows.length + ' منتج';
+  const loadedCount = state.products.length;
+  $('resultCount').textContent = 'عرض ' + loadedCount.toLocaleString('ar-EG') +
+    ' من أصل ' + state.totalCount.toLocaleString('ar-EG') + ' منتج';
+
+  const loadMoreWrap = $('loadMoreWrap');
+  if (loadMoreWrap) loadMoreWrap.hidden = state.isLoading || loadedCount >= state.totalCount;
 
   if (!rows.length) {
-    setState('لا توجد منتجات مطابقة للتصفية.');
+    setState(state.totalCount ? 'لا توجد منتجات مطابقة للتصفية.' : 'لا توجد منتجات متاحة.');
     return;
   }
 
@@ -550,21 +558,99 @@ function render() {
 }
 
 async function loadData() {
-  const [c,s,p,f] = await Promise.all([
+  const [c,s] = await Promise.all([
     sb.from('product_categories').select('*').eq('is_active',true).order('sort_order'),
-    sb.from('product_subcategories').select('*').eq('is_active',true).order('sort_order'),
-    sb.from('food_products').select('id,product_name,usage,notes,sort_order,subcategory_id,required_feature,is_active').eq('is_active',true).order('sort_order'),
-    sb.from('food_product_formulas').select('id,product_id,formula_name,basis_amount,basis_unit,kcal,carb,protein,fat,notes,sort_order').order('sort_order')
+    sb.from('product_subcategories').select('*').eq('is_active',true).order('sort_order')
   ]);
   if (c.error) throw c.error;
   if (s.error) throw s.error;
-  if (p.error) throw p.error;
-  if (f.error) throw f.error;
 
   state.categories = c.data || [];
   state.subcategories = s.data || [];
-  state.products = p.data || [];
-  state.formulas = f.data || [];
+  await loadProductsPage(true);
+}
+
+async function loadProductsPage(reset = false) {
+  if (state.isLoading) return;
+  state.isLoading = true;
+
+  const button = $('loadMoreBtn');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'جاري التحميل...';
+  }
+
+  if (reset) {
+    state.products = [];
+    state.formulas = [];
+    state.totalCount = 0;
+    setState('جاري تحميل المنتجات...');
+  }
+
+  try {
+    const offset = reset ? 0 : state.products.length;
+    let query = sb
+      .from('food_products')
+      .select('id,product_name,usage,notes,sort_order,subcategory_id,required_feature,is_active', { count: 'exact' })
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .order('product_name', { ascending: true });
+
+    if (state.subcategory) {
+      query = query.eq('subcategory_id', state.subcategory);
+    } else if (state.category) {
+      const subcategoryIds = state.subcategories
+        .filter(item => item.category_id === state.category)
+        .map(item => item.id);
+
+      if (!subcategoryIds.length) {
+        state.totalCount = 0;
+        state.products = [];
+        state.formulas = [];
+        return;
+      }
+      query = query.in('subcategory_id', subcategoryIds);
+    }
+
+    const searchTerm = state.search.trim().replace(/[%_,()\\"]/g, ' ').replace(/\s+/g, ' ');
+    if (searchTerm) {
+      const pattern = '%' + searchTerm + '%';
+      query = query.or(
+        'product_name.ilike.' + pattern +
+        ',usage.ilike.' + pattern +
+        ',notes.ilike.' + pattern
+      );
+    }
+
+    const { data, error, count } = await query.range(offset, offset + state.pageSize - 1);
+    if (error) throw error;
+
+    const pageProducts = data || [];
+    state.totalCount = count || 0;
+    state.products = reset ? pageProducts : state.products.concat(pageProducts);
+
+    const productIds = pageProducts.map(product => product.id);
+    if (productIds.length) {
+      const { data: formulaRows, error: formulaError } = await sb
+        .from('food_product_formulas')
+        .select('id,product_id,formula_name,basis_amount,basis_unit,kcal,carb,protein,fat,notes,sort_order')
+        .in('product_id', productIds)
+        .order('sort_order', { ascending: true });
+
+      if (formulaError) throw formulaError;
+      state.formulas = reset ? (formulaRows || []) : state.formulas.concat(formulaRows || []);
+    } else if (reset) {
+      state.formulas = [];
+    }
+  } finally {
+    state.isLoading = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'عرض المزيد';
+    }
+    const wrap = $('loadMoreWrap');
+    if (wrap) wrap.hidden = state.products.length >= state.totalCount;
+  }
 }
 
 function createEmptyFormula() {
@@ -1010,31 +1096,73 @@ $('editorForm').addEventListener('mousedown', e => {
   }
 });
 
-$('categoryFilter').onchange = e => {
+let searchReloadTimer = null;
+
+$('categoryFilter').onchange = async e => {
   state.category = e.target.value;
   state.subcategory = '';
   populateCategories();
-  render();
+  try {
+    await loadProductsPage(true);
+    render();
+  } catch (error) {
+    console.error(error);
+    setState(error.message || 'تعذر تحميل المنتجات.');
+  }
 };
 
-$('subcategoryFilter').onchange = e => {
+$('subcategoryFilter').onchange = async e => {
   state.subcategory = e.target.value;
-  render();
+  try {
+    await loadProductsPage(true);
+    render();
+  } catch (error) {
+    console.error(error);
+    setState(error.message || 'تعذر تحميل المنتجات.');
+  }
 };
 
 $('searchInput').oninput = e => {
   state.search = e.target.value.trim();
-  render();
+  clearTimeout(searchReloadTimer);
+  searchReloadTimer = setTimeout(async () => {
+    try {
+      await loadProductsPage(true);
+      render();
+    } catch (error) {
+      console.error(error);
+      setState(error.message || 'تعذر البحث عن المنتجات.');
+    }
+  }, 300);
 };
 
-$('resetBtn').onclick = () => {
+$('resetBtn').onclick = async () => {
+  clearTimeout(searchReloadTimer);
   state.category = '';
   state.subcategory = '';
   state.search = '';
   $('searchInput').value = '';
   populateCategories();
-  render();
+  try {
+    await loadProductsPage(true);
+    render();
+  } catch (error) {
+    console.error(error);
+    setState(error.message || 'تعذر إعادة تحميل المنتجات.');
+  }
 };
+
+$('loadMoreBtn')?.addEventListener('click', async () => {
+  if (state.isLoading || state.products.length >= state.totalCount) return;
+  try {
+    await loadProductsPage(false);
+    populateCategories();
+    render();
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || 'تعذر تحميل المزيد من المنتجات.', false);
+  }
+});
 
 initRichEditors(document);
 $('addProductBtn')?.addEventListener('click', () => openEditor('add-product'));
