@@ -68,7 +68,11 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-finance-fields[hidden]{display:none!important}
 .patient-finance-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .patient-finance-row>div{min-width:0}
-.patient-finance-fields input,.patient-finance-fields select{box-sizing:border-box;width:100%;min-width:0}
+.patient-finance-fields label{color:var(--dp-text-2)}
+.patient-finance-fields input,.patient-finance-fields select{
+  box-sizing:border-box;width:100%;min-width:0;
+  background:var(--dp-input);color:var(--dp-text);border-color:var(--dp-input-border)
+}
 .patient-finance-fields input:disabled,.patient-finance-fields select:disabled{background:var(--dp-surface-2);color:var(--dp-text-2);border-color:var(--dp-border);opacity:1}
 .patient-finance-discounted output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface-2);color:var(--dp-primary);font-size:12px;font-weight:900}
 .patient-finance-readonly output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface-2);color:var(--dp-text-2);font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
