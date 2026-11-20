@@ -2,6 +2,7 @@
   "buildCommand": "npm run build:css",
   "outputDirectory": ".",
   "rewrites": [
+    { "source": "/jobs/:id", "destination": "/api/job?id=:id" },
     {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
