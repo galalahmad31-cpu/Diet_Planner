@@ -32,7 +32,6 @@
   titles["nutritionsupport-patient.html"] = "الدعم الغذائي";
   titles["admin.html"] = "لوحة الإدارة";
   titles["article-view.html"] = "المقال";
-  titles["jobs.html"] = "الوظائف الطبية";
   titles["privacy.html"] = "سياسة الخصوصية";
 
   function buildHeader() {
@@ -74,7 +73,7 @@
       link.href = href;
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html")) {
+      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || (/^[0-9a-f-]{36}$/i.test(path) && href === "jobs.html")) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
       }
