@@ -697,7 +697,6 @@ html[data-theme="dark"] .bg-amber-50\/60{background:#3a2d17!important}
    ========================================================= */
 
 /* Preserve the green brand treatment and readable white copy. */
-html[data-theme="dark"] body:has(.dashboard-services-section) header.glass,
 html[data-theme="dark"] header.header,
 html[data-theme="dark"] .patient-profile-page-header,
 html[data-theme="dark"] .profile-page-header,
@@ -712,16 +711,12 @@ html[data-theme="dark"] .support-header{
   color:#F1F7F4!important;
   border-color:transparent!important;
 }
-html[data-theme="dark"] body:has(.dashboard-services-section) header.glass :is(h1,h2,h3),
-html[data-theme="dark"] body:has(.dashboard-services-section) header.glass .brand-sub,
-html[data-theme="dark"] body:has(.dashboard-services-section) header.glass #accountInfo,
-html[data-theme="dark"] body:has(.dashboard-services-section) header.glass #doctorName,
 html[data-theme="dark"] :is(.patient-profile-page-header,.profile-page-header,.finance-page-header,.about-branded-header,.patient-page-header,.feedback-branded-header,.food-page-header,.recipe-page-header,.support-header) :is(h1,h2,h3,p,span,small,strong){
   color:#F1F7F4!important;
 }
 
-/* The dashboard hero is also a branded surface, never dark-on-green. */
-html[data-theme="dark"] body:has(.dashboard-services-section) main section .bg-gradient-to-l :is(h1,h2,h3,p){
+/* The compact dashboard welcome panel retains readable white text in dark mode. */
+html[data-theme="dark"] .dp-dashboard-welcome-card :is(h1,h2,h3,p,span){
   color:#F1F7F4!important;
 }
 
