@@ -884,6 +884,7 @@ html.visit-embedded #dp-theme-toggle{display:none!important}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions button:hover{
   border-color:var(--dp-primary);color:var(--dp-primary);
 }
+body #foodModal.diet-food-modal-layer{z-index:2147483001!important}
 body .day-details-modal[hidden]{display:none!important}
 body .day-details-modal{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
