@@ -67,7 +67,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20261120-embedded-modal-v1',
+      src: 'js/visit-diet-plan.js?v=20261120-single-day-save-v1',
       ready: () => typeof window.dietPlan?.init === 'function'
     },
     exchangePlan: {
