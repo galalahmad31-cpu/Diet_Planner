@@ -6,6 +6,7 @@
 
   const state = {
     patients: [],
+    statusFilter: 'all',
     pendingDeleteId: null,
     statusTimer: null,
     user: null,
@@ -148,14 +149,45 @@
         throw new Error('Supabase client is not available.');
       }
 
-      const { data, error } = await supabase
+      const { data: patients, error: patientsError } = await supabase
         .from('patients')
-        .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes,created_at,updated_at')
+        .select('id,user_id,name,diagnosis')
         .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (patientsError) throw patientsError;
 
-      state.patients = data || [];
+      const patientIds = (patients || []).map((patient) => patient.id).filter(Boolean);
+      let financeRows = [];
+
+      if (patientIds.length) {
+        const { data, error: financeError } = await supabase
+          .from('patient_finances')
+          .select('patient_id,subscription_start_date,subscription_end_date,next_follow_up_date')
+          .in('patient_id', patientIds);
+
+        if (financeError) throw financeError;
+        financeRows = data || [];
+      }
+
+      // If legacy duplicates exist, use the record with the latest subscription
+      // start date; this keeps the directory deterministic without changing data.
+      financeRows.sort((a, b) =>
+        String(b.subscription_start_date || '').localeCompare(String(a.subscription_start_date || '')) ||
+        String(b.subscription_end_date || '').localeCompare(String(a.subscription_end_date || ''))
+      );
+
+      const financeByPatient = new Map();
+      financeRows.forEach((finance) => {
+        if (finance.patient_id && !financeByPatient.has(finance.patient_id)) {
+          financeByPatient.set(finance.patient_id, finance);
+        }
+      });
+
+      state.patients = (patients || []).map((patient) => ({
+        ...patient,
+        finance: financeByPatient.get(patient.id) || null
+      }));
+
       renderPatients();
     } catch (error) {
       console.error('Patient directory load failed:', error);
@@ -163,51 +195,121 @@
     }
   }
 
+  function localDateKey() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function getPatientSubscriptionStatus(patient) {
+    const expiryDate = String(patient.finance?.subscription_end_date || '').slice(0, 10);
+    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(expiryDate)) return 'unknown';
+    return expiryDate >= localDateKey() ? 'active' : 'expired';
+  }
+
+  function formatPatientDate(value) {
+    if (!value) return 'غير محدد';
+    const dateKey = String(value).slice(0, 10);
+    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey)) return 'غير محدد';
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return new Intl.DateTimeFormat('ar-EG', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date);
+  }
+
+  function updatePatientStats() {
+    const counts = { all: state.patients.length, active: 0, expired: 0, unknown: 0 };
+
+    state.patients.forEach((patient) => {
+      counts[getPatientSubscriptionStatus(patient)] += 1;
+    });
+
+    const values = {
+      totalPatientsCount: counts.all,
+      activePatientsCount: counts.active,
+      expiredPatientsCount: counts.expired,
+      unknownPatientsCount: counts.unknown
+    };
+
+    Object.entries(values).forEach(([id, value]) => {
+      const element = $(id);
+      if (element) element.textContent = String(value);
+    });
+
+    document.querySelectorAll('[data-status-filter]').forEach((button) => {
+      const selected = button.dataset.statusFilter === state.statusFilter;
+      button.classList.toggle('is-selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+  }
+
   function renderPatients() {
     const box = $('patientsList');
     const input = $('searchInput');
     if (!box || !input) return;
 
-    const query = input.value.trim().toLocaleLowerCase('ar-EG');
+    updatePatientStats();
 
-    const filtered = state.patients.filter((patient) =>
-      !query || String(patient.name || '').toLocaleLowerCase('ar-EG').includes(query)
-    );
+    const query = input.value.trim().toLocaleLowerCase('ar-EG');
+    const filtered = state.patients.filter((patient) => {
+      const matchesQuery = !query ||
+        String(patient.name || '').toLocaleLowerCase('ar-EG').includes(query) ||
+        String(patient.diagnosis || '').toLocaleLowerCase('ar-EG').includes(query);
+      const matchesStatus = state.statusFilter === 'all' ||
+        getPatientSubscriptionStatus(patient) === state.statusFilter;
+      return matchesQuery && matchesStatus;
+    });
 
     if (!filtered.length) {
+      const hasPatients = state.patients.length > 0;
       box.innerHTML = `
-        <div class="text-center py-12 border border-dashed border-slate-200 rounded-2xl">
-          <div class="text-3xl mb-3">👤</div>
-          <p class="font-bold text-slate-600 text-sm">
-            ${state.patients.length ? 'لا يوجد مريض مطابق للبحث.' : 'لا توجد ملفات مرضى حتى الآن.'}
-          </p>
+        <div class="patient-empty">
+          <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+          <p>${hasPatients ? 'لا توجد ملفات مطابقة للبحث أو التصفية.' : 'لا توجد ملفات مرضى حتى الآن.'}</p>
         </div>`;
       return;
     }
 
-    box.innerHTML = filtered.map((patient, index) => {
-      const age = patient.age ? `<span class="patient-meta"><i class="fa-solid fa-cake-candles"></i> ${escapeHtml(patient.age)} سنة</span>` : '';
-      const diagnosis = patient.diagnosis ? `<span class="patient-diagnosis">${escapeHtml(patient.diagnosis)}</span>` : '';
+    const statusLabels = {
+      active: 'نشط',
+      expired: 'منتهي',
+      unknown: 'غير محدد'
+    };
+
+    box.innerHTML = filtered.map((patient) => {
+      const status = getPatientSubscriptionStatus(patient);
+      const diagnosis = patient.diagnosis
+        ? escapeHtml(patient.diagnosis)
+        : 'التشخيص غير مسجل';
+      const followUp = formatPatientDate(patient.finance?.next_follow_up_date);
+
       return `
-      <article class="patient-card" role="link" tabindex="0"
-        data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}"
-        aria-label="فتح ملف المريض ${escapeHtml(patient.name || 'بدون اسم')}">
-        <div class="patient-card-head">
-          <div class="patient-identity">
-            <span class="patient-avatar" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+        <article class="patient-row" role="link" tabindex="0"
+          data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}"
+          aria-label="فتح ملف المريض ${escapeHtml(patient.name || 'بدون اسم')}">
+          <div class="patient-row-main">
             <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
+            <div class="patient-row-meta">
+              <span class="patient-diagnosis" title="التشخيص">${diagnosis}</span>
+              <span class="patient-follow-up">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                <span>المتابعة: ${escapeHtml(followUp)}</span>
+              </span>
+            </div>
           </div>
-          <div class="patient-card-tools">
-            <span class="patient-number">ملف ${String(index + 1).padStart(2,'0')}</span>
+          <div class="patient-row-actions">
+            <span class="patient-status patient-status--${status}">${statusLabels[status]}</span>
             <button type="button" data-action="ask-delete" data-patient-id="${escapeHtml(patient.id)}"
               class="patient-delete" title="حذف المريض" aria-label="حذف المريض">
               <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
             </button>
           </div>
-        </div>
-        <div class="patient-details">${age}${diagnosis}</div>
-        
-      </article>`;
+        </article>`;
     }).join('');
   }
 
@@ -353,6 +455,13 @@
   }
 
   function handleClick(event) {
+    const filterButton = event.target.closest('[data-status-filter]');
+    if (filterButton) {
+      state.statusFilter = filterButton.dataset.statusFilter || 'all';
+      renderPatients();
+      return;
+    }
+
     const target = event.target.closest('[data-action]');
     if (!target) return;
 
@@ -407,11 +516,11 @@
   async function init() {
     bindEvents();
 
-    // Start loading the patient directory immediately; access checks run independently.
-    const patientsLoad = loadPatients();
+    // Resolve the signed-in account first so patient and finance rows are
+    // loaded under the same verified session and RLS context.
     state.accessPromise = refreshAccess();
     await state.accessPromise;
-    await patientsLoad;
+    await loadPatients();
   }
 
   if (document.readyState === 'loading') {
