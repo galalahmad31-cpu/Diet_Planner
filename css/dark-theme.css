@@ -2129,3 +2129,43 @@ html[data-theme="dark"] body:has(#section-en) .delete-confirm-icon{
     background:#fff!important;color:#111!important;box-shadow:none!important;
   }
 }
+
+/* EN volume form surfaces — resolve legacy light-only field groups via central tokens. */
+html[data-theme="dark"] body:has(#section-en) .container-main,
+html[data-theme="dark"] body:has(#section-en) #en-volume-content,
+html[data-theme="dark"] body:has(#section-en) #en-calories-content{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-fields,
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-fields--primary,
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-fields--rates,
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-fields--fortification{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-field,
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-frequency{
+  background:transparent!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-field>label,
+html[data-theme="dark"] body:has(#section-en) #en-volume-content .en-volume-frequency>span{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #section-en .bg-white,
+html[data-theme="dark"] body:has(#section-en) #section-en .bg-emerald-50,
+html[data-theme="dark"] body:has(#section-en) #section-en .bg-blue-50,
+html[data-theme="dark"] body:has(#section-en) #section-en .bg-amber-50,
+html[data-theme="dark"] body:has(#section-en) #section-en .bg-purple-50{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#section-en) #section-en :is(.bg-emerald-100,.bg-blue-100,.bg-amber-100,.bg-purple-100,.bg-indigo-100){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
