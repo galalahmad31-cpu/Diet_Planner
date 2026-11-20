@@ -476,181 +476,283 @@ html.visit-embedded .text-slate-500{color:#475569!important}
 html.visit-embedded .text-slate-300{color:#64748b!important}
 
 
-/* Diet plan: flat visual hierarchy. The day is the only main card;
-   summary and meals are sections within it, not nested cards. */
-#daysContainer{display:grid;gap:14px}
-#daysContainer .day-card{
-  min-width:0;
-  overflow:hidden;
-  border:1px solid #dce7e3!important;
-  border-radius:15px!important;
-  background:#fff!important;
-  box-shadow:0 2px 7px rgba(18,65,54,.035)!important;
+/* VISIT — unified, token-driven layout.
+   Replaces the former layered day-card overrides; page behavior remains in JS. */
+:root{
+  --visit-card-radius:16px;
+  --visit-control-radius:10px;
+  --visit-space:14px;
 }
-#daysContainer .day-card-header{
+.visit-main-shell{width:min(100%,1440px);margin-inline:auto;padding:18px clamp(12px,2vw,28px) 36px}
+.visit-main-shell #visitContent{display:grid;gap:16px}
+.visit-main-shell .visit-patient-strip{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:13px 17px;border:1px solid var(--dp-border);border-radius:var(--visit-card-radius);
+  background:var(--dp-surface);box-shadow:0 3px 12px var(--dp-shadow);
+}
+.visit-main-shell .visit-patient-strip #patientName{margin:0;color:var(--dp-text);font-size:clamp(16px,2vw,21px);font-weight:900}
+.visit-main-shell .visit-patient-strip [data-action="backToPatient"]{
+  flex:0 0 auto;border:1px solid var(--dp-border);border-radius:10px;
+  background:var(--dp-surface-2);color:var(--dp-text-2);padding:9px 13px;
+}
+.visit-main-shell .visit-module-section{margin:0!important}
+.visit-main-shell .visit-module-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+}
+.visit-main-shell .visit-module-grid .module-card{
+  display:flex;align-items:center;min-width:0;min-height:64px;padding:11px 15px!important;
+  border:1px solid var(--dp-border)!important;border-radius:13px!important;
+  background:var(--dp-surface)!important;color:var(--dp-text)!important;
+  box-shadow:0 2px 8px var(--dp-shadow)!important;text-align:right;
+}
+.visit-main-shell .visit-module-grid .module-card>div{width:100%;min-width:0}
+.visit-main-shell .visit-module-grid .module-card h4{color:var(--dp-text)!important;font-size:13px!important}
+.visit-main-shell .visit-module-grid .module-card p{color:var(--dp-text-2)!important;font-size:10px!important}
+.visit-main-shell .visit-module-grid .module-card.module-active{
+  border-color:var(--dp-primary)!important;background:var(--dp-tab-active-bg)!important;
+  box-shadow:inset 0 0 0 1px var(--dp-primary)!important;
+}
+.visit-main-shell #moduleContent{margin-top:0!important}
+.visit-main-shell .embedded-diet-plan{background:transparent;color:var(--dp-text)}
+.visit-main-shell .embedded-diet-plan>main{max-width:none!important;padding:0!important;gap:12px!important}
+.visit-main-shell .embedded-diet-plan>main>section:first-child{
+  padding:13px 15px!important;border:1px solid var(--dp-border)!important;
+  border-radius:14px!important;background:var(--dp-surface)!important;
+  box-shadow:none!important;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer{display:grid;gap:12px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card{
+  min-width:0;overflow:hidden;border:1px solid var(--dp-border)!important;
+  border-radius:var(--visit-card-radius)!important;background:var(--dp-surface)!important;
+  color:var(--dp-text);box-shadow:0 3px 12px var(--dp-shadow)!important;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-header{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:11px 13px;background:#f7faf9;border-bottom:1px solid #e8efec;
+  padding:11px 14px;background:var(--dp-surface-2)!important;border-bottom:1px solid var(--dp-border)!important;
 }
-#daysContainer .day-card-heading{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
-#daysContainer .day-collapse-btn{
-  display:grid;place-items:center;width:31px;height:31px;flex:0 0 31px;
-  border:1px solid #e0e9e5;border-radius:9px;background:#fff;color:#47665c;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-heading,
+.visit-main-shell .embedded-diet-plan #daysContainer .day-title-group{display:flex;align-items:center;gap:9px;min-width:0}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-collapse-btn{
+  display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;
+  border:1px solid var(--dp-border);border-radius:9px;background:var(--dp-surface);color:var(--dp-text-2);
 }
-#daysContainer .day-title-group{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
-#daysContainer .day-title-input{
-  min-width:85px;max-width:190px;padding:3px 0;border:0;border-bottom:1px solid transparent;
-  background:transparent;color:#183f35;font-size:13px;font-weight:900;outline:none;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-title-input{
+  min-width:90px;max-width:190px;padding:3px 0;border:0;border-bottom:1px solid transparent;
+  background:transparent;color:var(--dp-text);font-size:13px;font-weight:900;
 }
-#daysContainer .day-title-input:focus{border-bottom-color:#16856d}
-#daysContainer .day-card-meta{color:#71847c;font-size:9px;font-weight:700;white-space:nowrap}
-#daysContainer .day-card-actions{display:flex;align-items:center;gap:5px;flex:0 0 auto}
-#daysContainer .day-card-actions button{
-  display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:31px;
-  padding:5px 9px;border:1px solid #e0e9e5;border-radius:8px;background:#fff;
-  color:#3e5c52;font-size:9px;font-weight:800;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-title-input:focus{border-bottom-color:var(--dp-primary);outline:0}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-meta{color:var(--dp-muted);font-size:10px;white-space:nowrap}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions{display:flex;align-items:center;gap:5px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions button{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:32px;
+  padding:5px 9px;border:1px solid var(--dp-border);border-radius:9px;
+  background:var(--dp-surface);color:var(--dp-text-2);font-size:10px;font-weight:800;
 }
-#daysContainer .day-card-actions .day-edit-btn{background:#edf4f1;border-color:#e1ebe6;color:#294f42}
-#daysContainer .day-card-actions .day-save-btn{background:#16856d;border-color:#16856d;color:#fff}
-#daysContainer .day-card-actions .day-copy-btn{width:31px;padding:0}
-#daysContainer .day-card-actions .day-delete-btn{width:31px;padding:0;border-color:#f0e2e2;background:#fffafa;color:#b65a5a}
-#daysContainer .day-card-actions button:disabled{opacity:.38;cursor:not-allowed}
-#daysContainer .day-card-body{display:grid;gap:12px;padding:12px 13px}
-#daysContainer .day-summary{
-  padding:0 0 10px;border:0;border-radius:0;background:transparent;
-  border-bottom:1px solid #e8efec;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions .day-save-btn{
+  border-color:var(--dp-primary);background:var(--dp-primary);color:#fff;
 }
-#daysContainer .day-summary-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 7px}
-#daysContainer .day-summary-heading strong{color:#205344;font-size:13px;font-weight:900}
-#daysContainer .day-summary-heading span{color:#71847c;font-size:9px;font-weight:600}
-#daysContainer .day-macros-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
-#daysContainer .day-macros-grid>div{
-  min-width:0;padding:5px 4px!important;border:0!important;border-radius:0!important;
-  border-inline-start:1px solid #e7efeb!important;background:transparent!important;
-  color:#24483d!important;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions .day-delete-btn{
+  color:var(--dp-danger);border-color:color-mix(in srgb,var(--dp-danger) 30%,var(--dp-border));
 }
-#daysContainer .day-macros-grid>div:last-child{border-inline-start:0!important}
-#daysContainer .day-macros-grid>div>div:first-child{gap:2px!important;flex-wrap:wrap}
-#daysContainer .day-macros-grid>div span{color:#587168!important;font-size:9px!important;font-weight:700!important}
-#daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{color:#183f35!important;font-size:16px!important;font-weight:900!important}
-#daysContainer .day-macros-grid>div>div:nth-child(2) span:last-child{color:#587168!important;font-size:9px!important;font-weight:700!important}
-#daysContainer .day-macros-grid>div>div:last-child{background:#e5efea!important}
-#daysContainer .day-micros-row{
-  display:flex;align-items:center;justify-content:flex-start;gap:18px;flex-wrap:wrap;
-  margin-top:5px;padding:8px 2px 0;border-top:1px solid #edf2ef;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions button:disabled{opacity:.4;cursor:not-allowed}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-card-body{display:grid;gap:13px;padding:14px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary{
+  display:grid;gap:12px;width:100%;padding:14px 15px;
+  border:1px solid var(--dp-border)!important;border-radius:13px;
+  background:var(--dp-surface-2)!important;
 }
-#daysContainer .day-micros-row span{
-  display:inline-flex;align-items:baseline;gap:5px;padding:0;border:0;border-radius:0;
-  background:transparent;color:#47665b;font-size:10px;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0;
 }
-#daysContainer .day-micros-row b{color:#477061;font-size:10px;font-weight:800}
-#daysContainer .day-micros-row strong{color:#183f35;font-size:13px;font-weight:900}
-#daysContainer .day-micros-row small{color:#71847c;font-size:9px;font-weight:700}
-#daysContainer .day-tools{display:grid;grid-template-columns:auto minmax(220px,1fr);align-items:center;gap:10px}
-#daysContainer .day-primary-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-#daysContainer .day-primary-actions button{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:35px;
-  padding:7px 11px;border-radius:9px;font-size:10px;font-weight:800;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary-heading>div{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary-heading strong{color:var(--dp-text);font-size:14px;font-weight:900}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary-heading span,
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary-heading small{color:var(--dp-muted);font-size:10px;font-weight:600}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-summary-layout{
+  display:grid;grid-template-columns:minmax(210px,.72fr) minmax(0,2fr);align-items:center;gap:18px;
 }
-#daysContainer .day-add-meal-btn{border:1px solid #16856d;background:#16856d;color:#fff}
-#daysContainer .day-fixed-meal-btn{
-  display:inline-flex!important;align-items:center;justify-content:center;gap:6px;
-  min-height:35px;padding:7px 11px;border:1px solid #16856d!important;border-radius:9px;
-  background:#16856d!important;color:#fff!important;font-size:10px;font-weight:800;
-  white-space:nowrap;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-block{
+  display:flex;align-items:center;justify-content:center;gap:14px;min-width:0;
 }
-#daysContainer .day-notes-wrap{display:flex;align-items:center;gap:7px;min-width:0}
-#daysContainer .day-notes-wrap>span{flex:0 0 auto;color:#71847c;font-size:9px;font-weight:800}
-#daysContainer .day-note-input{
-  width:100%;min-width:0;min-height:35px;padding:7px 9px;border:1px solid #e2ebe6;
-  border-radius:8px;background:#fff;color:#294f42;font-size:10px;line-height:1.6;resize:vertical;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring{
+  display:grid;place-items:center;width:126px;height:126px;flex:0 0 126px;padding:9px;
+  border-radius:50%;background:conic-gradient(var(--dp-accent) var(--day-progress,0%),var(--dp-border) 0);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dp-border) 65%,transparent);
 }
-#daysContainer .day-note-input::placeholder{color:#879a92}
-#daysContainer .day-meals-list{display:grid;gap:0}
-#daysContainer .meal-card{
-  min-width:0;overflow:hidden;border:0;border-bottom:1px solid #e8efec;
-  border-radius:0;background:transparent;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring-center{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  width:100%;height:100%;border:1px solid var(--dp-border);border-radius:50%;
+  background:var(--dp-surface);text-align:center;
 }
-#daysContainer .meal-card:last-child{border-bottom:0}
-#daysContainer .meal-card-header{
-  display:flex;align-items:center;justify-content:space-between;gap:9px;
-  padding:10px 2px;background:transparent;border:0;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring-center strong{
+  color:var(--dp-text);font-size:22px;font-weight:900;line-height:1.2;font-variant-numeric:tabular-nums;
 }
-#daysContainer .meal-title-wrap{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
-#daysContainer .meal-order{
-  display:grid;place-items:center;width:25px;height:25px;flex:0 0 25px;
-  border-radius:7px;background:#eaf3ef;color:#24715f;font-size:9px;font-weight:900;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring-center span{color:var(--dp-muted);font-size:9px;font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-copy{display:grid;gap:3px;min-width:0}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-copy>span{color:var(--dp-text-2);font-size:10px;font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-copy strong{color:var(--dp-primary);font-size:25px;font-weight:900;line-height:1.2}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-progress-copy small{color:var(--dp-muted);font-size:10px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metrics-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;min-width:0;
 }
-#daysContainer .meal-title-input{
-  width:100%;min-width:65px;max-width:210px;border:0;background:transparent;
-  color:#24444e;font-size:11px;font-weight:900;outline:none;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric{
+  display:grid;align-content:center;gap:7px;min-width:0;padding:12px;
+  border:1px solid var(--dp-border);border-radius:11px;background:var(--dp-surface);
 }
-#daysContainer .meal-title-input:focus{border-bottom:1px solid #16856d}
-#daysContainer .meal-items-count{flex:0 0 auto;color:#82918b;font-size:9px;font-weight:700}
-#daysContainer .meal-card-actions{display:flex;align-items:center;gap:5px;flex:0 0 auto}
-#daysContainer .meal-card-actions button{
-  display:grid;place-items:center;min-width:30px;height:30px;padding:0 8px;
-  border:1px solid #e1eae5;border-radius:8px;background:#fff;color:#5c746a;font-size:10px;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-heading,
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-foot{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-heading span{color:var(--dp-text-2);font-size:10px;font-weight:900}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-heading small,
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-foot{color:var(--dp-muted);font-size:9px;font-weight:700}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-value{display:flex;align-items:baseline;gap:5px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-value strong{color:var(--dp-text);font-size:20px;font-weight:900;line-height:1.2;font-variant-numeric:tabular-nums}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-value span{color:var(--dp-muted);font-size:10px;font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-track{height:6px;overflow:hidden;border-radius:99px;background:var(--dp-surface-3)}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-track span{display:block;height:100%;border-radius:inherit;background:var(--dp-accent)}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-protein .day-metric-track span{background:#55A9D1}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-carbs .day-metric-track span{background:#D99A24}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-fat .day-metric-track span{background:#27AE78}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--dp-border);
 }
-#daysContainer .meal-card-actions button:disabled{opacity:.3;cursor:not-allowed}
-#daysContainer .meal-card-actions .meal-add-food-btn{
-  display:inline-flex;align-items:center;gap:5px;padding:0 10px;
-  border-color:#16856d;background:#16856d;color:#fff;font-weight:800;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row span{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 9px;
+  border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface);color:var(--dp-text-2);font-size:9px;
 }
-#daysContainer .meal-card-actions .meal-delete-btn{border-color:#f0dddd;background:#fffafa;color:#b65a5a}
-#daysContainer .meal-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-#daysContainer .meal-items-table{width:100%;min-width:650px;border-collapse:collapse;font-size:10px}
-#daysContainer .meal-items-table th{
-  padding:8px;background:#f8faf9;color:#647970;text-align:center;font-size:9px;font-weight:800;white-space:nowrap;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row b{font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row strong{color:var(--dp-text);font-size:11px;font-weight:900}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row small{color:var(--dp-muted);font-size:9px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-tools{
+  display:grid;grid-template-columns:auto minmax(220px,1fr);align-items:center;gap:12px;
 }
-#daysContainer .meal-items-table th:first-child{text-align:right}
-#daysContainer .meal-items-table td{padding:8px;border-top:1px solid #edf2ef;color:#405b51;vertical-align:middle}
-#daysContainer .meal-items-table .meal-food-name{min-width:145px;color:#203f35;font-weight:800}
-#daysContainer .meal-items-table input:not([type=checkbox]){
-  width:100%;min-width:65px;min-height:30px;padding:5px 7px;border:1px solid #e2ebe6;
-  border-radius:7px;background:#fff;color:#294f42;font-size:10px;
+.visit-main-shell .embedded-diet-plan #daysContainer .day-primary-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-primary-actions button{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:37px;
+  padding:8px 12px;border:1px solid var(--dp-primary);border-radius:9px;
+  background:var(--dp-primary);color:#fff;font-size:10px;font-weight:900;
 }
-#daysContainer .meal-items-table .meal-quantity{min-width:95px;text-align:center;white-space:nowrap}
-#daysContainer .meal-items-table .meal-quantity input{width:60px!important;display:inline-block;text-align:center;font-weight:800}
-#daysContainer .meal-items-table .meal-quantity span{margin-inline-start:3px;color:#82918b;font-size:9px}
-#daysContainer .meal-items-table .meal-household{text-align:center;white-space:nowrap;color:#28745f;font-weight:800}
-#daysContainer .meal-items-table .meal-repeat-input{max-width:75px;text-align:center}
-#daysContainer .meal-items-table .meal-calc-cell{text-align:center;white-space:nowrap}
-#daysContainer .meal-items-table .meal-calc-cell input{width:15px;height:15px;vertical-align:middle;accent-color:#16856d}
-#daysContainer .meal-items-table .meal-item-delete{margin-inline-start:8px;color:#b65a5a}
-#daysContainer .meal-items-table .meal-empty-state{padding:15px;text-align:center;color:#71847c;font-size:10px}
-#daysContainer .day-empty-state{padding:25px 14px;border:1px dashed #cbd8dc;border-radius:12px;background:#fff;color:#60747c;text-align:center;font-size:11px;font-weight:800}
-@media(max-width:640px){
-  #daysContainer{gap:11px}
-  #daysContainer .day-card-header{align-items:center;padding:9px 10px;gap:7px}
-  #daysContainer .day-card-heading{gap:6px}
-  #daysContainer .day-title-group{gap:5px}
-  #daysContainer .day-title-input{max-width:120px;font-size:11px}
-  #daysContainer .day-card-meta{font-size:8px}
-  #daysContainer .day-card-actions{gap:3px}
-  #daysContainer .day-card-actions button{min-height:29px;padding:4px 6px;font-size:8px}
-  #daysContainer .day-card-actions .day-copy-btn,#daysContainer .day-card-actions .day-delete-btn{width:29px}
-  #daysContainer .day-card-actions button span{display:none}
-  #daysContainer .day-card-body{gap:9px;padding:9px 10px}
-  #daysContainer .day-summary-heading{margin-bottom:5px}
-  #daysContainer .day-summary-heading strong{font-size:12px}
-  #daysContainer .day-summary-heading span{font-size:8px}
-  #daysContainer .day-macros-grid>div{padding:5px 2px!important}
-  #daysContainer .day-macros-grid>div span{font-size:8px!important}
-  #daysContainer .day-macros-grid>div>div:nth-child(2) span:first-child{font-size:14px!important}
-  #daysContainer .day-micros-row{gap:15px}
-  #daysContainer .day-tools{grid-template-columns:1fr;gap:8px}
-  #daysContainer .day-primary-actions button{flex:1;min-height:33px;padding:6px 7px;font-size:9px}
-  #daysContainer .day-notes-wrap{align-items:flex-start;flex-direction:column;gap:4px}
-  #daysContainer .day-note-input{min-height:33px}
-  #daysContainer .meal-card-header{align-items:center;flex-direction:row;gap:7px;padding:9px 1px}
-  #daysContainer .meal-title-input{max-width:none;font-size:10px}
-  #daysContainer .meal-items-count{font-size:8px}
-  #daysContainer .meal-card-actions{width:auto;justify-content:flex-end;gap:4px}
-  #daysContainer .meal-card-actions button{min-width:28px;height:28px}
-  #daysContainer .meal-card-actions .meal-add-food-btn{flex:0 1 auto;max-width:105px;padding:0 7px;font-size:9px;white-space:nowrap}
-  #daysContainer .meal-items-table{min-width:620px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-notes-wrap{display:flex;align-items:center;gap:8px;min-width:0}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-notes-wrap>span{flex:0 0 auto;color:var(--dp-text-2);font-size:10px;font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-note-input{
+  width:100%;min-width:0;min-height:37px;padding:8px 10px;border:1px solid var(--dp-input-border);
+  border-radius:9px;background:var(--dp-input);color:var(--dp-text);font-size:10px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-meals-list{display:grid;gap:0}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-card{min-width:0;border:0;border-top:1px solid var(--dp-border);border-radius:0;background:transparent}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-card-header{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;
+  background:transparent;border:0;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-title-wrap{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-order{
+  display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:8px;
+  background:var(--dp-surface-3);color:var(--dp-primary);font-size:10px;font-weight:900;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-title-input{
+  width:100%;min-width:70px;max-width:240px;border:0;background:transparent;color:var(--dp-text);
+  font-size:12px;font-weight:900;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-count{color:var(--dp-muted);font-size:9px;white-space:nowrap}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions{display:flex;align-items:center;gap:5px}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions button{
+  display:inline-flex;align-items:center;justify-content:center;min-width:31px;height:31px;padding:0 9px;
+  border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface);color:var(--dp-text-2);font-size:10px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions .meal-add-food-btn{
+  gap:6px;border-color:var(--dp-primary);background:var(--dp-primary);color:#fff;font-weight:800;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions .meal-delete-btn{color:var(--dp-danger)}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table{
+  width:100%;min-width:620px;border-collapse:collapse;color:var(--dp-text);font-size:10px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table th{
+  padding:9px;background:var(--dp-surface-2);color:var(--dp-text-2);text-align:center;font-size:9px;font-weight:900;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table td{
+  padding:8px;border-top:1px solid var(--dp-border);background:transparent;color:var(--dp-text-2);vertical-align:middle;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-food-name{color:var(--dp-text);font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table input:not([type=checkbox]){
+  width:100%;min-width:60px;min-height:31px;padding:6px 8px;border:1px solid var(--dp-input-border);
+  border-radius:8px;background:var(--dp-input);color:var(--dp-text);font-size:10px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-quantity{text-align:center;white-space:nowrap}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-quantity input{width:62px!important;display:inline-block;text-align:center}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-quantity span{margin-inline-start:3px;color:var(--dp-muted);font-size:9px}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-household{text-align:center;color:var(--dp-primary);font-weight:800}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-empty-state{padding:16px;text-align:center;color:var(--dp-muted);font-size:10px}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-empty-state{
+  padding:28px 16px;border:1px dashed var(--dp-border);border-radius:12px;background:var(--dp-surface);
+  color:var(--dp-text-2);text-align:center;font-size:11px;font-weight:800;
+}
+.visit-main-shell .embedded-diet-plan .embedded-calculator{color:var(--dp-text)}
+.visit-main-shell .embedded-diet-plan .embedded-calculator .calc-card,
+.visit-main-shell .embedded-diet-plan .embedded-calculator .calc-result-neutral,
+.visit-main-shell .embedded-diet-plan .embedded-calculator .calc-result-bmr,
+.visit-main-shell .embedded-diet-plan .embedded-calculator .calc-result-tdee,
+.visit-main-shell .embedded-diet-plan .embedded-calculator .calc-result-group{
+  background:var(--dp-surface)!important;border-color:var(--dp-border)!important;color:var(--dp-text)!important;
+}
+.visit-main-shell .embedded-diet-plan .embedded-calculator label{color:var(--dp-text-2)}
+.visit-main-shell .embedded-diet-plan .embedded-calculator input,
+.visit-main-shell .embedded-diet-plan .embedded-calculator select{background:var(--dp-input);color:var(--dp-text)}
+@media(max-width:760px){
+  .visit-main-shell{padding:12px 10px 26px}
+  .visit-main-shell #visitContent{gap:12px}
+  .visit-main-shell .visit-patient-strip{padding:11px 12px}
+  .visit-main-shell .visit-module-grid{gap:7px}
+  .visit-main-shell .visit-module-grid .module-card{min-height:57px;padding:9px 10px!important}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-card-body{padding:10px;gap:10px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-summary{padding:11px;gap:10px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-summary-layout{grid-template-columns:1fr;gap:12px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-progress-block{gap:12px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring{width:112px;height:112px;flex-basis:112px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metrics-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric{padding:9px 7px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-value strong{font-size:17px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-tools{grid-template-columns:1fr;gap:9px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-notes-wrap{align-items:stretch;flex-direction:column;gap:5px}
+}
+@media(max-width:480px){
+  .visit-main-shell .visit-patient-strip{align-items:flex-start}
+  .visit-main-shell .visit-patient-strip [data-action="backToPatient"]{padding:8px 9px;font-size:10px}
+  .visit-main-shell .visit-module-grid .module-card{min-height:53px;padding:8px!important}
+  .visit-main-shell .visit-module-grid .module-card h4{font-size:11px!important}
+  .visit-main-shell .visit-module-grid .module-card p{display:none}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-card-header{padding:9px 10px;gap:6px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions{gap:3px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions button{min-height:29px;padding:4px 7px;font-size:9px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-card-actions button span{display:none}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-card-body{padding:9px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-summary-heading{align-items:flex-start}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metrics-grid{grid-template-columns:1fr}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric{grid-template-columns:1fr auto;align-items:center;gap:4px 10px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-heading{grid-column:1/-1}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-track{grid-column:1/-1}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-foot{grid-column:1/-1}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-value strong{font-size:16px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .meal-card-header{align-items:flex-start;flex-direction:column;gap:8px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}
+  .visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions .meal-add-food-btn{min-height:30px}
 }
 @media(max-width:360px){
-  #daysContainer .day-card-actions .day-copy-btn{display:none}
-  #daysContainer .day-macros-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring{width:100px;height:100px;flex-basis:100px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-progress-ring-center strong{font-size:19px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row{gap:5px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row span{padding:4px 6px;font-size:8px}
+}
+html[data-theme="dark"] .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table th{
+  background:var(--dp-surface-3);
+}
+html[data-theme="dark"] .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table td{
+  background:transparent;
+}
+html.visit-embedded,html.visit-embedded body{background:var(--dp-bg)!important;color:var(--dp-text)!important}
+html.visit-embedded body>main{width:100%!important;max-width:none!important;margin:0!important;padding:10px!important;box-sizing:border-box}
+html.visit-embedded #visitContent>section.visit-patient-strip{display:none}
+html.visit-embedded #visitContent>section.visit-module-section{margin-top:0!important}
+html.visit-embedded #dp-theme-toggle{display:none!important}
+@media(max-width:640px){
+  html.visit-embedded body>main{padding:7px!important}
 }
