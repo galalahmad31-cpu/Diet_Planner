@@ -444,12 +444,16 @@
 
       const accessStatus = await access.getAccessStatus();
       state.user = accessStatus?.user || null;
+
       if (!state.user) {
         setSubscriptionStatus(
-          'غير متاح',
-          'rounded-full bg-slate-200 px-3 py-1 text-[11px] font-black text-slate-600',
-          'لا توجد جلسة تسجيل دخول.'
+          'سجّل الدخول',
+          'rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black text-amber-700',
+          'سجّل الدخول لعرض بيانات حسابك وإدارة اشتراكك.'
         );
+        $('editProfileBtn')?.setAttribute('hidden', '');
+        $('logoutBtn')?.closest('div')?.setAttribute('hidden', '');
+        await loadPlans();
         return;
       }
 
