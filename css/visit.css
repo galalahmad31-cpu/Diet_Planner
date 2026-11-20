@@ -896,6 +896,13 @@ body #fixedMealsModal.diet-fixed-meals-modal-layer{
 }
 body #fixedMealsModal.diet-fixed-meals-modal-layer.hidden{display:none!important}
 body #fixedMealsModal.diet-fixed-meals-modal-layer:not(.hidden){display:flex!important}
+body :is(#addMealModal,#confirmModal).diet-action-modal-layer{
+  position:fixed!important;inset:0!important;z-index:2147483647!important;
+  display:flex;align-items:center;justify-content:center;
+  isolation:isolate;pointer-events:auto;
+}
+body :is(#addMealModal,#confirmModal).diet-action-modal-layer.hidden{display:none!important}
+body :is(#addMealModal,#confirmModal).diet-action-modal-layer:not(.hidden){display:flex!important}
 body .day-details-modal[hidden]{display:none!important}
 body .day-details-modal{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
