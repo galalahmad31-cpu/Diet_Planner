@@ -56,10 +56,7 @@
         <div id="headerActions" class="dp-header-account-actions">
           <div id="accountInfo" class="dp-header-account-info hidden">
             <span id="doctorName" class="dp-header-account-name" aria-live="polite"></span>
-            <button id="logoutBtn" type="button" class="hidden" title="تسجيل الخروج" aria-label="تسجيل الخروج">
-              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-              <span>تسجيل الخروج</span>
-            </button>
+
           </div>
           <div class="dp-header-auth-actions">
             <a id="loginCta" class="hidden" href="login.html">تسجيل الدخول</a>
@@ -80,6 +77,16 @@
         link.setAttribute("aria-current", "page");
       }
       track.append(link);
+      if (href === "app.html") {
+        const logout = document.createElement("button");
+        logout.id = "logoutBtn";
+        logout.type = "button";
+        logout.className = "dp-app-header__logout hidden";
+        logout.title = "تسجيل الخروج";
+        logout.setAttribute("aria-label", "تسجيل الخروج");
+        logout.innerHTML = '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>خروج</span>';
+        track.append(logout);
+      }
     });
     return header;
   }
