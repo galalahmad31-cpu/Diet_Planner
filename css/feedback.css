@@ -3,11 +3,8 @@
 
 body{
   margin:0;
-  font-family:Cairo,sans-serif;
-  background:
-    radial-gradient(circle at 90% 0%,rgba(23,143,132,.10),transparent 28%),
-    radial-gradient(circle at 5% 95%,rgba(23,143,132,.07),transparent 25%),
-    #f7fafb;
+  font-family:var(--dp-font);
+  background:var(--dp-bg);
   color:var(--dp-text);
 }
 
