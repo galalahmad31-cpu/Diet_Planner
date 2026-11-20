@@ -630,7 +630,13 @@ async function init() {
         user = await refreshFinanceWriteAccess();
 
         if (!user) {
-            location.replace('index.html');
+            window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'اشتراكات المرضى متاحة للمشتركين فقط. سجّل الدخول ثم اشترك للوصول إليها.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});
+            $('loading')?.remove();
+            return;
+        }
+        if (!canWriteFinance()) {
+            window.DietPlannerAccess?.showAccessPrompt?.({title:'هذه الصفحة للمشتركين',message:'إدارة اشتراكات المرضى متاحة باشتراك نشط فقط. يمكنك مراجعة خطط الاشتراك من صفحتك الشخصية.',actionLabel:'عرض خطط الاشتراك',actionHref:'profile.html'});
+            $('loading')?.remove();
             return;
         }
 
