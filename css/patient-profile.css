@@ -825,3 +825,14 @@ body.support-delete-modal-open{overflow:hidden}
 #exchangePlanContent .exchange-notes-hint{margin:6px 2px 0;color:var(--dp-muted);font-size:10px}
 @media(max-width:640px){#exchangePlanContent .exchange-plan-notes{min-height:260px;padding:12px;font-size:12px}}
 @media print{#exchangePlanContent .exchange-plan-notes{min-height:0;border:0;padding:0;background:#fff;color:#111}}
+
+/* Extended measurement history: body composition and patient feedback. */
+.measurements-table{min-width:1120px}
+.measurements-table th:nth-child(2){width:9%}
+.measurements-table th:nth-child(3),.measurements-table th:nth-child(4),.measurements-table th:nth-child(5){width:9%}
+.measurements-table th:nth-child(6),.measurements-table th:nth-child(7){width:10%}
+.measurements-table th:nth-child(8){width:10%}
+.measurements-table th:nth-child(9){width:18%;white-space:normal}
+.measurements-table th:last-child{width:7%}
+.measurement-notes-cell{min-width:160px;white-space:pre-wrap;overflow-wrap:anywhere;text-align:right!important}
+.inline-measurement-row textarea{width:100%;min-width:150px;min-height:76px;box-sizing:border-box;resize:vertical;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px;font:600 10px/1.7 Cairo,sans-serif}
