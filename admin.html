@@ -5,7 +5,7 @@
 <title>إدارة Diet Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=20261119-announcements-admin1">
+<link rel="stylesheet" href="css/admin.css?v=20261120-doctors-table-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -29,7 +29,7 @@
 </section>
 <section id="tab-doctors" style="display:none">
 <div class="toolbar"><div class="stats"><div class="stat">المستخدمون <b id="doctorCount">0</b></div><div class="stat">اشتراكات نشطة <b id="doctorActiveCount">0</b></div></div><input id="doctorSearch" class="search" placeholder="بحث باسم الطبيب أو البريد..."><button class="btn btn-outline" id="refreshDoctorsBtn"><i class="fa-solid fa-rotate"></i></button></div>
-<div class="card"><div id="doctorState" class="state">جاري التحميل...</div><div class="wrap" id="doctorWrap" style="display:none"><table><thead><tr><th>المستخدم</th><th>الدور</th><th>الخطة الحالية</th><th>البداية</th><th>النهاية</th><th>المرضى</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="doctorsBody"></tbody></table></div></div>
+<div class="card"><div id="doctorState" class="state">جاري التحميل...</div><div class="wrap" id="doctorWrap" style="display:none"><table class="doctors-table" dir="rtl"><colgroup><col class="doctor-col-user"><col class="doctor-col-role"><col class="doctor-col-plan"><col class="doctor-col-start"><col class="doctor-col-end"><col class="doctor-col-patients"><col class="doctor-col-status"><col class="doctor-col-actions"></colgroup><thead><tr><th scope="col">الطبيب</th><th scope="col">الدور</th><th scope="col">الخطة الحالية</th><th scope="col">البداية</th><th scope="col">النهاية</th><th scope="col">المرضى</th><th scope="col">الحالة</th><th scope="col">الإجراءات</th></tr></thead><tbody id="doctorsBody"></tbody></table></div></div>
 </section>
 <section id="tab-announcements" style="display:none">
  <div class="toolbar announcements-toolbar">
