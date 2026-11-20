@@ -63,7 +63,7 @@ async function findPlans(){
  if(!c.patient_id)throw new Error('لم يتم تحديد المريض لخطة البدائل.');
  if(!dbx)throw new Error('تعذر الاتصال بقاعدة البيانات.');
  const {data,error}=await dbx.from('nutrition_plans')
-  .select('id,patient_id,plan_name,start_date,created_at,updated_at')
+  .select('id,patient_id,plan_name,start_date,notes,created_at,updated_at')
   .eq('patient_id',c.patient_id)
   .order('updated_at',{ascending:false})
   .order('created_at',{ascending:false});
