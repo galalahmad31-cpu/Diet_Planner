@@ -593,7 +593,7 @@
     });
 
     const url = new URL('visit.html', window.location.href);
-    url.searchParams.set('visit_ui', '20261120-visit-summary-v6');
+    url.searchParams.set('visit_ui', Date.now().toString(36));
     url.searchParams.set('patient_id', patientId);
     url.searchParams.set('embed', '1');
     if (planId) url.searchParams.set('plan_id', planId);
