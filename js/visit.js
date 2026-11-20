@@ -67,7 +67,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
   const moduleLoaders = {
     dietPlan: {
-      src: 'js/visit-diet-plan.js?v=20261120-visit-summary-v3',
+      preloaded: true,
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
@@ -87,6 +87,14 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
     if (config.ready()) {
       return Promise.resolve(true);
+    }
+
+    if (config.preloaded) {
+      const reason = window.__dpDietPlanLoadError || 'ملف الوحدة لم ينشئ window.dietPlan.init';
+      const error = new Error('Gram diet module unavailable: ' + reason);
+      console.error(error);
+      showError('تعذر تهيئة وحدة خطة الجرامات. ' + reason);
+      return Promise.resolve(false);
     }
 
     if (modulePromises[module]) {
