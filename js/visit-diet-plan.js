@@ -348,8 +348,15 @@ function calculateDay(day){
  return {cal,pro,carb,fat,sod,pot,pho};
 }
 function metricCard(label,value,unit,target,pctv,kind){
- const bg={amber:'bg-amber-50 border-amber-200 text-amber-900',slate:'bg-slate-50 border-slate-200 text-slate-800',sky:'bg-sky-50 border-sky-200 text-sky-900',emerald:'bg-emerald-50 border-emerald-200 text-emerald-900'}[kind];
- return `<div class="${bg} border rounded-md px-1.5 py-1 min-w-0"><div class="flex items-center justify-center gap-1"><span class="text-[8px] sm:text-[9px] font-bold leading-tight whitespace-nowrap">${label}</span>${target?`<span class="text-[8px] opacity-70">/${target}</span>`:''}</div><div class="flex items-baseline justify-center gap-0.5 leading-tight"><span class="text-[12px] sm:text-[14px] font-black tabular-nums">${value}</span><span class="text-[8px] font-bold">${unit}</span></div>${target?`<div class="w-full bg-white/60 h-1 rounded-full mt-1 overflow-hidden"><div class="bg-current h-full rounded-full" style="width:${pctv}%"></div></div>`:''}</div>`;
+ const targetValue=num(target);
+ const hasTarget=targetValue>0;
+ const safePct=hasTarget?Math.max(0,Math.min(100,Number(pctv)||0)):0;
+ return `<div class="day-metric day-metric-${kind}">
+  <div class="day-metric-heading"><span>${label}</span>${hasTarget?`<small>الهدف ${Math.round(targetValue)} ${unit}</small>`:'<small>لا يوجد هدف محدد</small>'}</div>
+  <div class="day-metric-value"><strong>${Number(value).toLocaleString('en-US')}</strong><span>${unit}</span></div>
+  <div class="day-metric-track" aria-hidden="true"><span style="width:${safePct}%"></span></div>
+  <div class="day-metric-foot">${hasTarget?`<span>${Math.round(Number(value)/targetValue*100)}% من الهدف</span>`:'<span>حدد الهدف للمقارنة</span>'}</div>
+ </div>`;
 }
 
 async function syncFixedMeals(){
@@ -658,14 +665,20 @@ function renderDays(){
 
  container.innerHTML=daysData.length?daysData.map((d,di)=>{
   const calc=calculateDay(d);
-  const calPct=patientInfo.targetCal?Math.min(100,calc.cal/Number(patientInfo.targetCal)*100):0;
-  const proPct=patientInfo.targetPro?Math.min(100,calc.pro/Number(patientInfo.targetPro)*100):0;
-  const carbPct=patientInfo.targetCarb?Math.min(100,calc.carb/Number(patientInfo.targetCarb)*100):0;
-  const fatPct=patientInfo.targetFat?Math.min(100,calc.fat/Number(patientInfo.targetFat)*100):0;
+  const targetCal=num(patientInfo.targetCal);
+  const targetPro=num(patientInfo.targetPro);
+  const targetCarb=num(patientInfo.targetCarb);
+  const targetFat=num(patientInfo.targetFat);
+  const calPctRaw=targetCal>0?Math.round(calc.cal/targetCal*100):0;
+  const calPct=Math.max(0,Math.min(100,calPctRaw));
+  const proPct=targetPro>0?Math.min(100,calc.pro/targetPro*100):0;
+  const carbPct=targetCarb>0?Math.min(100,calc.carb/targetCarb*100):0;
+  const fatPct=targetFat>0?Math.min(100,calc.fat/targetFat*100):0;
   const meals=d.meals||[];
   const itemCount=meals.reduce((sum,meal)=>sum+(meal.items||[]).length,0);
+  const progressLabel=targetCal>0?`تم تحقيق ${calPctRaw}% من هدف السعرات`:'لم يتم تحديد هدف السعرات';
 
-  return `<section class="day-card bg-white border border-slate-200 rounded-2xl overflow-hidden" data-day-id="${escapeHtml(d.id)}">
+  return `<section class="day-card" data-day-id="${escapeHtml(d.id)}">
    <header class="day-card-header">
     <div class="day-card-heading">
      <button type="button" class="day-collapse-btn day-action-always" onclick="window.dietPlan.toggleDayCollapse('${escapeHtml(d.id)}')" aria-label="${d.isCollapsed?'فتح':'طي'} اليوم">
@@ -686,17 +699,34 @@ function renderDays(){
 
    ${d.isCollapsed?'':`<div class="day-card-body">
     <section class="day-summary" aria-label="ملخص القيمة الغذائية لليوم">
-     <div class="day-summary-heading"><strong>ملخص اليوم</strong><span>القيم المحسوبة من الأصناف المضافة</span></div>
-     <div class="day-macros-grid">
-      ${metricCard('السعرات',Math.round(calc.cal),'kcal',patientInfo.targetCal,calPct,'amber')}
-      ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'slate')}
-      ${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'sky')}
-      ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'emerald')}
+     <div class="day-summary-heading">
+      <div><strong>ملخص اليوم</strong><span>متابعة الإنجاز مقارنة بالهدف الغذائي</span></div>
+      <small>${itemCount} أصناف محسوبة</small>
+     </div>
+     <div class="day-summary-layout">
+      <div class="day-progress-block">
+       <div class="day-progress-ring" role="img" aria-label="${progressLabel}" style="--day-progress:${calPct}%">
+        <div class="day-progress-ring-center">
+         <strong>${Math.round(calc.cal).toLocaleString('en-US')}</strong>
+         <span>kcal محققة</span>
+        </div>
+       </div>
+       <div class="day-progress-copy">
+        <span>تحقيق هدف السعرات</span>
+        <strong>${targetCal>0?`${calPctRaw}%`:'—'}</strong>
+        <small>${targetCal>0?`من ${Math.round(targetCal).toLocaleString('en-US')} kcal`:'لم يحدد الهدف بعد'}</small>
+       </div>
+      </div>
+      <div class="day-metrics-grid">
+       ${metricCard('البروتين',Math.round(calc.pro),'g',patientInfo.targetPro,proPct,'protein')}
+       ${metricCard('الكربوهيدرات',Math.round(calc.carb),'g',patientInfo.targetCarb,carbPct,'carbs')}
+       ${metricCard('الدهون',Math.round(calc.fat),'g',patientInfo.targetFat,fatPct,'fat')}
+      </div>
      </div>
      <div class="day-micros-row" aria-label="المعادن">
-      <span><b>Na</b><strong>${Math.round(calc.sod)}</strong><small>mg</small></span>
-      <span><b>K</b><strong>${Math.round(calc.pot)}</strong><small>mg</small></span>
-      <span><b>P</b><strong>${Math.round(calc.pho)}</strong><small>mg</small></span>
+      <span><b>الصوديوم</b><strong>${Math.round(calc.sod).toLocaleString('en-US')}</strong><small>mg</small></span>
+      <span><b>البوتاسيوم</b><strong>${Math.round(calc.pot).toLocaleString('en-US')}</strong><small>mg</small></span>
+      <span><b>الفوسفور</b><strong>${Math.round(calc.pho).toLocaleString('en-US')}</strong><small>mg</small></span>
      </div>
     </section>
 
