@@ -75,6 +75,13 @@
     <div id="patientsList" class="patient-list" aria-live="polite">
       <div class="loading text-center text-sm text-slate-400 py-10">جاري تحميل المرضى...</div>
     </div>
+    <div id="patientsPagination" class="flex flex-col items-center gap-2 px-4 py-4" style="display:none">
+      <p id="patientsLoadSummary" class="text-xs text-slate-500" aria-live="polite"></p>
+      <button id="loadMorePatientsBtn" type="button"
+        class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-extrabold px-6 py-2.5 rounded-xl transition">
+        عرض المزيد
+      </button>
+    </div>
 
   </section>
 </main>
