@@ -557,11 +557,11 @@
       list.appendChild(row);
     });
 
-    const activePanel = $('planEmbeddedPanel');
+    const activePanel = $('planWorkspacePanel');
     const activePlanId = activePanel?.dataset.planId || '';
     if (activePlanId) {
       const stillExists = data.some(item => String(item.id) === String(activePlanId));
-      if (!stillExists) closePlanEmbedded();
+      if (!stillExists) closePlanWorkspace();
       else list.querySelectorAll('[data-open-plan]').forEach(button => {
         button.classList.toggle('is-active', button.dataset.openPlan === activePlanId);
       });
@@ -575,7 +575,7 @@
         !String(plan.plan_name || '').includes('البدائل')
       );
       if (latestGramsPlan) {
-        openPlanEmbedded(latestGramsPlan.id, 'الخطة الغذائية باستخدام الجرامات');
+        openPlanWorkspace(latestGramsPlan.id, 'الخطة الغذائية باستخدام الجرامات');
       }
     }
     return data;
@@ -649,8 +649,8 @@
     document.addEventListener('input', runInputAction);
   }
 
-  async function openPlanEmbedded(planId = null, planType = '') {
-    const panel = $('planEmbeddedPanel');
+  async function openPlanWorkspace(planId = null, planType = '') {
+    const panel = $('planWorkspacePanel');
     const content = $('dietPlanContent');
     if (!panel || !content || !patientId) return;
 
@@ -686,8 +686,8 @@
     }
   }
 
-  function closePlanEmbedded() {
-    const panel = $('planEmbeddedPanel');
+  function closePlanWorkspace() {
+    const panel = $('planWorkspacePanel');
     if (panel) {
       panel.hidden = true;
       delete panel.dataset.planId;
@@ -737,7 +737,7 @@
         .eq('id', plan.id).eq('patient_id', patientId);
       if (error) throw error;
 
-      if (String($('planEmbeddedPanel')?.dataset.planId || '') === String(plan.id)) closePlanEmbedded();
+      if (String($('planWorkspacePanel')?.dataset.planId || '') === String(plan.id)) closePlanWorkspace();
       await loadNutritionPlans();
     } catch (error) {
       console.error('Delete nutrition plan failed:', error);
@@ -758,7 +758,7 @@
       if (error) throw error;
       if (!planId) throw new Error('لم يتم استلام معرّف الخطة الجديدة.');
       await loadNutritionPlans();
-      openPlanEmbedded(planId, '');
+      openPlanWorkspace(planId, '');
     } catch (error) {
       console.error('Create nutrition plan failed:', error);
       await Swal.fire('تعذر إضافة الخطة', error.message || 'حدث خطأ أثناء إنشاء الخطة الغذائية.', 'error');
@@ -1269,7 +1269,7 @@
     $('visitsList')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-open-plan]');
       if (!button) return;
-      openPlanEmbedded(button.dataset.openPlan, button.dataset.planType);
+      openPlanWorkspace(button.dataset.openPlan, button.dataset.planType);
     });
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableBody')?.addEventListener('click', (event) => {
