@@ -833,3 +833,16 @@ body.support-delete-modal-open{overflow:hidden}
 
 /* Inline measurement editor inside the history table. */
 .measurement-entry-row{background:var(--surface-muted,#f2f8f6)!important}.measurement-entry-row td{padding:7px 5px!important;vertical-align:top}.measurement-entry-row input,.measurement-entry-row select,.measurement-entry-row textarea{display:block;width:100%;min-width:68px;box-sizing:border-box;border:1px solid var(--border-color,#d5e2de);border-radius:7px;background:var(--input-bg,#fff);color:var(--text-color,#243b3b);padding:7px 5px;font:600 10px/1.5 Cairo,sans-serif}.measurement-entry-row textarea{min-width:150px;min-height:58px;resize:vertical;text-align:right}.measurement-entry-row input:focus,.measurement-entry-row select:focus,.measurement-entry-row textarea:focus{outline:2px solid var(--primary-color,#059669);outline-offset:1px}.measurement-entry-actions{min-width:76px}.measurement-entry-actions button{display:block;width:100%;margin:0 0 5px;padding:7px 5px;border:0;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}.measurement-save-button{background:var(--primary-color,#059669);color:#fff}.measurement-cancel-button{background:var(--surface-muted,#e8eeec);color:var(--text-color,#475569)}.measurement-entry-actions button:disabled{opacity:.55;cursor:wait}[data-theme="dark"] .measurement-entry-row{background:var(--card-bg,#172b27)!important}
+
+/* Measurement row actions: readable controls with comfortable column width. */
+.measurements-table{min-width:1200px}
+.measurements-table th:last-child{width:12%}
+.measurement-row-actions{white-space:nowrap;min-width:118px}
+.measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
+.measurement-edit-button{border:1px solid #cfe4ee;background:#f0f8fc;color:#17617d}
+.measurement-edit-button:hover{background:#e0f0f7}
+.measurement-delete-button{width:auto;height:auto;border:1px solid #fee2e2;border-radius:7px;background:#fff7f7;color:#e11d48}
+.measurement-delete-button:hover{background:#ffe4e6}
+[data-theme="dark"] .measurement-edit-button{border-color:#315d68;background:#183d43;color:#b9e7ed}
+[data-theme="dark"] .measurement-delete-button{border-color:#713b45;background:#45252d;color:#fecdd3}
+@media(max-width:600px){.measurements-table{min-width:1200px}.measurement-row-actions{min-width:118px}}
