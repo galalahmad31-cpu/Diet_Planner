@@ -790,3 +790,15 @@ body.support-delete-modal-open{overflow:hidden}
 @media print{
   body.patient-profile-page>[data-dp-app-header]{display:none!important}
 }
+
+
+/* Patient profile: exchange-plan action pair shares the existing compact toolbar. */
+.followup-plan-actions{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.followup-plan-actions .followup-add-button{white-space:nowrap}
+.followup-plan-actions .followup-add-exchange-button{background:#6d45a8;color:#fff;border-color:#6d45a8}
+.followup-plan-actions .followup-add-exchange-button:hover{background:#59368f}
+#exchangePlanContent{min-width:0}
+@media(max-width:600px){
+ .followup-plan-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .followup-plan-actions .followup-add-button{width:100%;padding-inline:8px;font-size:10px}
+}
