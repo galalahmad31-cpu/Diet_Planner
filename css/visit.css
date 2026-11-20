@@ -819,3 +819,145 @@ html.visit-embedded #dp-theme-toggle{display:none!important}
 @media(max-width:640px){
   html.visit-embedded body>main{padding:7px!important}
 }
+
+
+/* Diet-plan day index + focused day dialog.
+   Uses the shared theme tokens; no local light/dark palette is introduced. */
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list{
+  display:grid;gap:9px;width:100%;min-width:0;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:8px;
+  min-width:0;padding:6px;border:1px solid var(--dp-border);
+  border-radius:13px;background:var(--dp-surface);box-shadow:0 2px 8px var(--dp-shadow);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-open{
+  display:grid;grid-template-columns:38px minmax(0,1fr) auto auto 14px;
+  align-items:center;gap:11px;min-width:0;padding:7px 9px;border:0;
+  border-radius:9px;background:transparent;color:var(--dp-text);text-align:right;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-open:hover{
+  background:var(--dp-surface-2);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-index{
+  display:grid;place-items:center;width:36px;height:36px;border-radius:10px;
+  background:var(--dp-tab-active-bg);color:var(--dp-primary);font-size:11px;font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-main{
+  display:grid;gap:3px;min-width:0;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-main strong{
+  overflow:hidden;color:var(--dp-text);font-size:12px;font-weight:900;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-main small{
+  color:var(--dp-muted);font-size:9px;font-weight:700;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-calories{
+  display:flex;align-items:baseline;gap:4px;white-space:nowrap;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-calories strong{
+  color:var(--dp-primary);font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-calories small{
+  color:var(--dp-muted);font-size:8px;font-weight:800;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-status{
+  padding:5px 8px;border:1px solid var(--dp-border);border-radius:20px;
+  font-size:9px;font-weight:800;white-space:nowrap;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-status.is-saved{
+  background:var(--dp-surface-2);color:var(--dp-text-2);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-status.is-pending{
+  background:var(--dp-warning-bg);border-color:var(--dp-warning-border);color:var(--dp-warning);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-chevron{
+  color:var(--dp-muted);font-size:10px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions{
+  display:flex;align-items:center;gap:5px;padding-inline-start:7px;
+  border-inline-start:1px solid var(--dp-border);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions button{
+  display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--dp-border);
+  border-radius:9px;background:var(--dp-surface-2);color:var(--dp-text-2);font-size:10px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions .day-list-delete{color:var(--dp-danger)}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions button:hover{
+  border-color:var(--dp-primary);color:var(--dp-primary);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-modal[hidden]{display:none!important}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-modal{
+  position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;
+  margin:0!important;padding:clamp(8px,2.5vw,24px);box-sizing:border-box;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-backdrop{
+  position:absolute;inset:0;background:rgba(8,18,24,.66);backdrop-filter:blur(4px);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-dialog{
+  position:relative;display:flex;flex-direction:column;width:min(100%,1120px);
+  max-height:min(94dvh,1050px);min-height:0;overflow:hidden;
+  border:1px solid var(--dp-border);border-radius:18px;
+  background:var(--dp-bg);color:var(--dp-text);
+  box-shadow:0 24px 80px rgba(0,0,0,.28);
+  animation:dayDetailsIn .18s ease-out;
+}
+@keyframes dayDetailsIn{
+  from{opacity:0;transform:translateY(10px) scale(.99)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-header{
+  position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex:0 0 auto;padding:13px 17px;border-bottom:1px solid var(--dp-border);
+  background:var(--dp-surface);
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-header>div{display:grid;gap:2px;min-width:0}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-header>div>span{
+  color:var(--dp-muted);font-size:9px;font-weight:800;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-header h2{
+  margin:0;color:var(--dp-text);font-size:14px;font-weight:900;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-close{
+  display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;
+  border:1px solid var(--dp-border);border-radius:10px;
+  background:var(--dp-surface-2);color:var(--dp-text-2);font-size:14px;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-content{
+  min-height:0;overflow:auto;padding:14px;overscroll-behavior:contain;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-content>.day-card{
+  margin:0;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-content>.day-card>.day-card-header{
+  position:sticky;top:0;z-index:1;border:1px solid var(--dp-border)!important;
+  border-radius:12px;background:var(--dp-surface-2)!important;
+}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-details-content>.day-card>.day-card-body{
+  padding:13px 0 0;
+}
+@media(max-width:640px){
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-row{gap:4px;padding:4px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-open{
+    grid-template-columns:32px minmax(0,1fr) auto 12px;gap:7px;padding:6px 5px;
+  }
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-index{width:30px;height:32px;font-size:10px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-main strong{font-size:10px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-main small{font-size:8px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-calories strong{font-size:11px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-status{display:none}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions{gap:3px;padding-inline-start:4px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions button{width:28px;height:30px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-details-modal{padding:0}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-details-dialog{
+    width:100%;height:100%;max-height:100dvh;border-radius:0;border:0;
+  }
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-details-header{padding:10px 13px}
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-details-content{padding:9px}
+}
+@media print{
+  .visit-main-shell .embedded-diet-plan #daysContainer .day-details-modal{display:none!important}
+}
