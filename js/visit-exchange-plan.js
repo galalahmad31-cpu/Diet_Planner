@@ -380,17 +380,19 @@ async function init(requestedPlanId=null){
   const c=ctx();
   if(!c.patient_id)throw new Error('لم يتم تحديد المريض.');
   const plans=await findPlans();
-  const selectedPlan=requestedExchangePlanId ? plans.find(p=>String(p.id)===String(requestedExchangePlanId))
+  const selectedPlan=requestedPlanId ? plans.find(p=>String(p.id)===String(requestedPlanId))
    : plans.find(p=>String(p.plan_name||'').includes('البدائل'));
-  if(requestedExchangePlanId&&!selectedPlan)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
+  if(requestedPlanId&&!selectedPlan)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
   const patientEnergy=window.currentPatientEnergy||{};
   S.t={cal:n(patientEnergy.energy_target_calories),pro:n(patientEnergy.energy_target_protein),carb:n(patientEnergy.energy_target_carb),fat:n(patientEnergy.energy_target_fat)};
   if(selectedPlan&&isUuid(selectedPlan.id)){
    const selectedName=String(selectedPlan.plan_name||'');
    if(selectedName.includes('الجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
    const isFreshNumberedPlan=/^الخطة\s+\d+\s+-/.test(selectedName);
-   S.plan=selectedPlan.id; S.editing=isFreshNumberedPlan;
-   await loadExchangeValues(); await loadDays();
+   S.plan=selectedPlan.id;
+   await loadExchangeValues();
+   S.editing=isFreshNumberedPlan || !S.saved;
+   await loadDays();
   }else{S.plan=null;S.editing=true;}
   render();renderDays();setButtons();
   S.ready=true;
