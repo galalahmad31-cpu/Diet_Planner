@@ -360,20 +360,14 @@ function showToast(message, ok = true) {
 }
 
 function populateCategories() {
-  const usedSubcategoryIds = new Set(state.products.map(p => p.subcategory_id).filter(Boolean));
-  const usedCategoryIds = new Set(
-    state.subcategories.filter(s => usedSubcategoryIds.has(s.id)).map(s => s.category_id).filter(Boolean)
-  );
-
-  const categories = state.categories.filter(c => state.isAdmin || usedCategoryIds.has(c.id));
-
+  // Category metadata is loaded once; do not derive available filters from
+  // the currently loaded 20-product page.
   $('categoryFilter').innerHTML =
     option('كل الأقسام','') +
-    categories.map(c => option(c.name,c.id,c.id === state.category)).join('');
+    state.categories.map(c => option(c.name,c.id,c.id === state.category)).join('');
 
   const activeSubs = state.subcategories.filter(s =>
-    (state.isAdmin || usedSubcategoryIds.has(s.id)) &&
-    (!state.category || s.category_id === state.category)
+    !state.category || s.category_id === state.category
   );
 
   if (!activeSubs.some(s => s.id === state.subcategory)) state.subcategory = '';
@@ -594,7 +588,8 @@ async function loadProductsPage(reset = false) {
       .select('id,product_name,usage,notes,sort_order,subcategory_id,required_feature,is_active', { count: 'exact' })
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
-      .order('product_name', { ascending: true });
+      .order('product_name', { ascending: true })
+      .order('id', { ascending: true });
 
     if (state.subcategory) {
       query = query.eq('subcategory_id', state.subcategory);
