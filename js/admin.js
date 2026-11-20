@@ -2,7 +2,7 @@
 'use strict';
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
-const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],activeTab:'requests',requestSearch:'',requestStatus:'all'};
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,activeTab:'requests',requestSearch:'',requestStatus:'all'};
 let confirmAction=null;
 
 const $=id=>document.getElementById(id);
@@ -269,13 +269,46 @@ function deleteAnnouncement(id){
  });
 }
 
+async function loadPrivacyPolicy(){
+ const box=$('privacyPolicyState'),editor=$('privacyPolicyEditor');
+ if(!box||!editor)return;
+ box.style.display='block';box.textContent='جاري تحميل سياسة الخصوصية...';editor.style.display='none';
+ const {data,error}=await sb.from('privacy_policy').select('id,content,updated_at').eq('id',1).maybeSingle();
+ if(error){box.textContent='تعذر تحميل سياسة الخصوصية. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.';console.error('Privacy policy load failed:',error);return}
+ if(!data){box.textContent='لم يتم العثور على سجل سياسة الخصوصية في قاعدة البيانات.';return}
+ state.privacyPolicy=data;
+ $('privacyPolicyContent').value=data.content||'';
+ $('privacyPolicyDate').value=data.updated_at||'';
+ box.style.display='none';editor.style.display='block';
+}
+async function savePrivacyPolicy(){
+ const content=$('privacyPolicyContent')?.value??'';
+ const updatedAt=$('privacyPolicyDate')?.value||'';
+ if(!updatedAt){toast('حدد تاريخ آخر تحديث.');$('privacyPolicyDate')?.focus();return}
+ if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(updatedAt)){toast('تاريخ آخر تحديث غير صالح.');return}
+ const button=$('savePrivacyPolicyBtn');
+ const original=button.innerHTML;button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+ try{
+  const {data,error}=await sb.from('privacy_policy').update({content,updated_at:updatedAt}).eq('id',1).select('id,content,updated_at').single();
+  if(error)throw error;
+  state.privacyPolicy=data;
+  toast('تم حفظ سياسة الخصوصية وتحديثها بنجاح.');
+ }catch(error){
+  console.error('Privacy policy save failed:',error);
+  toast(error?.message||'تعذر حفظ سياسة الخصوصية.');
+ }finally{
+  button.disabled=false;button.innerHTML=original;
+ }
+}
+
 function switchTab(tab){
  state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
- ['requests','plans','doctors','announcements'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors();if(tab==='announcements')loadAnnouncements()
+ ['requests','plans','doctors','announcements','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors();if(tab==='announcements')loadAnnouncements();if(tab==='privacy')loadPrivacyPolicy()
 }
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 $('newPlanBtn').onclick=()=>openPlan(null);$('refreshBtn').onclick=()=>loadAll();$('refreshDoctorsBtn').onclick=()=>loadAll();$('doctorSearch').oninput=renderDoctors;
+$('refreshPrivacyPolicyBtn').onclick=()=>loadPrivacyPolicy();$('savePrivacyPolicyBtn').onclick=savePrivacyPolicy;
 $('newAnnouncementBtn').onclick=()=>openAnnouncementForm();$('refreshAnnouncementsBtn').onclick=()=>loadAnnouncements();
 $('announcementList').onclick=e=>{
  const edit=e.target.closest('[data-announcement-edit]'),toggle=e.target.closest('[data-announcement-toggle]'),del=e.target.closest('[data-announcement-delete]');
