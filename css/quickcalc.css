@@ -368,7 +368,7 @@
 #qc-bmf-content .qc-bmf-fields label{min-height:2.7em}
 
 /* Full-width page shell; the shared application header is deliberately untouched. */
-.quickcalc-page-body{min-height:100vh}
+.quickcalc-page-body{min-height:100vh;font-family:var(--dp-font,Cairo,sans-serif)}
 .main-container.quickcalc-fullwidth-shell{
   display:block;
   width:100%;
