@@ -39,11 +39,11 @@ tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']},colors
   <div class="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1.5 notifications-tab-list">
     <button data-tab="today" class="tab-btn active rounded-xl px-2 py-3 text-xs sm:text-sm font-extrabold transition">
       <i class="fa-solid fa-calendar-day ml-1"></i> متابعات اليوم
-      <span id="todayCount" class="notifications-count-badge mr-1 inline-flex min-w-6 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[10px]">0</span>
+      <span id="todayCount" class="notifications-count-badge mr-1 inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px]">0</span>
     </button>
     <button data-tab="tomorrow" class="tab-btn rounded-xl px-2 py-3 text-xs sm:text-sm font-extrabold text-slate-500 transition">
       <i class="fa-solid fa-calendar-plus ml-1"></i> متابعات الغد
-      <span id="tomorrowCount" class="notifications-count-badge mr-1 inline-flex min-w-6 items-center justify-center rounded-full bg-white/70 px-1.5 py-0.5 text-[10px]">0</span>
+      <span id="tomorrowCount" class="notifications-count-badge mr-1 inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px]">0</span>
     </button>
     <button data-tab="subscriptions" class="tab-btn rounded-xl px-2 py-3 text-xs sm:text-sm font-extrabold text-slate-500 transition">
       <i class="fa-solid fa-credit-card ml-1"></i> الاشتراكات
@@ -55,7 +55,7 @@ tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']},colors
       <h2 id="tabTitle" class="font-extrabold text-slate-800">متابعات اليوم</h2>
       <p id="tabSubtitle" class="mt-1 text-xs text-slate-500">المرضى الذين موعد متابعتهم اليوم.</p>
     </div>
-    <div id="count" class="notifications-current-count flex h-9 min-w-9 items-center justify-center rounded-full bg-brand-50 px-3 text-sm font-extrabold text-brand-700">0</div>
+    <div id="count" class="notifications-current-count flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-extrabold">0</div>
   </div>
 </section>
 
