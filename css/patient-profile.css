@@ -233,7 +233,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
  .measurements-toolbar{align-items:stretch;flex-direction:column;gap:8px}
  .measurements-add-button{width:100%}
  .measurements-table-heading{align-items:flex-start}
- .measurements-table{min-width:680px}
+ .measurements-table{min-width:1120px}
 }
 
 /* Host-level confirmation for actions initiated inside the nutrition-support iframe. */
