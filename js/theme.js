@@ -38,7 +38,7 @@
       document.head.appendChild(meta);
     }
 
-    meta.content = safeTheme === "dark" ? "#0d1514" : "#f7fafb";
+    meta.content = safeTheme === "dark" ? "#101B19" : "#f7fafb";
   }
 
   function applyTheme(theme) {
@@ -60,6 +60,31 @@
       "title",
       isDark ? "Light mode" : "Dark mode"
     );
+  }
+
+  function normalizeThemeStylesheetOrder() {
+    const head = document.head;
+    if (!head) return;
+
+    const stylesheets = Array.from(
+      head.querySelectorAll('link[rel~="stylesheet"]')
+    );
+    const designSystem = stylesheets.find((link) =>
+      (link.getAttribute("href") || "").includes("design-system.css")
+    );
+    const themeStylesheet = stylesheets.find((link) =>
+      (link.getAttribute("href") || "").includes("theme.css")
+    );
+
+    // Keep shared foundations first and the theme overrides last.
+    // Moving existing nodes avoids duplicate stylesheet requests.
+    if (designSystem) head.appendChild(designSystem);
+    if (themeStylesheet) head.appendChild(themeStylesheet);
+  }
+
+  function initializeThemeUI() {
+    normalizeThemeStylesheetOrder();
+    createToggle();
   }
 
   function createToggle() {
@@ -125,8 +150,8 @@
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", createToggle, { once: true });
+    document.addEventListener("DOMContentLoaded", initializeThemeUI, { once: true });
   } else {
-    createToggle();
+    initializeThemeUI();
   }
 })();
