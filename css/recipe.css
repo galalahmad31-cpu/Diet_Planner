@@ -175,10 +175,6 @@ body {
     padding: 0.85rem;
 }
 
-html[data-theme="dark"] .recipe-modal {
-    background: rgba(0, 0, 0, 0.68);
-}
-
 @media (max-width: 640px) {
     .rich-editor {
         min-height: 190px;
