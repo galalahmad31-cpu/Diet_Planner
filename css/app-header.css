@@ -77,18 +77,20 @@
   font-size:15px;font-weight:900;line-height:1.5;letter-spacing:.1px;
 }
 #doctorName.dp-header-account-name.hidden{display:none!important}
-.dp-app-header__context #logoutBtn{
-  display:inline-flex;align-items:center;justify-content:center;gap:9px;
-  flex:0 0 auto;width:auto;min-width:104px;min-height:46px;
-  padding:10px 16px;border:1px solid rgba(255,255,255,.85);
+.dp-app-header__logout{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  flex:0 0 auto;min-width:94px;min-height:39px;
+  padding:8px 13px;border:1px solid rgba(255,255,255,.85);
   border-radius:12px;background:#fff;color:#15594d;
-  font-family:var(--dp-font,Cairo,sans-serif);font-size:14px;font-weight:900;
+  font-family:var(--dp-font,Cairo,sans-serif);font-size:12px;font-weight:900;
   line-height:1.35;white-space:nowrap;cursor:pointer;
   box-shadow:0 3px 10px rgba(0,0,0,.10);
+  transition:background .18s,border-color .18s,opacity .18s;
 }
-.dp-app-header__context #logoutBtn i{font-size:16px}
-.dp-app-header__context #logoutBtn.hidden{display:none!important}
-.dp-app-header__context #logoutBtn:disabled{opacity:.65;cursor:wait}
+.dp-app-header__logout i{font-size:14px}
+.dp-app-header__logout:hover{background:#edf8f3;border-color:#fff}
+.dp-app-header__logout.hidden{display:none!important}
+.dp-app-header__logout:disabled{opacity:.65;cursor:wait}
 .dp-header-auth-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto;flex-wrap:wrap}
 .dp-header-auth-actions a.hidden{display:none!important}
 .dp-header-auth-actions a{
