@@ -726,7 +726,6 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
   width:100%;min-width:70px;max-width:240px;border:0;background:transparent;color:var(--dp-text);
   font-size:12px;font-weight:900;
 }
-.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-count{color:var(--dp-muted);font-size:9px;white-space:nowrap}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions{display:flex;align-items:center;gap:5px}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions button{
   display:inline-flex;align-items:center;justify-content:center;min-width:31px;height:31px;padding:0 9px;
@@ -738,7 +737,7 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-card-actions .meal-delete-btn{color:var(--dp-danger)}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table{
-  width:100%;min-width:620px;border-collapse:collapse;color:var(--dp-text);font-size:10px;
+  width:100%;min-width:680px;border-collapse:collapse;color:var(--dp-text);font-size:10px;
 }
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table th{
   padding:9px;background:var(--dp-surface-2);color:var(--dp-text-2);text-align:center;font-size:9px;font-weight:900;
@@ -755,7 +754,11 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-quantity input{width:62px!important;display:inline-block;text-align:center}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-quantity span{margin-inline-start:3px;color:var(--dp-muted);font-size:9px}
 .visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-household{text-align:center;color:var(--dp-primary);font-weight:800}
-.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-empty-state{padding:16px;text-align:center;color:var(--dp-muted);font-size:10px}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-calc-cell{text-align:center;white-space:nowrap;width:54px}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-calc-cell input[type=checkbox]{width:16px;height:16px;vertical-align:middle;accent-color:var(--dp-primary)}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-action-cell{text-align:center;white-space:nowrap;width:58px}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-item-delete{display:inline-grid;place-items:center;width:30px;height:30px;padding:0;border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface-2);color:var(--dp-danger);cursor:pointer}
+.visit-main-shell .embedded-diet-plan #daysContainer .meal-items-table .meal-item-delete:hover{background:var(--dp-danger);border-color:var(--dp-danger);color:#fff}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-empty-state{
   padding:28px 16px;border:1px dashed var(--dp-border);border-radius:12px;background:var(--dp-surface);
   color:var(--dp-text-2);text-align:center;font-size:11px;font-weight:800;
