@@ -827,7 +827,7 @@ function renderDays(){
   list.className='day-list';
   container.prepend(list);
  }
- list.innerHTML=daysData.length?${daysData.map((d,di)=>{
+ list.innerHTML=daysData.length?`${daysData.map((d,di)=>{
   const calc=calculateDay(d);
   const meals=d.meals||[];
   const itemCount=meals.reduce((sum,meal)=>sum+(meal.items||[]).length,0);
