@@ -34,36 +34,55 @@ a{ -webkit-tap-highlight-color:transparent }
 }
 
 /* Consistent primary action colors for shared action components. */
-:where(.btn-primary,.dashboard-primary-btn,.followup-add-button,.measurements-add-button,.patient-save-actions button:first-child){
+:is(.btn-primary,.dashboard-primary-btn,.followup-add-button,.measurements-add-button,.patient-save-actions button:first-child){
   background-color:var(--dp-primary);
 }
-:where(.btn-primary,.dashboard-primary-btn,.followup-add-button,.measurements-add-button,.patient-save-actions button:first-child):hover{
+:is(.btn-primary,.dashboard-primary-btn,.followup-add-button,.measurements-add-button,.patient-save-actions button:first-child):hover{
   background-color:var(--dp-primary-hover);
 }
+.bg-brand-500,.bg-brand-600,.bg-brand-700{background-color:var(--dp-primary)}
+.text-brand-600,.text-brand-700{color:var(--dp-primary)}
+.border-brand-500,.border-brand-600{border-color:var(--dp-primary)}
 
 /* Branded application headers share one restrained green gradient. */
 .patient-profile-page-header,
 .profile-page-header,
 .finance-page-header,
-.about-branded-header{
+.about-branded-header,
+.patient-page-header,
+.feedback-branded-header,
+.food-page-header,
+.recipe-page-header,
+.support-header{
   background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%);
   color:#fff;
 }
 .patient-profile-page-header :where(h1,h2,h3),
 .profile-page-header :where(h1,h2,h3),
 .finance-page-header :where(h1,h2,h3),
-.about-branded-header :where(h1,h2,h3){color:#fff}
+.about-branded-header :where(h1,h2,h3),
+.patient-page-header :where(h1,h2,h3),
+.feedback-branded-header :where(h1,h2,h3),
+.food-page-header :where(h1,h2,h3),
+.recipe-page-header :where(h1,h2,h3),
+.support-header :where(h1,h2,h3){color:#fff}
 
 /* Dashboard home and administration headers use the same brand anchor. */
 body:has(.dashboard-services-section) header.glass,
+body:has(.product-modern) main>.mx-auto>header,
+body:has(#sub-content-quick-calc) .page-header,
 header.header{
   background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%);
   color:#fff;
   border-color:transparent;
 }
 body:has(.dashboard-services-section) header.glass :where(h1,h2,h3),
+body:has(.product-modern) main>.mx-auto>header :where(h1,h2,h3),
+body:has(#sub-content-quick-calc) .page-header :where(h1,h2,h3),
 header.header :where(h1,h2,h3){color:#fff}
 body:has(.dashboard-services-section) header.glass p,
+body:has(.product-modern) main>.mx-auto>header p,
+body:has(#sub-content-quick-calc) .page-header p,
 header.header .brand-sub{color:#DCEFE8}
 
 /* Dark mode inherits the semantic palette from css/theme.css. */
