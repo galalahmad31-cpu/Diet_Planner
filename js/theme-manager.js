@@ -52,11 +52,14 @@
     document.body.appendChild(button);
     updateToggle();
   };
-  // Keep the central dark theme after page and component styles.
+  // Enforce one deterministic order for the four central design stylesheets.
   const normalizeThemeStylesheetOrder = () => {
-    const link = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'))
-      .find((node) => /(?:^|\/)dark-theme\.css(?:\?|$)/.test(node.getAttribute("href") || ""));
-    if (link && link.parentNode) link.parentNode.appendChild(link);
+    const order = ["design-tokens.css", "light-theme.css", "components.css", "dark-theme.css"];
+    const links = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
+    order.forEach((filename) => {
+      const link = links.find((node) => (node.getAttribute("href") || "").split("?")[0].endsWith("/" + filename));
+      if (link && link.parentNode) link.parentNode.appendChild(link);
+    });
   };
   // Apply the saved mode immediately; stylesheet ordering is normalized before UI initialization.
   apply(stored());
