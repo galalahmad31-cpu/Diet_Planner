@@ -271,7 +271,21 @@
                             </div>
                         </div>
                         
-            <div id="printDocument" class="print-document" aria-hidden="true">
+            
+                <!-- Module dialogs and print containers -->
+            
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="nutritionSupportPanel" class="patient-module-panel patient-support-panel" role="tabpanel" aria-labelledby="nutritionSupportTab" hidden>
+      <iframe id="nutritionSupportFrame" title="الدعم الغذائي للمريض" loading="lazy" referrerpolicy="same-origin"></iframe>
+    </section>
+  </section>
+</main>
+<div id="dietPlanToastContainer" class="fixed bottom-5 left-5 z-[1000] space-y-2 pointer-events-none no-print"></div>
+<div id="printDocument" class="print-document" aria-hidden="true">
                     <div id="printHeader" class="hidden print:block max-w-7xl mx-auto w-full px-4 sm:px-6 pt-4 pb-3 border-b-2 border-slate-300">
                         <div class="grid grid-cols-3 items-start gap-6">
                             <div class="text-right print-doctor-block">
@@ -305,7 +319,8 @@
                     </div>
                 </div>
                 
-            <div class="embedded-diet-modals">
+            
+<div class="embedded-diet-modals">
                     <div id="foodModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
                         <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
                             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -435,18 +450,7 @@
                         </div>
                     </div>
                     </div>
-                <!-- Module dialogs and print containers -->
-            
-          </div>
-        </section>
-      </div>
-    </section>
 
-    <section id="nutritionSupportPanel" class="patient-module-panel patient-support-panel" role="tabpanel" aria-labelledby="nutritionSupportTab" hidden>
-      <iframe id="nutritionSupportFrame" title="الدعم الغذائي للمريض" loading="lazy" referrerpolicy="same-origin"></iframe>
-    </section>
-  </section>
-</main>
 
 <div id="supportDayDeleteModal" class="support-day-delete-modal" hidden role="dialog" aria-modal="true" aria-labelledby="supportDayDeleteTitle">
   <div class="support-day-delete-box" dir="rtl">
