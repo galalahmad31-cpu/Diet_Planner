@@ -7,7 +7,9 @@ body{
   color:var(--dp-text)!important;
   font-family:var(--dp-font);
   text-rendering:optimizeLegibility;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:auto;
+  -moz-osx-font-smoothing:auto;
+  font-synthesis:none;
 }
 button,input,select,textarea{font-family:var(--dp-font)}
 h1,h2,h3,h4,h5,h6{color:var(--dp-text)}
@@ -122,13 +124,8 @@ html[data-theme="dark"] :where(.glass,.card,.main-container,.patient-name-bar,.d
 
 /* =========================================================
    Readability normalization — centralized application layer
-   Keep page layouts intact; normalize contrast and text rendering.
+   Keep page layouts intact; normalize shared text contrast.
    ========================================================= */
-body{
-  -webkit-font-smoothing:auto;
-  -moz-osx-font-smoothing:auto;
-  font-synthesis:none;
-}
 
 /* Clinical text on light surfaces must remain clearly readable. */
 .patient-fields label,
@@ -166,5 +163,3 @@ body:has(.dashboard-services-section) main section .bg-gradient-to-l p{
   color:#EAF5F2;
 }
 
-/* Preserve deliberate semantic colors and ensure disabled controls
-   are the only elements intentionally rendered with reduced opacity. */
