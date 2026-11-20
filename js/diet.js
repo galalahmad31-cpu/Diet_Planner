@@ -209,7 +209,7 @@ function buildDietPreview(){
  const d=diets.find(x=>x.id===editingId)||{};
  const t=calcTotals();
  const macro=[['السعرات','kcal',t.kcal.toFixed(0)],['البروتين','جم',t.protein.toFixed(1)],['الكربوهيدرات','جم',t.carb.toFixed(1)],['الدهون','جم',t.fat.toFixed(1)],['الصوديوم','mg',t.sodium.toFixed(0)],['البوتاسيوم','mg',t.potassium.toFixed(0)],['الفسفور','mg',t.phosphorus.toFixed(0)]];
- let h=`<article class="diet-preview" dir="rtl"><article class="diet-preview" dir="rtl">`;
+ let h=`<article class="diet-preview" dir="rtl">`;
  h+='<header class="dp-cover"><div class="dp-brand"><span>DIET PLANNER</span><span class="dp-tag">خطة غذائية</span></div><h1>'+esc(d.name||$('dietName').value)+'</h1>';
  if(d.description||$('description').value)h+='<p>'+esc(d.description||$('description').value)+'</p>';
  h+='</header><section class="dp-summary"><h2 class="dp-section-title">القيم الغذائية اليومية</h2><div class="dp-macros">';
