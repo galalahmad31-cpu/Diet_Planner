@@ -1393,3 +1393,699 @@ html[data-theme="dark"] body :is(.bg-white,.bg-white\/95,.bg-white\/90){
 html[data-theme="dark"] body :is(.bg-white,.bg-white\/95,.bg-white\/90) :is(h1,h2,h3,h4,p,span,label,strong,small){
   color:inherit;
 }
+
+
+/* Consolidated page dark-mode rule from css/diet.css */
+/* Diet Library — page-specific dark-mode exceptions only.
+   Global surfaces, text, borders and forms stay in theme.css. */
+html[data-theme="dark"] .glass{background:rgba(23,33,31,.96)!important;border-color:var(--dp-border)!important;box-shadow:0 8px 30px rgba(0,0,0,.22)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .food-name-cell{color:var(--dp-text)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .food-name-en{color:var(--dp-muted)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+/* Semantic exceptions for the diet cards. */
+html[data-theme="dark"] #dietGrid .bg-amber-50,
+html[data-theme="dark"] #dietGrid .bg-amber-50\/60{background:#3a3019!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .text-amber-600,
+html[data-theme="dark"] #dietGrid .text-amber-700{color:#f3cf63!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .text-amber-900{color:#f6df9a!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .bg-emerald-50,
+html[data-theme="dark"] #dietGrid .bg-emerald-50\/70{background:#17352e!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .text-emerald-700,
+html[data-theme="dark"] #dietGrid .text-emerald-900{color:#8fe3c5!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .bg-indigo-50{background:#25234a!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .text-indigo-600{color:#aeb5ff!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .bg-slate-50\/70{background:#1b2927!important;border-top:1px solid var(--dp-border)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .ring-slate-200{--tw-ring-color:#3c514d!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+/* Editor uses an arbitrary light background not covered by the global palette. */
+html[data-theme="dark"] #editor > div{background:var(--dp-bg)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #editor .bg-slate-50\/60{background:#182522!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+/* Food picker selected state. */
+html[data-theme="dark"] #foodPicker .bg-brand-50\/60{background:#17342f!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #foodPicker .border-brand-100,
+html[data-theme="dark"] #foodPicker .border-brand-200{border-color:#315c55!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+/* Viewer/picker/delete surfaces needing page-specific contrast. */
+html[data-theme="dark"] #foodPicker > div,
+html[data-theme="dark"] #deleteConfirmModal > div{background:var(--dp-surface)!important;color:var(--dp-text)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #deleteConfirmModal .bg-slate-100,
+html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;color:var(--dp-text)!important}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-item{background:#17211f;border-color:var(--dp-border);box-shadow:0 3px 12px rgba(0,0,0,.15)}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .diet-list-item:nth-child(odd){background:#17211f}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] #dietGrid .diet-list-item:nth-child(even){background:#1d302b}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-title{color:var(--dp-text)}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-logo{background:#203a35;color:#75c9b8}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-publisher{color:var(--dp-muted)}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-publisher strong{color:#d0ddd8}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-copy,html[data-theme="dark"] .diet-list-edit{background:#24312e;color:var(--dp-text);border-color:var(--dp-border)}
+
+/* Consolidated page dark-mode rule from css/diet.css */
+html[data-theme="dark"] .diet-list-icon-btn{background:#302222;border-color:#563737;color:#f1a0a0}
+
+/* Consolidated page dark-mode rule from css/patient-profile.css */
+html[data-theme="dark"] .support-day-delete-box{background:#172a2b}
+
+/* Consolidated page dark-mode rule from css/patient-profile.css */
+html[data-theme="dark"] .support-day-delete-box h3{color:#edf7f4}
+
+/* Consolidated page dark-mode rule from css/patient-profile.css */
+html[data-theme="dark"] .support-day-delete-box p{color:#bbceca}
+
+/* Consolidated page dark-mode rule from css/patient-profile.css */
+html[data-theme="dark"] .support-day-delete-actions [data-delete-cancel]{background:#263c3d;color:#dcebe8}
+
+/* Consolidated page dark-mode rule from css/recipe.css */
+html[data-theme="dark"] .recipe-modal {
+    background: rgba(0, 0, 0, 0.68);
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+/* Final contrast pass — dark mode */
+html[data-theme="dark"] #mix-result{
+  background:#1d4038!important;
+  color:#a9f0d6!important;
+  border:1px solid #3e7568!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-yellow-100{
+  background:#3a3218!important;
+  color:#f5d978!important;
+  border:1px solid #66572a!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-blue-900{
+  background:#28357a!important;
+  color:#f0f3ff!important;
+  border:1px solid #4858ad!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-blue-100{
+  background:#20333b!important;
+  color:#bfe8f0!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .text-blue-200{
+  color:#b9d4ff!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .text-blue-800,
+html[data-theme="dark"] #section-tpn .text-blue-900{
+  color:#a9d8ff!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .peer-checked\:bg-blue-600{
+  background:#4f7ff5!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+/* Dark-mode refinement: keep clinical colors, but use the global dark palette as the base. */
+html[data-theme="dark"] #section-tpn .bg-indigo-900{
+  background:#202b29!important;
+  color:var(--dp-text)!important;
+  border:1px solid #344843!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-indigo-900 .border-indigo-700{
+  border-color:#3b514d!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-emerald-50,
+html[data-theme="dark"] #section-tpn .bg-emerald-100{
+  background:#18302b!important;
+  border-color:#36544d!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .text-emerald-900,
+html[data-theme="dark"] #section-tpn .text-emerald-800{
+  color:#9be6d0!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-blue-200{
+  background:#243331!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-amber-50,
+html[data-theme="dark"] #section-tpn .bg-amber-100{
+  background:#332b19!important;
+  border-color:#5b4b2a!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .text-amber-900,
+html[data-theme="dark"] #section-tpn .text-amber-800{
+  color:#f1d99b!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-white{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .border{
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .text-yellow-400{
+  color:#f5d76e!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+/* =========================================================
+   GLOBAL DARK MODE — Nutrition Support Patient
+   Page-specific colors must not override theme.css.
+   ========================================================= */
+html[data-theme="dark"] body{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .container-main{
+  background:var(--dp-surface)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 20px 55px rgba(0,0,0,.28)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .detail-patient-area,
+html[data-theme="dark"] .support-days,
+html[data-theme="dark"] .day-edit-toolbar{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .detail-top h2,
+html[data-theme="dark"] .days-toolbar h3,
+html[data-theme="dark"] .day-edit-title{
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-edit-btn{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-edit-btn:hover{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-list{
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-row,
+html[data-theme="dark"] .day-item{
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-item{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-item:hover,
+html[data-theme="dark"] .day-item.active{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .support-tab{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text-2)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .support-tab:hover{
+  background:var(--dp-surface-3)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .day-edit-toolbar{
+  background:var(--dp-surface-2)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .support-day-locked #section-en input,
+html[data-theme="dark"] .support-day-locked #section-en select,
+html[data-theme="dark"] .support-day-locked #section-en textarea,
+html[data-theme="dark"] .support-day-locked #section-tpn input,
+html[data-theme="dark"] .support-day-locked #section-tpn select,
+html[data-theme="dark"] .support-day-locked #section-tpn textarea{
+  background:#111c1a!important;
+  color:var(--dp-muted)!important;
+  border-color:var(--dp-input-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en .bg-blue-50,
+html[data-theme="dark"] #section-en .bg-indigo-50,
+html[data-theme="dark"] #section-en .bg-purple-50{
+  background:#1a2927!important;
+  border-color:#30413e!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .bg-gray-50,
+html[data-theme="dark"] #section-tpn .bg-blue-50,
+html[data-theme="dark"] #section-tpn .bg-blue-100{
+  background:#1b252f!important;
+  border-color:#354252!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en .bg-purple-100,
+html[data-theme="dark"] #section-en .bg-purple-100:hover{
+  background:#203a35!important;
+  color:#d8eeea!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en .bg-white,
+html[data-theme="dark"] #section-tpn .bg-white,
+html[data-theme="dark"] .tab-content .bg-white{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .table-custom{
+  background:var(--dp-surface)!important;
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .table-custom td{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en .table-custom tbody tr:nth-child(even) td{
+  background:#1c2b28!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en .table-custom tbody tr:hover td{
+  background:#233632!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .table-custom tbody tr:nth-child(even) td{
+  background:#202734!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-tpn .table-custom tbody tr:hover td{
+  background:#27303e!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .bg-low-risk{
+  background:#143126!important;
+  color:#c7ead9!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .bg-mod-risk{
+  background:#332b16!important;
+  color:#f3dfad!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .bg-high-risk{
+  background:#351b1d!important;
+  color:#f3c6c8!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .highlight-box{
+  background:#1b302d!important;
+  border-color:#36534e!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .monitoring-section{
+  background:#192823!important;
+  border-color:#30453f!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .component-select,
+html[data-theme="dark"] #glu-remaining-info{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #patient-collapse-btn{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #patient-collapse-btn:hover{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en input,
+html[data-theme="dark"] #section-en select,
+html[data-theme="dark"] #section-en textarea,
+html[data-theme="dark"] #section-tpn input,
+html[data-theme="dark"] #section-tpn select,
+html[data-theme="dark"] #section-tpn textarea{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] #section-en input::placeholder,
+html[data-theme="dark"] #section-en textarea::placeholder,
+html[data-theme="dark"] #section-tpn input::placeholder,
+html[data-theme="dark"] #section-tpn textarea::placeholder{
+  color:var(--dp-muted)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .delete-confirm-title,
+html[data-theme="dark"] .print-settings-head h3,
+html[data-theme="dark"] .print-completion-modal h3{
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .delete-confirm-text,
+html[data-theme="dark"] .print-settings-head p,
+html[data-theme="dark"] .print-field label,
+html[data-theme="dark"] .print-completion-modal p{
+  color:var(--dp-text-2)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .delete-confirm-cancel,
+html[data-theme="dark"] .print-cancel-btn{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+
+/* Consolidated page dark-mode rule from css/nutritionsupport-patient.css */
+html[data-theme="dark"] .print-field input{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+
+/* =========================================================
+   Central compatibility layer for legacy page-specific UI.
+   All theme colors stay here; page CSS keeps layout only.
+   ========================================================= */
+html[data-theme="dark"] body{
+  background-color:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body :is(
+  .patient-name-bar,.dashboard-card,.patient-module-panel,.measurements-panel,
+  .measurement-summary-card,.patient-data-content,.patient-finance-content,
+  .patient-finance-empty,.patient-module-tab:not(.is-active),
+  .embedded-calculator,.energy-workspace,.macro-workspace,.target-adjustment,
+  .macro-item,.result-metric,.result-equation,.patient-stat,.patient-row,
+  .product-modern,.product-card,.formula-item,.rich-link-dialog,
+  .rich-editor-surface,.rich-editor-toolbar,.admin-modal,.admin-modal>form,
+  .assessment-section,.assessment-body,.assessment-labs,.assessment-clinical,
+  .assessment-dietary,.module-card,.qc-panel,.qc-result,.qc-note,
+  .highlight-box,.support-content,.support-days,.day-edit-toolbar,
+  .detail-patient-area,.table-wrap,.table-container,.summary-card,.metric-card,
+  .auth-card,.login-card,.register-card,.password-card,.profile-card,
+  .profile-section,.finance-card,.feedback-card,.article-card,.recipe-card
+){
+  background-color:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 2px 12px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] body :is(
+  .patient-name-bar,.dashboard-card,.patient-module-panel,.measurements-panel,
+  .measurement-summary-card,.patient-data-content,.patient-finance-content,
+  .patient-module-tab:not(.is-active),.embedded-calculator,.energy-workspace,
+  .macro-workspace,.target-adjustment,.patient-stat,.patient-row,
+  .product-modern,.product-card,.formula-item,.rich-link-dialog,
+  .rich-editor-surface,.rich-editor-toolbar,.assessment-section,.module-card,
+  .qc-panel,.qc-result,.qc-note,.highlight-box,.support-content,.support-days,
+  .day-edit-toolbar,.detail-patient-area,.table-wrap,.table-container,
+  .summary-card,.metric-card,.auth-card,.login-card,.register-card,
+  .password-card,.profile-card,.profile-section,.finance-card,.feedback-card,
+  .article-card,.recipe-card
+) :is(h1,h2,h3,h4,h5,strong,b,label,th){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body :is(
+  .patient-name-bar,.dashboard-card,.patient-module-panel,.measurements-panel,
+  .measurement-summary-card,.patient-data-content,.patient-finance-content,
+  .patient-module-tab:not(.is-active),.embedded-calculator,.energy-workspace,
+  .macro-workspace,.target-adjustment,.patient-stat,.patient-row,
+  .product-modern,.product-card,.formula-item,.rich-link-dialog,
+  .rich-editor-surface,.rich-editor-toolbar,.assessment-section,.module-card,
+  .qc-panel,.qc-result,.qc-note,.highlight-box,.support-content,.support-days,
+  .day-edit-toolbar,.detail-patient-area,.table-wrap,.table-container,
+  .summary-card,.metric-card,.auth-card,.login-card,.register-card,
+  .password-card,.profile-card,.profile-section,.finance-card,.feedback-card,
+  .article-card,.recipe-card
+) :is(p,small,span,.muted,.hint,.description,.subtitle){
+  color:var(--dp-text-2)!important;
+}
+
+/* Patient profile and clinical calculator */
+html[data-theme="dark"] #patientName,
+html[data-theme="dark"] .dashboard-card-head h3,
+html[data-theme="dark"] .patient-finance-heading strong,
+html[data-theme="dark"] .patient-data-title strong,
+html[data-theme="dark"] .patient-module-tab-copy strong,
+html[data-theme="dark"] .measurement-summary-value,
+html[data-theme="dark"] .patient-fields label,
+html[data-theme="dark"] .patient-data-fields label{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #visitsList>div,
+html[data-theme="dark"] .patient-fields input,
+html[data-theme="dark"] .patient-fields select,
+html[data-theme="dark"] .patient-fields textarea,
+html[data-theme="dark"] .patient-data-fields input,
+html[data-theme="dark"] .patient-data-fields select,
+html[data-theme="dark"] .patient-data-fields textarea,
+html[data-theme="dark"] .patient-finance-fields input,
+html[data-theme="dark"] .patient-finance-fields select{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] .patient-finance-discounted output,
+html[data-theme="dark"] .patient-finance-readonly output,
+html[data-theme="dark"] .patient-finance-empty,
+html[data-theme="dark"] .patient-finance-error,
+html[data-theme="dark"] .patient-finance-success-toast{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active{
+  background:var(--dp-primary)!important;
+  color:#fff!important;
+  border-color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active :is(strong,small,.dashboard-icon){
+  color:#fff!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active .dashboard-icon{
+  background:rgba(255,255,255,.14)!important;
+}
+html[data-theme="dark"] .measurement-summary-label,
+html[data-theme="dark"] .measurement-summary-note,
+html[data-theme="dark"] .patient-module-tab-copy small{
+  color:var(--dp-text-2)!important;
+}
+
+/* Food library, product library and data tables */
+html[data-theme="dark"] .products-table th:first-child,
+html[data-theme="dark"] .products-table td:first-child,
+html[data-theme="dark"] .products-table thead th:first-child,
+html[data-theme="dark"] .patient-row:nth-child(even),
+html[data-theme="dark"] .patient-stat,
+html[data-theme="dark"] .patient-stat.is-selected{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .field-input,
+html[data-theme="dark"] .rich-link-input,
+html[data-theme="dark"] .rich-editor-surface,
+html[data-theme="dark"] .rich-editor-toolbar :is(button,select),
+html[data-theme="dark"] .admin-modal>form>.mt-7.flex.flex-col-reverse{
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] .formula-item-title,
+html[data-theme="dark"] .product-modern :is(h1,h2,h3,h4,strong),
+html[data-theme="dark"] .product-card :is(h1,h2,h3,h4,strong){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .product-modern :is(p,small,.text-slate-700,.text-slate-500),
+html[data-theme="dark"] .product-card :is(p,small,.text-slate-700,.text-slate-500){
+  color:var(--dp-text-2)!important;
+}
+
+/* Visit and nutrition-support workspaces */
+html[data-theme="dark"] .assessment-section,
+html[data-theme="dark"] .assessment-body,
+html[data-theme="dark"] .assessment-labs,
+html[data-theme="dark"] .assessment-clinical,
+html[data-theme="dark"] .assessment-dietary,
+html[data-theme="dark"] .module-card{
+  background:var(--dp-surface)!important;
+  border-color:var(--dp-border)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .assessment-section :is(h1,h2,h3,h4,strong,label),
+html[data-theme="dark"] .module-card :is(h1,h2,h3,h4,strong,label){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .assessment-section :is(p,small,span),
+html[data-theme="dark"] .module-card :is(p,small,span){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .table-custom th,
+html[data-theme="dark"] .ref-table th{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .table-custom td,
+html[data-theme="dark"] .ref-table td,
+html[data-theme="dark"] .ref-table tr:nth-child(even){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .qc-tab,
+html[data-theme="dark"] .qc-panel,
+html[data-theme="dark"] .qc-result,
+html[data-theme="dark"] .qc-note,
+html[data-theme="dark"] .highlight-box{
+  background-color:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .page-header{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .page-header :is(h1,h2,h3,p,span){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .page-header .page-header-icon{
+  background:var(--dp-primary)!important;
+  color:#fff!important;
+}
+html[data-theme="dark"] .back-btn,
+html[data-theme="dark"] .qc-tab{
+  color:var(--dp-text)!important;
+}
+
+/* Keep branded headers, active primary actions, and semantic status colors intact. */
+html[data-theme="dark"] :is(
+  .patient-profile-page-header,.food-page-header,.profile-page-header,
+  .finance-page-header,.about-branded-header,.patient-page-header,
+  .feedback-branded-header,.recipe-page-header,.support-header,.nsp-page-header
+){
+  color:#fff!important;
+}
+html[data-theme="dark"] :is(
+  .patient-profile-page-header,.food-page-header,.profile-page-header,
+  .finance-page-header,.about-branded-header,.patient-page-header,
+  .feedback-branded-header,.recipe-page-header,.support-header,.nsp-page-header
+) :is(h1,h2,h3,p,span,i){
+  color:inherit!important;
+}
+html[data-theme="dark"] :is(button,.btn-primary,.dashboard-primary-btn,.measurements-add-button,.followup-add-button).bg-emerald-600,
+html[data-theme="dark"] :is(button,.btn-primary,.dashboard-primary-btn,.measurements-add-button,.followup-add-button).bg-green-600{
+  color:#fff!important;
+}
