@@ -367,7 +367,7 @@ function metricRing(label,value,unit,target,kind){
   </div>
   <div class="day-ring-meta">
    <strong>${hasTarget?`${rawPercent}%`:'—'}</strong>
-   <small>${hasTarget?`من ${Math.round(targetValue).toLocaleString('en-US')} ${unit}`:'لم يحدد الهدف'}</small>
+   <small>${hasTarget?`من <b class="day-ring-target-value">${Math.round(targetValue).toLocaleString('en-US')}</b> ${unit}`:'لم يحدد الهدف'}</small>
   </div>
  </article>`;
 }
