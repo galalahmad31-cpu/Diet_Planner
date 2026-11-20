@@ -435,6 +435,5 @@
 
   window.DietPlannerDashboard = {
     init: initializeDashboard,
-    logout: logoutUser
   };
 })();
