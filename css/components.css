@@ -44,6 +44,29 @@ a{ -webkit-tap-highlight-color:transparent }
   outline-offset:2px;
 }
 
+/* Central table-row interaction state.
+   Rows opt in with .dp-themed-table-row; no page-specific hover colors. */
+table tbody tr.dp-themed-table-row{
+  background-color:var(--dp-surface);
+  color:var(--dp-text);
+  transition:background-color .14s ease;
+}
+table tbody tr.dp-themed-table-row > td{
+  background-color:transparent;
+  color:inherit;
+  border-color:var(--dp-border);
+}
+table tbody tr.dp-themed-table-row:hover,
+table tbody tr.dp-themed-table-row:focus-within{
+  background-color:var(--dp-surface-3);
+}
+table tbody tr.dp-themed-table-row > td:is(.text-slate-800,.text-slate-700,.text-slate-600,.text-gray-800,.text-gray-700,.text-gray-600){
+  color:var(--dp-text);
+}
+@media(prefers-reduced-motion:reduce){
+  table tbody tr.dp-themed-table-row{transition:none}
+}
+
 /* Shared content surfaces: retain each page's geometry, unify finish. */
 :where(.glass,.card,.main-container,.patient-name-bar,.dashboard-panel,.section-card,.toolbar,.tabs){
   border-color:var(--dp-border);
