@@ -831,3 +831,22 @@ body.support-delete-modal-open{overflow:hidden}
 /* Flexible patient feedback column in the measurement history. */
 .measurement-notes-cell{min-width:160px;white-space:pre-wrap;overflow-wrap:anywhere;text-align:right!important}
 .inline-measurement-row textarea{width:100%;min-width:150px;min-height:76px;box-sizing:border-box;resize:vertical;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px;font:600 10px/1.7 Cairo,sans-serif}
+
+
+/* Patient measurement dialogs: one responsive, theme-aware modal system. */
+.patient-measurement-swal{width:min(560px,calc(100vw - 28px))!important;padding:22px!important;border:1px solid var(--border-color,#dce7e4)!important;border-radius:20px!important;background:var(--card-bg,#fff)!important;color:var(--text-color,#183b3b)!important;font-family:'Cairo',sans-serif!important;box-shadow:0 24px 70px rgba(0,0,0,.22)!important}
+.patient-measurement-swal-title{margin:0 0 15px!important;color:var(--text-color,#183b3b)!important;font:900 19px 'Cairo',sans-serif!important}
+.patient-measurement-swal-text{color:var(--muted-text,#64748b)!important;font:600 12px/1.8 'Cairo',sans-serif!important}
+.patient-measurement-swal .measurement-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;text-align:right}
+.patient-measurement-swal .measurement-form-grid label{display:flex;min-width:0;flex-direction:column;gap:5px;color:var(--text-color,#334155);font:800 11px 'Cairo',sans-serif}
+.patient-measurement-swal .measurement-form-grid label b{display:inline;color:#dc2626}
+.patient-measurement-swal .measurement-form-grid input,.patient-measurement-swal .measurement-form-grid select,.patient-measurement-swal .measurement-form-grid textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--border-color,#dbe5e2);border-radius:9px;background:var(--input-bg,#fff);color:var(--text-color,#1f2937);padding:9px 10px;font:600 12px 'Cairo',sans-serif;outline:none}
+.patient-measurement-swal .measurement-form-grid input:focus,.patient-measurement-swal .measurement-form-grid select:focus,.patient-measurement-swal .measurement-form-grid textarea:focus{border-color:var(--primary-color,#059669);box-shadow:0 0 0 3px rgba(5,150,105,.12)}
+.patient-measurement-swal .measurement-form-notes{grid-column:1/-1}
+.patient-measurement-swal .measurement-form-grid textarea{resize:vertical;min-height:82px;line-height:1.7}
+.patient-measurement-swal .measurement-form-hint{margin:12px 0 0;color:var(--muted-text,#64748b);font:600 10px/1.7 'Cairo',sans-serif;text-align:right}
+.patient-measurement-swal-confirm,.patient-measurement-swal-cancel{min-width:100px;margin:5px 4px 0!important;padding:9px 17px!important;border:0!important;border-radius:9px!important;font:800 11px 'Cairo',sans-serif!important;cursor:pointer}
+.patient-measurement-swal-confirm{background:var(--primary-color,#059669)!important;color:#fff!important}
+.patient-measurement-swal-cancel{background:var(--surface-muted,#eef2f1)!important;color:var(--text-color,#475569)!important}
+.patient-measurement-swal .swal2-validation-message{font:700 11px/1.7 'Cairo',sans-serif!important}
+@media(max-width:520px){.patient-measurement-swal{padding:16px!important}.patient-measurement-swal-title{font-size:16px!important}.patient-measurement-swal .measurement-form-grid{grid-template-columns:1fr;gap:9px}.patient-measurement-swal .measurement-form-notes{grid-column:auto}}
