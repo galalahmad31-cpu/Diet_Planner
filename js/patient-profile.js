@@ -282,7 +282,10 @@
         <td data-label="محيط الأرداف (سم)">${log.hip == null ? '—' : Number(log.hip).toFixed(1)}</td>
         <td data-label="الالتزام">${escapeHtml(labels[log.adherence] || '—')}</td>
         <td data-label="ملاحظات المريض" class="measurement-notes-cell">${escapeHtml(log.notes || '—')}</td>
-        <td data-label="إجراء" class="no-print"><button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
+        <td data-label="إجراء" class="no-print measurement-row-actions">
+          <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
+          <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>
+        </td>
       </tr>`).join('');
   }
 
@@ -328,15 +331,14 @@
     }
   }
 
-  function openMeasurementEntry() {
-    if (!canWrite()) { showMeasurementError('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط.'); return; }
-    if (!measurementState.loaded) { void loadMeasurements().then(() => { if (measurementState.loaded) openMeasurementEntry(); }); return; }
-    const body = $('weightTableBody');
-    if (!body || body.querySelector('[data-measurement-editor]')) return;
+  function createMeasurementEditor(log = null) {
     const now = new Date();
     const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    const row = document.createElement('tr'); row.className = 'measurement-entry-row'; row.dataset.measurementEditor = 'true';
-    row.innerHTML = '<td><input data-field="date" type="date" value="' + localDate + '" aria-label="تاريخ القياس"></td>' +
+    const row = document.createElement('tr');
+    row.className = 'measurement-entry-row';
+    row.dataset.measurementEditor = 'true';
+    if (log?.id) row.dataset.measurementEditorId = String(log.id);
+    row.innerHTML = '<td><input data-field="date" type="date" aria-label="تاريخ القياس"></td>' +
       '<td><input data-field="weight" type="number" min="0.1" step="0.1" placeholder="إلزامي" aria-label="الوزن بالكيلوجرام" required></td>' +
       '<td><input data-field="bodyFat" type="number" min="0" max="100" step="0.1" placeholder="—" aria-label="نسبة الدهون"></td>' +
       '<td><input data-field="muscle" type="number" min="0" max="100" step="0.1" placeholder="—" aria-label="نسبة العضلات"></td>' +
@@ -346,8 +348,38 @@
       '<td><select data-field="adherence" aria-label="الالتزام الغذائي"><option value="">لم يحدد</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></td>' +
       '<td><textarea data-field="notes" rows="2" placeholder="ملاحظات المريض ومشكلاته مع النظام الغذائي" aria-label="ملاحظات المريض"></textarea></td>' +
       '<td class="measurement-entry-actions"><button type="button" class="measurement-save-button" data-measurement-save>حفظ</button><button type="button" class="measurement-cancel-button" data-measurement-cancel>إلغاء</button></td>';
-    body.prepend(row); row.querySelector('[data-field="weight"]')?.focus();
+    const values = {
+      date: log?.date || localDate, weight: log?.weight ?? '', bodyFat: log?.bodyFat ?? '',
+      muscle: log?.muscle ?? '', water: log?.water ?? '', waist: log?.waist ?? '',
+      hip: log?.hip ?? '', adherence: log?.adherence || '', notes: log?.notes || ''
+    };
+    Object.entries(values).forEach(([field, value]) => {
+      const input = row.querySelector('[data-field="' + field + '"]');
+      if (input) input.value = String(value);
+    });
+    return row;
+  }
+
+  function openMeasurementEntry() {
+    if (!canWrite()) { showMeasurementError('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط.'); return; }
+    if (!measurementState.loaded) { void loadMeasurements().then(() => { if (measurementState.loaded) openMeasurementEntry(); }); return; }
+    const body = $('weightTableBody');
+    if (!body || body.querySelector('[data-measurement-editor]')) return;
+    const row = createMeasurementEditor();
+    body.prepend(row);
+    row.querySelector('[data-field="weight"]')?.focus();
     const errorBox = $('measurementsError'); if (errorBox) errorBox.hidden = true;
+  }
+
+  function editMeasurementEntry(index) {
+    if (!canWrite()) { showMeasurementError('تعديل القياسات متاح أثناء الاشتراك المدفوع فقط.'); return; }
+    const log = measurementState.logs[index];
+    const body = $('weightTableBody');
+    const currentRow = body?.querySelectorAll('tr')[index];
+    if (!log || !currentRow || body.querySelector('[data-measurement-editor]')) return;
+    const editor = createMeasurementEditor(log);
+    currentRow.replaceWith(editor);
+    editor.querySelector('[data-field="weight"]')?.focus();
   }
 
   async function saveMeasurementEntry(row) {
@@ -362,10 +394,22 @@
     row.dataset.saving = 'true'; const saveButton = row.querySelector('[data-measurement-save]');
     if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'جارٍ الحفظ'; }
     try {
-      const { data, error } = await supabase.from('weight_logs').insert({ patient_id: patientId, weight: payload.weight, measurement_date: payload.date, body_fat_percent: payload.bodyFat, muscle_percent: payload.muscle, water_percent: payload.water, waist_cm: payload.waist, hip_cm: payload.hip, diet_adherence: payload.adherence, notes: payload.notes }).select('id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
+      const record = { patient_id: patientId, weight: payload.weight, measurement_date: payload.date, body_fat_percent: payload.bodyFat, muscle_percent: payload.muscle, water_percent: payload.water, waist_cm: payload.waist, hip_cm: payload.hip, diet_adherence: payload.adherence, notes: payload.notes };
+      const editingId = row.dataset.measurementEditorId || '';
+      const query = editingId
+        ? supabase.from('weight_logs').update(record).eq('id', editingId).eq('patient_id', patientId)
+        : supabase.from('weight_logs').insert(record);
+      const { data, error } = await query.select('id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
       if (error) throw error;
-      measurementState.logs.push({ id: data.id, date: data.measurement_date, createdAt: data.created_at || '', weight: Number(data.weight), bodyFat: data.body_fat_percent == null ? null : Number(data.body_fat_percent), muscle: data.muscle_percent == null ? null : Number(data.muscle_percent), water: data.water_percent == null ? null : Number(data.water_percent), waist: data.waist_cm == null ? null : Number(data.waist_cm), hip: data.hip_cm == null ? null : Number(data.hip_cm), adherence: data.diet_adherence || '', notes: data.notes || '' });
-      measurementState.logs.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.createdAt).localeCompare(String(b.createdAt))); renderMeasurements();
+      const savedLog = { id: data.id, date: data.measurement_date, createdAt: data.created_at || '', weight: Number(data.weight), bodyFat: data.body_fat_percent == null ? null : Number(data.body_fat_percent), muscle: data.muscle_percent == null ? null : Number(data.muscle_percent), water: data.water_percent == null ? null : Number(data.water_percent), waist: data.waist_cm == null ? null : Number(data.waist_cm), hip: data.hip_cm == null ? null : Number(data.hip_cm), adherence: data.diet_adherence || '', notes: data.notes || '' };
+      if (editingId) {
+        const existingIndex = measurementState.logs.findIndex(log => String(log.id) === String(editingId));
+        if (existingIndex >= 0) measurementState.logs[existingIndex] = savedLog;
+      } else {
+        measurementState.logs.push(savedLog);
+      }
+      measurementState.logs.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.createdAt).localeCompare(String(b.createdAt)));
+      renderMeasurements();
     } catch (error) {
       console.error('Save patient measurement failed:', error); row.dataset.saving = 'false';
       if (saveButton) { saveButton.disabled = false; saveButton.textContent = 'حفظ'; }
@@ -1338,9 +1382,11 @@
     $('weightTableBody')?.addEventListener('click', (event) => {
       const save = event.target.closest('[data-measurement-save]');
       const cancel = event.target.closest('[data-measurement-cancel]');
+      const edit = event.target.closest('[data-measurement-edit]');
       const remove = event.target.closest('[data-measurement-delete]');
       if (save) void saveMeasurementEntry(save.closest('[data-measurement-editor]'));
-      else if (cancel) cancel.closest('[data-measurement-editor]')?.remove();
+      else if (cancel) renderMeasurements();
+      else if (edit) editMeasurementEntry(Number(edit.dataset.measurementEdit));
       else if (remove) void deleteMeasurement(Number(remove.dataset.measurementDelete));
     });
     $('patientFinanceDetails')?.addEventListener('toggle', (event) => {
