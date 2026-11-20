@@ -774,8 +774,8 @@ html[data-theme="dark"] .article-body td{
 }
 
 /* ---------- Page-surface normalization: patient directory ---------- */
-html[data-theme="dark"] main > section,
-html[data-theme="dark"] main > section.bg-white{
+html[data-theme="dark"] body:has(.patient-stats) main > section,
+html[data-theme="dark"] body:has(.patient-stats) main > section.bg-white{
   background:var(--dp-surface)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
