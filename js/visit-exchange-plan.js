@@ -6,8 +6,6 @@
 
 (function(){
 const G=[{k:'fruit',n:'الفاكهة',m:1,kcal:60,carb:15,pro:0,fat:0},{k:'veg',n:'الخضروات غير النشوية',m:1,kcal:25,carb:5,pro:2,fat:0},{k:'milk',n:'اللبن والزبادي',m:1,subs:['خالى الدسم','متوسط الدسم','غني الدسم'],v:{'خالى الدسم':[100,12,8,2],'متوسط الدسم':[120,12,8,5],'غني الدسم':[160,12,8,8]}},{k:'legumes',n:'البقوليات',m:1,kcal:115,carb:15,pro:7,fat:0},{k:'starch',n:'النشويات',m:0,kcal:80,carb:15,pro:2,fat:0},{k:'meat',n:'اللحوم',m:0,subs:['خالية الدهون','متوسطة الدهون','غنية الدهون'],v:{'خالية الدهون':[45,0,7,3],'متوسطة الدهون':[75,0,7,5],'غنية الدهون':[100,0,7,8]}},{k:'fat',n:'الدهون',m:0,kcal:45,carb:0,pro:0,fat:5}];
-const exchangeParams=new URLSearchParams(location.search);
-const requestedExchangePlanId=exchangeParams.get('plan_id');
 const S={ready:false,plan:null,saved:false,editing:false,t:{cal:0,pro:0,carb:0,fat:0},r:{},days:[],savedDays:[],dayEditing:{},itemContext:null,confirm:null};
 G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
 const dbx=window.DietPlannerAccess?.supabaseClient;
@@ -372,8 +370,10 @@ function setupExchangePlanEvents(){
   else if(action==='set-item-repeat')setItemField(dayId,mealId,itemId,'repeat',el.value);
  });
 }
-async function init(){
- if(S.ready)return;
+async function init(requestedPlanId=null){
+ S.ready=false;
+ S.plan=null;S.saved=false;S.editing=false;S.t={cal:0,pro:0,carb:0,fat:0};S.days=[];S.savedDays=[];S.dayEditing={};S.confirm=null;
+ G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
  setupExchangePlanEvents();
  try{
   if(!dbx)throw new Error('تعذر الاتصال بقاعدة البيانات.');
@@ -402,5 +402,5 @@ async function init(){
  }
 }
 async function confirmAction(){const cb=S.confirm;if(!cb)return false;closeConfirm();await cb();return true}
-window.exchangePlan={init,confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,addDay,editDay,saveDay,deleteDay,setDayTitle,setMealName,addMeal,deleteMeal,moveMeal,addItem,setItemField,deleteItem,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
+window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,addDay,editDay,saveDay,deleteDay,setDayTitle,setMealName,addMeal,deleteMeal,moveMeal,addItem,setItemField,deleteItem,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
 })();
