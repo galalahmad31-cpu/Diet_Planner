@@ -1200,3 +1200,38 @@ html[data-theme="dark"] :is(.patient-fields,.patient-data-fields,.profile-form,.
 html[data-theme="dark"] :is(.patient-fields,.patient-data-fields,.profile-form,.finance-form,.feedback-form,.recipe-form,.food-form,.product-filter-panel,.qc-panel) :is(label,p,small,.hint,.field-hint){
   color:var(--dp-text-2)!important;
 }
+
+/* Nutrition-support patient day planner */
+html[data-theme="dark"] .table-custom,
+html[data-theme="dark"] .table-custom tbody td,
+html[data-theme="dark"] .day-item,
+html[data-theme="dark"] .day-edit-toolbar,
+html[data-theme="dark"] .day-edit-btn,
+html[data-theme="dark"] .patient-readonly-card{
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .table-custom th{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .table-custom tbody tr:nth-child(even) td,
+html[data-theme="dark"] .table-custom tbody tr:hover td{
+  background:var(--dp-surface-3)!important;
+}
+html[data-theme="dark"] .day-item.active{
+  background:#173a34!important;
+  color:#8DE0C7!important;
+  border-color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .day-save-btn{
+  background:var(--dp-primary)!important;
+  color:#fff!important;
+}
+html[data-theme="dark"] .support-day-locked :is(input,select,textarea){
+  background:#172622!important;
+  color:var(--dp-muted)!important;
+  border-color:var(--dp-border)!important;
+}
