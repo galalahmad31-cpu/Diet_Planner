@@ -884,25 +884,12 @@ html.visit-embedded #dp-theme-toggle{display:none!important}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions button:hover{
   border-color:var(--dp-primary);color:var(--dp-primary);
 }
-body #foodModal.diet-food-modal-layer{
+body .diet-modal-portal-layer{
   position:fixed!important;inset:0!important;z-index:2147483647!important;
+  display:flex!important;align-items:center;justify-content:center;
   isolation:isolate;pointer-events:auto;
 }
-body #foodModal.diet-food-modal-layer.hidden{display:none!important}
-body #foodModal.diet-food-modal-layer:not(.hidden){display:flex!important}
-body #fixedMealsModal.diet-fixed-meals-modal-layer{
-  position:fixed!important;inset:0!important;z-index:2147483647!important;
-  isolation:isolate;pointer-events:auto;
-}
-body #fixedMealsModal.diet-fixed-meals-modal-layer.hidden{display:none!important}
-body #fixedMealsModal.diet-fixed-meals-modal-layer:not(.hidden){display:flex!important}
-body :is(#addMealModal,#confirmModal).diet-action-modal-layer{
-  position:fixed!important;inset:0!important;z-index:2147483647!important;
-  display:flex;align-items:center;justify-content:center;
-  isolation:isolate;pointer-events:auto;
-}
-body :is(#addMealModal,#confirmModal).diet-action-modal-layer.hidden{display:none!important}
-body :is(#addMealModal,#confirmModal).diet-action-modal-layer:not(.hidden){display:flex!important}
+body .diet-modal-portal-layer.hidden{display:none!important}
 body .day-details-modal[hidden]{display:none!important}
 body .day-details-modal{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
