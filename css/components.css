@@ -167,18 +167,6 @@ body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,
   body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta){transition:none}
 }
 
-/* Dark mode inherits the semantic palette from css/theme.css. */
-html[data-theme="dark"] body{background:var(--dp-bg);color:var(--dp-text)}
-html[data-theme="dark"] :where(h1,h2,h3,h4,h5,h6){color:var(--dp-text)}
-html[data-theme="dark"] :where(input,select,textarea){color:var(--dp-text);border-color:var(--dp-input-border)}
-html[data-theme="dark"] :where(.glass,.card,.main-container,.patient-name-bar,.dashboard-panel,.section-card,.toolbar,.tabs){
-  border-color:var(--dp-border);
-  box-shadow:0 2px 12px var(--dp-shadow);
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-}
-
 /* =========================================================
    Readability normalization — centralized application layer
    Keep page layouts intact; normalize shared text contrast.
