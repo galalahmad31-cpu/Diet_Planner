@@ -339,6 +339,13 @@ function setupExchangePlanEvents(){
   else if(action==='delete-item')deleteItem(dayId,mealId,itemId);
   else if(action==='add-meal')addMeal(dayId);
  });
+ const notes=document.getElementById('exchangePlanNotes');
+ if(notes&&notes.dataset.eventsReady!=='1'){
+  notes.dataset.eventsReady='1';
+  const resize=()=>{notes.style.height='auto';notes.style.height=Math.max(notes.scrollHeight,300)+'px'};
+  notes.addEventListener('input',()=>{S.notes=notes.value;resize()});
+  resize();
+ }
  const valuesBody=document.getElementById('exchangeValuesBody');
  if(valuesBody&&valuesBody.dataset.eventsReady!=='1'){
   valuesBody.dataset.eventsReady='1';
