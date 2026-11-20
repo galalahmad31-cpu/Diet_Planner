@@ -608,20 +608,25 @@
   }
 
   function bindDietPlanActions() {
-    const workspace = $('planWorkspace');
-    if (!workspace || workspace.dataset.actionsBound === 'true') return;
-    workspace.dataset.actionsBound = 'true';
+    if (document.documentElement.dataset.dpDirectDietActionsBound === 'true') return;
+    document.documentElement.dataset.dpDirectDietActionsBound = 'true';
 
-    workspace.addEventListener('click', async (event) => {
+    const isDietPlanElement = (element) => Boolean(
+      element?.closest(
+        '#planWorkspace, #foodModal, #fixedMealsModal, #addMealModal, #confirmModal, #printSettingsModal, #dayDetailsModal'
+      )
+    );
+
+    document.addEventListener('click', async (event) => {
       const confirmButton = event.target.closest('#confirmOkBtn');
-      if (confirmButton) {
+      if (confirmButton && isDietPlanElement(confirmButton)) {
         event.preventDefault();
         await window.dietPlan?.confirmAction?.();
         return;
       }
 
       const target = event.target.closest('[data-action]');
-      if (!target || !workspace.contains(target)) return;
+      if (!target || !isDietPlanElement(target)) return;
       const action = target.dataset.action || '';
       if (action === 'executeActivePrint') {
         event.preventDefault();
@@ -637,12 +642,12 @@
 
     const runInputAction = (event) => {
       const target = event.target.closest('[data-action-input]');
-      if (!target || !workspace.contains(target)) return;
+      if (!target || !isDietPlanElement(target)) return;
       const method = window.dietPlan?.[target.dataset.actionInput];
       if (typeof method === 'function') method(event);
     };
-    workspace.addEventListener('input', runInputAction);
-    workspace.addEventListener('keyup', runInputAction);
+    document.addEventListener('input', runInputAction);
+    document.addEventListener('keyup', runInputAction);
   }
 
   async function openPlanEmbedded(planId = null, planType = '') {
