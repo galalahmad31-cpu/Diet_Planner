@@ -22,18 +22,18 @@
 - Food/recipes/products: `food.html` → `js/food.js`; `recipe.html` → `js/recipe.js`; `products.html` → `js/products.js`
 - Finance/weight: `finance.html` → `js/finance.js`; the repository's standalone weight page uses the Arabic-named `weightم.html`, `css/weightم.css`, and `js/weightم.js`.
 - Nutrition support: the standalone `nutritionsupport.html` page is retained temporarily but is no longer exposed in shared navigation; patient-linked nutrition support remains in `nutritionsupport-patient.html` → `js/nutritionsupport-patient.js`.
-- Subscriptions: `subscription_plans_index.html` → `js/subscription_plans_index.js`; `subscription_plansم.html` → `js/subscription_plansم.js`.
+- Subscriptions: plans and subscription actions are presented inside `profile.html` using `js/profile.js` and `js/subscription_plansم.js`.
 - Other modules include profile, articles, feedback, notifications, about, and password recovery/update pages.
 
 ## Subscription/security flow
-1. Auth helper routes admins and users with an active paid subscription to `app.html`; other signed-in users go to `subscription_plans_index.html`.
+1. The public dashboard remains accessible; subscription plans and subscription actions are managed from `profile.html`.
 2. Subscription UI loads active plans and only the current user's subscriptions.
 3. Paid requests upload proof to the private `subscription-proofs` bucket and call `create_subscription`; the database now verifies that the referenced proof exists in that bucket and belongs to the caller's own UID folder.
 4. `create_subscription` uses an empty `search_path` and schema-qualified table references. It verifies that a paid-plan proof exists in the private bucket and belongs to the caller's UID folder.
 5. The subscription-update trigger blocks users from changing entitlement snapshots (`is_free_trial`, duration, patient quota, and feature snapshot) while a request is pending, and validates ownership/existence when the proof path changes.
 6. Direct table privileges for `trial_claims` have been revoked from `anon`, `authenticated`, and `PUBLIC`; trial claims are written by the controlled subscription function.
 7. RLS, triggers, and database functions are the security boundary. Frontend checks are UX only.
-8. The two subscription pages intentionally differ in redirects/navigation; do not merge them without regression tests.
+8. There is one subscription-plan interface in `profile.html`; keep subscription actions in the shared subscription module rather than recreating a standalone plans page.
 
 ## Known release risks
 - Security Advisor still flags callable `SECURITY DEFINER` RPCs. Several are intentionally callable by authenticated users and contain authorization checks, but they still require ongoing review.
