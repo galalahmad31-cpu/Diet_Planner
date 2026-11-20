@@ -1,53 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>خطط الاشتراك - Diet Planner</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
-<link rel="stylesheet" href="css/subscription_plans_index.css?v=20261120-subscription-ui-v1">
-<link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
-<link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
-<link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
-<script src="js/theme.js?v=20261120-central-v11"></script>
-  <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
-  <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v2">
-  <script src="js/app-header.js?v=20261120-central-header-v3" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,follow">
+  <meta http-equiv="refresh" content="0;url=profile.html">
+  <title>الصفحة الشخصية | Diet Planner</title>
+  <script>window.location.replace("profile.html");</script>
 </head>
 <body>
-<div data-dp-app-header data-page-title="خطط الاشتراك"></div><div data-dp-page-actions><div class="header-actions"><button id="logoutBtn" class="btn btn-outline" type="button"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button></div></div>
-<main class="container">
-<div class="page-title"><h1>خطط الاشتراك</h1><p>اختر الخطة المناسبة لك واستمتع بمزايا Diet Planner</p></div>
-<div id="plans" class="plans"><div class="loading">جاري تحميل الخطط...</div></div>
-</main>
-<div id="subscribeModal" class="modal-backdrop">
-<div class="modal">
-<h2>الاشتراك في الخطة</h2>
-<div id="selectedPlanInfo" style="background:#f6faf9;border-radius:12px;padding:13px;margin-bottom:16px;font-size:13px;line-height:1.9"></div>
-<div class="form-group">
-<label>صورة التحويل</label>
-<input id="paymentProof" type="file" accept="image/jpeg,image/png,image/webp">
-<div style="font-size:11px;color:#7b8d89;margin-top:6px">يفضل أن تكون الصورة واضحة. الحد الأقصى 5 ميجابايت.</div>
-</div>
-<div class="form-group">
-<label>ملاحظات (اختياري)</label>
-<textarea id="paymentNote" placeholder="أي ملاحظات خاصة بالتحويل"></textarea>
-</div>
-<div id="pendingActions" style="display:none;margin-top:10px;gap:8px;flex-wrap:wrap">
-<button id="replaceProofBtn" class="btn btn-outline" data-action="replace-proof"><i class="fa-solid fa-image"></i> تعديل إثبات الدفع</button>
-<button id="cancelSubscriptionBtn" class="btn btn-danger" data-action="cancel-pending"><i class="fa-solid fa-ban"></i> إلغاء الطلب</button>
-</div>
-<div class="modal-actions">
-<button class="btn btn-outline" data-action="close-subscribe">إغلاق</button>
-<button id="submitSubscriptionBtn" class="btn btn-primary" data-action="submit-subscription">إرسال طلب الاشتراك</button>
-</div>
-</div>
-</div>
-<div id="toast" class="toast"></div>
-<div id="confirmOverlay" class="confirm-backdrop"><div class="confirm-modal" role="dialog" aria-modal="true"><div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><h3 id="confirmTitle">تأكيد العملية</h3><p id="confirmMessage" class="confirm-message"></p><div class="confirm-actions"><button class="btn btn-outline" data-action="confirm-no">إلغاء</button><button class="btn btn-confirm-danger" data-action="confirm-yes">تأكيد</button></div></div></div>
-<script src="js/subscription_plans_index.js?v=20261120-subscription-init-v2" defer></script>
+  <p>جاري تحويلك إلى <a href="profile.html">الصفحة الشخصية</a> لإدارة اشتراكك.</p>
 </body>
 </html>
