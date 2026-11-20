@@ -109,7 +109,7 @@ function render(){
     <td class="px-3 py-3 text-center">${f.sodium}</td><td class="px-3 py-3 text-center">${f.potassium}</td><td class="px-3 py-3 text-center">${f.phosphorus}</td><td class="px-3 py-3 text-center">${f.water}</td>
     <td class="px-3 py-3 text-center">${f.preparation_method?`<button type="button" data-prep="${esc(f.id)}" class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">أعرض</button>`:'—'}</td>
     <td class="px-3 py-3 text-center">${f.is_custom?'<span class="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-600">مخصص</span>':'<span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">أساسي</span>'}</td>
-    <td class="px-3 py-3 text-center"><button data-action="${esc(f.id)}" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-brand-50">إجراء</button></td>
+    <td class="px-3 py-3 text-center">${(isAdmin||(f.is_custom&&f.created_by===user?.id))?`<button data-action="${esc(f.id)}" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-brand-50">إجراء</button>`:"—"}</td>
   </tr>`).join('');
   $('empty').classList.toggle('hidden',filtered.length>0);
   $('shownCount').textContent=`${visibleFoods.length} من ${filtered.length} معروض`;
@@ -119,7 +119,7 @@ function render(){
     loadMoreBtn.classList.toggle('hidden',!hasMore);
     loadMoreBtn.textContent=`عرض المزيد (${Math.min(FOOD_PAGE_SIZE,filtered.length-visibleFoodCount)} صنف)`;
   }
-  $('countBadge').textContent=`${foods.length} صنف`; $('totalStat').textContent=foods.length;
+  $('totalStat').textContent=foods.length;
   $('baseStat').textContent=foods.filter(f=>!f.is_custom).length; $('customStat').textContent=foods.filter(f=>f.is_custom).length;
 }
 function loadMoreFoods(){
