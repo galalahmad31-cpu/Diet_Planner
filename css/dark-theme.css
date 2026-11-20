@@ -1039,33 +1039,17 @@ html[data-theme="dark"] .product-modern textarea{background:var(--dp-input)!impo
 /* Food library */
 html[data-theme="dark"] body:has(.food-brand-copy),
 html[data-theme="dark"] body:has(.food-brand-copy) .glass,
-html[data-theme="dark"] .food-card,
-html[data-theme="dark"] .food-item,
-html[data-theme="dark"] .food-row,
-html[data-theme="dark"] .food-list-item,
-html[data-theme="dark"] .food-table-wrap,
-html[data-theme="dark"] .food-modal,
-html[data-theme="dark"] .food-form,
 html[data-theme="dark"] .table-wrap{
   background:var(--dp-surface-2)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
 }
-html[data-theme="dark"] .food-card :is(h2,h3,h4,strong),
-html[data-theme="dark"] .food-item :is(h2,h3,h4,strong){color:var(--dp-text)!important}
-html[data-theme="dark"] .food-card :is(p,small,span),
-html[data-theme="dark"] .food-item :is(p,small,span){color:var(--dp-text-2)!important}
 
 /* Diet library and recipe editor */
 html[data-theme="dark"] body:has(.recipe-brand-copy) .glass,
 html[data-theme="dark"] .recipe-card,
-html[data-theme="dark"] .recipe-list-item,
-html[data-theme="dark"] .recipe-form,
 html[data-theme="dark"] .recipe-modal,
-html[data-theme="dark"] .recipe-editor,
-html[data-theme="dark"] .recipe-preview,
 html[data-theme="dark"] .recipe-list-icon-btn,
-html[data-theme="dark"] .diet-card,
 html[data-theme="dark"] .diet-list-item,
 html[data-theme="dark"] .diet-stat-mini{
   background:var(--dp-surface-2)!important;
@@ -1073,11 +1057,8 @@ html[data-theme="dark"] .diet-stat-mini{
   border-color:var(--dp-border)!important;
 }
 html[data-theme="dark"] .recipe-card :is(h2,h3,h4,strong),
-html[data-theme="dark"] .recipe-list-item :is(h2,h3,h4,strong),
-html[data-theme="dark"] .diet-card :is(h2,h3,h4,strong){color:var(--dp-text)!important}
-html[data-theme="dark"] .recipe-card :is(p,small,span),
-html[data-theme="dark"] .recipe-list-item :is(p,small,span),
-html[data-theme="dark"] .diet-card :is(p,small,span){color:var(--dp-text-2)!important}
+html[data-theme="dark"] .recipe-card :is(h2,h3,h4,strong){color:var(--dp-text)!important}
+html[data-theme="dark"] .recipe-card :is(p,small,span){color:var(--dp-text-2)!important}
 
 /* Articles list and reader */
 html[data-theme="dark"] body:has(.article-card) .glass,
@@ -1106,21 +1087,17 @@ html[data-theme="dark"] .article-reader-content blockquote{background:#173a34!im
 
 /* Feedback */
 html[data-theme="dark"] body:has(.feedback-branded-header) .glass,
-html[data-theme="dark"] .feedback-card,
-html[data-theme="dark"] .feedback-form,
-html[data-theme="dark"] .feedback-rating-card,
-html[data-theme="dark"] .feedback-list-item,
-html[data-theme="dark"] .feedback-item,
-html[data-theme="dark"] .feedback-empty,
-html[data-theme="dark"] .feedback-comment-box{
+html[data-theme="dark"] .feedback-main-card,
+html[data-theme="dark"] .feedback-reviews-card,
+html[data-theme="dark"] .feedback-form{
   background:var(--dp-surface-2)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
 }
-html[data-theme="dark"] .feedback-card :is(h2,h3,h4,strong),
-html[data-theme="dark"] .feedback-list-item :is(h2,h3,h4,strong){color:var(--dp-text)!important}
-html[data-theme="dark"] .feedback-card :is(p,small,span),
-html[data-theme="dark"] .feedback-list-item :is(p,small,span){color:var(--dp-text-2)!important}
+html[data-theme="dark"] .feedback-main-card :is(h2,h3,h4,strong),
+html[data-theme="dark"] .feedback-reviews-card :is(h2,h3,h4,strong){color:var(--dp-text)!important}
+html[data-theme="dark"] .feedback-main-card :is(p,small,span),
+html[data-theme="dark"] .feedback-reviews-card :is(p,small,span){color:var(--dp-text-2)!important}
 
 /* Account profile and subscription details */
 html[data-theme="dark"] body:has(.profile-page-header) .glass,
@@ -1144,25 +1121,15 @@ html[data-theme="dark"] .profile-subscribe-modal :is(p,small,span){color:var(--d
 
 /* Finance, admin and notifications */
 html[data-theme="dark"] body:has(.finance-page-header) .glass,
-html[data-theme="dark"] .finance-card,
-html[data-theme="dark"] .finance-panel,
-html[data-theme="dark"] .finance-stat,
-html[data-theme="dark"] .finance-table-wrap,
 html[data-theme="dark"] .announcement-admin-item,
 html[data-theme="dark"] .announcement-form-options,
-html[data-theme="dark"] .notification-card,
-html[data-theme="dark"] .notification-item,
-html[data-theme="dark"] .notification-panel{
+html[data-theme="dark"] .announcement-form-options{
   background:var(--dp-surface-2)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
 }
-html[data-theme="dark"] .finance-card :is(h2,h3,h4,strong),
-html[data-theme="dark"] .announcement-admin-item :is(h2,h3,h4,strong),
-html[data-theme="dark"] .notification-item :is(h2,h3,h4,strong){color:var(--dp-text)!important}
-html[data-theme="dark"] .finance-card :is(p,small,span),
-html[data-theme="dark"] .announcement-admin-item :is(p,small,span),
-html[data-theme="dark"] .notification-item :is(p,small,span){color:var(--dp-text-2)!important}
+html[data-theme="dark"] .announcement-admin-item :is(h2,h3,h4,strong){color:var(--dp-text)!important}
+html[data-theme="dark"] .announcement-admin-item :is(p,small,span){color:var(--dp-text-2)!important}
 
 /* Visit assessment and embedded clinical calculators */
 html[data-theme="dark"] .assessment-section,
@@ -1191,14 +1158,13 @@ html[data-theme="dark"] #weightTab tbody tr,
 html[data-theme="dark"] #weightTab thead th,
 html[data-theme="dark"] .inline-measurement-row,
 html[data-theme="dark"] .adherence-badge,
-html[data-theme="dark"] .weight-stat-card,
-html[data-theme="dark"] .weight-chart-card{
+html[data-theme="dark"] #weightTab tbody tr{
   background:var(--dp-surface-2)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
 }
 html[data-theme="dark"] #weightTab :is(th,td),
-html[data-theme="dark"] .weight-stat-card :is(h2,h3,strong){color:var(--dp-text)!important}
+
 html[data-theme="dark"] #weightTab input,
 html[data-theme="dark"] #weightTab select,
 html[data-theme="dark"] .inline-measurement-row input,
