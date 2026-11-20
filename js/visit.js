@@ -71,7 +71,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
       ready: () => !!window.dietPlan?.init
     },
     exchangePlan: {
-      src: 'js/visit-exchange-plan.js?v=20261119-numbered-plans-v2',
+      src: 'js/visit-exchange-plan.js?v=20261120-exchange-rings-v3',
       ready: () => !!window.exchangePlan?.init
     }
   };
