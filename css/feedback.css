@@ -317,8 +317,6 @@ body{
 #feedbackList>article .text-slate-300{color:var(--dp-muted)}
 #feedbackList>article>p{margin-top:1rem;color:var(--dp-text-2);font-size:.875rem;line-height:1.9;white-space:pre-wrap}
 #feedbackList>article>div:last-child{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--dp-border)}
-#feedbackList>article [data-edit-feedback],#feedbackList>article [data-delete-feedback]{display:inline-flex;align-items:center;gap:.5rem;min-height:40px;padding:.45rem 1rem;border:1px solid var(--dp-border);border-radius:.75rem;background:var(--dp-surface-2);color:var(--dp-text-2);font:inherit;font-size:.75rem;font-weight:800;cursor:pointer}
-
 #feedbackDeleteModal>div>div:first-child{display:flex;align-items:flex-start;gap:1rem}
 #feedbackDeleteModal>div>div:first-child>div:first-child{display:flex;flex:0 0 48px;align-items:center;justify-content:center;width:48px;height:48px;border-radius:1rem;background:color-mix(in srgb,var(--dp-danger) 12%,var(--dp-surface));color:var(--dp-danger)}
 
