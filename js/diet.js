@@ -24,11 +24,12 @@ async function getSession(){
   const access=window.DietPlannerAccess;
   if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
   user=await withTimeout(access.getCurrentUser(),5000,'التحقق من الجلسة');
-  if(!user){location.replace('index.html');return false;}
+  if(!user){window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'مكتبة الدايت متاحة للمشتركين فقط. سجّل الدخول ثم اشترك للوصول إليها.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});$('loading')&&( $('loading').style.display='none');return false;}
   const accessStatus=await withTimeout(access.getAccessStatus(),5000,'التحقق من الاشتراك');
   if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return false;}
   if(accessStatus.isAdmin!==true && accessStatus.hasActiveSubscription!==true){
-    location.replace('subscription_plans_index.html');
+    window.DietPlannerAccess?.showAccessPrompt?.({title:'هذه الصفحة للمشتركين',message:'مكتبة الدايت متاحة باشتراك نشط فقط. يمكنك مراجعة خطط الاشتراك من صفحتك الشخصية.',actionLabel:'عرض خطط الاشتراك',actionHref:'profile.html'});
+    $('loading')&&($('loading').style.display='none');
     return false;
   }
   isAdmin=accessStatus.isAdmin===true;
