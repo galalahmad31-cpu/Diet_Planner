@@ -6,8 +6,6 @@
 
 (function(){
 const G=[{k:'fruit',n:'الفاكهة',m:1,kcal:60,carb:15,pro:0,fat:0},{k:'veg',n:'الخضروات غير النشوية',m:1,kcal:25,carb:5,pro:2,fat:0},{k:'milk',n:'اللبن والزبادي',m:1,subs:['خالى الدسم','متوسط الدسم','غني الدسم'],v:{'خالى الدسم':[100,12,8,2],'متوسط الدسم':[120,12,8,5],'غني الدسم':[160,12,8,8]}},{k:'legumes',n:'البقوليات',m:1,kcal:115,carb:15,pro:7,fat:0},{k:'starch',n:'النشويات',m:0,kcal:80,carb:15,pro:2,fat:0},{k:'meat',n:'اللحوم',m:0,subs:['خالية الدهون','متوسطة الدهون','غنية الدهون'],v:{'خالية الدهون':[45,0,7,3],'متوسطة الدهون':[75,0,7,5],'غنية الدهون':[100,0,7,8]}},{k:'fat',n:'الدهون',m:0,kcal:45,carb:0,pro:0,fat:5}];
-const exchangeParams=new URLSearchParams(location.search);
-const requestedExchangePlanId=exchangeParams.get('plan_id');
 const S={ready:false,plan:null,saved:false,editing:false,t:{cal:0,pro:0,carb:0,fat:0},r:{},days:[],savedDays:[],dayEditing:{},itemContext:null,confirm:null};
 G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
 const dbx=window.DietPlannerAccess?.supabaseClient;
@@ -326,7 +324,7 @@ async function saveAndPrintFromSettings(){
  }
 }
 function edit(){if(!S.plan)return;S.editing=true;render();status('وضع التعديل')}
-async function deletePlan(){if(!(await canWriteExchangePlan())){status('حذف خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return;}if(!S.plan)return;openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',S.plan);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete().eq('plan_id',S.plan);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',S.plan);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.days=[];S.savedDays=[];S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();renderDays();setButtons();status('تم حذف خطة البدائل بنجاح')}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
+async function deletePlan(){if(!(await canWriteExchangePlan())){status('حذف خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return;}if(!S.plan)return;const deletedPlanId=S.plan;openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',deletedPlanId);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete() .eq('plan_id',deletedPlanId);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',deletedPlanId);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.days=[];S.savedDays=[];S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();renderDays();setButtons();status('تم حذف خطة البدائل بنجاح');window.dispatchEvent(new CustomEvent('dp-exchange-plan-deleted',{detail:{planId:deletedPlanId}}))}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
 function setupExchangePlanEvents(){
  const container=document.getElementById('exchangeDaysContainer');
  if(!container||container.dataset.eventsReady==='1')return;
@@ -372,25 +370,29 @@ function setupExchangePlanEvents(){
   else if(action==='set-item-repeat')setItemField(dayId,mealId,itemId,'repeat',el.value);
  });
 }
-async function init(){
- if(S.ready)return;
+async function init(requestedPlanId=null){
+ S.ready=false;
+ S.plan=null;S.saved=false;S.editing=false;S.t={cal:0,pro:0,carb:0,fat:0};S.days=[];S.savedDays=[];S.dayEditing={};S.confirm=null;
+ G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
  setupExchangePlanEvents();
  try{
   if(!dbx)throw new Error('تعذر الاتصال بقاعدة البيانات.');
   const c=ctx();
   if(!c.patient_id)throw new Error('لم يتم تحديد المريض.');
   const plans=await findPlans();
-  const selectedPlan=requestedExchangePlanId ? plans.find(p=>String(p.id)===String(requestedExchangePlanId))
+  const selectedPlan=requestedPlanId ? plans.find(p=>String(p.id)===String(requestedPlanId))
    : plans.find(p=>String(p.plan_name||'').includes('البدائل'));
-  if(requestedExchangePlanId&&!selectedPlan)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
+  if(requestedPlanId&&!selectedPlan)throw new Error('الخطة المطلوبة غير موجودة لهذا المريض أو لا تملك صلاحية عرضها.');
   const patientEnergy=window.currentPatientEnergy||{};
   S.t={cal:n(patientEnergy.energy_target_calories),pro:n(patientEnergy.energy_target_protein),carb:n(patientEnergy.energy_target_carb),fat:n(patientEnergy.energy_target_fat)};
   if(selectedPlan&&isUuid(selectedPlan.id)){
    const selectedName=String(selectedPlan.plan_name||'');
    if(selectedName.includes('الجرامات'))throw new Error('هذه الخطة مخصصة للجرامات وليست خطة البدائل.');
    const isFreshNumberedPlan=/^الخطة\s+\d+\s+-/.test(selectedName);
-   S.plan=selectedPlan.id; S.editing=isFreshNumberedPlan;
-   await loadExchangeValues(); await loadDays();
+   S.plan=selectedPlan.id;
+   await loadExchangeValues();
+   S.editing=isFreshNumberedPlan || !S.saved;
+   await loadDays();
   }else{S.plan=null;S.editing=true;}
   render();renderDays();setButtons();
   S.ready=true;
@@ -402,5 +404,5 @@ async function init(){
  }
 }
 async function confirmAction(){const cb=S.confirm;if(!cb)return false;closeConfirm();await cb();return true}
-window.exchangePlan={init,confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,addDay,editDay,saveDay,deleteDay,setDayTitle,setMealName,addMeal,deleteMeal,moveMeal,addItem,setItemField,deleteItem,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
+window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,addDay,editDay,saveDay,deleteDay,setDayTitle,setMealName,addMeal,deleteMeal,moveMeal,addItem,setItemField,deleteItem,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
 })();
