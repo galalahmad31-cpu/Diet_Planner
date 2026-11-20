@@ -616,7 +616,7 @@
     if (exchangePlanModulePromise) return exchangePlanModulePromise;
     exchangePlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-exchange-plan.js?v=20261120-exchange-render-fix-v3';
+      script.src = 'js/visit-exchange-plan.js?v=20261120-exchange-confirm-fix-v4';
       script.async = true;
       script.onload = () => typeof window.exchangePlan?.init === 'function'
         ? resolve(true)
