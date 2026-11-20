@@ -39,10 +39,6 @@
     if (elements.logout) {
       elements.logout.classList.remove("hidden");
       elements.logout.disabled = false;
-      if (elements.logout.dataset.handlerBound !== "true") {
-        elements.logout.addEventListener("click", logoutUser);
-        elements.logout.dataset.handlerBound = "true";
-      }
     }
 
     if (!elements.accountName) return;
@@ -362,22 +358,6 @@
     } catch (error) {
       section.hidden = true;
       console.warn("Dashboard announcements could not be loaded:", error);
-    }
-  }
-
-  // ---------------------------------------------------------
-  // Logout
-  // ---------------------------------------------------------
-  async function logoutUser() {
-    if (!elements.logout) return;
-
-    elements.logout.disabled = true;
-
-    try {
-      await window.DietPlannerAccess?.logout();
-    } catch (error) {
-      console.error("Logout failed:", error);
-      window.location.replace("index.html");
     }
   }
 
