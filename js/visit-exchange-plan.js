@@ -29,7 +29,36 @@ function manual(){return ['fruit','veg','milk','legumes'].reduce((a,k)=>{const g
 function calc(){const m=manual();S.r.starch.count=Math.max(0,rnd((S.t.carb-m.carb)/15,2));const mp=m.pro+S.r.starch.count*2;const mv=vals(G.find(g=>g.k==='meat'));S.r.meat.count=Math.max(0,rnd((S.t.pro-mp)/7,2));S.r.fat.count=Math.max(0,rnd((S.t.fat-m.fat-S.r.meat.count*mv.fat)/5,2))}
 function total(){return G.reduce((a,g)=>{const r=S.r[g.k],v=vals(g),c=n(r.count);a.kcal+=c*v.kcal;a.carb+=c*v.carb;a.pro+=c*v.pro;a.fat+=c*v.fat;return a},{kcal:0,carb:0,pro:0,fat:0})}
 function setButtons(){const has=!!S.plan;document.getElementById('exchangeSaveBtn').disabled=!S.editing;document.getElementById('exchangeEditBtn').disabled=!has||S.editing;document.getElementById('exchangeDeleteBtn').disabled=!has||S.editing}
-function updateDisplay(){calc();const t=total();document.getElementById('exchangeTotalCal').textContent=rnd(t.kcal,0);document.getElementById('exchangeTotalPro').textContent=rnd(t.pro,1);document.getElementById('exchangeTotalCarb').textContent=rnd(t.carb,1);document.getElementById('exchangeTotalFat').textContent=rnd(t.fat,1);G.forEach(g=>{const row=document.querySelector('[data-ex-row="'+g.k+'"]');if(!row)return;const r=S.r[g.k],v=vals(g),c=n(r.count),els=row.querySelectorAll('[data-val]');[c*v.kcal,c*v.carb,c*v.pro,c*v.fat].forEach((v,i)=>{if(els[i])els[i].textContent=rnd(v,1)});const inp=row.querySelector('[data-count]');if(inp&&document.activeElement!==inp)inp.value=r.count})}
+function updateRingSummary(t){
+ const metrics=[
+  {key:'cal',value:t.kcal,target:S.t.cal,digits:0},
+  {key:'carb',value:t.carb,target:S.t.carb,digits:1},
+  {key:'pro',value:t.pro,target:S.t.pro,digits:1},
+  {key:'fat',value:t.fat,target:S.t.fat,digits:1}
+ ];
+ metrics.forEach(metric=>{
+  const ring=document.querySelector('.exchange-ring[data-ring="'+metric.key+'"]');
+  const percent=metric.target>0?(metric.value/metric.target)*100:null;
+  if(ring)ring.style.setProperty('--ring-progress',String(percent===null?0:Math.min(100,Math.max(0,percent))));
+  const percentEl=document.getElementById('exchangePercent'+metric.key[0].toUpperCase()+metric.key.slice(1));
+  if(percentEl)percentEl.textContent=percent===null?'لا يوجد هدف':rnd(percent,0)+'%';
+  const totalEl=document.getElementById('exchangeTotal'+metric.key[0].toUpperCase()+metric.key.slice(1));
+  if(totalEl)totalEl.textContent=rnd(metric.value,metric.digits);
+ });
+}
+function updateDisplay(){
+ calc();
+ const t=total();
+ updateRingSummary(t);
+ G.forEach(g=>{
+  const row=document.querySelector('[data-ex-row="'+g.k+'"]');
+  if(!row)return;
+  const r=S.r[g.k],v=vals(g),c=n(r.count),els=row.querySelectorAll('[data-val]');
+  [c*v.kcal,c*v.carb,c*v.pro,c*v.fat].forEach((value,i)=>{if(els[i])els[i].textContent=rnd(value,1)});
+  const inp=row.querySelector('[data-count]');
+  if(inp&&document.activeElement!==inp)inp.value=r.count;
+ });
+}
 function render(){calc();document.getElementById('exchangeTargetCal').textContent=S.t.cal?rnd(S.t.cal,0)+' kcal':'—';document.getElementById('exchangeTargetPro').textContent=S.t.pro?rnd(S.t.pro,1)+' g':'—';document.getElementById('exchangeTargetCarb').textContent=S.t.carb?rnd(S.t.carb,1)+' g':'—';document.getElementById('exchangeTargetFat').textContent=S.t.fat?rnd(S.t.fat,1)+' g':'—';const b=document.getElementById('exchangeValuesBody');b.innerHTML=G.map(g=>{const r=S.r[g.k],v=vals(g),c=n(r.count);let sub='—';if(g.subs)sub='<select data-sub="'+g.k+'" '+(S.editing?'':'disabled')+' class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-bold">'+g.subs.map(s=>'<option value="'+esc(s)+'" '+(r.sub===s?'selected':'')+'>'+esc(s)+'</option>').join('')+'</select>';const cnt=g.m?'<input data-count="'+g.k+'" '+(S.editing?'':'disabled')+' type="number" min="0" step="0.5" inputmode="decimal" value="'+r.count+'" class="w-20 mx-auto block text-center bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-extrabold text-violet-700">':'<span class="font-black text-violet-700">'+rnd(r.count,2)+'</span>';return '<tr data-ex-row="'+g.k+'" class="border-b border-slate-100 last:border-0"><td class="py-2.5 px-3 font-black">'+esc(g.n)+'</td><td class="py-2.5 px-3">'+sub+'</td><td class="py-2.5 px-3 text-center">'+cnt+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.kcal,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.carb,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.pro,1)+'</td><td data-val class="py-2.5 px-3 text-center font-bold">'+rnd(c*v.fat,1)+'</td></tr>'}).join('');updateDisplay();setButtons()}
 async function findPlans(){
  const c=ctx();
