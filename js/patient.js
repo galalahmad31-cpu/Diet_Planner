@@ -516,11 +516,11 @@
   async function init() {
     bindEvents();
 
-    // Resolve the signed-in account first so patient and finance rows are
-    // loaded under the same verified session and RLS context.
+    // Load the directory immediately while access and quota checks run independently.
+    const patientsLoad = loadPatients();
     state.accessPromise = refreshAccess();
     await state.accessPromise;
-    await loadPatients();
+    await patientsLoad;
   }
 
   if (document.readyState === 'loading') {
