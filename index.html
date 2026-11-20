@@ -62,7 +62,15 @@
 
         <div class="mx-auto max-w-6xl">
 
-            <div data-dp-app-header data-page-title="الرئيسية"></div>
+            <div data-dp-app-header data-page-title="الرئيسية"></div><div data-dp-page-actions><div class="flex flex-wrap items-center justify-end gap-2 sm:justify-end" id="headerActions">
+<span id="doctorName" class="hidden text-sm font-bold text-slate-700" aria-hidden="true"></span>
+<a id="loginCta" href="login.html" class="rounded-xl border border-brand-500 px-4 py-2 text-sm font-bold text-brand-700 transition hover:bg-brand-50">تسجيل الدخول</a>
+<a id="registerCta" href="login.html#register" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700">إنشاء حساب</a>
+<button id="logoutBtn" type="button" class="hidden flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600" title="تسجيل الخروج" aria-label="تسجيل الخروج">
+  <i class="fa-solid fa-right-from-bracket"></i>
+</button>
+
+</div></div>
 
             <section class="mt-7">
 
