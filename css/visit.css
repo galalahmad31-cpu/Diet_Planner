@@ -514,7 +514,7 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
 }
 .visit-main-shell #moduleContent{margin-top:0!important}
 .visit-main-shell .embedded-diet-plan{background:transparent;color:var(--dp-text)}
-.visit-main-shell .embedded-diet-plan>main{max-width:none!important;padding:0!important;gap:12px!important}
+.visit-main-shell .embedded-diet-plan>.visit-diet-inner{max-width:none!important;padding:0!important;gap:12px!important}
 .visit-main-shell .embedded-diet-plan>main>section:first-child{
   padding:13px 15px!important;border:1px solid var(--dp-border)!important;
   border-radius:14px!important;background:var(--dp-surface)!important;
