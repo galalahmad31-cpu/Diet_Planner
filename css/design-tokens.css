@@ -32,6 +32,11 @@
   --border-color:var(--dp-border);
   --primary-color:var(--dp-primary);
   --accent-color:var(--dp-accent);
+  --dp-tab-bg:var(--dp-surface);
+  --dp-tab-text:var(--dp-text);
+  --dp-tab-active-bg:#E8F6F1;
+  --dp-tab-active-text:#176B63;
+  --dp-tab-border:var(--dp-border);
 }
 
 html[data-theme="dark"]{
@@ -63,5 +68,10 @@ html[data-theme="dark"]{
   --border-color:var(--dp-border);
   --primary-color:var(--dp-primary);
   --accent-color:var(--dp-accent);
+  --dp-tab-bg:var(--dp-surface);
+  --dp-tab-text:var(--dp-text);
+  --dp-tab-active-bg:var(--dp-primary);
+  --dp-tab-active-text:#FFFFFF;
+  --dp-tab-border:var(--dp-border);
 }
 
