@@ -58,13 +58,52 @@
 }
 .dp-app-header__context{
   display:flex;align-items:center;flex-wrap:wrap;gap:9px;
-  margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.16);
+  width:100%;margin-top:10px;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.16);
 }
 .dp-app-header__context[hidden]{display:none!important}
-.dp-app-header__context :is(button,a,[role="button"]){
-  max-width:100%;min-height:36px;
+.dp-app-header__context :is(button,a,[role="button"]){max-width:100%;min-height:36px}
+#headerActions.dp-header-account-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;width:100%;min-width:0;
 }
-.dp-app-header__context #logoutBtn{color:#15594d}
+.dp-header-account-info{display:flex;align-items:center;gap:12px;min-width:0}
+.dp-header-account-info.hidden{display:none!important}
+#doctorName.dp-header-account-name{
+  display:block;min-width:0;max-width:min(68vw,520px);
+  overflow-wrap:anywhere;color:#fff;font-size:12px;font-weight:800;line-height:1.5;
+}
+#doctorName.dp-header-account-name.hidden{display:none!important}
+.dp-app-header__context #logoutBtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  flex:0 0 auto;width:auto;min-width:74px;min-height:36px;
+  padding:8px 12px;border:1px solid rgba(255,255,255,.75);
+  border-radius:11px;background:#fff;color:#15594d;
+  font-family:var(--dp-font,Cairo,sans-serif);font-size:11px;font-weight:900;
+  line-height:1.3;white-space:nowrap;cursor:pointer;
+}
+.dp-app-header__context #logoutBtn.hidden{display:none!important}
+.dp-app-header__context #logoutBtn:disabled{opacity:.65;cursor:wait}
+.dp-header-auth-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.dp-header-auth-actions a{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:36px;padding:8px 12px;border:1px solid rgba(255,255,255,.3);
+  border-radius:11px;color:#fff;background:rgba(255,255,255,.09);
+  font-family:var(--dp-font,Cairo,sans-serif);font-size:11px;font-weight:800;
+  line-height:1.3;text-decoration:none;white-space:nowrap;
+}
+.dp-header-auth-actions #registerCta{background:#fff;border-color:#fff;color:#15594d}
+.dp-header-auth-actions a:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55)}
+.dp-header-auth-actions #registerCta:hover{background:#edf8f3}
+@media(max-width:640px){
+  .dp-app-header__context{gap:8px}
+  #headerActions.dp-header-account-actions{gap:8px}
+  .dp-header-account-info{gap:8px}
+  #doctorName.dp-header-account-name{max-width:calc(100vw - 150px);font-size:11px}
+  .dp-app-header__context #logoutBtn{min-width:66px;padding:8px 10px;font-size:10px}
+  .dp-header-auth-actions{gap:6px}
+  .dp-header-auth-actions a{min-height:34px;padding:7px 9px;font-size:10px}
+}
 @media(max-width:640px){
   .dp-app-header{width:calc(100% - 16px);margin:8px auto 12px;padding:12px 11px 9px;border-radius:18px}
   .dp-app-header__brand-row{gap:8px;margin-bottom:9px}
