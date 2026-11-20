@@ -249,7 +249,7 @@ function render() {
   list.forEach((notification) => {
     const element = document.createElement('div');
 
-    element.className = 'card glass rounded-3xl p-4 sm:p-5';
+    element.className = 'card glass rounded-3xl p-4 sm:p-5 notification-card';
 
     element.innerHTML = `
       <div class="flex items-start gap-4">
@@ -259,7 +259,7 @@ function render() {
 
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
-            <h3 class="font-extrabold text-slate-800">
+            <h3 class="font-extrabold text-slate-800 notification-patient-name">
               ${esc(notification.patientName)}
             </h3>
 
@@ -268,18 +268,18 @@ function render() {
             </span>
           </div>
 
-          <p class="mt-1 text-sm font-extrabold text-slate-700">
+          <p class="mt-1 text-sm font-extrabold text-slate-700 notification-title">
             ${esc(notification.title)}
           </p>
 
-          <p class="mt-1 text-sm leading-6 text-slate-500">
+          <p class="mt-1 text-sm leading-6 text-slate-500 notification-copy">
             ${esc(notification.text)}
           </p>
 
           ${
             notification.date
               ? `
-                <div class="mt-2 text-xs font-bold text-slate-400">
+                <div class="mt-2 text-xs font-bold text-slate-400 notification-date">
                   <i class="fa-regular fa-calendar ml-1"></i>
                   ${formatDate(notification.date)}
                 </div>
