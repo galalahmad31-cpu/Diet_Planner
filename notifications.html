@@ -17,6 +17,8 @@ tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']},colors
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v6">
   <script src="js/theme.js?v=20261120-central-v11"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v1">
+  <script src="js/app-header.js?v=20261120-central-header-v1" defer></script>
 </head>
 
 <body class="min-h-screen notifications-page">
@@ -31,24 +33,7 @@ tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']},colors
 <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
 <div class="mx-auto max-w-4xl">
 
-<header class="glass rounded-3xl px-5 py-5 sm:px-7 sm:py-6 shadow-sm">
-  <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex items-center gap-4">
-      <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-lg">
-        <i class="fa-solid fa-bell text-2xl"></i>
-      </div>
-      <div>
-        <h1 class="text-2xl font-extrabold text-slate-800 sm:text-3xl">الإشعارات</h1>
-        <p class="mt-1 text-sm font-medium text-slate-500">تنبيهات الاشتراكات ومواعيد المتابعة</p>
-      </div>
-    </div>
-
-    <a href="app.html" class="flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600">
-      <i class="fa-solid fa-arrow-right"></i>
-      الرئيسية
-    </a>
-  </div>
-</header>
+<div data-dp-app-header data-page-title="الإشعارات"></div>
 
 <section class="mt-6 glass rounded-3xl p-3 sm:p-4 notifications-tabs">
   <div class="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1.5 notifications-tab-list">
