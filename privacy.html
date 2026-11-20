@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-<link rel="stylesheet" href="css/privacy.css">
+<link rel="stylesheet" href="css/privacy.css?v=20261120-dynamic-policy-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -23,66 +23,13 @@
   <main class="min-h-screen px-4 py-6 sm:px-6">
     <div class="mx-auto max-w-3xl">
 
-      <div data-dp-app-header data-page-title="سياسة الخصوصية"></div><div data-dp-page-actions><a href="index.html"
-             class="shrink-0 rounded-xl bg-slate-800 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-slate-700 transition">
-            الرئيسية
-          </a></div>
+      <div data-dp-app-header data-page-title="سياسة الخصوصية"></div>
 
-      <article class="glass rounded-3xl p-6 sm:p-8">
-        <div class="mb-7">
-          <h2 class="text-2xl font-black text-slate-800">سياسة الخصوصية</h2>
-          <p class="mt-2 text-sm text-slate-500 leading-7">
-            نحن نحترم خصوصيتك ونسعى إلى استخدام بياناتك فقط لتوفير وتشغيل خدمات Diet Planner.
-          </p>
-        </div>
-
-        <div class="space-y-6 text-sm leading-8 text-slate-600">
-
-          <section>
-            <h3 class="font-extrabold text-slate-800 mb-1">البيانات التي يتم جمعها</h3>
-            <p>
-              عند تسجيل الدخول باستخدام Google، قد يتم استخدام بيانات أساسية من حسابك مثل
-              الاسم وعنوان البريد الإلكتروني لإنشاء حسابك وتسجيل الدخول.
-            </p>
-          </section>
-
-          <section>
-            <h3 class="font-extrabold text-slate-800 mb-1">بيانات التطبيق</h3>
-            <p>
-              قد تتضمن البيانات التي تدخلها داخل التطبيق بيانات المرضى والمعلومات الغذائية
-              والخطط والتقييمات المرتبطة باستخدام Diet Planner. تُستخدم هذه البيانات لتشغيل
-              وظائف التطبيق وتقديم خدماته.
-            </p>
-          </section>
-
-          <section>
-            <h3 class="font-extrabold text-slate-800 mb-1">تسجيل الدخول باستخدام Google</h3>
-            <p>
-              يستخدم التطبيق خدمة Google لتسجيل الدخول بشكل آمن، ولا يطلب صلاحيات Google
-              إضافية غير اللازمة لعملية تسجيل الدخول.
-            </p>
-          </section>
-
-          <section>
-            <h3 class="font-extrabold text-slate-800 mb-1">حماية البيانات</h3>
-            <p>
-              نستخدم وسائل تقنية مناسبة للمساعدة في حماية البيانات ومنع الوصول غير المصرح به.
-              ويقتصر الوصول إلى بيانات الحساب والبيانات المرتبطة به على المستخدم المصرح له وفقًا
-              لصلاحيات التطبيق.
-            </p>
-          </section>
-
-          <section>
-            <h3 class="font-extrabold text-slate-800 mb-1">التحديثات</h3>
-            <p>
-              قد يتم تحديث سياسة الخصوصية من وقت لآخر عند تطوير التطبيق أو إضافة خدمات جديدة.
-            </p>
-          </section>
-
-        </div>
-
+      <article class="glass rounded-3xl p-6 sm:p-8" aria-label="محتوى سياسة الخصوصية">
+        <div id="privacyPolicyContent" class="privacy-policy-content" hidden></div>
+        <div id="privacyPolicyEmpty" class="privacy-policy-empty" hidden></div>
         <div class="mt-8 pt-5 border-t border-slate-100 text-center">
-          <p class="text-xs text-slate-400">آخر تحديث: سبتمبر 2026</p>
+          <p class="text-xs text-slate-400">آخر تحديث: <time id="privacyPolicyUpdatedAt">—</time></p>
         </div>
       </article>
 
@@ -96,5 +43,6 @@
   </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/auth-access.js?v=20261120-central-account-v1"></script>
+<script src="js/privacy-policy.js?v=20261120-dynamic-policy-v1"></script>
 </body>
 </html>
