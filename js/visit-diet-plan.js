@@ -358,11 +358,9 @@ function closeAddMealModal(){
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
-function ensureFoodModalPortal(){return ensureDietModalPortal('foodModal');}
-
 async function openFoodModal(did,mid){
  await ensureAllFoods();
- const modal=ensureFoodModalPortal();
+ const modal=ensureDietModalPortal('foodModal');
  if(!modal)return;
  currentModalContext={dayId:did,mealId:mid};
  const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);
@@ -642,10 +640,8 @@ function initFixedMealsSearch(){
  input.dataset.bound='1';
 }
 
-function ensureFixedMealsModalPortal(){return ensureDietModalPortal('fixedMealsModal');}
-
 async function openFixedMeals(dayId){
- const modal=ensureFixedMealsModalPortal();
+ const modal=ensureDietModalPortal('fixedMealsModal');
  if(!modal)return;
  fixedMealsTargetDayId=dayId;
  const search=document.getElementById('fixedMealsSearch');
