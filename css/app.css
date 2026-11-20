@@ -36,14 +36,6 @@
   .nav-card p { font-size: 9px !important; }
 }
 
-/* Mobile header account controls: align email and logout cleanly */
-@media(max-width:640px){
- #headerActions{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%;min-width:0}
- #doctorName{display:block!important;flex:1 1 auto;min-width:0;overflow-wrap:anywhere;line-height:1.4}
- #logoutBtn{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;white-space:nowrap;margin:0!important;padding:9px 12px!important;line-height:1.2}
- #headerActions #loginCta,#headerActions #registerCta{flex:0 0 auto}
-}
-
 /* Keep the hidden utility authoritative for logout visibility. */
 #logoutBtn.hidden,
 #logoutBtn.hidden:hover { display: none !important; }
@@ -82,10 +74,6 @@
 
   header p {
     font-size: 11px !important;
-  }
-
-  #headerActions {
-    gap: 8px !important;
   }
 
   main section.mt-7 {
@@ -174,89 +162,56 @@
 }
 
 
-/* Dashboard services ribbon and notifications workspace */
-.dashboard-services-section,
+/* Homepage welcome panel — compact companion to the single shared navigation. */
+.dp-dashboard-welcome{min-width:0}
+.dp-dashboard-welcome-card{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  min-width:0;padding:clamp(18px,3vw,28px);
+  border:1px solid rgba(255,255,255,.16);border-radius:22px;
+  color:#fff;background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
+  box-shadow:0 9px 24px rgba(8,76,64,.11);
+}
+.dp-dashboard-welcome-copy{min-width:0;max-width:760px}
+.dp-dashboard-eyebrow{
+  display:inline-flex;align-items:center;margin-bottom:8px;padding:5px 10px;
+  border:1px solid rgba(255,255,255,.18);border-radius:999px;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);
+  font-size:10px;font-weight:800;line-height:1.5;
+}
+.dp-dashboard-welcome-card h1{
+  margin:0;color:#fff;font-size:clamp(21px,2.5vw,29px);
+  font-weight:900;line-height:1.4;letter-spacing:-.3px;
+}
+.dp-dashboard-welcome-card p{
+  max-width:680px;margin:7px 0 0;color:rgba(255,255,255,.86);
+  font-size:13px;font-weight:500;line-height:1.8;
+}
+.dp-dashboard-admin-link{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  flex:0 0 auto;min-height:40px;padding:9px 14px;
+  border:1px solid rgba(255,255,255,.25);border-radius:12px;
+  background:rgba(255,255,255,.14);color:#fff;
+  font-size:12px;font-weight:800;text-decoration:none;
+  transition:background .18s,border-color .18s;
+}
+.dp-dashboard-admin-link:hover{background:rgba(255,255,255,.23);border-color:rgba(255,255,255,.4)}
+.dp-dashboard-admin-link[hidden]{display:none!important}
+@media(max-width:640px){
+  .dp-dashboard-welcome-card{align-items:flex-start;flex-direction:column;gap:13px;padding:17px;border-radius:18px}
+  .dp-dashboard-welcome-card h1{font-size:21px}
+  .dp-dashboard-welcome-card p{margin-top:6px;font-size:12px;line-height:1.75}
+}
+@media(prefers-reduced-motion:reduce){.dp-dashboard-admin-link{transition:none}}
+
+/* Dashboard notifications workspace */
 .dashboard-notifications-section{
   min-width:0;
 }
-.dashboard-section-heading,
 .dashboard-notifications-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
-}
-.dashboard-strip-controls{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  flex:0 0 auto;
-}
-.dashboard-strip-arrow{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:32px;
-  height:32px;
-  border:1px solid #dce9e7;
-  border-radius:10px;
-  color:#347e77;
-  background:#fff;
-  transition:background .18s,border-color .18s,transform .18s;
-}
-.dashboard-strip-arrow:hover{
-  background:#edf8f6;
-  border-color:#aed6d1;
-}
-.dashboard-services-strip{
-  display:flex;
-  flex-direction:row;
-  gap:10px;
-  width:100%;
-  min-width:0;
-  padding:3px 2px 12px;
-  overflow-x:auto;
-  overflow-y:hidden;
-  overscroll-behavior-inline:contain;
-  scroll-snap-type:x mandatory;
-  scroll-behavior:smooth;
-  scrollbar-width:thin;
-  scrollbar-color:#b7d6d2 transparent;
-  -webkit-overflow-scrolling:touch;
-}
-.dashboard-services-strip::-webkit-scrollbar{height:5px}
-.dashboard-services-strip::-webkit-scrollbar-thumb{background:#b7d6d2;border-radius:99px}
-.dashboard-service-card{
-  display:flex;
-  flex:0 0 clamp(145px,17vw,190px);
-  flex-direction:column;
-  min-width:0;
-  min-height:118px;
-  padding:12px!important;
-  border-radius:16px!important;
-  scroll-snap-align:start;
-  scroll-snap-stop:normal;
-  text-decoration:none;
-}
-.dashboard-service-card>div:first-child{
-  align-items:center;
-}
-.dashboard-service-card .dashboard-service-icon{
-  width:36px!important;
-  height:36px!important;
-  border-radius:11px!important;
-}
-.dashboard-service-card .dashboard-service-icon i{font-size:15px!important}
-.dashboard-service-card>div:first-child>i{font-size:10px!important}
-.dashboard-service-card h4{
-  margin-top:9px!important;
-  font-size:12px!important;
-  line-height:1.45!important;
-}
-.dashboard-service-card p{
-  margin-top:3px!important;
-  font-size:10px!important;
-  line-height:1.45!important;
 }
 .dashboard-notifications-section{
   padding:16px 18px;
@@ -325,8 +280,6 @@
   text-align:center;
 }
 @media(max-width:767px){
-  .dashboard-services-strip{gap:8px}
-  .dashboard-service-card{flex-basis:145px;min-height:108px}
   .dashboard-notifications-section{padding:13px;border-radius:16px}
   .dashboard-notification-row{gap:9px;padding:11px 2px}
   .dashboard-notification-row-icon{width:31px;height:31px;flex-basis:31px}
@@ -335,8 +288,6 @@
   .dashboard-notification-date{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){
-  .dashboard-services-strip{scroll-behavior:auto}
-  .dashboard-service-card,.dashboard-strip-arrow{transition:none}
 }
 
 
