@@ -20,6 +20,7 @@
   let hasMore = true;
   let loading = false;
   let searchTimer = null;
+  let reloadQueued = false;
   let jobs = [];
 
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -85,8 +86,12 @@
   }
 
   async function loadJobs(reset = false) {
-    if (loading || !client) {
-      if (!client) showError("تعذر الاتصال بقاعدة البيانات. حاول تحديث الصفحة.");
+    if (loading) {
+      if (reset) reloadQueued = true;
+      return;
+    }
+    if (!client) {
+      showError("تعذر الاتصال بقاعدة البيانات. حاول تحديث الصفحة.");
       return;
     }
     if (reset) {
@@ -136,6 +141,10 @@
       loading = false;
       $("jobsLoadMore").disabled = false;
       $("jobsLoadMore").innerHTML = 'عرض المزيد <i class="fa-solid fa-chevron-down"></i>';
+      if (reloadQueued) {
+        reloadQueued = false;
+        loadJobs(true);
+      }
     }
   }
 
