@@ -203,7 +203,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .measurements-error{color:#be123c!important}
 .measurements-table-wrap{width:100%;max-width:100%;overflow-x:auto;border:1px solid #e5edf0;border-radius:11px;background:#fff;overscroll-behavior-inline:contain}
 .measurements-table-wrap:focus-visible{outline:3px solid #8bd2c2;outline-offset:2px}
-.measurements-table{width:100%;min-width:1120px;border-collapse:separate;border-spacing:0;table-layout:fixed;text-align:center;font-family:'Cairo',sans-serif}
+.measurements-table{width:100%;min-width:1200px;border-collapse:separate;border-spacing:0;table-layout:fixed;text-align:center;font-family:'Cairo',sans-serif}
 .measurements-table-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .measurements-table th{padding:11px 8px;background:#f1f7f6;color:#526873;font-size:10px;font-weight:900;white-space:nowrap;border-bottom:1px solid #dfe9e8}
 .measurements-table th:first-child{width:9%}
@@ -212,7 +212,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .measurements-table th:nth-child(6),.measurements-table th:nth-child(7){width:10%}
 .measurements-table th:nth-child(8){width:10%}
 .measurements-table th:nth-child(9){width:18%;white-space:normal}
-.measurements-table th:last-child{width:7%}
+.measurements-table th:last-child{width:12%}
 .measurements-table th span{color:#82919a;font-size:9px;font-weight:700}
 .measurements-table td{padding:10px 8px;border-bottom:1px solid #edf2f4;color:#475569;font-size:10px;font-weight:700;line-height:1.6;vertical-align:middle}
 .measurements-table tbody tr:last-child td{border-bottom:0}
@@ -220,8 +220,14 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .measurements-table tbody tr:hover{background:#f3faf7}
 .measurements-table .measurement-weight{color:#047857;font-weight:900;font-size:11px;font-variant-numeric:tabular-nums}
 .measurements-table td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
-.measurement-delete-button{width:30px;height:30px;border:1px solid #fee2e2;border-radius:8px;background:#fff7f7;color:#e11d48;cursor:pointer}
+.measurement-delete-button{min-width:48px;min-height:30px;padding:5px 9px;border:1px solid #fee2e2;border-radius:7px;background:#fff7f7;color:#e11d48;cursor:pointer;font:800 10px Cairo,sans-serif}
 .measurement-delete-button:hover{background:#ffe4e6}
+.measurement-row-actions{white-space:nowrap;min-width:118px}
+.measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
+.measurement-edit-button{border:1px solid #cfe4ee;background:#f0f8fc;color:#17617d}
+.measurement-edit-button:hover{background:#e0f0f7}
+[data-theme="dark"] .measurement-edit-button{border-color:#315d68;background:#183d43;color:#b9e7ed}
+[data-theme="dark"] .measurement-delete-button{border-color:#713b45;background:#45252d;color:#fecdd3}
 
 
 
@@ -233,7 +239,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
  .measurements-toolbar{align-items:stretch;flex-direction:column;gap:8px}
  .measurements-add-button{width:100%}
  .measurements-table-heading{align-items:flex-start}
- .measurements-table{min-width:1120px}
+ .measurements-table{min-width:1200px}
 }
 
 /* Host-level confirmation for actions initiated inside the nutrition-support iframe. */
@@ -834,15 +840,3 @@ body.support-delete-modal-open{overflow:hidden}
 /* Inline measurement editor inside the history table. */
 .measurement-entry-row{background:var(--surface-muted,#f2f8f6)!important}.measurement-entry-row td{padding:7px 5px!important;vertical-align:top}.measurement-entry-row input,.measurement-entry-row select,.measurement-entry-row textarea{display:block;width:100%;min-width:68px;box-sizing:border-box;border:1px solid var(--border-color,#d5e2de);border-radius:7px;background:var(--input-bg,#fff);color:var(--text-color,#243b3b);padding:7px 5px;font:600 10px/1.5 Cairo,sans-serif}.measurement-entry-row textarea{min-width:150px;min-height:58px;resize:vertical;text-align:right}.measurement-entry-row input:focus,.measurement-entry-row select:focus,.measurement-entry-row textarea:focus{outline:2px solid var(--primary-color,#059669);outline-offset:1px}.measurement-entry-actions{min-width:76px}.measurement-entry-actions button{display:block;width:100%;margin:0 0 5px;padding:7px 5px;border:0;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}.measurement-save-button{background:var(--primary-color,#059669);color:#fff}.measurement-cancel-button{background:var(--surface-muted,#e8eeec);color:var(--text-color,#475569)}.measurement-entry-actions button:disabled{opacity:.55;cursor:wait}[data-theme="dark"] .measurement-entry-row{background:var(--card-bg,#172b27)!important}
 
-/* Measurement row actions: readable controls with comfortable column width. */
-.measurements-table{min-width:1200px}
-.measurements-table th:last-child{width:12%}
-.measurement-row-actions{white-space:nowrap;min-width:118px}
-.measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
-.measurement-edit-button{border:1px solid #cfe4ee;background:#f0f8fc;color:#17617d}
-.measurement-edit-button:hover{background:#e0f0f7}
-.measurement-delete-button{width:auto;height:auto;border:1px solid #fee2e2;border-radius:7px;background:#fff7f7;color:#e11d48}
-.measurement-delete-button:hover{background:#ffe4e6}
-[data-theme="dark"] .measurement-edit-button{border-color:#315d68;background:#183d43;color:#b9e7ed}
-[data-theme="dark"] .measurement-delete-button{border-color:#713b45;background:#45252d;color:#fecdd3}
-@media(max-width:600px){.measurements-table{min-width:1200px}.measurement-row-actions{min-width:118px}}
