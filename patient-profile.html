@@ -283,6 +283,39 @@
                                         <div id="exchangePlanStatus" class="text-[10px] font-bold text-slate-400">
                                         </div>
                                     </div>
+                                    <div class="exchange-day-summary" aria-label="ملخص اليوم">
+  <h3 class="exchange-day-summary-title">ملخص اليوم</h3>
+  <div class="exchange-rings-grid">
+    <article class="exchange-ring-metric exchange-ring-calories">
+      <span class="exchange-ring-label">السعرات</span>
+      <div class="exchange-ring" data-ring="cal" role="img" aria-label="السعرات المحققة من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalCal">0</strong><span>kcal</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetCal">—</b></span><strong id="exchangePercentCal">—</strong></div>
+    </article>
+    <article class="exchange-ring-metric exchange-ring-carbs">
+      <span class="exchange-ring-label">الكربوهيدرات</span>
+      <div class="exchange-ring" data-ring="carb" role="img" aria-label="الكربوهيدرات المحققة من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalCarb">0</strong><span>g</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetCarb">—</b></span><strong id="exchangePercentCarb">—</strong></div>
+    </article>
+    <article class="exchange-ring-metric exchange-ring-protein">
+      <span class="exchange-ring-label">البروتين</span>
+      <div class="exchange-ring" data-ring="pro" role="img" aria-label="البروتين المحقق من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalPro">0</strong><span>g</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetPro">—</b></span><strong id="exchangePercentPro">—</strong></div>
+    </article>
+    <article class="exchange-ring-metric exchange-ring-fat">
+      <span class="exchange-ring-label">الدهون</span>
+      <div class="exchange-ring" data-ring="fat" role="img" aria-label="الدهون المحققة من الهدف">
+        <div class="exchange-ring-center"><strong id="exchangeTotalFat">0</strong><span>g</span></div>
+      </div>
+      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetFat">—</b></span><strong id="exchangePercentFat">—</strong></div>
+    </article>
+  </div>
+</div>
                                     <div class="flex justify-end mt-3 no-print">
                                         <button type="button" data-action="exchangePlan.openPrintSettings" id="exchangePrintBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-sm">
                                             <i class="fa-solid fa-print ml-1">
