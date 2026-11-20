@@ -262,6 +262,7 @@
     else if (action === 'logout') logout();
     else if (action === 'confirm-yes') { $('confirmOverlay').style.display = 'none'; state.confirm?.(true); state.confirm = null; }
     else if (action === 'confirm-no') { $('confirmOverlay').style.display = 'none'; state.confirm?.(false); state.confirm = null; }
+    else if (action === 'retry-load') { el.disabled = true; el.textContent = 'جاري إعادة المحاولة...'; initialize(); }
   });
 
   $('logoutBtn')?.addEventListener('click', logout);
