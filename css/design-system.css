@@ -3,7 +3,8 @@
    Page-specific layout and behavior remain in their own files. */
 html,body{min-height:100%;background:var(--dp-bg)}
 body{
-  color:var(--dp-text);
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
   font-family:var(--dp-font);
   text-rendering:optimizeLegibility;
   -webkit-font-smoothing:antialiased;
