@@ -17,6 +17,13 @@
   };
 
   const $ = (id) => document.getElementById(id);
+
+  // Local HTML escaping for patient-entered text rendered in this page.
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>\"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;'
+    })[character]);
+  }
   let dietPlanModulePromise = null;
 
   function setLink(id, page) {
