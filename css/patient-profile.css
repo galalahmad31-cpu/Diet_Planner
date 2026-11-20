@@ -293,9 +293,8 @@ body.support-delete-modal-open{overflow:hidden}
   .followup-day-delete{width:22px;height:22px;flex-basis:22px}
   .followup-add-button{min-height:28px;padding:0 8px;font-size:9px}
 }
-.visit-embedded-panel{margin-top:13px;border:1px solid #e1e9e5;border-radius:12px;background:#f7faf8;overflow:hidden}
-.visit-embedded-panel[hidden]{display:none!important}
-#planFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:var(--dp-bg)}
+.patient-plan-workspace-panel{margin-top:13px;border:0;border-radius:0;background:transparent;overflow:visible}
+.patient-plan-workspace-panel[hidden]{display:none!important}
 
 /* Patient-level energy and macro calculator — scoped to its own tab. */
 #patientEnergyPanel{
@@ -780,4 +779,14 @@ body.support-delete-modal-open{overflow:hidden}
  .measurement-summary-label{font-size:8px;line-height:1.45}
  .measurement-summary-value{font-size:13px}
  .measurement-summary-note{font-size:7px;line-height:1.4}
+}
+
+
+/* Direct diet-plan workspace inside the patient profile. */
+#planWorkspace{width:100%;min-width:0}
+#planWorkspace #dietPlanContent{width:100%;min-width:0}
+#planWorkspace .embedded-diet-plan{width:100%;min-width:0}
+
+@media print{
+  body.patient-profile-page>[data-dp-app-header]{display:none!important}
 }

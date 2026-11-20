@@ -13,20 +13,21 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
-  <script src="js/patient-profile.js?v=20261120-fullscreen-embedded-modal-v2" defer></script>
+  <script src="js/patient-profile.js?v=20261120-direct-patient-plan-v1" defer></script>
 
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v14">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261120-centralized-v4">
+  <link rel="stylesheet" href="css/visit.css?v=20261120-direct-patient-plan-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261120-direct-patient-plan-v1">
   <script src="js/theme.js?v=20261120-central-v14" defer></script>
   
   <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v7">
   <script src="js/app-header.js?v=20261120-central-account-v5" defer></script>
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen patient-profile-page">
 
 <div data-dp-app-header data-page-title="ملف المريض"></div>
 
@@ -232,8 +233,49 @@
             <button type="button" id="addPlanButton" class="followup-add-button">＋ إضافة خطة</button>
           </div>
         </section>
-        <section id="planEmbeddedPanel" class="visit-embedded-panel" aria-label="محرر الخطة الغذائية المحددة" hidden>
-<iframe id="planFrame" title="محرر الخطط الغذائية" loading="lazy" referrerpolicy="same-origin"></iframe>
+        <section id="planWorkspacePanel" class="patient-plan-workspace-panel" aria-label="محرر الخطة الغذائية المحددة" hidden>
+          <div id="planWorkspace" class="patient-diet-workspace visit-main-shell">
+            <div id="dietPlanContent" class="hidden w-full">
+                            <div class="embedded-diet-plan">
+                                <div class="visit-diet-inner w-full space-y-5">
+                                    <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+                                            <div class="visit-diet-actions no-print">
+                                                <button type="button" data-action="dietPlan.addNewDay" class="visit-diet-action-button visit-diet-add-button">
+                                                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                                    <span>إضافة يوم جديد</span>
+                                                </button>
+                                                <button type="button" data-action="dietPlan.openPrintSettingsModal" class="visit-diet-action-button visit-diet-print-button">
+                                                    <i class="fa-solid fa-print" aria-hidden="true"></i>
+                                                    <span>طباعة</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <section id="planTab" class="space-y-5">
+                                        
+                                        <div id="emptyState" class="hidden text-center py-12 bg-white border border-dashed border-slate-300 rounded-2xl p-6 space-y-3 no-print">
+                                            <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                                                <i class="fa-solid fa-utensils">
+                                                </i>
+                                            </div>
+                                            <h4 class="font-bold text-slate-700 text-base">
+                                                لا توجد أيام تغذوية مضافة
+                                            </h4>
+                                            <p class="text-xs text-slate-500 font-semibold">استخدم زر «إضافة يوم جديد» أعلى الخطة لبدء إضافة الأيام.</p>
+                                        </div>
+                                        <div id="daysContainer" class="space-y-5">
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                        
+            
+                <!-- Module dialogs and print containers -->
+            
+          </div>
         </section>
       </div>
     </section>
@@ -243,6 +285,173 @@
     </section>
   </section>
 </main>
+<div id="dietPlanToastContainer" class="fixed bottom-5 left-5 z-[1000] space-y-2 pointer-events-none no-print"></div>
+<div id="printDocument" class="print-document" aria-hidden="true">
+                    <div id="printHeader" class="hidden print:block max-w-7xl mx-auto w-full px-4 sm:px-6 pt-4 pb-3 border-b-2 border-slate-300">
+                        <div class="grid grid-cols-3 items-start gap-6">
+                            <div class="text-right print-doctor-block">
+                                <p id="printHospitalName" class="print-hospital text-sm font-black text-slate-800">
+                                    اسم المستشفى
+                                </p>
+                                <p id="printDoctorName" class="text-sm font-extrabold text-slate-700 mt-1">
+                                    د. أحمد جلال
+                                </p>
+                                <p id="printDoctorSpecialty" class="print-meta text-[11px] text-slate-500 font-bold mt-0.5">
+                                    التغذية العلاجية
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <h1 class="print-title text-base font-black text-slate-800">
+                                    الخطة الغذائية
+                                </h1>
+                                <p id="printPatientName" class="print-patient text-xs font-bold text-slate-500 mt-1">
+                                </p>
+                            </div>
+                            <div class="text-left print-meta">
+                                <p id="printClinicAddress" class="text-[11px] text-slate-600 font-bold">
+                                    العنوان
+                                </p>
+                                <p id="printReportDate" class="text-[11px] text-slate-500 mt-1">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="printPlanContent" aria-hidden="true">
+                    </div>
+                </div>
+                
+            
+<div class="embedded-diet-modals">
+                    <div id="foodModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
+                        <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                                <h3 id="modalMealTitle" class="font-extrabold text-slate-800 text-base">
+                                    إضافة صنف للوجبة
+                                </h3>
+                                <button data-action="dietPlan.closeFoodModal" class="text-slate-400 hover:text-slate-600">
+                                    <i class="fa-solid fa-xmark text-lg">
+                                    </i>
+                                </button>
+                            </div>
+                            <div class="space-y-3">
+                                <input type="text" id="foodSearchInput" placeholder="اكتب اسم الطعام للبحث..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                                <input type="hidden" id="selectedFoodId">
+                                <div id="foodDropdownList" class="border border-slate-200 rounded-xl max-h-56 overflow-y-auto divide-y divide-slate-100">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">
+                                        الكمية (جرام)
+                                    </label>
+                                    <input type="number" id="foodGramsInput" value="100" data-action-input="updateFoodModalHousehold" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-emerald-700">
+                                </div>
+                                <div id="foodModalHouseholdBox" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+                                    <div class="text-[10px] text-emerald-600 font-bold">
+                                        المقياس المنزلي
+                                    </div>
+                                    <div id="foodModalHousehold" class="text-xs text-emerald-800 font-black">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 pt-2 border-t border-slate-100">
+                                <button data-action="dietPlan.confirmAddFoodItem" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl">
+                                    إضافة للوجبة
+                                </button>
+                                <button data-action="dietPlan.closeFoodModal" class="bg-slate-100 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl">
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add meal -->
+                    <div id="addMealModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
+                        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+                            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2">
+                                إضافة وجبة جديدة
+                            </h3>
+                            <input type="text" id="newMealNameInput" placeholder="اسم الوجبة (مثال: سناك بعد الظهر)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                            <div class="flex gap-2 pt-2">
+                                <button data-action="dietPlan.confirmCreateMeal" class="flex-1 bg-emerald-600 text-white font-bold text-xs py-2 rounded-xl">
+                                    إضافة الوجبة
+                                </button>
+                                <button data-action="dietPlan.closeAddMealModal" class="bg-slate-100 text-slate-600 font-bold text-xs px-4 py-2 rounded-xl">
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Confirm -->
+                    <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
+                        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-3">
+                            <h3 id="confirmTitle" class="font-bold text-slate-800 text-base">
+                                تأكيد الإجراء
+                            </h3>
+                            <p id="confirmText" class="text-xs text-slate-500">
+                                هل أنت متأكد؟
+                            </p>
+                            <div class="flex gap-2 pt-2">
+                                <button id="confirmOkBtn" class="flex-1 bg-rose-600 text-white font-bold text-xs py-2 rounded-xl">
+                                    تأكيد
+                                </button>
+                                <button data-action="dietPlan.closeConfirmModal" class="bg-slate-100 text-slate-600 font-bold text-xs px-4 py-2 rounded-xl">
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fixed diets -->
+                    <div id="fixedMealsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
+                        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                            <div class="p-4 bg-slate-900 text-white flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-black text-base">
+                                        الوجبات الثابتة
+                                    </h3>
+                                    <p class="text-[11px] text-slate-300 mt-1">
+                                        اختر الدايت لتطبيقه على اليوم المحدد
+                                    </p>
+                                </div>
+                                <button data-action="dietPlan.closeFixedMeals" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700">
+                                    <i class="fa-solid fa-xmark">
+                                    </i>
+                                </button>
+                            </div>
+                            <div class="p-4 border-b border-slate-100 bg-slate-50">
+                                <div class="relative">
+                                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                    </i>
+                                    <input id="fixedMealsSearch" type="search" autocomplete="off"
+      placeholder="ابحث باسم الدايت أو الوصف..."
+      class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-11 pl-4 text-sm outline-none focus:border-sky-400">
+                                </div>
+                            </div>
+                            <div id="fixedMealsList" class="p-4 overflow-y-auto space-y-3">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Print settings -->
+                    <div id="printSettingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
+                        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+                            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2">
+                                إعدادات الطباعة
+                            </h3>
+                            <div class="space-y-3 text-xs">
+                                <input type="text" id="settingDocName" value="د. أحمد جلال" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <input type="text" id="settingDocSpec" value="استشاري التغذية العلاجية" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <input type="text" id="settingClinicName" value="اسم المستشفى" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <input type="text" id="settingAddress" value="القاهرة - مصر" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            </div>
+                            <div class="flex gap-2 pt-2 border-t border-slate-100">
+                                <button id="executePrintBtn" data-action="executeActivePrint" class="flex-1 bg-emerald-600 text-white font-bold text-xs py-2 rounded-xl">
+                                    حفظ وطباعة
+                                </button>
+                                <button data-action="dietPlan.closePrintSettingsModal" class="bg-slate-100 text-slate-600 font-bold text-xs px-4 py-2 rounded-xl">
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
 
 <div id="supportDayDeleteModal" class="support-day-delete-modal" hidden role="dialog" aria-modal="true" aria-labelledby="supportDayDeleteTitle">
   <div class="support-day-delete-box" dir="rtl">
