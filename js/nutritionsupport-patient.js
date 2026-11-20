@@ -35,19 +35,13 @@
 
         if (!content || !arrow) return;
 
-        if (content.classList.contains('hidden')) {
+        const willOpen = content.classList.contains('hidden');
 
-            content.classList.remove('hidden');
+        content.classList.toggle('hidden', !willOpen);
+        arrow.classList.toggle('rotate-180', willOpen);
 
-            arrow.classList.add('rotate-180');
-
-        } else {
-
-            content.classList.add('hidden');
-
-            arrow.classList.remove('rotate-180');
-
-        }
+        const trigger = document.querySelector('[aria-controls="' + contentId + '"]');
+        trigger?.setAttribute('aria-expanded', String(willOpen));
 
     }
 
