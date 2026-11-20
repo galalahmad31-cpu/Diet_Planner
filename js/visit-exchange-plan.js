@@ -120,6 +120,19 @@ async function ensureExchangePlan(skipAuth=false){
  S.plan=createdPlanId;
  return S.plan;
 }
+function closeConfirm(){S.confirm=null;if(window.Swal&&typeof window.Swal.close==='function')window.Swal.close();}
+function openConfirm(title,message,onConfirm){
+ S.confirm=typeof onConfirm==='function'?onConfirm:null;
+ if(window.Swal&&typeof window.Swal.fire==='function'){
+  window.Swal.fire({icon:'warning',title,text:message,showCancelButton:true,confirmButtonText:'تأكيد الحذف',cancelButtonText:'إلغاء',reverseButtons:true,focusCancel:true}).then(async result=>{
+   const action=S.confirm;S.confirm=null;
+   if(result.isConfirmed&&action)await action();
+  });
+  return;
+ }
+ const action=S.confirm;S.confirm=null;
+ if(action&&window.confirm(message))void action();
+}
 function renderDays(){/* Legacy day-based editor removed: exchange plans use free-form notes. */}
 function openPrintSettings(){
   const modal=document.getElementById('printSettingsModal');
@@ -256,6 +269,6 @@ async function init(requestedPlanId=null){
   throw error;
  }
 }
-async function confirmAction(){const cb=S.confirm;if(!cb)return false;closeConfirm();await cb();return true}
+async async function confirmAction(){const cb=S.confirm;if(!cb)return false;S.confirm=null;await cb();return true}
 window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
 })();
