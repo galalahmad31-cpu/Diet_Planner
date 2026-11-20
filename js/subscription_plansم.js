@@ -41,7 +41,7 @@
     const { data, error } = await sb.auth.getUser();
     if (error) throw error;
     if (!data?.user) {
-      window.location.replace('index.html');
+      state.user = null;
       return false;
     }
     state.user = data.user;
@@ -321,7 +321,10 @@
   // authenticated plan/subscription data used by the dedicated plans page.
   window.openSubscribeModal = async (planId) => {
     try {
-      if (!state.user && !(await loadUser())) return false;
+      if (!state.user && !(await loadUser())) {
+        toast('لعرض تفاصيل الاشتراك وتنفيذه، يرجى تسجيل الدخول أولًا.');
+        return false;
+      }
       if (!subscriptionDataPromise) subscriptionDataPromise = loadData();
       await subscriptionDataPromise;
 
