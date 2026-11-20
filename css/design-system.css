@@ -119,3 +119,52 @@ html[data-theme="dark"] :where(.glass,.card,.main-container,.patient-name-bar,.d
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* =========================================================
+   Readability normalization — centralized application layer
+   Keep page layouts intact; normalize contrast and text rendering.
+   ========================================================= */
+body{
+  -webkit-font-smoothing:auto;
+  -moz-osx-font-smoothing:auto;
+  font-synthesis:none;
+}
+
+/* Clinical text on light surfaces must remain clearly readable. */
+.patient-fields label,
+.dashboard-card-head p,
+.patient-finance-heading small,
+.patient-data-title small,
+.patient-module-tab-copy small,
+.measurements-table-heading p,
+.measurements-table th span,
+.measurements-table td,
+.patient-finance-empty,
+.patient-finance-access-note,
+.finance-state,
+.profile-plans-heading p,
+.profile-plans-loading,
+.profile-plans-empty,
+.profile-subscribe-help,
+.profile-detail-line strong,
+.profile-confirm-message,
+.dashboard-notification-action,
+.dashboard-notification-date,
+.dashboard-announcement-card p,
+.dashboard-announcement-card-footer{
+  color:var(--dp-text-2);
+}
+
+/* The dashboard hero is a branded surface: headings must not inherit
+   the dark body heading color on its green gradient. */
+body:has(.dashboard-services-section) main section .bg-gradient-to-l h1,
+body:has(.dashboard-services-section) main section .bg-gradient-to-l h2,
+body:has(.dashboard-services-section) main section .bg-gradient-to-l h3{
+  color:#FFFFFF;
+}
+body:has(.dashboard-services-section) main section .bg-gradient-to-l p{
+  color:#EAF5F2;
+}
+
+/* Preserve deliberate semantic colors and ensure disabled controls
+   are the only elements intentionally rendered with reduced opacity. */
