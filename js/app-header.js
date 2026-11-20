@@ -52,7 +52,21 @@
       <nav class="dp-app-header__nav" aria-label="التنقل الرئيسي">
         <div class="dp-app-header__track"></div>
       </nav>
-      <div class="dp-app-header__context" hidden></div>`;
+      <div class="dp-app-header__context">
+        <div id="headerActions" class="dp-header-account-actions">
+          <div id="accountInfo" class="dp-header-account-info hidden">
+            <span id="doctorName" class="dp-header-account-name" aria-live="polite"></span>
+            <button id="logoutBtn" type="button" class="hidden" title="تسجيل الخروج" aria-label="تسجيل الخروج">
+              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+              <span>تسجيل الخروج</span>
+            </button>
+          </div>
+          <div class="dp-header-auth-actions">
+            <a id="loginCta" class="hidden" href="login.html">تسجيل الدخول</a>
+            <a id="registerCta" class="hidden" href="login.html#register">إنشاء حساب</a>
+          </div>
+        </div>
+      </div>`;
     const track = header.querySelector(".dp-app-header__track");
     pages.forEach(([href, label, icon]) => {
       const link = document.createElement("a");
@@ -70,6 +84,50 @@
     return header;
   }
 
+
+  function renderAccount(user) {
+    const info = document.getElementById("accountInfo");
+    const name = document.getElementById("doctorName");
+    const logout = document.getElementById("logoutBtn");
+    const login = document.getElementById("loginCta");
+    const register = document.getElementById("registerCta");
+    const signedIn = Boolean(user?.id);
+    info?.classList.toggle("hidden", !signedIn);
+    logout?.classList.toggle("hidden", !signedIn);
+    login?.classList.toggle("hidden", signedIn);
+    register?.classList.toggle("hidden", signedIn);
+    if (name) name.textContent = signedIn
+      ? (user.user_metadata?.full_name || user.user_metadata?.name || user.email || "حساب المستخدم")
+      : "";
+  }
+
+  function bindAccountActions() {
+    const logout = document.getElementById("logoutBtn");
+    if (logout && logout.dataset.centralHandlerBound !== "true") {
+      logout.addEventListener("click", async () => {
+        if (logout.disabled) return;
+        logout.disabled = true;
+        try {
+          await window.DietPlannerAccess?.logout();
+        } catch (error) {
+          console.error("Central logout failed:", error);
+          logout.disabled = false;
+        }
+      });
+      logout.dataset.centralHandlerBound = "true";
+    }
+    const supabase = window.DietPlannerAccess?.supabaseClient;
+    if (!supabase?.auth) {
+      renderAccount(null);
+      console.warn("DietPlannerAccess is unavailable; central account actions remain in visitor mode.");
+      return;
+    }
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) console.error("Header session lookup failed:", error);
+      renderAccount(data?.session?.user || null);
+    });
+    supabase.auth.onAuthStateChange((_event, session) => renderAccount(session?.user || null));
+  }
   function mount() {
     if (!document.body || document.querySelector(".dp-app-header")) return;
     const placeholder = document.querySelector("[data-dp-app-header]");
@@ -90,7 +148,8 @@
       const main = document.querySelector("main");
       document.body.insertBefore(header, main || document.body.firstChild);
     }
-    if (context.children.length) context.hidden = false;
+    context.hidden = false;
+    bindAccountActions();
     document.body.classList.add("dp-has-app-header");
   }
 
