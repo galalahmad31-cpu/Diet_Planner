@@ -21,6 +21,7 @@
 .dp-app-header__brand-row{
   display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:13px;
 }
+.dp-app-header__page-meta{display:flex;align-items:center;justify-content:flex-start;gap:9px;min-width:0;max-width:58%}
 .dp-app-header__brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:#fff;text-decoration:none}
 .dp-app-header__logo{
   display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;
@@ -77,20 +78,20 @@
   font-size:15px;font-weight:900;line-height:1.5;letter-spacing:.1px;
 }
 #doctorName.dp-header-account-name.hidden{display:none!important}
-.dp-app-header__logout{
+.dp-app-header__page-meta .dp-app-header__logout{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  flex:0 0 auto;min-width:94px;min-height:39px;
-  padding:8px 13px;border:1px solid rgba(255,255,255,.85);
-  border-radius:12px;background:#fff;color:#15594d;
+  flex:0 0 auto;min-width:88px;min-height:36px;
+  padding:7px 12px;border:1px solid rgba(255,255,255,.85);
+  border-radius:11px;background:#fff;color:#15594d;
   font-family:var(--dp-font,Cairo,sans-serif);font-size:12px;font-weight:900;
   line-height:1.35;white-space:nowrap;cursor:pointer;
   box-shadow:0 3px 10px rgba(0,0,0,.10);
   transition:background .18s,border-color .18s,opacity .18s;
 }
-.dp-app-header__logout i{font-size:14px}
-.dp-app-header__logout:hover{background:#edf8f3;border-color:#fff}
-.dp-app-header__logout.hidden{display:none!important}
-.dp-app-header__logout:disabled{opacity:.65;cursor:wait}
+.dp-app-header__page-meta .dp-app-header__logout i{font-size:13px}
+.dp-app-header__page-meta .dp-app-header__logout:hover{background:#edf8f3;border-color:#fff}
+.dp-app-header__page-meta .dp-app-header__logout.hidden{display:none!important}
+.dp-app-header__page-meta .dp-app-header__logout:disabled{opacity:.65;cursor:wait}
 .dp-header-auth-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto;flex-wrap:wrap}
 .dp-header-auth-actions a.hidden{display:none!important}
 .dp-header-auth-actions a{
@@ -108,8 +109,9 @@
   #headerActions.dp-header-account-actions{gap:10px;flex-wrap:wrap}
   .dp-header-account-info{gap:9px;flex-wrap:wrap}
   #doctorName.dp-header-account-name{max-width:calc(100vw - 145px);padding:8px 11px;font-size:14px}
-  .dp-app-header__logout{min-width:88px;min-height:36px;padding:7px 10px;font-size:11px}
-  .dp-app-header__logout i{font-size:13px}
+  .dp-app-header__page-meta{gap:6px;max-width:58%}
+  .dp-app-header__page-meta .dp-app-header__logout{min-width:0;min-height:32px;padding:6px 8px;font-size:10px}
+  .dp-app-header__page-meta .dp-app-header__logout i{font-size:11px}
   .dp-header-auth-actions{gap:8px}
   .dp-header-auth-actions a{min-height:42px;padding:9px 13px;font-size:12px}
 }
@@ -120,7 +122,8 @@
   .dp-app-header__brand{gap:9px}
   .dp-app-header__brand-copy strong{font-size:16px}
   .dp-app-header__brand-copy small{font-size:10px}
-  .dp-app-header__page-title{max-width:48%;padding:6px 8px;font-size:10px}
+  .dp-app-header__page-meta{max-width:58%;gap:5px}
+  .dp-app-header__page-title{max-width:none;padding:6px 8px;font-size:10px}
   .dp-app-header__track{gap:6px}
   .dp-app-header__link{min-height:36px;padding:7px 10px;font-size:10px;border-radius:10px}
   .dp-app-header__context{gap:7px;margin-top:8px;padding-top:8px}
