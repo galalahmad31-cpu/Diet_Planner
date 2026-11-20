@@ -76,6 +76,12 @@ header.header{
   color:#fff;
   border-color:transparent;
 }
+body:has(#sub-content-quick-calc) .page-header{
+  background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%)!important;
+  border-color:transparent!important;
+  color:#fff!important;
+}
+body:has(#sub-content-quick-calc) .page-header h1{color:#fff!important}
 body:has(.dashboard-services-section) header.glass :where(h1,h2,h3),
 body:has(.product-modern) main>.mx-auto>header :where(h1,h2,h3),
 body:has(#sub-content-quick-calc) .page-header :where(h1,h2,h3),
