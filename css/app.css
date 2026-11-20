@@ -13,8 +13,6 @@
   header h1 { font-size: 21px !important; }
   header p { font-size: 11px !important; }
   header .flex.items-center.justify-between.gap-3 { gap: 8px; }
-  #doctorName { font-size: 12px; }
-  header #logoutBtn { width: 38px; height: 38px; }
   main section.mt-7 { margin-top: 14px; }
   main section .rounded-3xl.bg-gradient-to-l { padding: 15px 16px !important; border-radius: 18px !important; box-shadow: 0 5px 16px rgba(15,71,67,.08) !important; }
   main section .rounded-3xl.bg-gradient-to-l .mb-3 { margin-bottom: 7px; }
