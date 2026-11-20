@@ -2395,3 +2395,14 @@ html[data-theme="dark"] .recipe-modal .nutrition-item{
 }
 html[data-theme="dark"] #search::placeholder,
 html[data-theme="dark"] .recipe-modal .field-input::placeholder{color:var(--dp-muted)!important;opacity:1}
+
+html[data-theme="dark"] .recipe-modal>.bg-white,
+html[data-theme="dark"] .recipe-modal>div>.bg-white{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .recipe-modal>.bg-white :is(h2,h3,strong),
+html[data-theme="dark"] .recipe-modal>div>.bg-white :is(h2,h3,strong){color:var(--dp-text)!important}
+html[data-theme="dark"] .recipe-modal>.bg-white :is(p,small),
+html[data-theme="dark"] .recipe-modal>div>.bg-white :is(p,small){color:var(--dp-text-2)!important}
