@@ -73,7 +73,7 @@ a{ -webkit-tap-highlight-color:transparent }
 .food-page-header,
 .recipe-page-header,
 .support-header{
-  background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%);
+  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
   color:#fff;
 }
 .patient-profile-page-header :where(h1,h2,h3),
@@ -91,7 +91,7 @@ body:has(.dashboard-services-section) header.glass,
 body:has(.product-modern) main>.mx-auto>header,
 body:has(#sub-content-quick-calc) .page-header,
 header.header{
-  background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%)!important;
+  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%)!important;
   color:#fff!important;
   border-color:transparent!important;
 }
@@ -114,7 +114,7 @@ body:has(.dashboard-services-section) header.glass .brand-sub,
 body:has(.product-modern) main>.mx-auto>header p,
 body:has(#sub-content-quick-calc) .page-header p,
 header.header .brand-sub{
-  color:#EAF5F2!important;
+  color:#F4FBF8!important;
 }
 
 /* White utility controls retain a dark, legible icon on the branded header. */
