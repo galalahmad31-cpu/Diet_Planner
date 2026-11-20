@@ -570,14 +570,12 @@
     }
 
     if (autoOpenLatest) {
-      // New plans use a numbered name (e.g. "الخطة 1 - date"), not a
-      // fixed "الجرامات" label. Choose the newest non-alternatives plan;
-      // the embedded editor is explicitly opened in gram mode below.
-      const latestGramsPlan = data.find(plan =>
-        !String(plan.plan_name || '').includes('البدائل')
-      );
-      if (latestGramsPlan) {
-        openPlanWorkspace(latestGramsPlan.id, 'الخطة الغذائية باستخدام الجرامات');
+      // The query is already ordered by latest update, then creation date.
+      // Select from all plans and let openPlanWorkspace choose the editor
+      // from the selected plan's actual name (grams or exchanges).
+      const latestPlan = data[0];
+      if (latestPlan) {
+        await openPlanWorkspace(latestPlan.id, latestPlan.plan_name || '');
       }
     }
     return data;
