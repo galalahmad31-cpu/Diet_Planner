@@ -293,8 +293,8 @@ body.support-delete-modal-open{overflow:hidden}
   .followup-day-delete{width:22px;height:22px;flex-basis:22px}
   .followup-add-button{min-height:28px;padding:0 8px;font-size:9px}
 }
-.visit-embedded-panel{margin-top:13px;border:0;border-radius:0;background:transparent;overflow:visible}
-.visit-embedded-panel[hidden]{display:none!important}
+.patient-plan-workspace-panel{margin-top:13px;border:0;border-radius:0;background:transparent;overflow:visible}
+.patient-plan-workspace-panel[hidden]{display:none!important}
 
 /* Patient-level energy and macro calculator — scoped to its own tab. */
 #patientEnergyPanel{
