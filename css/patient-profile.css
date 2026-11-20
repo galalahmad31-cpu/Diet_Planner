@@ -222,13 +222,13 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .measurements-table td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
 .measurement-delete-button{width:30px;height:30px;border:1px solid #fee2e2;border-radius:8px;background:#fff7f7;color:#e11d48;cursor:pointer}
 .measurement-delete-button:hover{background:#ffe4e6}
-.measurement-inline-actions{display:flex;justify-content:center;gap:5px}
-.measurement-inline-actions button{border:0;border-radius:7px;padding:7px 9px;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
-.measurement-save{background:#059669;color:#fff}
-.measurement-cancel{background:#f1f5f9;color:#475569}
-.inline-measurement-row{background:#f0faf6!important}
-.inline-measurement-row td{padding:7px 4px}
-.inline-measurement-row input,.inline-measurement-row select{width:100%;min-width:0;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:8px 5px;font:700 10px Cairo,sans-serif}
+
+
+
+
+
+
+
 @media(max-width:640px){
  .measurements-toolbar{align-items:stretch;flex-direction:column;gap:8px}
  .measurements-add-button{width:100%}
@@ -830,7 +830,7 @@ body.support-delete-modal-open{overflow:hidden}
 
 /* Flexible patient feedback column in the measurement history. */
 .measurement-notes-cell{min-width:160px;white-space:pre-wrap;overflow-wrap:anywhere;text-align:right!important}
-.inline-measurement-row textarea{width:100%;min-width:150px;min-height:76px;box-sizing:border-box;resize:vertical;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px;font:600 10px/1.7 Cairo,sans-serif}
+
 
 
 /* Patient measurement dialogs: one responsive, theme-aware modal system. */
