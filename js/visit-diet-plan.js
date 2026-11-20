@@ -8,7 +8,11 @@
 (function(){
 
 const sb=window.DietPlannerAccess?.supabaseClient;
-if (!sb) { console.error("Diet Planner access layer is unavailable to the gram-based diet module."); return; }
+if (!sb) {
+ window.__dpDietPlanLoadError = 'DietPlannerAccess.supabaseClient غير متاح عند تحميل الوحدة';
+ console.error(window.__dpDietPlanLoadError);
+ return;
+}
 const params=new URLSearchParams(location.search);
 const initialUrlPatientId=params.get('patient_id') || params.get('id');
 const initialUrlPlanId=params.get('plan_id');
@@ -839,4 +843,5 @@ function init(){
 }
 
 window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, toggleDayCollapse, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, metricCard, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, savePlan, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
+window.__dpDietPlanLoadError = null;
 })();
