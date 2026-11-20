@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الوظائف الطبية والصحية | Diet Planner</title>
+<meta name="description" content="اكتشف أحدث فرص العمل في المجال الطبي والصحي في مصر: الصيدلة والطب والتمريض والتغذية العلاجية والتحاليل والأشعة وغيرها.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://nutrition-3.vercel.app/jobs.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Diet Planner">
+<meta property="og:title" content="الوظائف الطبية والصحية | Diet Planner">
+<meta property="og:description" content="فرص عمل محدثة في مختلف التخصصات الطبية والصحية.">
+<meta property="og:url" content="https://nutrition-3.vercel.app/jobs.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
+<link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
+<link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
+<link rel="stylesheet" href="css/dark-theme.css?v=20261120-home-layout-v1">
+<link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+<link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v8">
+<link rel="stylesheet" href="css/jobs.css?v=20261121-jobs-v1">
+<script src="js/theme.js?v=20261120-central-v11" defer></script>
+<script src="js/app-header.js?v=20261120-central-account-v5" defer></script>
+</head>
+<body>
+<main class="jobs-page">
+<div data-dp-app-header data-page-title="الوظائف الطبية والصحية"></div>
+<section class="jobs-hero" aria-labelledby="jobsTitle">
+<div class="jobs-hero-copy">
+<span class="jobs-eyebrow"><i class="fa-solid fa-briefcase"></i> فرص مهنية في القطاع الصحي</span>
+<h1 id="jobsTitle">خطوتك المهنية القادمة تبدأ من هنا</h1>
+<p>اكتشف فرص العمل المنشورة في مختلف التخصصات الطبية والصحية، وتواصل مباشرة مع جهة التوظيف.</p>
+</div>
+<div class="jobs-hero-icon" aria-hidden="true"><i class="fa-solid fa-user-doctor"></i></div>
+</section>
+<section class="jobs-tools" aria-label="البحث والتصفية">
+<label class="jobs-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="jobsSearch" type="search" placeholder="ابحث بالمسمى الوظيفي أو جهة العمل أو المدينة" autocomplete="off"></label>
+<label class="jobs-filter"><span>التخصص</span><select id="jobsSpecialty">
+<option value="">كل التخصصات</option>
+<option value="medicine">الطب</option><option value="pharmacy">الصيدلة</option><option value="nursing">التمريض</option><option value="clinical_nutrition">التغذية العلاجية</option><option value="laboratory">المعامل والتحاليل</option><option value="radiology">الأشعة</option><option value="dentistry">طب الأسنان</option><option value="physiotherapy">العلاج الطبيعي</option><option value="healthcare_management">الإدارة الصحية</option><option value="other">تخصصات صحية أخرى</option>
+</select></label>
+</section>
+<div class="jobs-results-head"><div><h2>الوظائف المتاحة</h2><p id="jobsCount" aria-live="polite">جاري تحميل الوظائف...</p></div><span class="jobs-results-mark"><i class="fa-solid fa-shield-heart"></i> إعلانات من إدارة المنصة</span></div>
+<section id="jobsList" class="jobs-list" aria-live="polite"><div class="jobs-state"><i class="fa-solid fa-spinner fa-spin"></i><p>جاري تحميل الوظائف...</p></div></section>
+<div id="jobsEmpty" class="jobs-state" hidden><i class="fa-regular fa-folder-open"></i><p>لا توجد وظائف مطابقة حاليًا.</p></div>
+<div class="jobs-load-more-wrap"><button id="jobsLoadMore" class="jobs-load-more" type="button" hidden>عرض المزيد <i class="fa-solid fa-chevron-down"></i></button></div>
+<footer class="jobs-footer">Diet Planner <span>•</span> فرص العمل في القطاع الطبي والصحي</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth-access.js?v=20261120-page-access-v1"></script>
+<script src="js/jobs.js?v=20261121-jobs-v1"></script>
+</body>
+</html>
