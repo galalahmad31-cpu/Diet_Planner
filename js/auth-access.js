@@ -704,6 +704,43 @@
   }
 
   // ---------------------------------------------------------
+  // Shared page access notice
+  // ---------------------------------------------------------
+  function showAccessPrompt({ title, message, actionLabel, actionHref }) {
+    const existing = document.getElementById("dpAccessPrompt");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "dpAccessPrompt";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "dpAccessPromptTitle");
+    overlay.style.cssText = "position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:20px;background:rgba(15,23,42,.72);backdrop-filter:blur(5px);";
+    const panel = document.createElement("section");
+    panel.style.cssText = "width:min(100%,440px);padding:28px 22px;border-radius:20px;background:var(--dp-surface,#fff);color:var(--dp-text,#172033);border:1px solid var(--dp-border,#e5e7eb);box-shadow:0 24px 70px rgba(0,0,0,.25);text-align:center;font-family:inherit;";
+    const icon = document.createElement("div");
+    icon.textContent = "🔒";
+    icon.style.cssText = "font-size:34px;margin-bottom:12px;";
+    const heading = document.createElement("h2");
+    heading.id = "dpAccessPromptTitle";
+    heading.textContent = title;
+    heading.style.cssText = "margin:0 0 9px;font-size:20px;font-weight:900;";
+    const description = document.createElement("p");
+    description.textContent = message;
+    description.style.cssText = "margin:0 0 20px;font-size:14px;line-height:1.9;color:var(--dp-text-2,#64748b);";
+    const action = document.createElement("a");
+    action.href = actionHref;
+    action.textContent = actionLabel;
+    action.style.cssText = "display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 22px;border-radius:12px;background:var(--dp-primary,#159b78);color:#fff;text-decoration:none;font-weight:800;font-size:14px;";
+    panel.append(icon, heading, description, action);
+    overlay.append(panel);
+    document.body.append(overlay);
+    document.body.style.overflow = "hidden";
+    action.focus();
+    return overlay;
+  }
+
+  // ---------------------------------------------------------
   // Public API
   // ---------------------------------------------------------
   window.DietPlannerAccess = {
@@ -715,6 +752,7 @@
     canWrite,
     hasFeature,
     getAccessStatus,
+    showAccessPrompt,
     logout: logoutUser
   };
 
