@@ -52,16 +52,35 @@
     document.body.appendChild(button);
     updateToggle();
   };
-  // Enforce one deterministic order for the four central design stylesheets.
-  const normalizeThemeStylesheetOrder = () => {
-    const order = ["design-tokens.css", "light-theme.css", "components.css", "dark-theme.css"];
-    const links = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
-    order.forEach((filename) => {
-      const link = links.find((node) => (node.getAttribute("href") || "").split("?")[0].endsWith("/" + filename));
-      if (link && link.parentNode) link.parentNode.appendChild(link);
+
+  // Every page receives exactly one copy of each central stylesheet.
+  // Versioning here prevents stale page-level URLs from retaining an old theme.
+  const ensureCentralStylesheets = () => {
+    const files = [
+      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v3"],
+      ["light-theme.css", "css/light-theme.css?v=20261120-central-v3"],
+      ["components.css", "css/components.css?v=20261120-central-v3"],
+      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v6"]
+    ];
+    const allLinks = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
+    files.forEach(([filename, href]) => {
+      const matches = allLinks.filter((node) => {
+        const path = (node.getAttribute("href") || "").split("?")[0];
+        return path.endsWith("/" + filename) || path === filename;
+      });
+      let link = matches.shift();
+      matches.forEach((duplicate) => duplicate.remove());
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+      }
+      if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+      // Append in order so page-specific styles cannot override the central theme.
+      document.head.appendChild(link);
     });
   };
-  // Apply the saved mode immediately; stylesheet ordering is normalized before UI initialization.
+
   apply(stored());
   const media = window.matchMedia?.("(prefers-color-scheme: dark)");
   media?.addEventListener?.("change", (event) => {
@@ -78,7 +97,7 @@
     toggle: () => save(root.dataset.theme === "dark" ? "light" : "dark")
   };
   const initialize = () => {
-    normalizeThemeStylesheetOrder();
+    ensureCentralStylesheets();
     createToggle();
   };
   if (document.readyState === "loading") {
