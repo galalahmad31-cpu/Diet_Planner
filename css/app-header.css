@@ -85,6 +85,7 @@
 .dp-app-header__context #logoutBtn.hidden{display:none!important}
 .dp-app-header__context #logoutBtn:disabled{opacity:.65;cursor:wait}
 .dp-header-auth-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.dp-header-auth-actions a.hidden{display:none!important}
 .dp-header-auth-actions a{
   display:inline-flex;align-items:center;justify-content:center;
   min-height:36px;padding:8px 12px;border:1px solid rgba(255,255,255,.3);
