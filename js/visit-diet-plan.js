@@ -4,7 +4,7 @@
  * Kept isolated in its own IIFE to protect its internal state.
  * ========================================================= */
 
-/* Embedded diet-plan module. Kept isolated in an IIFE to avoid global/spaghetti collisions. */
+/* Diet-plan module. Kept isolated in an IIFE to avoid global collisions. */
 (function(){
 
 const sb=window.DietPlannerAccess?.supabaseClient;
@@ -881,9 +881,6 @@ function openDayDetails(id){
  activeDayDetailsId=String(day.id);
  modal.hidden=false;
  document.body.style.overflow='hidden';
- if(new URLSearchParams(location.search).get('embed')==='1'&&window.parent!==window){
-  window.parent.postMessage({type:'dp-plan-embed-modal',open:true},location.origin);
- }
  renderActiveDayDetails();
  modal.querySelector('.day-details-close')?.focus();
 }
@@ -894,9 +891,6 @@ function closeDayDetails(){
  modal.hidden=true;
  activeDayDetailsId=null;
  document.body.style.overflow=dayDetailsPreviousOverflow;
- if(new URLSearchParams(location.search).get('embed')==='1'&&window.parent!==window){
-  window.parent.postMessage({type:'dp-plan-embed-modal',open:false},location.origin);
- }
  const trigger=closingId?document.querySelector(`[data-day-open="${CSS.escape(closingId)}"]`):null;
  trigger?.focus();
 }
