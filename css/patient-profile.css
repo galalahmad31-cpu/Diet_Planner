@@ -788,3 +788,7 @@ body.support-delete-modal-open{overflow:hidden}
 #planWorkspace{width:100%;min-width:0}
 #planWorkspace #dietPlanContent{width:100%;min-width:0}
 #planWorkspace .embedded-diet-plan{width:100%;min-width:0}
+
+@media print{
+  body.patient-profile-page>[data-dp-app-header]{display:none!important}
+}
