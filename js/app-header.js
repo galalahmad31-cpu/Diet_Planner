@@ -24,7 +24,6 @@
     ["feedback.html", "شاركنا رأيك", "fa-star"],
     ["about.html", "عن التطبيق", "fa-circle-info"],
     ["notifications.html", "الإشعارات", "fa-bell"],
-    ["nutritionsupport.html", "الدعم الغذائي", "fa-notes-medical"]
   ];
   const titles = Object.fromEntries(pages.map(([href, label]) => [href, label]));
   titles["patient-profile.html"] = "ملف المريض";
@@ -63,7 +62,7 @@
       if (path === "weightم.html" && href === "app.html") link.id = "dashboardBtn";
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || (path === "nutritionsupport-patient.html" && href === "nutritionsupport.html") || ((path === "subscription_plans_index.html" || path === "subscription_plansم.html") && href === "profile.html")) {
+      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || ((path === "subscription_plans_index.html" || path === "subscription_plansم.html") && href === "profile.html")) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
       }
