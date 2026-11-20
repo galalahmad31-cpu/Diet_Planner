@@ -11,33 +11,11 @@
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
   <script src="js/theme.js?v=20261120-central-v11"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v1">
+  <script src="js/app-header.js?v=20261120-central-header-v1" defer></script>
 </head>
 <body>
- <header class="header admin-branded-header">
-  <div class="admin-brand-top">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></div>
-      <div class="admin-brand-copy"><div class="brand-title">Diet Planner</div><div class="brand-sub">د. أحمد جلال</div></div>
-    </div>
-    <span class="admin-page-label">الإدارة</span>
-  </div>
-  <nav class="admin-access-nav" dir="rtl" aria-label="التنقل السريع">
-    <div class="admin-access-track">
-      <a href="app.html" class="admin-access-card"><i class="fa-solid fa-house"></i><span>الرئيسية</span></a>
-      <a href="patient.html" class="admin-access-card"><i class="fa-solid fa-user-group"></i><span>قائمة المرضى</span></a>
-      <a href="food.html" class="admin-access-card"><i class="fa-solid fa-apple-whole"></i><span>مكتبة الأغذية</span></a>
-      <a href="products.html" class="admin-access-card"><i class="fa-solid fa-prescription-bottle-medical"></i><span>المنتجات الغذائية</span></a>
-      <a href="diet.html" class="admin-access-card"><i class="fa-solid fa-layer-group"></i><span>مكتبة الدايت</span></a>
-      <a href="recipe.html" class="admin-access-card"><i class="fa-solid fa-bowl-food"></i><span>الوصفات الصحية</span></a>
-      <a href="quickcalc.html" class="admin-access-card"><i class="fa-solid fa-calculator"></i><span>الحاسبة السريعة</span></a>
-      <a href="finance.html" class="admin-access-card"><i class="fa-solid fa-wallet"></i><span>اشتراكات المرضى</span></a>
-      <a href="article.html" class="admin-access-card"><i class="fa-solid fa-newspaper"></i><span>المقالات</span></a>
-      <a href="profile.html" class="admin-access-card"><i class="fa-solid fa-user-doctor"></i><span>الصفحة الشخصية وخطط الاشتراك</span></a>
-      <a href="feedback.html" class="admin-access-card"><i class="fa-solid fa-star"></i><span>شاركنا رأيك</span></a>
-      <a href="about.html" class="admin-access-card"><i class="fa-solid fa-circle-info"></i><span>عن التطبيق</span></a>
-    </div>
-  </nav>
-</header>
+ <div data-dp-app-header data-page-title="لوحة الإدارة"></div>
 <main class="container" id="adminContent" style="display:none">
 <div class="title"><h1>إدارة الاشتراكات</h1><p>إدارة الطلبات والخطط والأطباء من مكان واحد</p></div>
 <nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button></nav>
