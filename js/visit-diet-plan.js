@@ -428,16 +428,31 @@ function filterFoodList(){
  }).join('');
 }
 function selectFoodForMeal(id){
- const f=foodDatabase.find(x=>String(x.id)===String(id)); if(!f)return;
- const selected=document.getElementById('selectedFoodId'),search=document.getElementById('foodSearchInput'); if(!selected||!search)return;
- selected.value=String(f.id); search.value=f.name; updateFoodModalHousehold(); filterFoodList();
+ const selected=document.getElementById('selectedFoodId');
+ if(!selected)return;
+ const foodId=String(id);
+ if(String(selected.value)===foodId){
+  selected.value='';
+ }else{
+  const food=foodDatabase.find(item=>String(item.id)===foodId);
+  if(!food)return;
+  selected.value=foodId;
+ }
+ updateFoodModalHousehold();
+ filterFoodList();
+}
+function handleFoodSearchInput(){
+ const selected=document.getElementById('selectedFoodId');
+ if(selected)selected.value='';
+ updateFoodModalHousehold();
+ filterFoodList();
 }
 function initFoodSearchInteraction(){
  const input=document.getElementById('foodSearchInput');
  const drop=document.getElementById('foodDropdownList');
  if(!input||!drop||input.dataset.bound==='1')return;
 
- input.addEventListener('input',filterFoodList);
+ input.addEventListener('input',handleFoodSearchInput);
  input.addEventListener('focus',filterFoodList);
 
  drop.addEventListener('click',event=>{
