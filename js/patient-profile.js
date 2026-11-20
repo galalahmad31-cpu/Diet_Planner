@@ -260,7 +260,7 @@
     const body = $('weightTableBody');
     if (!body) return;
     if (!measurementState.logs.length) {
-      body.innerHTML = '<tr><td colspan="6" class="measurements-state">لا توجد قياسات مسجلة لهذا المريض.</td></tr>';
+      body.innerHTML = '<tr><td colspan="10" class="measurements-state">لا توجد قياسات مسجلة لهذا المريض.</td></tr>';
       return;
     }
     const labels = { excellent: 'ممتاز', good: 'جيد', fair: 'متوسط', poor: 'ضعيف' };
@@ -268,9 +268,13 @@
       <tr>
         <td data-label="التاريخ">${measurementDateLabel(log.date)}</td>
         <td data-label="الوزن (كجم)" class="measurement-weight">${Number(log.weight).toFixed(1)}</td>
+        <td data-label="نسبة الدهون">${log.bodyFat == null ? '—' : Number(log.bodyFat).toFixed(1)+'%'}</td>
+        <td data-label="نسبة العضلات">${log.muscle == null ? '—' : Number(log.muscle).toFixed(1)+'%'}</td>
+        <td data-label="نسبة الماء">${log.water == null ? '—' : Number(log.water).toFixed(1)+'%'}</td>
         <td data-label="محيط الوسط (سم)">${log.waist == null ? '—' : Number(log.waist).toFixed(1)}</td>
         <td data-label="محيط الأرداف (سم)">${log.hip == null ? '—' : Number(log.hip).toFixed(1)}</td>
         <td data-label="الالتزام">${escapeHtml(labels[log.adherence] || '—')}</td>
+        <td data-label="ملاحظات المريض" class="measurement-notes-cell">${escapeHtml(log.notes || '—')}</td>
         <td data-label="إجراء" class="no-print"><button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
       </tr>`).join('');
   }
@@ -285,7 +289,7 @@
     try {
       const { data, error } = await supabase
         .from('weight_logs')
-        .select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at')
+        .select('id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at')
         .eq('patient_id', patientId)
         .order('measurement_date', { ascending: true })
         .order('created_at', { ascending: true });
@@ -295,6 +299,9 @@
         date: item.measurement_date,
         createdAt: item.created_at || '',
         weight: Number(item.weight),
+        bodyFat: item.body_fat_percent == null ? null : Number(item.body_fat_percent),
+        muscle: item.muscle_percent == null ? null : Number(item.muscle_percent),
+        water: item.water_percent == null ? null : Number(item.water_percent),
         waist: item.waist_cm == null ? null : Number(item.waist_cm),
         hip: item.hip_cm == null ? null : Number(item.hip_cm),
         adherence: item.diet_adherence || '',
@@ -337,9 +344,13 @@
     row.innerHTML = `
       <td><input type="date" id="inlineDate" value="${localDate}" aria-label="تاريخ القياس"></td>
       <td><input type="number" step="0.1" min="0.1" id="inlineWeight" placeholder="كجم" aria-label="الوزن"></td>
+      <td><input type="number" step="0.1" min="0" max="100" id="inlineBodyFat" placeholder="%" aria-label="نسبة الدهون"></td>
+      <td><input type="number" step="0.1" min="0" max="100" id="inlineMuscle" placeholder="%" aria-label="نسبة العضلات"></td>
+      <td><input type="number" step="0.1" min="0" max="100" id="inlineWater" placeholder="%" aria-label="نسبة الماء"></td>
       <td><input type="number" step="0.1" min="0.1" id="inlineWaist" placeholder="سم" aria-label="محيط الوسط"></td>
       <td><input type="number" step="0.1" min="0.1" id="inlineHip" placeholder="سم" aria-label="محيط الأرداف"></td>
       <td><select id="inlineAdherence" aria-label="الالتزام"><option value="">—</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></td>
+      <td><textarea id="inlineMeasurementNotes" rows="3" placeholder="اكتب المشكلة أو الصعوبة التي واجهتك مع الدايت..." aria-label="ملاحظات المريض"></textarea></td>
       <td class="no-print"><div class="measurement-inline-actions"><button type="button" data-measurement-save class="measurement-save">حفظ</button><button type="button" data-measurement-cancel class="measurement-cancel">إلغاء</button></div></td>`;
     body.prepend(row);
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -355,14 +366,19 @@
     const waist = waistRaw === '' ? null : Number.parseFloat(waistRaw);
     const hip = hipRaw === '' ? null : Number.parseFloat(hipRaw);
     const adherence = $('inlineAdherence')?.value || '';
+    const notes = $('inlineMeasurementNotes')?.value.trim() || '';
+    const readPercent = id => { const raw = $(id)?.value ?? ''; const value = raw === '' ? null : Number.parseFloat(raw); return { raw, value }; };
+    const bodyFat = readPercent('inlineBodyFat'), muscle = readPercent('inlineMuscle'), water = readPercent('inlineWater');
+    const invalidPercent = item => item.raw !== '' && (!Number.isFinite(item.value) || item.value < 0 || item.value > 100);
     if (!date || !Number.isFinite(weight) || weight <= 0 ||
+        invalidPercent(bodyFat) || invalidPercent(muscle) || invalidPercent(water) ||
         (waistRaw !== '' && (!Number.isFinite(waist) || waist <= 0)) ||
         (hipRaw !== '' && (!Number.isFinite(hip) || hip <= 0))) {
       if (window.Swal && typeof window.Swal.fire === 'function') {
         window.Swal.fire({
           icon: 'warning',
           title: 'راجع بيانات القياس',
-          text: 'تأكد من إدخال تاريخ القياس والوزن بصورة صحيحة، وراجع قيم محيط الوسط والأرداف إذا أدخلتها.',
+          text: 'تأكد من إدخال تاريخ القياس والوزن بصورة صحيحة، وراجع نسب الدهون والعضلات والماء (من 0 إلى 100%) ومحيطات الجسم إذا أدخلتها.',
           confirmButtonText: 'حسنًا',
           buttonsStyling: false,
           customClass: {
@@ -386,14 +402,20 @@
         patient_id: patientId,
         weight,
         measurement_date: date,
+        body_fat_percent: bodyFat.value,
+        muscle_percent: muscle.value,
+        water_percent: water.value,
         waist_cm: waist,
         hip_cm: hip,
         diet_adherence: adherence || null,
-        notes: null
-      }).select('id,patient_id,weight,measurement_date,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
+        notes: notes || null
+      }).select('id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at').single();
       if (error) throw error;
       measurementState.logs.push({
         id: data.id, date: data.measurement_date, createdAt: data.created_at || '', weight: Number(data.weight),
+        bodyFat: data.body_fat_percent == null ? null : Number(data.body_fat_percent),
+        muscle: data.muscle_percent == null ? null : Number(data.muscle_percent),
+        water: data.water_percent == null ? null : Number(data.water_percent),
         waist: data.waist_cm == null ? null : Number(data.waist_cm),
         hip: data.hip_cm == null ? null : Number(data.hip_cm),
         adherence: data.diet_adherence || '', notes: data.notes || ''
