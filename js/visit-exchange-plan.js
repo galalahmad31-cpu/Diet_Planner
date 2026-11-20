@@ -94,154 +94,7 @@ async function ensureExchangePlan(skipAuth=false){
  return S.plan;
 }
 function renderDays(){const container=document.getElementById('exchangeDaysContainer');if(container)container.replaceChildren();const empty=document.getElementById('exchangeDaysEmpty');if(empty)empty.hidden=true}
-function clone(v){return JSON.parse(JSON.stringify(v||[]))}
-function dayEditing(id){return!!S.dayEditing[String(id)]}
-function renderDays(){
- const c=document.getElementById('exchangeDaysContainer'),e=document.getElementById('exchangeDaysEmpty');
- if(!S.days.length){c.innerHTML='';e.classList.remove('hidden');return}
- e.classList.add('hidden');
- c.innerHTML=S.days.map((d,di)=>`<div data-xday="${esc(d.id)}" class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
-  <div class="p-3 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-   <div class="flex items-center gap-2 flex-1 min-w-0">
-    <span class="text-[10px] text-slate-400 font-bold shrink-0">اليوم ${di+1}</span>
-    <input value="${esc(d.title)}" ${dayEditing(d.id)?'':'disabled'} data-xaction="set-day-title" data-day-id="${esc(d.id)}" class="bg-transparent border-b border-slate-600 focus:border-violet-400 outline-none font-black text-sm w-full sm:w-48">
-   </div>
-   <div class="flex items-center gap-1.5 no-print">
-    <button data-xaction="edit-day" data-day-id="${esc(d.id)}" class="px-2.5 py-1.5 rounded-lg bg-sky-600 text-white text-[10px] font-bold"><i class="fa-solid fa-pen ml-1"></i>تعديل</button>
-    <button data-xaction="save-day" data-day-id="${esc(d.id)}" ${dayEditing(d.id)?'':'disabled'} class="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold disabled:opacity-40"><i class="fa-solid fa-floppy-disk ml-1"></i>حفظ</button>
-    <button data-xaction="delete-day" data-day-id="${esc(d.id)}" class="px-2.5 py-1.5 rounded-lg bg-rose-600 text-white text-[10px] font-bold"><i class="fa-solid fa-trash ml-1"></i>حذف</button>
-   </div>
-  </div>
-  <div class="p-3 space-y-3">
-   ${(d.meals||[]).map((m,mi)=>`<div class="border border-slate-200 rounded-xl p-3">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
-     <input value="${esc(m.name)}" ${dayEditing(d.id)?'':'disabled'} data-xaction="set-meal-name" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" class="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 font-black text-xs w-full sm:w-56">
-     <div class="flex gap-1 no-print flex-wrap">
-      <button data-xaction="move-meal-up" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" ${dayEditing(d.id)||mi===0?'':'disabled'} class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 disabled:opacity-40" title="تحريك لأعلى"><i class="fa-solid fa-arrow-up"></i></button>
-      <button data-xaction="move-meal-down" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" ${dayEditing(d.id)||mi===(d.meals.length-1)?'':'disabled'} class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 disabled:opacity-40" title="تحريك لأسفل"><i class="fa-solid fa-arrow-down"></i></button>
-      <button data-xaction="add-item" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" ${dayEditing(d.id)?'':'disabled'} class="px-2.5 py-1.5 rounded-lg bg-violet-600 text-white text-[10px] font-bold disabled:opacity-40"><i class="fa-solid fa-plus ml-1"></i>إضافة صنف</button>
-      <button data-xaction="delete-meal" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" ${dayEditing(d.id)?'':'disabled'} class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 disabled:opacity-40" title="حذف الوجبة"><i class="fa-solid fa-trash"></i></button>
-     </div>
-    </div>
-    <div class="overflow-x-auto mt-2">
-     <table class="w-full min-w-[720px] text-[10px]">
-      <thead><tr class="text-slate-500 border-b border-slate-100"><th class="py-2 text-right">اسم الصنف</th><th class="py-2 text-center">المقياس المنزلي</th><th class="py-2 text-center">التكرار</th><th class="py-2 text-center no-print w-20">إجراء</th></tr></thead>
-      <tbody>${(m.items||[]).length?(m.items||[]).map(it=>`<tr class="border-b border-slate-50 last:border-0">
-       <td class="py-2 px-1"><input data-xitem-name="${esc(it.id)}" value="${esc(it.name)}" ${dayEditing(d.id)?'':'disabled'} data-xaction="set-item-name" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" data-item-id="${esc(it.id)}" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-xs font-bold outline-none focus:border-violet-400"></td>
-       <td class="py-2 px-1"><input value="${esc(it.measure)}" ${dayEditing(d.id)?'':'disabled'} data-xaction="set-item-measure" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" data-item-id="${esc(it.id)}" placeholder="مثال: كوب / ½ رغيف" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-xs font-bold text-center outline-none focus:border-violet-400"></td>
-       <td class="py-2 px-1"><input value="${esc(it.repeat||'')}" ${dayEditing(d.id)?'':'disabled'} data-xaction="set-item-repeat" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" data-item-id="${esc(it.id)}" placeholder="يوميًا / 3 مرات أسبوعيًا" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-xs font-bold text-center outline-none focus:border-violet-400"></td>
-       <td class="py-2 text-center no-print"><button data-xaction="delete-item" data-day-id="${esc(d.id)}" data-meal-id="${esc(m.id)}" data-item-id="${esc(it.id)}" ${dayEditing(d.id)?'':'disabled'} class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 disabled:opacity-40" title="حذف الصنف"><i class="fa-solid fa-trash"></i></button></td>
-      </tr>`).join(''):'<tr><td colspan="4" class="py-5 text-center text-slate-400 font-bold">لا توجد أصناف مضافة. اضغط «إضافة صنف» لإضافة صف جديد.</td></tr>'}</tbody>
-     </table>
-    </div>
-
-   </div>`).join('')}
-   <button data-xaction="add-meal" data-day-id="${esc(d.id)}" ${dayEditing(d.id)?'':'disabled'} class="w-full border border-dashed border-violet-300 text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-xl py-2 text-xs font-extrabold disabled:opacity-40 no-print"><i class="fa-solid fa-plus ml-1"></i>إضافة وجبة</button>
-  </div>
- </div>`).join('');
-}
-async function addDay(){
- if(!S.plan){const idp=await ensureExchangePlan();if(!idp){status('تعذر إنشاء خطة البدائل لهذا المريض',true);return}}
- const id='local-day-'+Date.now();S.days.push({id,title:`اليوم ${S.days.length+1}`,meals:[{id:'local-meal-'+Date.now()+'-1',name:'وجبة الإفطار',items:[]},{id:'local-meal-'+Date.now()+'-2',name:'وجبة الغداء',items:[]},{id:'local-meal-'+Date.now()+'-3',name:'وجبة العشاء',items:[]}]});S.dayEditing[id]=true;renderDays();status('تمت إضافة اليوم — اضغط حفظ لتخزينه')}
-function editDay(id){S.dayEditing[String(id)]=true;renderDays()}
-function setDayTitle(id,v){const d=S.days.find(x=>String(x.id)===String(id));if(d&&dayEditing(id))d.title=String(v).trim()||d.title}
-function setMealName(did,mid,v){const d=S.days.find(x=>String(x.id)===String(did)),m=d?.meals.find(x=>String(x.id)===String(mid));if(m&&dayEditing(did))m.name=String(v).trim()||m.name}
-function moveMeal(did,mid,dir){const d=S.days.find(x=>String(x.id)===String(did));if(!d||!dayEditing(did))return;const i=d.meals.findIndex(m=>String(m.id)===String(mid)),n=i+Number(dir);if(i<0||n<0||n>=d.meals.length)return;const [m]=d.meals.splice(i,1);d.meals.splice(n,0,m);renderDays()}
-function addMeal(did){const d=S.days.find(x=>String(x.id)===String(did));if(d&&dayEditing(did)){d.meals.push({id:'local-meal-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:`وجبة ${d.meals.length+1}`,items:[]});renderDays()}}
-function deleteMeal(did,mid){openConfirm('حذف الوجبة','هل أنت متأكد من حذف الوجبة بكل أصنافها؟',()=>{const d=S.days.find(x=>String(x.id)===String(did));if(d&&dayEditing(did)){d.meals=d.meals.filter(m=>String(m.id)!==String(mid));renderDays()}})}
-function openConfirm(title,text,cb){document.getElementById('confirmTitle').textContent=title;document.getElementById('confirmText').textContent=text;S.confirm=cb;document.getElementById('confirmModal').classList.remove('hidden')}
-function closeConfirm(){document.getElementById('confirmModal').classList.add('hidden');S.confirm=null}
-async function saveDay(id){if(!dayEditing(id))return;const ok=await saveDaysToDb();if(ok){S.savedDays=clone(S.days);S.dayEditing[String(id)]=false;renderDays();status('تم حفظ اليوم بنجاح')}}
-async function deleteRemovedDays(removed){
- if(!removed.length)return;
- const mr=await dbx.from('plan_meals').select('id').in('day_id',removed);
- if(mr.error)throw mr.error;
- const mealIds=(mr.data||[]).map(x=>x.id);
- if(mealIds.length){
-  let r=await dbx.from('plan_items').delete().in('meal_id',mealIds);
-  if(r.error)throw r.error;
-  r=await dbx.from('plan_meals').delete().in('day_id',removed);
-  if(r.error)throw r.error;
- }
- const r=await dbx.from('plan_days').delete().in('id',removed);
- if(r.error)throw r.error;
-}
-
-async function prepareDayRecord(day,index){
- let dayId=String(day.id).startsWith('local-day-')?null:day.id;
- if(!dayId){
-  const r=await dbx.from('plan_days').insert({plan_id:S.plan,day_number:index+1,day_name:day.title}).select('id').single();
-  if(r.error)throw r.error;
-  dayId=r.data.id;
-  day.id=dayId;
- }else{
-  const r=await dbx.from('plan_days').update({day_number:index+1,day_name:day.title}).eq('id',dayId);
-  if(r.error)throw r.error;
- }
- return dayId;
-}
-
-async function clearDayMeals(dayId){
- const oldM=await dbx.from('plan_meals').select('id').eq('day_id',dayId);
- if(oldM.error)throw oldM.error;
- const mealIds=(oldM.data||[]).map(x=>x.id);
- if(!mealIds.length)return;
- let r=await dbx.from('plan_items').delete().in('meal_id',mealIds);
- if(r.error)throw r.error;
- r=await dbx.from('plan_meals').delete().in('day_id',dayId);
- if(r.error)throw r.error;
-}
-
-async function saveDayMeals(day,dayId){
- const mealRows=(day.meals||[]).map((m,mi)=>({id:crypto.randomUUID(),day_id:dayId,meal_name:m.name||('وجبة '+(mi+1)),meal_order:mi+1}));
- if(mealRows.length){
-  const r=await dbx.from('plan_meals').insert(mealRows);
-  if(r.error)throw r.error;
- }
- const itemRows=[];
- (day.meals||[]).forEach((m,mi)=>(m.items||[]).forEach(it=>{
-  if(String(it.name||'').trim())itemRows.push({id:crypto.randomUUID(),meal_id:mealRows[mi].id,food_id:null,item_name:String(it.name).trim(),quantity_g:0,household_measure:String(it.measure||'').trim()||null,frequency:String(it.repeat||'').trim()||null});
- }));
- if(itemRows.length){
-  const r=await dbx.from('plan_items').insert(itemRows);
-  if(r.error)throw r.error;
- }
-}
-
-async function saveSingleDay(day,index){
- const dayId=await prepareDayRecord(day,index);
- await clearDayMeals(dayId);
- await saveDayMeals(day,dayId);
-}
-
-async function saveDaysToDb(){
- if(!S.plan)return false;
- try{
-  const oldIds=S.savedDays.filter(d=>!String(d.id).startsWith('local-day-')).map(d=>d.id);
-  const currentIds=S.days.filter(d=>!String(d.id).startsWith('local-day-')).map(d=>d.id);
-  const removed=oldIds.filter(id=>!currentIds.includes(id));
-  await deleteRemovedDays(removed);
-  for(let i=0;i<S.days.length;i++)await saveSingleDay(S.days[i],i);
-  return true;
- }catch(e){
-  status('تعذر حفظ أيام الخطة: '+(e.message||e),true);
-  return false;
- }
-}
-function deleteDay(id){openConfirm('حذف اليوم','هل أنت متأكد من حذف هذا اليوم بكل وجباته وأصنافه؟',async()=>{const old=clone(S.days),idx=S.days.findIndex(x=>String(x.id)===String(id));if(idx<0)return;S.days.splice(idx,1);if(await saveDaysToDb()){S.savedDays=clone(S.days);renderDays();status('تم حذف اليوم بنجاح')}else{S.days=old;renderDays()}})}
-function addItem(did,mid){
- const d=S.days.find(x=>String(x.id)===String(did)),m=d?.meals.find(x=>String(x.id)===String(mid));
- if(!m||!dayEditing(did))return;
- const id='local-item-'+Date.now()+'-'+Math.random().toString(36).slice(2);
- m.items.push({id,name:'',measure:'',repeat:''});
- renderDays();
- requestAnimationFrame(()=>{const el=document.querySelector(`[data-xday="${CSS.escape(String(did))}"] [data-xitem-name="${CSS.escape(String(id))}"]`);if(el){el.focus();el.scrollIntoView({block:'nearest',inline:'nearest'});}});
-}
-function setItemField(did,mid,iid,field,value){
- const d=S.days.find(x=>String(x.id)===String(did)),m=d?.meals.find(x=>String(x.id)===String(mid)),it=m?.items.find(x=>String(x.id)===String(iid));
- if(it&&dayEditing(did))it[field]=String(value??'');
-}
-function deleteItem(did,mid,iid){openConfirm('حذف الصنف','هل أنت متأكد من حذف هذا الصنف؟',()=>{const d=S.days.find(x=>String(x.id)===String(did)),m=d?.meals.find(x=>String(x.id)===String(mid));if(m&&dayEditing(did)){m.items=m.items.filter(x=>String(x.id)!==String(iid));renderDays()}})}
+function renderDays(){const container=document.getElementById('exchangeDaysContainer');if(container)container.replaceChildren();const empty=document.getElementById('exchangeDaysEmpty');if(empty)empty.hidden=true}
 function openPrintSettings(){
   const modal=document.getElementById('printSettingsModal');
   const pb=document.getElementById('executePrintBtn');
@@ -250,13 +103,11 @@ function openPrintSettings(){
   modal.classList.remove('hidden');
 }
 function printAll(){
- if(!S.days.length){status('لا توجد أيام غذائية للطباعة',true);return;}
  openPrintSettings();
 }
 function buildPrintAll(){
  const container=document.getElementById('printPlanContent');
  if(!container)return;
- if(!S.days.length){container.innerHTML='<p class="print-note">لا توجد أيام غذائية مسجلة.</p>';return;}
  container.innerHTML=`<section class="print-day"><h2 class="print-day-title">تفاصيل الخطة الغذائية</h2><div class="print-plan-notes">${esc(S.notes||'لا توجد تفاصيل مسجلة.').replace(/\n/g,'<br>')}</div></section>`;
 }
 function executePrintAll(){
@@ -320,7 +171,7 @@ async function saveAndPrintFromSettings(){
  }
 }
 function edit(){if(!S.plan)return;S.editing=true;render();status('وضع التعديل')}
-async function deletePlan(){if(!(await canWriteExchangePlan())){status('حذف خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return;}if(!S.plan)return;const deletedPlanId=S.plan;openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',deletedPlanId);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete() .eq('plan_id',deletedPlanId);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',deletedPlanId);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.days=[];S.savedDays=[];S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();renderDays();setButtons();status('تم حذف خطة البدائل بنجاح');window.dispatchEvent(new CustomEvent('dp-exchange-plan-deleted',{detail:{planId:deletedPlanId}}))}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
+async function deletePlan(){if(!(await canWriteExchangePlan())){status('حذف خطة البدائل متاح أثناء الاشتراك المدفوع فقط',true);return;}if(!S.plan)return;const deletedPlanId=S.plan;openConfirm('حذف خطة البدائل','هل أنت متأكد من حذف خطة البدائل بالكامل؟',async()=>{try{const dr=await dbx.from('plan_days').select('id').eq('plan_id',deletedPlanId);if(dr.error)throw dr.error;const dids=(dr.data||[]).map(x=>x.id);if(dids.length){const mr=await dbx.from('plan_meals').select('id').in('day_id',dids);if(mr.error)throw mr.error;const mids=(mr.data||[]).map(x=>x.id);if(mids.length){let r=await dbx.from('plan_items').delete().in('meal_id',mids);if(r.error)throw r.error;r=await dbx.from('plan_meals').delete().in('day_id',dids);if(r.error)throw r.error}let r=await dbx.from('plan_days').delete().in('id',dids);if(r.error)throw r.error}let r=await dbx.from('exchange_values').delete() .eq('plan_id',deletedPlanId);if(r.error)throw r.error;r=await dbx.from('nutrition_plans').delete().eq('id',deletedPlanId);if(r.error)throw r.error;S.plan=null;S.saved=false;S.editing=true;S.r={};G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});render();setButtons();status('تم حذف خطة البدائل بنجاح');window.dispatchEvent(new CustomEvent('dp-exchange-plan-deleted',{detail:{planId:deletedPlanId}}))}catch(e){status('تعذر حذف خطة البدائل: '+(e.message||e),true)}})}
 function setupExchangePlanEvents(){
  const container=document.getElementById('exchangeDaysContainer');
  if(!container||container.dataset.eventsReady==='1')return;
