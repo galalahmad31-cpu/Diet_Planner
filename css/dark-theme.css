@@ -2105,7 +2105,7 @@ html[data-theme="dark"] body:has(#section-en){
 }
 html[data-theme="dark"] body:has(#section-en) :is(
   .support-days,.support-tabs,.day-edit-toolbar,.support-content,
-  .tab-content,.monitoring-section,.highlight-box,.table-custom,
+  .tab-content,.monitoring-section,.highlight-box,.table-custom,\n  .en-volume-fields,.en-volume-field,
   .print-settings-modal,.print-completion-modal,.delete-confirm-box
 ){
   background:var(--dp-surface)!important;
@@ -2180,11 +2180,11 @@ html[data-theme="dark"] body:has(#section-en) .table-custom th{
   color:var(--dp-text)!important;
 }
 html[data-theme="dark"] body:has(#section-en) #section-en :is(
-  .bg-purple-100,.bg-purple-50,.bg-blue-50,.bg-indigo-50,
+  .bg-purple-100,.bg-purple-50,.bg-blue-50,.bg-indigo-50,.bg-indigo-100,\n  .bg-blue-100,.bg-blue-200,.bg-indigo-900,
   .bg-emerald-50,.bg-emerald-100
 ),
 html[data-theme="dark"] body:has(#section-en) #section-tpn :is(
-  .bg-gray-50,.bg-blue-50,.bg-blue-100,.bg-emerald-50,.bg-emerald-100,
+  .bg-gray-50,.bg-blue-50,.bg-blue-100,.bg-blue-200,.bg-indigo-50,\n  .bg-emerald-50,.bg-emerald-100,.bg-amber-50,.bg-amber-100,
   .bg-indigo-900,.bg-white
 ){
   background:var(--dp-surface-2)!important;
@@ -2192,7 +2192,7 @@ html[data-theme="dark"] body:has(#section-en) #section-tpn :is(
   border-color:var(--dp-border)!important;
 }
 html[data-theme="dark"] body:has(#section-en) #section-en :is(
-  .text-purple-700,.text-purple-800,.text-purple-900,
+  .text-purple-700,.text-purple-800,.text-purple-900,.text-indigo-700,.text-indigo-800,.text-indigo-900,
   .text-blue-700,.text-blue-800,.text-blue-900,.text-emerald-700
 ),
 html[data-theme="dark"] body:has(#section-en) #section-tpn :is(
