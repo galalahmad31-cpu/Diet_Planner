@@ -1008,11 +1008,10 @@ async function init() {
 
     state.isAdmin = status.isAdmin === true;
 
-    // Keep admin-only controls hidden unless the verified profile role is admin.
+    // The verified profile role is the single source of truth for this admin-only toolbar.
     const adminToolbar = $('adminToolbar');
     if (adminToolbar) {
       adminToolbar.hidden = !state.isAdmin;
-      adminToolbar.classList.toggle('hidden', !state.isAdmin);
       adminToolbar.classList.toggle('flex', state.isAdmin);
       adminToolbar.setAttribute('aria-hidden', String(!state.isAdmin));
     }
