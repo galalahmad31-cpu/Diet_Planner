@@ -199,9 +199,7 @@ function buildNotifications(rows) {
           type = `ينتهي خلال ${subscriptionDays} أيام`;
           title = 'الاشتراك يقترب من الانتهاء';
           text = `يتبقى ${subscriptionDays} أيام على انتهاء الاشتراك. يُفضّل التواصل مع المريض مسبقًا لتجديد الاشتراك.`;
-          box = subscriptionDays <= 3
-            ? 'warning'
-            : 'info';
+          tone = subscriptionDays <= 3 ? 'warning' : 'info';
         }
 
         addNotification(result.subscriptions, row, {
@@ -209,7 +207,7 @@ function buildNotifications(rows) {
           title,
           text,
           icon,
-          box,
+          tone,
           date: subscriptionEnd
         });
       } else if (subscriptionDays < 0) {
