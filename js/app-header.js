@@ -108,10 +108,17 @@
 
   function mount() {
     if (!document.body || document.querySelector(".dp-app-header")) return;
-    const oldHeader = findLegacyHeader();
+    const placeholder = document.querySelector("[data-dp-app-header]");
+    const oldHeader = placeholder ? null : findLegacyHeader();
     const header = buildHeader();
     const context = header.querySelector(".dp-app-header__context");
-    if (oldHeader) {
+    if (placeholder) {
+      const title = placeholder.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim();
+      header.querySelector(".dp-app-header__page-title").textContent = title;
+      const actions = document.querySelector("[data-dp-page-actions]");
+      if (actions) context.append(...actions.childNodes);
+      placeholder.replaceWith(header);
+    } else if (oldHeader) {
       preservePageControls(oldHeader, context);
       const title = context.dataset.pageLabel || titles[path] || document.title.split("|")[0].trim();
       header.querySelector(".dp-app-header__page-title").textContent = title;
