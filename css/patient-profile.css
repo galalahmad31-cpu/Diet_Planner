@@ -203,14 +203,16 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .measurements-error{color:#be123c!important}
 .measurements-table-wrap{width:100%;max-width:100%;overflow-x:auto;border:1px solid #e5edf0;border-radius:11px;background:#fff;overscroll-behavior-inline:contain}
 .measurements-table-wrap:focus-visible{outline:3px solid #8bd2c2;outline-offset:2px}
-.measurements-table{width:100%;min-width:680px;border-collapse:separate;border-spacing:0;table-layout:fixed;text-align:center;font-family:'Cairo',sans-serif}
+.measurements-table{width:100%;min-width:1120px;border-collapse:separate;border-spacing:0;table-layout:fixed;text-align:center;font-family:'Cairo',sans-serif}
 .measurements-table-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .measurements-table th{padding:11px 8px;background:#f1f7f6;color:#526873;font-size:10px;font-weight:900;white-space:nowrap;border-bottom:1px solid #dfe9e8}
-.measurements-table th:first-child{width:17%}
-.measurements-table th:nth-child(2){width:15%}
-.measurements-table th:nth-child(3),.measurements-table th:nth-child(4){width:17%}
-.measurements-table th:nth-child(5){width:21%}
-.measurements-table th:last-child{width:13%}
+.measurements-table th:first-child{width:9%}
+.measurements-table th:nth-child(2){width:9%}
+.measurements-table th:nth-child(3),.measurements-table th:nth-child(4),.measurements-table th:nth-child(5){width:9%}
+.measurements-table th:nth-child(6),.measurements-table th:nth-child(7){width:10%}
+.measurements-table th:nth-child(8){width:10%}
+.measurements-table th:nth-child(9){width:18%;white-space:normal}
+.measurements-table th:last-child{width:7%}
 .measurements-table th span{color:#82919a;font-size:9px;font-weight:700}
 .measurements-table td{padding:10px 8px;border-bottom:1px solid #edf2f4;color:#475569;font-size:10px;font-weight:700;line-height:1.6;vertical-align:middle}
 .measurements-table tbody tr:last-child td{border-bottom:0}
@@ -826,13 +828,6 @@ body.support-delete-modal-open{overflow:hidden}
 @media(max-width:640px){#exchangePlanContent .exchange-plan-notes{min-height:260px;padding:12px;font-size:12px}}
 @media print{#exchangePlanContent .exchange-plan-notes{min-height:0;border:0;padding:0;background:#fff;color:#111}}
 
-/* Extended measurement history: body composition and patient feedback. */
-.measurements-table{min-width:1120px}
-.measurements-table th:nth-child(2){width:9%}
-.measurements-table th:nth-child(3),.measurements-table th:nth-child(4),.measurements-table th:nth-child(5){width:9%}
-.measurements-table th:nth-child(6),.measurements-table th:nth-child(7){width:10%}
-.measurements-table th:nth-child(8){width:10%}
-.measurements-table th:nth-child(9){width:18%;white-space:normal}
-.measurements-table th:last-child{width:7%}
+/* Flexible patient feedback column in the measurement history. */
 .measurement-notes-cell{min-width:160px;white-space:pre-wrap;overflow-wrap:anywhere;text-align:right!important}
 .inline-measurement-row textarea{width:100%;min-width:150px;min-height:76px;box-sizing:border-box;resize:vertical;border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px;font:600 10px/1.7 Cairo,sans-serif}
