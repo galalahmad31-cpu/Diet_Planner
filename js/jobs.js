@@ -110,7 +110,7 @@
         .range(offset, offset + PAGE_SIZE - 1);
       const specialty = $("jobsSpecialty").value;
       if (specialty) request = request.eq("specialty", specialty);
-      const search = $("jobsSearch").value.trim().replace(/[(),.*%_\'"\\\\]/g, " ").replace(/\\s+/g, " ").slice(0, 80);
+      const search = $("jobsSearch").value.trim().replace(/[(),.*%_'"\\]/g, " ").replace(/\s+/g, " ").slice(0, 80);
       if (search) {
         const pattern = "%" + search + "%";
         request = request.or("title.ilike." + pattern + ",organization_name.ilike." + pattern + ",location_city.ilike." + pattern);
