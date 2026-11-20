@@ -217,11 +217,14 @@ async function init(){
     return;
   }
   const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
-  if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return;}
+  if(!accessStatus?.authenticated || !accessStatus.user){
+    window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'مكتبة الأغذية متاحة للمشتركين فقط. سجّل الدخول ثم اشترك للوصول إليها.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});
+    $('loading').style.display='none';return;
+  }
   user=accessStatus.user;isAdmin=accessStatus.isAdmin===true;
   if(!isAdmin && accessStatus.hasActiveSubscription!==true){
-    location.replace('subscription_plans_index.html');
-    return;
+    window.DietPlannerAccess?.showAccessPrompt?.({title:'هذه الصفحة للمشتركين',message:'مكتبة الأغذية متاحة باشتراك نشط فقط. يمكنك مراجعة خطط الاشتراك من صفحتك الشخصية.',actionLabel:'عرض خطط الاشتراك',actionHref:'profile.html'});
+    $('loading').style.display='none';return;
   }
   try{await Promise.all([loadFoods(),loadExchanges()]);}
   catch(error){console.error('Food library initialization failed:',error);toast('حدث خطأ أثناء تحميل المكتبة: '+(error?.message||'خطأ غير معروف'),false);}
