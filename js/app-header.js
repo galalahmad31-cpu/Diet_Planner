@@ -30,9 +30,7 @@
   titles["visit.html"] = "الخطة الغذائية";
   titles["nutritionsupport.html"] = "الدعم الغذائي";
   titles["nutritionsupport-patient.html"] = "الدعم الغذائي";
-  titles["notifications.html"] = "الإشعارات";
   titles["admin.html"] = "لوحة الإدارة";
-  titles["subscription_plansم.html"] = "خطط الاشتراك";
   titles["article-view.html"] = "المقال";
   titles["privacy.html"] = "سياسة الخصوصية";
   titles["weightم.html"] = "متابعة الوزن";
@@ -72,7 +70,7 @@
       if (path === "weightم.html" && href === "app.html") link.id = "dashboardBtn";
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || (path === "subscription_plansم.html" && href === "profile.html")) {
+      if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html" || path === "weightم.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html")) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
       }
