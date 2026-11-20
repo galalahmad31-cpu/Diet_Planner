@@ -2408,3 +2408,48 @@ html[data-theme="dark"] .recipe-modal>.bg-white :is(h2,h3,strong),
 html[data-theme="dark"] .recipe-modal>div>.bg-white :is(h2,h3,strong){color:var(--dp-text)!important}
 html[data-theme="dark"] .recipe-modal>.bg-white :is(p,small),
 html[data-theme="dark"] .recipe-modal>div>.bg-white :is(p,small){color:var(--dp-text-2)!important}
+
+/* Notifications page — central theme adapter.
+   The page stylesheet controls geometry only; colors come exclusively from shared tokens. */
+html[data-theme="dark"] body.notifications-page{
+  background-color:var(--dp-bg)!important;
+  background-image:none!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body.notifications-page :is(header.glass,.notifications-tabs,#empty,.notification-card){
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 8px 24px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] body.notifications-page .notifications-tab-list{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body.notifications-page .tab-btn{
+  background:transparent!important;
+  color:var(--dp-tab-text)!important;
+  border-color:transparent!important;
+}
+html[data-theme="dark"] body.notifications-page .tab-btn.active{
+  background:var(--dp-tab-active-bg)!important;
+  color:var(--dp-tab-active-text)!important;
+  border-color:var(--dp-primary)!important;
+  box-shadow:0 2px 8px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] body.notifications-page :is(#tabTitle,#emptyTitle,.notification-patient-name,.notification-title){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body.notifications-page :is(#tabSubtitle,#emptyText,.notification-copy,.notification-date,footer){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] body.notifications-page .notification-card .bg-sky-50,
+html[data-theme="dark"] body.notifications-page .notification-card .bg-indigo-50,
+html[data-theme="dark"] body.notifications-page .notification-card .bg-amber-50,
+html[data-theme="dark"] body.notifications-page .notification-card .bg-red-50{
+  border:1px solid var(--dp-border)!important;
+}
+html[data-theme="dark"] body.notifications-page #loading{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+}
