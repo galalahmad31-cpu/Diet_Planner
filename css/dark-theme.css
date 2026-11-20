@@ -1880,11 +1880,7 @@ html[data-theme="dark"] .highlight-box{
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
 }
-html[data-theme="dark"] .page-header{
-  background:var(--dp-surface)!important;
-  color:var(--dp-text)!important;
-  border-color:var(--dp-border)!important;
-}
+
 html[data-theme="dark"] .page-header :is(h1,h2,h3,p,span){
   color:var(--dp-text)!important;
 }
