@@ -13,14 +13,14 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
-  <script src="js/patient-profile.js?v=20261120-exchange-render-fix-v4" defer></script>
+  <script src="js/patient-profile.js?v=20261120-exchange-render-fix-v5" defer></script>
 
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/visit.css?v=20261120-patient-exchange-v1">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261120-exchange-notes-v3">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261120-exchange-central-colors-v1">
   <script src="js/theme.js?v=20261120-central-v14" defer></script>
   
   <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v7">
@@ -277,45 +277,12 @@
             
                         <div id="exchangePlanContent" class="hidden w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                             <div class="exchange-plan-module p-3 sm:p-5">
-                                <section class="bg-white border border-violet-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                                <section class="exchange-plan-panel rounded-2xl p-4 sm:p-5">
                                     <div class="flex items-center justify-between gap-3 mb-3">
 
                                         <div id="exchangePlanStatus" class="text-[10px] font-bold text-slate-400">
                                         </div>
                                     </div>
-                                    <div class="exchange-day-summary" aria-label="ملخص اليوم">
-  <h3 class="exchange-day-summary-title">ملخص اليوم</h3>
-  <div class="exchange-rings-grid">
-    <article class="exchange-ring-metric exchange-ring-calories">
-      <span class="exchange-ring-label">السعرات</span>
-      <div class="exchange-ring" data-ring="cal" role="img" aria-label="السعرات المحققة من الهدف">
-        <div class="exchange-ring-center"><strong id="exchangeTotalCal">0</strong><span>kcal</span></div>
-      </div>
-      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetCal">—</b></span><strong id="exchangePercentCal">—</strong></div>
-    </article>
-    <article class="exchange-ring-metric exchange-ring-carbs">
-      <span class="exchange-ring-label">الكربوهيدرات</span>
-      <div class="exchange-ring" data-ring="carb" role="img" aria-label="الكربوهيدرات المحققة من الهدف">
-        <div class="exchange-ring-center"><strong id="exchangeTotalCarb">0</strong><span>g</span></div>
-      </div>
-      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetCarb">—</b></span><strong id="exchangePercentCarb">—</strong></div>
-    </article>
-    <article class="exchange-ring-metric exchange-ring-protein">
-      <span class="exchange-ring-label">البروتين</span>
-      <div class="exchange-ring" data-ring="pro" role="img" aria-label="البروتين المحقق من الهدف">
-        <div class="exchange-ring-center"><strong id="exchangeTotalPro">0</strong><span>g</span></div>
-      </div>
-      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetPro">—</b></span><strong id="exchangePercentPro">—</strong></div>
-    </article>
-    <article class="exchange-ring-metric exchange-ring-fat">
-      <span class="exchange-ring-label">الدهون</span>
-      <div class="exchange-ring" data-ring="fat" role="img" aria-label="الدهون المحققة من الهدف">
-        <div class="exchange-ring-center"><strong id="exchangeTotalFat">0</strong><span>g</span></div>
-      </div>
-      <div class="exchange-ring-meta"><span>الهدف: <b id="exchangeTargetFat">—</b></span><strong id="exchangePercentFat">—</strong></div>
-    </article>
-  </div>
-</div>
                                     <div class="flex justify-end mt-3 no-print">
                                         <button type="button" data-action="exchangePlan.openPrintSettings" id="exchangePrintBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-sm">
                                             <i class="fa-solid fa-print ml-1">
@@ -323,7 +290,7 @@
                                             طباعة
                                         </button>
                                     </div>
-                                    <div class="mt-4 p-3 rounded-xl bg-violet-50 border border-violet-100 text-[10px] text-violet-800 leading-6">
+                                    <div class="exchange-method-note mt-4 p-3 rounded-xl text-[10px] leading-6">
                                         <b>
                                             طريقة الحساب:
                                         </b>
@@ -362,7 +329,7 @@
                                     </div>
                                     
                                     <div class="flex flex-col sm:flex-row gap-2 mt-4">
-                                        <button type="button" data-action="exchangePlan.save" id="exchangeSaveBtn" class="flex-1 bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs py-2.5 rounded-xl disabled:opacity-40">
+                                        <button type="button" data-action="exchangePlan.save" id="exchangeSaveBtn" class="exchange-save-button flex-1 text-white font-extrabold text-xs py-2.5 rounded-xl disabled:opacity-40">
                                             <i class="fa-solid fa-floppy-disk ml-1">
                                             </i>
                                             حفظ
