@@ -1,0 +1,81 @@
+/* Diet Planner — centralized application header */
+.dp-app-header{
+  position:relative;z-index:30;
+  width:min(100% - 24px,1600px);
+  margin:12px auto 18px;
+  padding:16px 18px 12px;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:24px;
+  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
+  box-shadow:0 12px 30px rgba(8,76,64,.16);
+  overflow:hidden;
+}
+.dp-app-header:before{
+  content:"";position:absolute;inset:0 auto 0 0;width:34%;pointer-events:none;
+  background:radial-gradient(circle at 10% 15%,rgba(255,255,255,.12),transparent 48%);
+}
+.dp-app-header__brand-row,.dp-app-header__brand,.dp-app-header__nav,.dp-app-header__context{
+  position:relative;z-index:1;min-width:0;
+}
+.dp-app-header__brand-row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:13px;
+}
+.dp-app-header__brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:#fff;text-decoration:none}
+.dp-app-header__logo{
+  display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;
+  border:1px solid rgba(255,255,255,.18);border-radius:15px;
+  background:rgba(255,255,255,.13);font-size:21px;
+}
+.dp-app-header__brand-copy{display:flex;flex-direction:column;gap:1px;line-height:1.35}
+.dp-app-header__brand-copy strong{font-size:19px;font-weight:900;letter-spacing:-.2px;color:#fff}
+.dp-app-header__brand-copy small{font-size:11px;font-weight:700;color:rgba(255,255,255,.82)}
+.dp-app-header__page-title{
+  min-width:0;max-width:45%;padding:7px 12px;border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;background:rgba(255,255,255,.09);color:#fff;
+  font-size:12px;font-weight:800;text-align:center;overflow-wrap:anywhere;
+}
+.dp-app-header__nav{width:100%;overflow:hidden}
+.dp-app-header__track{
+  display:flex;align-items:center;gap:7px;width:100%;min-width:0;
+  overflow-x:auto;overflow-y:hidden;padding:2px 1px 7px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.42) transparent;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;
+}
+.dp-app-header__track::-webkit-scrollbar{height:4px}
+.dp-app-header__track::-webkit-scrollbar-thumb{background:rgba(255,255,255,.38);border-radius:99px}
+.dp-app-header__link{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  flex:0 0 auto;min-height:39px;padding:8px 12px;border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;background:rgba(255,255,255,.09);color:#f2fbf8;
+  font-family:var(--dp-font,Cairo,sans-serif);font-size:11px;font-weight:800;
+  line-height:1.35;text-decoration:none;white-space:nowrap;transition:background .18s,border-color .18s,color .18s;
+}
+.dp-app-header__link i{font-size:12px;opacity:.95}
+.dp-app-header__link:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);color:#fff}
+.dp-app-header__link.is-active{
+  color:#15594d;background:#fff;border-color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+.dp-app-header__context{
+  display:flex;align-items:center;flex-wrap:wrap;gap:9px;
+  margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.16);
+}
+.dp-app-header__context[hidden]{display:none!important}
+.dp-app-header__context :is(button,a,[role="button"]){
+  max-width:100%;min-height:36px;
+}
+.dp-app-header__context #logoutBtn{color:#15594d}
+@media(max-width:640px){
+  .dp-app-header{width:calc(100% - 16px);margin:8px auto 12px;padding:12px 11px 9px;border-radius:18px}
+  .dp-app-header__brand-row{gap:8px;margin-bottom:9px}
+  .dp-app-header__logo{width:40px;height:40px;flex-basis:40px;border-radius:12px;font-size:18px}
+  .dp-app-header__brand{gap:9px}
+  .dp-app-header__brand-copy strong{font-size:16px}
+  .dp-app-header__brand-copy small{font-size:10px}
+  .dp-app-header__page-title{max-width:48%;padding:6px 8px;font-size:10px}
+  .dp-app-header__track{gap:6px}
+  .dp-app-header__link{min-height:36px;padding:7px 10px;font-size:10px;border-radius:10px}
+  .dp-app-header__context{gap:7px;margin-top:8px;padding-top:8px}
+}
+@media(prefers-reduced-motion:reduce){.dp-app-header__link{transition:none}}
+@media print{.dp-app-header{display:none!important}}
