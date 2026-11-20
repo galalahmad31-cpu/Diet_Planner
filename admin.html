@@ -6,6 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="css/admin.css?v=20261120-doctors-table-v1">
+<link rel="stylesheet" href="css/admin-jobs.css?v=20261121-jobs-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -18,7 +19,7 @@
  <div data-dp-app-header data-page-title="لوحة الإدارة"></div>
 <main class="container" id="adminContent" style="display:none">
 <div class="title"><h1>إدارة الاشتراكات</h1><p>إدارة الطلبات والخطط والأطباء من مكان واحد</p></div>
-<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button><button class="tab" data-tab="privacy"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button><button class="tab" data-tab="jobs"><i class="fa-solid fa-briefcase"></i> إدارة الوظائف</button><button class="tab" data-tab="privacy"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</button></nav>
 <section id="tab-requests">
 <div class="toolbar requests-toolbar"><div class="stats"><button type="button" class="stat stat-filter selected" data-request-filter="all" aria-pressed="true">كل الطلبات <b id="totalCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="pending" aria-pressed="false">قيد المراجعة <b id="pendingCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="paid" aria-pressed="false">مفعّلة <b id="paidCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="canceled" aria-pressed="false">ملغاة <b id="canceledCount">0</b></button></div><input id="requestSearch" class="search" type="search" placeholder="ابحث بالاسم أو البريد أو الخطة..." aria-label="البحث في طلبات الاشتراك"><button class="btn btn-outline" id="refreshBtn"><i class="fa-solid fa-rotate"></i> تحديث</button></div>
 <div class="card"><div id="requestState" class="state">جاري التحميل...</div><div class="wrap" id="requestWrap" style="display:none"><table><thead><tr><th>الطبيب</th><th>الخطة</th><th>السعر</th><th>تاريخ الطلب</th><th>البداية / النهاية</th><th>الحالة</th><th>إثبات الدفع</th><th>إجراءات</th></tr></thead><tbody id="requestsBody"></tbody></table></div></div>
@@ -42,6 +43,55 @@
  <div class="card announcement-admin-card">
   <div id="announcementState" class="state">جاري تحميل الإعلانات...</div>
   <div id="announcementList" class="announcement-admin-list" style="display:none"></div>
+ </div>
+</section>
+<section id="tab-jobs" style="display:none">
+ <div class="job-admin-toolbar">
+  <div class="job-admin-stats">
+   <div class="job-admin-stat">كل الوظائف <b id="jobAdminTotal">0</b></div>
+   <div class="job-admin-stat">منشورة <b id="jobAdminPublished">0</b></div>
+   <div class="job-admin-stat">مسودات <b id="jobAdminDrafts">0</b></div>
+  </div>
+  <div class="job-admin-actions">
+   <input id="jobAdminSearch" class="job-admin-search" type="search" placeholder="ابحث بالوظيفة أو الجهة أو المدينة">
+   <button class="btn btn-outline" id="jobAdminRefresh" type="button"><i class="fa-solid fa-rotate"></i> تحديث</button>
+   <button class="btn btn-primary" id="jobAdminNew" type="button"><i class="fa-solid fa-plus"></i> إضافة وظيفة</button>
+  </div>
+ </div>
+ <div class="card" style="padding:14px">
+  <div id="jobAdminState" class="state">افتح تبويب الوظائف لتحميل الإعلانات.</div>
+  <div id="jobAdminList" class="job-admin-list" hidden></div>
+ </div>
+ <div id="jobAdminOverlay" class="job-admin-overlay" hidden>
+  <section class="job-admin-modal" role="dialog" aria-modal="true" aria-labelledby="jobAdminDialogTitle">
+   <div class="job-admin-modal-head"><h2 id="jobAdminDialogTitle">إضافة وظيفة جديدة</h2><button id="jobAdminClose" class="job-admin-close" type="button" aria-label="إغلاق">×</button></div>
+   <form id="jobAdminForm">
+    <input id="jobAdminId" type="hidden">
+    <div class="job-admin-form-grid">
+     <div class="job-admin-field full"><label for="jobAdminTitle">المسمى الوظيفي *</label><input id="jobAdminTitle" maxlength="180" required></div>
+     <div class="job-admin-field"><label for="jobAdminSpecialty">التخصص *</label><select id="jobAdminSpecialty" required>
+      <option value="medicine">الطب</option><option value="pharmacy">الصيدلة</option><option value="nursing">التمريض</option><option value="clinical_nutrition">التغذية العلاجية</option><option value="laboratory">المعامل والتحاليل</option><option value="radiology">الأشعة</option><option value="dentistry">طب الأسنان</option><option value="physiotherapy">العلاج الطبيعي</option><option value="healthcare_management">الإدارة الصحية</option><option value="other">تخصصات صحية أخرى</option>
+     </select></div>
+     <div class="job-admin-field"><label for="jobAdminCompany">جهة العمل *</label><input id="jobAdminCompany" maxlength="180" required></div>
+     <div class="job-admin-field"><label for="jobAdminCity">المحافظة / المدينة</label><input id="jobAdminCity" maxlength="120" placeholder="مثال: القاهرة"></div>
+     <div class="job-admin-field"><label for="jobAdminEmployment">نوع التوظيف *</label><select id="jobAdminEmployment" required><option value="full_time">دوام كامل</option><option value="part_time">دوام جزئي</option><option value="contract">تعاقد</option><option value="temporary">مؤقت</option><option value="internship">تدريب</option><option value="freelance">عمل حر</option></select></div>
+     <div class="job-admin-field"><label for="jobAdminWorkplace">نظام العمل *</label><select id="jobAdminWorkplace" required><option value="on_site">من مقر العمل</option><option value="hybrid">هجين</option><option value="remote">عن بُعد</option></select></div>
+     <div class="job-admin-field full"><label for="jobAdminDescription">وصف الوظيفة *</label><textarea id="jobAdminDescription" minlength="20" maxlength="20000" required></textarea></div>
+     <div class="job-admin-field full"><label for="jobAdminRequirements">المتطلبات والشروط</label><textarea id="jobAdminRequirements" maxlength="12000"></textarea></div>
+     <div class="job-admin-field"><label for="jobAdminSalaryMin">الحد الأدنى للراتب</label><input id="jobAdminSalaryMin" type="number" min="0" step="0.01"></div>
+     <div class="job-admin-field"><label for="jobAdminSalaryMax">الحد الأقصى للراتب</label><input id="jobAdminSalaryMax" type="number" min="0" step="0.01"></div>
+     <div class="job-admin-field"><label for="jobAdminCurrency">العملة</label><select id="jobAdminCurrency"><option value="EGP">جنيه مصري (EGP)</option><option value="SAR">ريال سعودي (SAR)</option><option value="AED">درهم إماراتي (AED)</option><option value="USD">دولار أمريكي (USD)</option></select></div>
+     <div class="job-admin-field"><label for="jobAdminSalaryPeriod">دورية الراتب</label><select id="jobAdminSalaryPeriod"><option value="month">شهري</option><option value="week">أسبوعي</option><option value="day">يومي</option><option value="hour">بالساعة</option><option value="year">سنوي</option></select></div>
+     <div class="job-admin-field full"><label for="jobAdminApplyUrl">رابط التقديم</label><input id="jobAdminApplyUrl" type="url" placeholder="https://..."></div>
+     <div class="job-admin-field"><label for="jobAdminEmail">البريد الإلكتروني للتقديم</label><input id="jobAdminEmail" type="email"></div>
+     <div class="job-admin-field"><label for="jobAdminPhone">رقم التواصل</label><input id="jobAdminPhone" type="tel"></div>
+     <div class="job-admin-field"><label for="jobAdminExpiry">آخر موعد للتقديم</label><input id="jobAdminExpiry" type="date"></div>
+     <div class="job-admin-field"><label for="jobAdminStatus">حالة الإعلان</label><select id="jobAdminStatus"><option value="draft">مسودة</option><option value="published">نشر الآن</option><option value="closed">مغلق</option></select></div>
+     <div class="job-admin-field full"><small class="job-admin-help">يجب إضافة وسيلة واحدة على الأقل للتقديم: رابط أو بريد إلكتروني أو رقم تواصل. الوظائف المنشورة والمنتهية صلاحيتها فقط تظهر للزوار وفق حالة النشر وتاريخ الانتهاء.</small></div>
+    </div>
+    <div class="job-admin-form-actions"><button id="jobAdminSave" class="job-admin-save" type="submit">حفظ الوظيفة</button><button id="jobAdminCancel" class="job-admin-cancel" type="button">إلغاء</button></div>
+   </form>
+  </section>
  </div>
 </section>
 <section id="tab-privacy" style="display:none">
@@ -70,6 +120,6 @@
 <div class="modal-bg" id="confirmBg"><div class="modal small"><div class="modal-head"><h2 id="confirmTitle">تأكيد العملية</h2><button class="close" id="confirmClose"><i class="fa-solid fa-xmark"></i></button></div><div id="confirmText" class="confirm-text"></div><div class="modal-foot"><button class="btn btn-danger" id="confirmYes">تأكيد</button><button class="btn btn-outline" id="confirmNo">إلغاء</button></div></div></div>
 <div class="modal-bg" id="proofBg"><div class="modal"><div class="modal-head"><h2>إثبات الدفع</h2><button class="close" id="proofClose"><i class="fa-solid fa-xmark"></i></button></div><div id="proofBody"></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261120-role-inline-v1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261121-jobs-tab-v1"></script><script src="js/admin-jobs.js?v=20261121-jobs-v1"></script>
   
 </body></html>
