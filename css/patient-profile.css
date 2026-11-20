@@ -320,10 +320,6 @@ html,body{max-width:100%;overflow-x:hidden}
 .support-day-delete-actions [data-delete-cancel]{background:#f1f5f9;color:#52616a}
 .support-day-delete-actions [data-delete-confirm]{background:#dc2626;color:#fff}
 .support-day-delete-actions button:focus-visible{outline:3px solid #a7c9c1;outline-offset:2px}
-html[data-theme="dark"] .support-day-delete-box{background:#172a2b}
-html[data-theme="dark"] .support-day-delete-box h3{color:#edf7f4}
-html[data-theme="dark"] .support-day-delete-box p{color:#bbceca}
-html[data-theme="dark"] .support-day-delete-actions [data-delete-cancel]{background:#263c3d;color:#dcebe8}
 body.support-delete-modal-open{overflow:hidden}
 
 
