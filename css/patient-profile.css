@@ -781,3 +781,10 @@ body.support-delete-modal-open{overflow:hidden}
  .measurement-summary-value{font-size:13px}
  .measurement-summary-note{font-size:7px;line-height:1.4}
 }
+
+
+/* Direct diet-plan workspace inside the patient profile. */
+#planEmbeddedPanel.visit-embedded-panel{overflow:visible;background:transparent;border:0;border-radius:0}
+#planWorkspace{width:100%;min-width:0}
+#planWorkspace #dietPlanContent{width:100%;min-width:0}
+#planWorkspace .embedded-diet-plan{width:100%;min-width:0}
