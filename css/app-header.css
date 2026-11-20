@@ -39,27 +39,42 @@
   font-size:12px;font-weight:800;text-align:center;white-space:nowrap;
   overflow:visible;text-overflow:clip;overflow-wrap:normal;
 }
-.dp-app-header__nav{width:100%;overflow:hidden}
-.dp-app-header__track{
-  display:flex;align-items:center;gap:7px;width:100%;min-width:0;
-  overflow-x:auto;overflow-y:hidden;padding:2px 1px 7px;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.42) transparent;
-  -webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;
+.dp-app-header__nav{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;width:100%;min-width:0}
+.dp-app-header__nav-top{display:flex;align-items:center;justify-content:flex-start;min-width:0}
+.dp-app-header__toggle{
+  display:inline-flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:38px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);
+  border-radius:11px;background:rgba(255,255,255,.12);color:#fff;
+  font-family:var(--dp-font,Cairo,sans-serif);font-size:11px;font-weight:900;
+  line-height:1.35;cursor:pointer;transition:background .18s,border-color .18s;
 }
-.dp-app-header__track::-webkit-scrollbar{height:4px}
-.dp-app-header__track::-webkit-scrollbar-thumb{background:rgba(255,255,255,.38);border-radius:99px}
+.dp-app-header__toggle:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
+.dp-app-header__toggle i{font-size:10px;transition:transform .18s ease}
+.dp-app-header__toggle[aria-expanded="true"] i{transform:rotate(180deg)}
+.dp-app-header__track{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+  width:100%;min-width:0;overflow:hidden;
+  transition:opacity .18s ease;
+}
+.dp-app-header__nav.is-collapsed .dp-app-header__track{display:flex;min-height:39px}
+.dp-app-header__nav.is-collapsed .dp-app-header__link:not(.is-active){display:none}
+.dp-app-header__nav.is-collapsed .dp-app-header__link.is-active{min-height:36px}
+.dp-app-header__nav.is-expanded .dp-app-header__track{display:grid}
 .dp-app-header__link{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  flex:0 0 auto;min-height:39px;padding:8px 12px;border:1px solid rgba(255,255,255,.12);
+  min-width:0;min-height:39px;padding:8px 10px;border:1px solid rgba(255,255,255,.12);
   border-radius:12px;background:rgba(255,255,255,.09);color:#f2fbf8;
   font-family:var(--dp-font,Cairo,sans-serif);font-size:11px;font-weight:800;
-  line-height:1.35;text-decoration:none;white-space:nowrap;transition:background .18s,border-color .18s,color .18s;
+  line-height:1.35;text-decoration:none;text-align:center;white-space:normal;
+  transition:background .18s,border-color .18s,color .18s;
 }
-.dp-app-header__link i{font-size:12px;opacity:.95}
+.dp-app-header__link i{flex:0 0 auto;font-size:12px;opacity:.95}
 .dp-app-header__link:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);color:#fff}
 .dp-app-header__link.is-active{
   color:#15594d;background:#fff;border-color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.1);
 }
+@media(min-width:641px){.dp-app-header__nav.is-expanded .dp-app-header__track{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1024px){.dp-app-header__nav.is-expanded .dp-app-header__track{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .dp-app-header__context{
   display:flex;align-items:center;flex-wrap:wrap;gap:9px;
   width:100%;margin-top:10px;padding-top:10px;
@@ -108,17 +123,6 @@
 .dp-header-auth-actions a:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55)}
 .dp-header-auth-actions #registerCta:hover{background:#edf8f3}
 @media(max-width:640px){
-  .dp-app-header__context{gap:9px}
-  #headerActions.dp-header-account-actions{gap:10px;flex-wrap:wrap}
-  .dp-header-account-info{gap:9px;flex-wrap:wrap}
-  #doctorName.dp-header-account-name{max-width:calc(100vw - 145px);padding:8px 11px;font-size:14px}
-  .dp-app-header__page-meta{gap:6px;max-width:58%}
-  .dp-app-header__page-meta .dp-app-header__logout{min-width:0;min-height:32px;padding:6px 8px;font-size:10px}
-  .dp-app-header__page-meta .dp-app-header__logout i{font-size:11px}
-  .dp-header-auth-actions{gap:8px}
-  .dp-header-auth-actions a{min-height:42px;padding:9px 13px;font-size:12px}
-}
-@media(max-width:640px){
   .dp-app-header{width:calc(100% - 16px);margin:8px auto 12px;padding:12px 11px 9px;border-radius:18px}
   .dp-app-header__brand-row{gap:8px;margin-bottom:9px}
   .dp-app-header__logo{width:40px;height:40px;flex-basis:40px;border-radius:12px;font-size:18px}
@@ -127,9 +131,17 @@
   .dp-app-header__brand-copy small{font-size:10px}
   .dp-app-header__page-meta{max-width:none;gap:5px;flex:0 1 auto}
   .dp-app-header__page-title{max-width:none;min-width:max-content;padding:6px 8px;font-size:10px;white-space:nowrap}
-  .dp-app-header__track{gap:6px}
-  .dp-app-header__link{min-height:36px;padding:7px 10px;font-size:10px;border-radius:10px}
   .dp-app-header__context{gap:7px;margin-top:8px;padding-top:8px}
+  #headerActions.dp-header-account-actions{gap:10px;flex-wrap:wrap}
+  .dp-header-account-info{gap:9px;flex-wrap:wrap}
+  #doctorName.dp-header-account-name{max-width:calc(100vw - 145px);padding:8px 11px;font-size:14px}
+  .dp-app-header__page-meta .dp-app-header__logout{min-width:0;min-height:32px;padding:6px 8px;font-size:10px}
+  .dp-app-header__page-meta .dp-app-header__logout i{font-size:11px}
+  .dp-header-auth-actions{gap:8px}
+  .dp-header-auth-actions a{min-height:42px;padding:9px 13px;font-size:12px}
+  .dp-app-header__toggle{min-height:36px;padding:7px 11px;font-size:10px}
+  .dp-app-header__track{gap:6px}
+  .dp-app-header__link{min-height:37px;padding:7px 6px;font-size:10px;border-radius:10px}
 }
 @media(prefers-reduced-motion:reduce){.dp-app-header__link{transition:none}}
 @media print{.dp-app-header{display:none!important}}
