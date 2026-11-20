@@ -71,7 +71,7 @@
   }
 
   function renderProfile() {
-    $('doctorName').textContent = state.profile.full_name || '—';
+    $('profileDoctorName').textContent = state.profile.full_name || '—';
     $('doctorSpecialty').textContent = state.profile.profession || '—';
     $('doctorPhone').textContent = state.profile.phone || '—';
     $('doctorEmail').textContent = state.user?.email || '—';
@@ -411,12 +411,6 @@
     }
   }
 
-  async function logout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error('Logout failed:', error);
-    window.location.replace('index.html');
-  }
-
   function bindEvents() {
     $('profilePlansList')?.addEventListener('click', (event) => {
       const retry = event.target.closest('[data-plans-retry]');
@@ -437,7 +431,6 @@
       event.preventDefault();
       saveProfile();
     });
-    $('logoutBtn')?.addEventListener('click', logout);
   }
 
   async function init() {
@@ -456,7 +449,6 @@
           'سجّل الدخول لعرض بيانات حسابك وإدارة اشتراكك.'
         );
         $('editProfileBtn')?.setAttribute('hidden', '');
-        $('logoutBtn')?.closest('div')?.setAttribute('hidden', '');
         await loadPlans();
         return;
       }
