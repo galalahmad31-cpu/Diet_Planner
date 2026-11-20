@@ -1,5 +1,0 @@
-/* Backward-compatible entry point. Keep this file for existing page references.
-   The centralized source files are imported exactly once in a deterministic order. */
-@import url("./design-tokens.css");
-@import url("./light-theme.css");
-@import url("./dark-theme.css");
