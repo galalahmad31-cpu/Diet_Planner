@@ -34,17 +34,17 @@ function showToast(msg,type='success'){
  t.innerHTML='<i class="fa-solid '+(type==='error'?'fa-circle-exclamation':'fa-circle-check')+'"></i> <span class="mr-2">'+escapeHtml(msg)+'</span>';
  c.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
-function ensureDietModalPortal(id,className){
+function ensureDietModalPortal(id){
  const modal=document.getElementById(id);
  if(!modal)return null;
  if(modal.parentElement!==document.body)document.body.appendChild(modal);
- if(className)modal.classList.add(className);
+ modal.classList.add('diet-modal-portal-layer');
  modal.setAttribute('role','dialog');
  modal.setAttribute('aria-modal','true');
  return modal;
 }
 function openConfirmModal(title,text,callback){
- const modal=ensureDietModalPortal('confirmModal','diet-action-modal-layer');
+ const modal=ensureDietModalPortal('confirmModal');
  if(!modal)return;
  document.getElementById('confirmTitle').textContent=title;
  document.getElementById('confirmText').textContent=text;
@@ -343,7 +343,7 @@ function deleteDay(id){
 }
 
 function openAddMealModal(id){
- const modal=ensureDietModalPortal('addMealModal','diet-action-modal-layer');
+ const modal=ensureDietModalPortal('addMealModal');
  if(!modal)return;
  targetMealDayId=id;
  document.getElementById('newMealNameInput').value='';
@@ -358,15 +358,7 @@ function closeAddMealModal(){
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
-function ensureFoodModalPortal(){
- const modal=document.getElementById('foodModal');
- if(!modal)return null;
- if(modal.parentElement!==document.body)document.body.appendChild(modal);
- modal.classList.add('diet-food-modal-layer');
- modal.setAttribute('role','dialog');
- modal.setAttribute('aria-modal','true');
- return modal;
-}
+function ensureFoodModalPortal(){return ensureDietModalPortal('foodModal');}
 
 async function openFoodModal(did,mid){
  await ensureAllFoods();
@@ -380,13 +372,6 @@ async function openFoodModal(did,mid){
  document.getElementById('foodGramsInput').value='100';
  document.getElementById('foodModalHouseholdBox').classList.add('hidden');
 
- Object.assign(modal.style,{
-  position:'fixed',
-  inset:'0',
-  zIndex:'2147483647',
-  isolation:'isolate'
- });
- modal.style.setProperty('display','flex','important');
  modal.classList.remove('hidden');
  filterFoodList();
  document.getElementById('foodSearchInput').focus({preventScroll:true});
@@ -395,9 +380,6 @@ function closeFoodModal(){
  const modal=document.getElementById('foodModal');
  if(modal){
   modal.classList.add('hidden');
-  ['display','position','inset','z-index','isolation'].forEach(property=>modal.style.removeProperty(property));
-  modal.removeAttribute('aria-modal');
-  modal.removeAttribute('role');
  }
  currentModalContext={dayId:null,mealId:null};
 }
@@ -645,15 +627,7 @@ function initFixedMealsSearch(){
  input.dataset.bound='1';
 }
 
-function ensureFixedMealsModalPortal(){
- const modal=document.getElementById('fixedMealsModal');
- if(!modal)return null;
- if(modal.parentElement!==document.body)document.body.appendChild(modal);
- modal.classList.add('diet-fixed-meals-modal-layer');
- modal.setAttribute('role','dialog');
- modal.setAttribute('aria-modal','true');
- return modal;
-}
+function ensureFixedMealsModalPortal(){return ensureDietModalPortal('fixedMealsModal');}
 
 async function openFixedMeals(dayId){
  const modal=ensureFixedMealsModalPortal();
@@ -662,13 +636,6 @@ async function openFixedMeals(dayId){
  const search=document.getElementById('fixedMealsSearch');
  if(search)search.value='';
  document.getElementById('fixedMealsList').innerHTML='<div class="text-center py-8 text-slate-400 font-bold">جاري تحميل مكتبة الدايت...</div>';
- Object.assign(modal.style,{
-  position:'fixed',
-  inset:'0',
-  zIndex:'2147483647',
-  isolation:'isolate'
- });
- modal.style.setProperty('display','flex','important');
  modal.classList.remove('hidden');
  initFixedMealsSearch();
  await syncFixedMeals();
@@ -684,9 +651,6 @@ function closeFixedMeals(){
  const modal=document.getElementById('fixedMealsModal');
  if(modal){
   modal.classList.add('hidden');
-  ['display','position','inset','z-index','isolation'].forEach(property=>modal.style.removeProperty(property));
-  modal.removeAttribute('aria-modal');
-  modal.removeAttribute('role');
  }
  fixedMealsTargetDayId=null;
 }
