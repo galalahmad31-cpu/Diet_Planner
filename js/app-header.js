@@ -39,43 +39,6 @@
   titles["privacy.html"] = "سياسة الخصوصية";
   titles["weightم.html"] = "متابعة الوزن";
 
-  function findLegacyHeader() {
-    const candidates = [...document.querySelectorAll("body header")];
-    return candidates.find(header => {
-      if (header.closest(".support-report-print-header,#printHeader")) return false;
-      const hasBrand = /Diet Planner/i.test(header.textContent || "") ||
-        header.querySelector('[class*="brand-logo"],[class~="logo"],.brand');
-      const hasQuickNav = header.querySelector('nav[aria-label="التنقل السريع"],.quick-access-nav,[class*="access-nav"]');
-      return Boolean(hasBrand || hasQuickNav);
-    }) || null;
-  }
-
-  function preservePageControls(oldHeader, context) {
-    if (!oldHeader) return;
-    const containers = [...oldHeader.querySelectorAll('#headerActions,[class*="header-actions"],.header-actions')];
-    const moved = new Set();
-    containers.forEach(node => {
-      if ([...moved].some(parent => parent.contains(node))) return;
-      context.append(node);
-      moved.add(node);
-    });
-
-    const candidates = [...oldHeader.querySelectorAll('[id],button,[class*="page-label"]')];
-    candidates.forEach(node => {
-      if (node.closest("nav") && !node.id) return;
-      if ([...moved].some(parent => parent === node || parent.contains(node))) return;
-      if (node.matches('[class*="page-label"]')) {
-        const label = node.textContent.trim();
-        if (label && !context.dataset.pageLabel) context.dataset.pageLabel = label;
-        return;
-      }
-      if (node.id === "logoutBtn" || node.matches("button,[id]")) {
-        context.append(node);
-        moved.add(node);
-      }
-    });
-  }
-
   function buildHeader() {
     const header = document.createElement("header");
     header.className = "dp-app-header no-print";
@@ -112,7 +75,6 @@
   function mount() {
     if (!document.body || document.querySelector(".dp-app-header")) return;
     const placeholder = document.querySelector("[data-dp-app-header]");
-    const oldHeader = placeholder ? null : findLegacyHeader();
     const header = buildHeader();
     const context = header.querySelector(".dp-app-header__context");
     if (placeholder) {
@@ -124,13 +86,6 @@
         actions.remove();
       }
       placeholder.replaceWith(header);
-    } else if (oldHeader) {
-      preservePageControls(oldHeader, context);
-      const title = context.dataset.pageLabel || titles[path] || document.title.split("|")[0].trim();
-      header.querySelector(".dp-app-header__page-title").textContent = title;
-      const parent = oldHeader.parentElement;
-      oldHeader.replaceWith(header);
-      if (parent && parent !== document.body && parent.children.length === 0) parent.remove();
     } else {
       header.querySelector(".dp-app-header__page-title").textContent =
         titles[path] || document.title.split("|")[0].trim();
