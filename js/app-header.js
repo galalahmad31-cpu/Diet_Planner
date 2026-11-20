@@ -75,6 +75,7 @@
       const link = document.createElement("a");
       link.className = "dp-app-header__link";
       link.href = appBasePath + href;
+      link.dataset.pageHref = href;
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
       if (path === href || (path === "index.html" && href === "app.html") || ((path === "patient-profile.html" || path === "visit.html") && href === "patient.html") || (path === "article-view.html" && href === "article.html") || (/^[0-9a-f-]{36}$/i.test(path) && href === "jobs.html")) {
@@ -148,10 +149,10 @@
     const context = header.querySelector(".dp-app-header__context");
     if (placeholder) {
       const title = (placeholder.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim()).trim();
-      const activeLink = header.querySelector(".dp-app-header__link.is-active");
-      const activeLabel = activeLink?.querySelector("span")?.textContent.trim();
+      const activeHref = header.querySelector(".dp-app-header__link.is-active")?.dataset.pageHref;
+      const isCurrentNavigationPage = activeHref === path || (path === "index.html" && activeHref === "app.html");
       const pageTitle = header.querySelector(".dp-app-header__page-title");
-      if (title && title !== activeLabel) pageTitle.textContent = title;
+      if (title && !isCurrentNavigationPage) pageTitle.textContent = title;
       else pageTitle.remove();
       const actions = document.querySelector("[data-dp-page-actions]");
       if (actions) {
@@ -167,10 +168,10 @@
       placeholder.replaceWith(header);
     } else {
       const title = (titles[path] || document.title.split("|")[0].trim()).trim();
-      const activeLink = header.querySelector(".dp-app-header__link.is-active");
-      const activeLabel = activeLink?.querySelector("span")?.textContent.trim();
+      const activeHref = header.querySelector(".dp-app-header__link.is-active")?.dataset.pageHref;
+      const isCurrentNavigationPage = activeHref === path || (path === "index.html" && activeHref === "app.html");
       const pageTitle = header.querySelector(".dp-app-header__page-title");
-      if (title && title !== activeLabel) pageTitle.textContent = title;
+      if (title && !isCurrentNavigationPage) pageTitle.textContent = title;
       else pageTitle.remove();
       const main = document.querySelector("main");
       document.body.insertBefore(header, main || document.body.firstChild);
