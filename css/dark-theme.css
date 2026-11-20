@@ -1262,8 +1262,7 @@ html[data-theme="dark"] .dashboard-notifications-section,
 html[data-theme="dark"] .dashboard-announcements-section,
 html[data-theme="dark"] .dashboard-announcement-card,
 html[data-theme="dark"] .dp-announcement-dialog,
-html[data-theme="dark"] .dashboard-notification-row,
-html[data-theme="dark"] .dashboard-strip-arrow{
+html[data-theme="dark"] .dashboard-notification-row{
   background:var(--dp-surface)!important;
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
@@ -1290,13 +1289,6 @@ html[data-theme="dark"] .dashboard-announcement-type{
   background:var(--dp-surface-3)!important;
   color:var(--dp-accent)!important;
   border-color:var(--dp-border)!important;
-}
-html[data-theme="dark"] .dashboard-strip-arrow{
-  color:var(--dp-text-2)!important;
-}
-html[data-theme="dark"] .dashboard-strip-arrow:hover{
-  background:var(--dp-surface-3)!important;
-  border-color:var(--dp-accent)!important;
 }
 html[data-theme="dark"] .dashboard-announcement-dialog,
 html[data-theme="dark"] .dp-announcement-dialog :is(input,select,textarea){
