@@ -1,6 +1,6 @@
 *{box-sizing:border-box}
-body{margin:0;font-family:Cairo,sans-serif;background:#f7fafb;color:#17252a}
-.glass{background:rgba(255,255,255,.9);border:1px solid #e5edf0;box-shadow:0 8px 30px rgba(15,71,67,.05)}
+body{margin:0;font-family:var(--dp-font);background:var(--dp-bg);color:var(--dp-text)}
+.glass{background:var(--dp-surface);border:1px solid var(--dp-border);box-shadow:0 8px 30px var(--dp-shadow)}
 
 .table-wrap{
   width:100%;
@@ -31,11 +31,11 @@ body{margin:0;font-family:Cairo,sans-serif;background:#f7fafb;color:#17252a}
   position:sticky;
   right:0;
   z-index:2;
-  background:#fff;
+  background:var(--dp-surface);
 }
 
 .products-table thead th:first-child{
-  background:#f8fafb;
+  background:var(--dp-surface-2);
   z-index:3;
 }
 
