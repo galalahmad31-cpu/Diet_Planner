@@ -15,8 +15,8 @@ if (!sb) {
 }
 const params=new URLSearchParams(location.search);
 const initialUrlPatientId=params.get('patient_id') || params.get('id');
-const initialUrlPlanId=params.get('plan_id');
-const isNewPlan=params.get('new_plan')==='1';
+let initialUrlPlanId=params.get('plan_id');
+let isNewPlan=params.get('new_plan')==='1';
 let patientId=initialUrlPatientId;
 let activePlanStartDate=null, activePlanName=null;
 
@@ -1006,6 +1006,29 @@ function init(){
  return dietInitPromise;
 }
 
-window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init};
+async function openPlan(planId=null, createNew=false){
+ if(dietInitPromise) await dietInitPromise;
+ closeDayDetails();
+ closeFoodModal();
+ closeFixedMeals();
+ closeAddMealModal();
+ closeConfirmModal();
+ patientId=window.currentPatientId||initialUrlPatientId;
+ initialUrlPlanId=planId?String(planId):null;
+ isNewPlan=Boolean(createNew);
+ activeCloudPlanId=null;
+ activePlanStartDate=null;
+ activePlanName=null;
+ daysData=[];
+ savedDaysData=[];
+ dayEditModes={};
+ fixedMealsTargetDayId=null;
+ currentModalContext={dayId:null,mealId:null};
+ targetMealDayId=null;
+ dietInitPromise=null;
+ return init();
+}
+
+window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
 window.__dpDietPlanLoadError = null;
 })();
