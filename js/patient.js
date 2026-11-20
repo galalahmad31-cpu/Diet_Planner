@@ -205,14 +205,14 @@
 
   function getPatientSubscriptionStatus(patient) {
     const expiryDate = String(patient.finance?.subscription_end_date || '').slice(0, 10);
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(expiryDate)) return 'unknown';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(expiryDate)) return 'unknown';
     return expiryDate >= localDateKey() ? 'active' : 'expired';
   }
 
   function formatPatientDate(value) {
     if (!value) return 'غير محدد';
     const dateKey = String(value).slice(0, 10);
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey)) return 'غير محدد';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return 'غير محدد';
     const [year, month, day] = dateKey.split('-').map(Number);
     const date = new Date(year, month - 1, day);
     return new Intl.DateTimeFormat('ar-EG', {
