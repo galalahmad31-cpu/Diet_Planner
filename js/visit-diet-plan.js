@@ -701,7 +701,7 @@ function renderDays(){
     <section class="day-summary" aria-label="ملخص القيمة الغذائية لليوم">
      <div class="day-summary-heading">
       <div><strong>ملخص اليوم</strong><span>متابعة الإنجاز مقارنة بالهدف الغذائي</span></div>
-      <small>${itemCount} أصناف محسوبة</small>
+      <small>${itemCount} أصناف مضافة</small>
      </div>
      <div class="day-summary-layout">
       <div class="day-progress-block">
