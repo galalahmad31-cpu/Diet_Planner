@@ -140,6 +140,12 @@
       toast("أضف رابط التقديم أو البريد الإلكتروني أو رقم التواصل.");
       return;
     }
+    const expiryDate = valueOrNull("jobAdminExpiry");
+    const today = new Date().toISOString().slice(0, 10);
+    if (status === "published" && expiryDate && expiryDate < today) {
+      toast("لا يمكن نشر وظيفة انتهى موعد التقديم الخاص بها.");
+      return;
+    }
     const salaryMin = valueOrNull("jobAdminSalaryMin");
     const salaryMax = valueOrNull("jobAdminSalaryMax");
     if (salaryMin !== null && salaryMax !== null && Number(salaryMax) < Number(salaryMin)) {
@@ -168,7 +174,7 @@
       published_at: status === "published"
         ? (existing?.status === "published" && existing.published_at ? existing.published_at : now)
         : (existing?.published_at || null),
-      expires_at: valueOrNull("jobAdminExpiry"),
+      expires_at: expiryDate,
       updated_at: now
     };
     if (!id) payload.created_by = currentUserId;
@@ -197,6 +203,11 @@
     const job = rows.find((item) => item.id === id);
     if (!job) return;
     const status = job.status === "published" ? "draft" : "published";
+    const today = new Date().toISOString().slice(0, 10);
+    if (status === "published" && job.expires_at && job.expires_at < today) {
+      toast("حدّث تاريخ انتهاء الإعلان قبل إعادة نشر الوظيفة.");
+      return;
+    }
     const now = new Date().toISOString();
     const { error } = await client.from(PAGE).update({
       status,
