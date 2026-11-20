@@ -11,9 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
-  <script src="js/patient.js?v=20261118-patient-quota-fix1" defer></script>
+  <script src="js/patient.js?v=20261120-patient-list-compact-v1" defer></script>
 
-  <link rel="stylesheet" href="css/patient.css?v=20261119-food-header-exact1">
+  <link rel="stylesheet" href="css/patient.css?v=20261120-patient-list-compact-v1">
   <link rel="stylesheet" href="css/theme.css?v=20260921-3">
   <script src="js/theme.js?v=20260921-3"></script>
 </head>
@@ -78,8 +78,27 @@
       </div>
     </div>
 
-    <div id="statusBox" class="px-5 pt-4"></div>
-    <div id="patientsList" class="p-5">
+    <div id="patientStats" class="patient-stats" aria-label="إحصائيات المرضى">
+      <button type="button" class="patient-stat is-selected" data-status-filter="all" aria-pressed="true">
+        <span class="patient-stat-label">إجمالي المرضى</span>
+        <strong id="totalPatientsCount">—</strong>
+      </button>
+      <button type="button" class="patient-stat" data-status-filter="active" aria-pressed="false">
+        <span class="patient-stat-label">ملفات نشطة</span>
+        <strong id="activePatientsCount">—</strong>
+      </button>
+      <button type="button" class="patient-stat" data-status-filter="expired" aria-pressed="false">
+        <span class="patient-stat-label">ملفات منتهية</span>
+        <strong id="expiredPatientsCount">—</strong>
+      </button>
+      <button type="button" class="patient-stat" data-status-filter="unknown" aria-pressed="false">
+        <span class="patient-stat-label">اشتراك غير محدد</span>
+        <strong id="unknownPatientsCount">—</strong>
+      </button>
+    </div>
+
+    <div id="statusBox" class="px-5 pt-3"></div>
+    <div id="patientsList" class="patient-list" aria-live="polite">
       <div class="loading text-center text-sm text-slate-400 py-10">جاري تحميل المرضى...</div>
     </div>
 
