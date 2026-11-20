@@ -52,10 +52,10 @@
     document.body.appendChild(button);
     updateToggle();
   };
-  // Keep the centralized theme stylesheet after page styles so semantic colors win.
+  // Keep the central dark theme after page and component styles.
   const normalizeThemeStylesheetOrder = () => {
     const link = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'))
-      .find((node) => (node.getAttribute("href") || "").includes("theme.css"));
+      .find((node) => /(?:^|\/)dark-theme\.css(?:\?|$)/.test(node.getAttribute("href") || ""));
     if (link && link.parentNode) link.parentNode.appendChild(link);
   };
   // Apply the saved mode immediately; stylesheet ordering is normalized before UI initialization.
