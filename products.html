@@ -20,6 +20,7 @@
         </script>
         <style>
             body{font-family:Cairo,sans-serif;background:#f6faf9}
+#adminToolbar[hidden]{display:none!important}
 .glass{background:rgba(255,255,255,.94);border:1px solid #e7efed}
 .product-card{transition:.18s ease}.product-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,118,110,.08)}
 .admin-modal-backdrop{background:rgba(15,23,42,.62);backdrop-filter:blur(5px)}
@@ -71,7 +72,7 @@
             <div class="mx-auto max-w-7xl">
                 <div data-dp-app-header data-page-title="المنتجات الغذائية"></div>
                 <div data-dp-page-actions>
-                    <div id="adminToolbar" class="hidden items-center justify-end gap-2" hidden aria-hidden="true">
+                    <div id="adminToolbar" class="items-center justify-end gap-2" hidden aria-hidden="true">
                         <button id="addProductBtn" type="button" class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-extrabold text-emerald-800 shadow-sm hover:bg-emerald-50">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             إضافة منتج
