@@ -335,6 +335,8 @@ function ensureFoodModalPortal(){
  if(!modal)return null;
  if(modal.parentElement!==document.body)document.body.appendChild(modal);
  modal.classList.add('diet-food-modal-layer');
+ modal.setAttribute('role','dialog');
+ modal.setAttribute('aria-modal','true');
  return modal;
 }
 
@@ -342,12 +344,35 @@ async function openFoodModal(did,mid){
  await ensureAllFoods();
  const modal=ensureFoodModalPortal();
  if(!modal)return;
- currentModalContext={dayId:did,mealId:mid};const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);
+ currentModalContext={dayId:did,mealId:mid};
+ const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);
  document.getElementById('modalMealTitle').textContent=m?`إضافة صنف لـ (${m.name})`:'إضافة صنف للوجبة';
- document.getElementById('foodSearchInput').value='';document.getElementById('selectedFoodId').value='';document.getElementById('foodGramsInput').value='100';document.getElementById('foodModalHouseholdBox').classList.add('hidden');
- filterFoodList();modal.classList.remove('hidden');
+ document.getElementById('foodSearchInput').value='';
+ document.getElementById('selectedFoodId').value='';
+ document.getElementById('foodGramsInput').value='100';
+ document.getElementById('foodModalHouseholdBox').classList.add('hidden');
+
+ Object.assign(modal.style,{
+  position:'fixed',
+  inset:'0',
+  zIndex:'2147483647',
+  isolation:'isolate'
+ });
+ modal.style.setProperty('display','flex','important');
+ modal.classList.remove('hidden');
+ filterFoodList();
+ document.getElementById('foodSearchInput').focus({preventScroll:true});
 }
-function closeFoodModal(){document.getElementById('foodModal').classList.add('hidden');currentModalContext={dayId:null,mealId:null};}
+function closeFoodModal(){
+ const modal=document.getElementById('foodModal');
+ if(modal){
+  modal.classList.add('hidden');
+  ['display','position','inset','z-index','isolation'].forEach(property=>modal.style.removeProperty(property));
+  modal.removeAttribute('aria-modal');
+  modal.removeAttribute('role');
+ }
+ currentModalContext={dayId:null,mealId:null};
+}
 function updateFoodModalHousehold(){const f=foodDatabase.find(x=>x.id===document.getElementById('selectedFoodId').value),g=parseFloat(document.getElementById('foodGramsInput').value),box=document.getElementById('foodModalHouseholdBox');if(f?.household&&Number.isFinite(g)){document.getElementById('foodModalHousehold').textContent=scaleHouseholdMeasure(f.household,g);box.classList.remove('hidden')}else box.classList.add('hidden');}
 function normalizeFoodSearch(value){
  return String(value??'')
