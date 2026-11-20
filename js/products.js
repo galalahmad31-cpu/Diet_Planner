@@ -934,8 +934,11 @@ async function init() {
         return;
       }
     } else {
-      $('adminToolbar').classList.remove('hidden');
-      $('adminToolbar').classList.add('flex');
+      const adminToolbar = $('adminToolbar');
+      if (adminToolbar) {
+        adminToolbar.classList.remove('hidden');
+        adminToolbar.classList.add('flex');
+      }
     }
 
     await loadData();
@@ -1031,7 +1034,7 @@ $('resetBtn').onclick = () => {
 };
 
 initRichEditors(document);
-$('addProductBtn').onclick = () => openEditor('add-product');
+$('addProductBtn')?.addEventListener('click', () => openEditor('add-product'));
 $('closeEditorBtn').onclick = closeEditor;
 $('cancelEditorBtn').onclick = closeEditor;
 $('cancelConfirmBtn').onclick = closeConfirm;
