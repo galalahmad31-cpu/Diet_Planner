@@ -57,10 +57,10 @@
   // Versioning here prevents stale page-level URLs from retaining an old theme.
   const ensureCentralStylesheets = () => {
     const files = [
-      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v7"],
-      ["light-theme.css", "css/light-theme.css?v=20261120-central-v7"],
-      ["components.css", "css/components.css?v=20261120-central-v7"],
-      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v7"]
+      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v8"],
+      ["light-theme.css", "css/light-theme.css?v=20261120-central-v8"],
+      ["components.css", "css/components.css?v=20261120-central-v8"],
+      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v8"]
     ];
     const allLinks = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
     files.forEach(([filename, href]) => {
