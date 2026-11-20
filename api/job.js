@@ -43,7 +43,7 @@ module.exports = async function handler(req, res) {
   }
   try {
     const endpoint = new URL(SUPABASE_URL + '/rest/v1/job_posts');
-    endpoint.searchParams.set('select', '*');
+    endpoint.searchParams.set('select', 'id,title,specialty,organization_name,location_city,country_code,employment_type,workplace_type,description,requirements,salary_min,salary_max,salary_currency,salary_period,application_url,contact_email,contact_phone,status,published_at,expires_at,created_at,updated_at');
     endpoint.searchParams.set('id', 'eq.' + id);
     endpoint.searchParams.set('status', 'eq.published');
     endpoint.searchParams.set('published_at', 'lte.' + new Date().toISOString());
