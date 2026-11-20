@@ -6,6 +6,10 @@
 
   const state = {
     patients: [],
+    totalPatients: 0,
+    pageSize: 50,
+    hasMorePatients: false,
+    isLoadingPatients: false,
     statusFilter: 'all',
     pendingDeleteId: null,
     statusTimer: null,
@@ -140,23 +144,50 @@
     }
   }
 
-  async function loadPatients() {
+  async function loadPatients({ reset = true } = {}) {
     const box = $('patientsList');
-    if (!box) return;
+    const pagination = $('patientsPagination');
+    const moreButton = $('loadMorePatientsBtn');
+    if (!box || state.isLoadingPatients) return;
+
+    if (reset) {
+      state.patients = [];
+      state.totalPatients = 0;
+      state.hasMorePatients = false;
+      box.innerHTML = '<div class="loading text-center text-sm text-slate-400 py-10">جاري تحميل المرضى...</div>';
+      if (pagination) pagination.style.display = 'none';
+    }
+
+    state.isLoadingPatients = true;
+    if (moreButton) {
+      moreButton.disabled = true;
+      moreButton.textContent = 'جاري التحميل...';
+    }
 
     try {
-      if (!supabase) {
-        throw new Error('Supabase client is not available.');
+      if (!supabase) throw new Error('Supabase client is not available.');
+
+      if (reset) {
+        const { count, error: countError } = await supabase
+          .from('patients')
+          .select('id', { count: 'exact', head: true });
+        if (countError) throw countError;
+        state.totalPatients = count || 0;
       }
 
+      const from = state.patients.length;
+      const to = from + state.pageSize - 1;
       const { data: patients, error: patientsError } = await supabase
         .from('patients')
         .select('id,user_id,name,diagnosis')
-        .order('name', { ascending: true });
+        .order('name', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, to);
 
       if (patientsError) throw patientsError;
 
-      const patientIds = (patients || []).map((patient) => patient.id).filter(Boolean);
+      const pagePatients = patients || [];
+      const patientIds = pagePatients.map((patient) => patient.id).filter(Boolean);
       let financeRows = [];
 
       if (patientIds.length) {
@@ -169,8 +200,7 @@
         financeRows = data || [];
       }
 
-      // If legacy duplicates exist, use the record with the latest subscription
-      // start date; this keeps the directory deterministic without changing data.
+      // Resolve legacy duplicate finance rows deterministically within this page.
       financeRows.sort((a, b) =>
         String(b.subscription_start_date || '').localeCompare(String(a.subscription_start_date || '')) ||
         String(b.subscription_end_date || '').localeCompare(String(a.subscription_end_date || ''))
@@ -183,16 +213,36 @@
         }
       });
 
-      state.patients = (patients || []).map((patient) => ({
+      state.patients.push(...pagePatients.map((patient) => ({
         ...patient,
         finance: financeByPatient.get(patient.id) || null
-      }));
+      })));
 
+      state.hasMorePatients = state.patients.length < state.totalPatients;
       renderPatients();
+      updatePatientsPagination();
     } catch (error) {
       console.error('Patient directory load failed:', error);
-      showLoadError();
+      if (reset || !state.patients.length) showLoadError();
+      else showStatus('تعذر تحميل الدفعة التالية من المرضى.');
+    } finally {
+      state.isLoadingPatients = false;
+      updatePatientsPagination();
     }
+  }
+
+  function updatePatientsPagination() {
+    const pagination = $('patientsPagination');
+    const button = $('loadMorePatientsBtn');
+    const summary = $('patientsLoadSummary');
+    if (!pagination || !button || !summary) return;
+
+    const loaded = state.patients.length;
+    pagination.style.display = loaded ? 'flex' : 'none';
+    summary.textContent = `تم تحميل ${loaded} من ${state.totalPatients} مريض`;
+    button.style.display = state.hasMorePatients ? 'inline-flex' : 'none';
+    button.disabled = state.isLoadingPatients;
+    button.textContent = state.isLoadingPatients ? 'جاري التحميل...' : 'عرض المزيد';
   }
 
   function localDateKey() {
@@ -230,7 +280,7 @@
     });
 
     const values = {
-      totalPatientsCount: counts.all,
+      totalPatientsCount: state.totalPatients,
       activePatientsCount: counts.active,
       expiredPatientsCount: counts.expired,
       unknownPatientsCount: counts.unknown
@@ -444,6 +494,7 @@
       if (error) throw error;
 
       state.patients = state.patients.filter((patient) => patient.id !== id);
+      state.totalPatients = Math.max(0, state.totalPatients - 1);
       closeDeleteModal();
       renderPatients();
       showStatus('تم حذف المريض.', 'success');
@@ -496,6 +547,9 @@
       if (card) handleCardKeydown({ key: event.key, target: event.target, currentTarget: card, preventDefault: () => event.preventDefault() });
     });
     $('searchInput')?.addEventListener('input', renderPatients);
+    $('loadMorePatientsBtn')?.addEventListener('click', () => {
+      if (state.hasMorePatients && !state.isLoadingPatients) void loadPatients({ reset: false });
+    });
 
     $('newPatientName')?.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') createPatient();
