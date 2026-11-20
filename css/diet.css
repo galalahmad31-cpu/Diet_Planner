@@ -9,42 +9,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
 .food-name-cell{display:block!important;width:100%!important;color:#0f172a!important;visibility:visible!important;opacity:1!important;font-weight:800;line-height:1.5;cursor:pointer;text-align:right}
 .food-name-en{display:block!important;color:#94a3b8!important;font-size:9px!important;font-weight:400!important}
 
-/* Diet Library — page-specific dark-mode exceptions only.
-   Global surfaces, text, borders and forms stay in theme.css. */
-html[data-theme="dark"] .glass{background:rgba(23,33,31,.96)!important;border-color:var(--dp-border)!important;box-shadow:0 8px 30px rgba(0,0,0,.22)!important}
-html[data-theme="dark"] .food-name-cell{color:var(--dp-text)!important}
-html[data-theme="dark"] .food-name-en{color:var(--dp-muted)!important}
-
-/* Semantic exceptions for the diet cards. */
-html[data-theme="dark"] #dietGrid .bg-amber-50,
-html[data-theme="dark"] #dietGrid .bg-amber-50\/60{background:#3a3019!important}
-html[data-theme="dark"] #dietGrid .text-amber-600,
-html[data-theme="dark"] #dietGrid .text-amber-700{color:#f3cf63!important}
-html[data-theme="dark"] #dietGrid .text-amber-900{color:#f6df9a!important}
-html[data-theme="dark"] #dietGrid .bg-emerald-50,
-html[data-theme="dark"] #dietGrid .bg-emerald-50\/70{background:#17352e!important}
-html[data-theme="dark"] #dietGrid .text-emerald-700,
-html[data-theme="dark"] #dietGrid .text-emerald-900{color:#8fe3c5!important}
-html[data-theme="dark"] #dietGrid .bg-indigo-50{background:#25234a!important}
-html[data-theme="dark"] #dietGrid .text-indigo-600{color:#aeb5ff!important}
-html[data-theme="dark"] #dietGrid .bg-slate-50\/70{background:#1b2927!important;border-top:1px solid var(--dp-border)!important}
-html[data-theme="dark"] #dietGrid .ring-slate-200{--tw-ring-color:#3c514d!important}
-
-/* Editor uses an arbitrary light background not covered by the global palette. */
-html[data-theme="dark"] #editor > div{background:var(--dp-bg)!important}
-html[data-theme="dark"] #editor .bg-slate-50\/60{background:#182522!important}
-
-/* Food picker selected state. */
-html[data-theme="dark"] #foodPicker .bg-brand-50\/60{background:#17342f!important}
-html[data-theme="dark"] #foodPicker .border-brand-100,
-html[data-theme="dark"] #foodPicker .border-brand-200{border-color:#315c55!important}
-
-/* Viewer/picker/delete surfaces needing page-specific contrast. */
-html[data-theme="dark"] #foodPicker > div,
-html[data-theme="dark"] #deleteConfirmModal > div{background:var(--dp-surface)!important;color:var(--dp-text)!important}
-html[data-theme="dark"] #deleteConfirmModal .bg-slate-100,
-html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;color:var(--dp-text)!important}
-
 
 /* Compact, phone-first diet library */
 @media (max-width: 640px) {
@@ -297,15 +261,6 @@ html[data-theme="dark"] #cancelEditor{background:var(--dp-surface-3)!important;c
 .diet-list-btn:hover,.diet-list-icon-btn:hover{filter:brightness(.97);border-color:#bfd8d2}
 #dietGrid .diet-list-item:nth-child(odd){background:#fff}
 #dietGrid .diet-list-item:nth-child(even){background:#eff8f4}
-html[data-theme="dark"] .diet-list-item{background:#17211f;border-color:var(--dp-border);box-shadow:0 3px 12px rgba(0,0,0,.15)}
-html[data-theme="dark"] #dietGrid .diet-list-item:nth-child(odd){background:#17211f}
-html[data-theme="dark"] #dietGrid .diet-list-item:nth-child(even){background:#1d302b}
-html[data-theme="dark"] .diet-list-title{color:var(--dp-text)}
-html[data-theme="dark"] .diet-list-logo{background:#203a35;color:#75c9b8}
-html[data-theme="dark"] .diet-list-publisher{color:var(--dp-muted)}
-html[data-theme="dark"] .diet-list-publisher strong{color:#d0ddd8}
-html[data-theme="dark"] .diet-list-copy,html[data-theme="dark"] .diet-list-edit{background:#24312e;color:var(--dp-text);border-color:var(--dp-border)}
-html[data-theme="dark"] .diet-list-icon-btn{background:#302222;border-color:#563737;color:#f1a0a0}
 @media(max-width:640px){
  .diet-list-item{align-items:flex-start;flex-direction:column;gap:10px;padding:12px}
  .diet-list-title{font-size:10px;line-height:1.4}
