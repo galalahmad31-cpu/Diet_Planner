@@ -617,12 +617,31 @@ function initFixedMealsSearch(){
  input.dataset.bound='1';
 }
 
+function ensureFixedMealsModalPortal(){
+ const modal=document.getElementById('fixedMealsModal');
+ if(!modal)return null;
+ if(modal.parentElement!==document.body)document.body.appendChild(modal);
+ modal.classList.add('diet-fixed-meals-modal-layer');
+ modal.setAttribute('role','dialog');
+ modal.setAttribute('aria-modal','true');
+ return modal;
+}
+
 async function openFixedMeals(dayId){
+ const modal=ensureFixedMealsModalPortal();
+ if(!modal)return;
  fixedMealsTargetDayId=dayId;
  const search=document.getElementById('fixedMealsSearch');
  if(search)search.value='';
  document.getElementById('fixedMealsList').innerHTML='<div class="text-center py-8 text-slate-400 font-bold">جاري تحميل مكتبة الدايت...</div>';
- document.getElementById('fixedMealsModal').classList.remove('hidden');
+ Object.assign(modal.style,{
+  position:'fixed',
+  inset:'0',
+  zIndex:'2147483647',
+  isolation:'isolate'
+ });
+ modal.style.setProperty('display','flex','important');
+ modal.classList.remove('hidden');
  initFixedMealsSearch();
  await syncFixedMeals();
  const list=document.getElementById('fixedMealsList');
@@ -631,8 +650,18 @@ async function openFixedMeals(dayId){
   return;
  }
  renderFixedMealsList();
+ search?.focus({preventScroll:true});
 }
-function closeFixedMeals(){document.getElementById('fixedMealsModal').classList.add('hidden');fixedMealsTargetDayId=null;}
+function closeFixedMeals(){
+ const modal=document.getElementById('fixedMealsModal');
+ if(modal){
+  modal.classList.add('hidden');
+  ['display','position','inset','z-index','isolation'].forEach(property=>modal.style.removeProperty(property));
+  modal.removeAttribute('aria-modal');
+  modal.removeAttribute('role');
+ }
+ fixedMealsTargetDayId=null;
+}
 async function applyFixedDiet(i){
  const diet=fixedMealsDatabase[i],day=daysData.find(d=>d.id===fixedMealsTargetDayId);
  if(!diet||!day||!isDayEditing(day.id)){showToast('افتح اليوم بوضع التعديل أولاً','error');return;}
