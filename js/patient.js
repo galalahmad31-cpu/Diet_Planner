@@ -516,11 +516,20 @@
   async function init() {
     bindEvents();
 
-    // Load the directory immediately while access and quota checks run independently.
-    const patientsLoad = loadPatients();
     state.accessPromise = refreshAccess();
     await state.accessPromise;
-    await patientsLoad;
+    if (!state.user) {
+      window.DietPlannerAccess?.showAccessPrompt?.({
+        title: "تسجيل الدخول مطلوب",
+        message: "سجّل الدخول أولًا لعرض قائمة المرضى وملفاتهم.",
+        actionLabel: "تسجيل الدخول",
+        actionHref: "login.html"
+      });
+      const list = $("patientsList");
+      if (list) list.innerHTML = "";
+      return;
+    }
+    await loadPatients();
   }
 
   if (document.readyState === 'loading') {
