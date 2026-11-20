@@ -677,6 +677,11 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
   color:var(--dp-muted);font-size:clamp(7px,.8vw,9px);font-weight:700;
   line-height:1.35;overflow-wrap:anywhere;
 }
+.visit-main-shell .embedded-diet-plan #daysContainer .day-ring-meta .day-ring-target-value{
+  display:inline-block;margin-inline:2px;color:var(--dp-text);
+  font-size:clamp(11px,1.15vw,14px);font-weight:900;
+  line-height:1.2;font-variant-numeric:tabular-nums;
+}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-ring-calories{--ring-color:var(--dp-warning)}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-ring-carbs{--ring-color:var(--dp-info)}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-ring-protein{--ring-color:var(--dp-accent)}
