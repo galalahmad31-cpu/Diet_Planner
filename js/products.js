@@ -927,17 +927,20 @@ async function init() {
 
     state.isAdmin = status.isAdmin === true;
 
+    // Keep admin-only controls hidden unless the verified profile role is admin.
+    const adminToolbar = $('adminToolbar');
+    if (adminToolbar) {
+      adminToolbar.hidden = !state.isAdmin;
+      adminToolbar.classList.toggle('hidden', !state.isAdmin);
+      adminToolbar.classList.toggle('flex', state.isAdmin);
+      adminToolbar.setAttribute('aria-hidden', String(!state.isAdmin));
+    }
+
     if (!state.isAdmin) {
       const ok = await access.hasFeature(status.user.id,'product');
       if (ok !== true) {
         setState('هذه الخدمة غير متاحة في اشتراكك الحالي.');
         return;
-      }
-    } else {
-      const adminToolbar = $('adminToolbar');
-      if (adminToolbar) {
-        adminToolbar.classList.remove('hidden');
-        adminToolbar.classList.add('flex');
       }
     }
 
