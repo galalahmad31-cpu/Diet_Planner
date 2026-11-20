@@ -11,7 +11,7 @@ body{font-family:'Cairo',sans-serif;background:#f8fafc;color:#0f172a}
 
 
 /* Patient profile dashboard — clean consolidated styles */
-:root{--dp-primary:#176b63;--dp-ink:#172b3a;--dp-muted:#718096;--dp-line:#e6edf1}
+:root{--dp-ink:var(--dp-text);--dp-line:var(--dp-border)}
 body{background:#f3f6f8;color:var(--dp-ink);font-family:'Cairo',sans-serif}
 main{width:100%;max-width:1440px!important;margin-inline:auto}
 header.patient-profile-page-header{background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%)!important;border-color:transparent!important}
