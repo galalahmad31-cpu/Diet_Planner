@@ -756,6 +756,16 @@
       alert('حذف الخطط متاح أثناء الاشتراك المدفوع فقط.');
       return;
     }
+    if (String(plan.plan_name || '').includes('البدائل')) {
+      const loaded = await loadExchangePlanModule();
+      if (!loaded) {
+        await Swal.fire('تعذر الحذف', 'تعذر تحميل وحدة خطة البدائل.', 'error');
+        return;
+      }
+      await openPlanWorkspace(plan.id, plan.plan_name);
+      window.exchangePlan.deletePlan();
+      return;
+    }
     const result = await Swal.fire({
       title: 'حذف الخطة الغذائية',
       text: `هل تريد حذف "${plan.plan_name || 'الخطة'}"؟ سيتم حذف الأيام والوجبات والأصناف التابعة لها.`,
@@ -1337,6 +1347,10 @@
     $('savePatientButton')?.addEventListener('click', saveAllPatientData);
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
+    window.addEventListener('dp-exchange-plan-deleted', () => {
+      closePlanWorkspace();
+      void loadNutritionPlans();
+    });
     $('addPlanButton')?.addEventListener('click', addNutritionPlan);
     $('addExchangePlanButton')?.addEventListener('click', addExchangeNutritionPlan);
     $('visitsList')?.addEventListener('click', (event) => {
