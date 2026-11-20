@@ -665,6 +665,12 @@
         return;
       }
       if (!action.startsWith('dietPlan.')) return;
+      if (action === 'dietPlan.closePrintSettingsModal' && target.closest('#printSettingsModal') && target.closest('#printSettingsModal').classList.contains('hidden') === false && target.dataset.printMode !== 'exchange' && $('executePrintBtn')?.dataset.printMode === 'exchange') {
+        event.preventDefault();
+        $('printSettingsModal')?.classList.add('hidden');
+        delete $('executePrintBtn')?.dataset.printMode;
+        return;
+      }
       if (action === 'dietPlan.closeConfirmModal' && await window.exchangePlan?.hasPendingConfirm?.()) {
         event.preventDefault();
         window.exchangePlan.closeConfirmModal();
@@ -736,6 +742,10 @@
     }
     window.dietPlan?.closeDayDetails?.();
     window.exchangePlan?.closeConfirmModal?.();
+    const printSettingsModal = $('printSettingsModal');
+    printSettingsModal?.classList.add('hidden');
+    const executePrintButton = $('executePrintBtn');
+    if (executePrintButton) delete executePrintButton.dataset.printMode;
     window.dietPlan?.closeFoodModal?.();
     window.dietPlan?.closeFixedMeals?.();
     window.dietPlan?.closeAddMealModal?.();
@@ -779,12 +789,6 @@
     if (!result.isConfirmed) return;
 
     try {
-      if (plan.plan_name === 'الخطة الغذائية باستخدام البدائل') {
-        const { error: exchangeError } = await supabase
-          .from('exchange_values').delete().eq('plan_id', plan.id);
-        if (exchangeError) throw exchangeError;
-      }
-
       const { error } = await supabase
         .from('nutrition_plans').delete()
         .eq('id', plan.id).eq('patient_id', patientId);
@@ -838,7 +842,11 @@
         .update({ plan_name: 'الخطة الغذائية باستخدام البدائل' })
         .eq('id', planId)
         .eq('patient_id', patientId);
-      if (renameError) throw renameError;
+      if (renameError) {
+        const { error: cleanupError } = await supabase.from('nutrition_plans').delete().eq('id', planId).eq('patient_id', patientId);
+        if (cleanupError) console.error('Failed to clean up unlabelled exchange plan:', cleanupError);
+        throw renameError;
+      }
       await loadNutritionPlans();
       await openPlanWorkspace(planId, 'الخطة الغذائية باستخدام البدائل');
     } catch (error) {
