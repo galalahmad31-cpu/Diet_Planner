@@ -18,7 +18,7 @@
  <div data-dp-app-header data-page-title="لوحة الإدارة"></div>
 <main class="container" id="adminContent" style="display:none">
 <div class="title"><h1>إدارة الاشتراكات</h1><p>إدارة الطلبات والخطط والأطباء من مكان واحد</p></div>
-<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button><button class="tab" data-tab="privacy"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</button></nav>
 <section id="tab-requests">
 <div class="toolbar requests-toolbar"><div class="stats"><button type="button" class="stat stat-filter selected" data-request-filter="all" aria-pressed="true">كل الطلبات <b id="totalCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="pending" aria-pressed="false">قيد المراجعة <b id="pendingCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="paid" aria-pressed="false">مفعّلة <b id="paidCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="canceled" aria-pressed="false">ملغاة <b id="canceledCount">0</b></button></div><input id="requestSearch" class="search" type="search" placeholder="ابحث بالاسم أو البريد أو الخطة..." aria-label="البحث في طلبات الاشتراك"><button class="btn btn-outline" id="refreshBtn"><i class="fa-solid fa-rotate"></i> تحديث</button></div>
 <div class="card"><div id="requestState" class="state">جاري التحميل...</div><div class="wrap" id="requestWrap" style="display:none"><table><thead><tr><th>الطبيب</th><th>الخطة</th><th>السعر</th><th>تاريخ الطلب</th><th>البداية / النهاية</th><th>الحالة</th><th>إثبات الدفع</th><th>إجراءات</th></tr></thead><tbody id="requestsBody"></tbody></table></div></div>
@@ -48,11 +48,32 @@
   <div id="announcementList" class="announcement-admin-list" style="display:none"></div>
  </div>
 </section>
+<section id="tab-privacy" style="display:none">
+ <div class="toolbar">
+  <div class="stats"><div class="stat">محتوى سياسة الخصوصية</div></div>
+  <button class="btn btn-outline" id="refreshPrivacyPolicyBtn" type="button"><i class="fa-solid fa-rotate"></i> تحديث</button>
+ </div>
+ <div class="card" style="padding:18px">
+  <div id="privacyPolicyState" class="state">اضغط تحديث لتحميل محتوى السياسة.</div>
+  <div id="privacyPolicyEditor" style="display:none">
+   <div class="field" style="margin-bottom:14px">
+    <label for="privacyPolicyContent">محتوى سياسة الخصوصية</label>
+    <textarea id="privacyPolicyContent" rows="18" maxlength="50000" placeholder="اكتب سياسة الخصوصية هنا بالطريقة التي تريدها..."></textarea>
+    <small style="display:block;margin-top:7px;color:var(--dp-text-2,#718096)">يمكنك كتابة النص بحرية وتقسيمه إلى فقرات باستخدام سطر جديد. سيظهر للزوار بنفس ترتيب الأسطر.</small>
+   </div>
+   <div class="field" style="max-width:260px;margin-bottom:16px">
+    <label for="privacyPolicyDate">تاريخ آخر تحديث</label>
+    <input id="privacyPolicyDate" type="date" required>
+   </div>
+   <button class="btn btn-primary" id="savePrivacyPolicyBtn" type="button"><i class="fa-solid fa-floppy-disk"></i> حفظ ونشر السياسة</button>
+  </div>
+ </div>
+</section>
 </main>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"><div class="modal-head"><h2 id="modalTitle"></h2><button class="close" id="modalClose"><i class="fa-solid fa-xmark"></i></button></div><div id="modalBody"></div></div></div>
 <div class="modal-bg" id="confirmBg"><div class="modal small"><div class="modal-head"><h2 id="confirmTitle">تأكيد العملية</h2><button class="close" id="confirmClose"><i class="fa-solid fa-xmark"></i></button></div><div id="confirmText" class="confirm-text"></div><div class="modal-foot"><button class="btn btn-danger" id="confirmYes">تأكيد</button><button class="btn btn-outline" id="confirmNo">إلغاء</button></div></div></div>
 <div class="modal-bg" id="proofBg"><div class="modal"><div class="modal-head"><h2>إثبات الدفع</h2><button class="close" id="proofClose"><i class="fa-solid fa-xmark"></i></button></div><div id="proofBody"></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261119-announcements-admin1"></script><script src="js/admin-roles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261120-privacy-policy-admin-v1"></script><script src="js/admin-roles.js"></script>
   
 </body></html>
