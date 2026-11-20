@@ -609,9 +609,9 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-value span{color:var(--dp-muted);font-size:10px;font-weight:800}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-track{height:6px;overflow:hidden;border-radius:99px;background:var(--dp-surface-3)}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-metric-track span{display:block;height:100%;border-radius:inherit;background:var(--dp-accent)}
-.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-protein .day-metric-track span{background:#55A9D1}
-.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-carbs .day-metric-track span{background:#D99A24}
-.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-fat .day-metric-track span{background:#27AE78}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-protein .day-metric-track span{background:var(--dp-info)}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-carbs .day-metric-track span{background:var(--dp-warning)}
+.visit-main-shell .embedded-diet-plan #daysContainer .day-metric-fat .day-metric-track span{background:var(--dp-success)}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-micros-row{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--dp-border);
 }
