@@ -269,6 +269,6 @@ async function init(requestedPlanId=null){
   throw error;
  }
 }
-async async function confirmAction(){const cb=S.confirm;if(!cb)return false;S.confirm=null;await cb();return true}
+async function confirmAction(){const cb=S.confirm;if(!cb)return false;S.confirm=null;await cb();return true}
 window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
 })();
