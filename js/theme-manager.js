@@ -60,9 +60,15 @@
     apply(theme);
   };
   const createToggle = () => {
+    // Pages may opt out of the floating switch while still using this
+    // centralized theme manager and its cross-page synchronization.
+    if (!document.body) return;
+    if (document.body.dataset.dpThemeToggle === "off") {
+      document.getElementById("dp-theme-toggle")?.remove();
+      return;
+    }
     let button = document.getElementById("dp-theme-toggle");
     if (button) { updateToggle(); return; }
-    if (!document.body) return;
     button = document.createElement("button");
     button.type = "button";
     button.id = "dp-theme-toggle";
@@ -76,10 +82,10 @@
   // Versioning here prevents stale page-level URLs from retaining an old theme.
   const ensureCentralStylesheets = () => {
     const files = [
-      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v12"],
-      ["light-theme.css", "css/light-theme.css?v=20261120-central-v12"],
-      ["components.css", "css/components.css?v=20261120-central-v12"],
-      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v12"]
+      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v13"],
+      ["light-theme.css", "css/light-theme.css?v=20261120-central-v13"],
+      ["components.css", "css/components.css?v=20261120-central-v13"],
+      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v13"]
     ];
     const allLinks = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
     files.forEach(([filename, href]) => {
