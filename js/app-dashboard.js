@@ -422,21 +422,16 @@
         return;
       }
 
-      // This dashboard is an entitled workspace, not an email-confirmation landing page.
-      // A normal account must have an active paid/free-trial subscription.
-      if (status.isAdmin !== true && status.hasActiveSubscription !== true) {
-        window.location.replace("subscription_plans_index.html");
-        return;
-      }
-
       await renderAccountName(status.user, status.isAdmin === true);
       renderAdminCard(status.isAdmin);
       // Load the dashboard notification summary after authentication.
       await loadDashboardNotifications(status.user.id);
     } catch (error) {
       console.error("Dashboard access verification failed:", error);
-      // Fail closed rather than rendering an entitled dashboard on an error.
-      window.location.replace("subscription_plans_index.html?access_check=failed");
+      // The public dashboard remains available even when account verification fails.
+      renderAdminCard(false);
+      renderVisitorDashboard();
+      renderDashboardNotifications([], "unavailable");
     }
   }
 
