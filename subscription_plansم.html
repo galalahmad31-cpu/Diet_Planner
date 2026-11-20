@@ -15,15 +15,11 @@
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
 <script src="js/theme.js?v=20261120-central-v11"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/app-header.css?v=20261120-central-header-v1">
+  <script src="js/app-header.js?v=20261120-central-header-v1" defer></script>
 </head>
 <body>
-<header class="header">
-<div class="brand"><div class="brand-title">خطط الاشتراك</div></div>
-<div class="header-actions">
-<button id="dashboardBtn" class="btn btn-outline" data-action="dashboard"><i class="fa-solid fa-gauge-high"></i> الرئيسية</button>
-<button id="profileBtn" class="btn btn-outline" data-action="profile"><i class="fa-solid fa-user"></i> الملف الشخصي</button>
-</div>
-</header>
+<div data-dp-app-header data-page-title="خطط الاشتراك"></div>
 <main class="container">
 <div class="page-title"><h1>خطط الاشتراك</h1><p>اختر الخطة المناسبة لك واستمتع بمزايا التطبيق</p></div>
 <div id="subscriptionStatus" class="subscription-status" aria-live="polite"></div>
