@@ -144,7 +144,7 @@ function buildNotifications(rows) {
           title: 'موعد المتابعة اليوم',
           text: 'المريض لديه موعد متابعة اليوم.',
           icon: 'fa-solid fa-calendar-check',
-          box: 'bg-sky-50 text-sky-700',
+          tone: 'info',
           date: nextFollowUp
         });
       }
@@ -155,7 +155,7 @@ function buildNotifications(rows) {
           title: 'موعد المتابعة غدًا',
           text: 'المريض لديه موعد متابعة غدًا.',
           icon: 'fa-solid fa-calendar-plus',
-          box: 'bg-indigo-50 text-indigo-700',
+          tone: 'info',
           date: nextFollowUp
         });
       }
@@ -181,27 +181,27 @@ function buildNotifications(rows) {
         let title;
         let text;
         let icon = 'fa-solid fa-calendar-days';
-        let box = 'bg-sky-50 text-sky-700';
+        let tone = 'info';
 
         if (isToday) {
           type = 'ينتهي اليوم';
           title = 'الاشتراك ينتهي اليوم';
           text = 'ينتهي اشتراك المريض اليوم. يُرجى التواصل معه لتجديد الاشتراك واستمرار المتابعة.';
           icon = 'fa-solid fa-triangle-exclamation';
-          box = 'bg-red-50 text-red-700';
+          tone = 'danger';
         } else if (isTomorrow) {
           type = 'ينتهي غدًا';
           title = 'الاشتراك يقترب من الانتهاء';
           text = 'يتبقى يوم واحد على انتهاء الاشتراك. يُفضّل التواصل مع المريض لتجديد الاشتراك قبل انتهائه.';
           icon = 'fa-solid fa-calendar-day';
-          box = 'bg-amber-50 text-amber-700';
+          tone = 'warning';
         } else {
           type = `ينتهي خلال ${subscriptionDays} أيام`;
           title = 'الاشتراك يقترب من الانتهاء';
           text = `يتبقى ${subscriptionDays} أيام على انتهاء الاشتراك. يُفضّل التواصل مع المريض مسبقًا لتجديد الاشتراك.`;
           box = subscriptionDays <= 3
-            ? 'bg-amber-50 text-amber-700'
-            : 'bg-sky-50 text-sky-700';
+            ? 'warning'
+            : 'info';
         }
 
         addNotification(result.subscriptions, row, {
@@ -223,7 +223,7 @@ function buildNotifications(rows) {
           title: 'انتهى اشتراك المريض',
           text: `انتهى الاشتراك منذ ${elapsedText}. يُرجى التواصل مع المريض لتجديد الاشتراك واستمرار المتابعة.`,
           icon: 'fa-solid fa-circle-exclamation',
-          box: 'bg-red-50 text-red-700',
+          tone: 'danger',
           date: subscriptionEnd
         });
       }
@@ -253,7 +253,7 @@ function render() {
 
     element.innerHTML = `
       <div class="flex items-start gap-4">
-        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${notification.box}">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl notification-tone notification-tone-${notification.tone}">
           <i class="${notification.icon}"></i>
         </div>
 
@@ -263,7 +263,7 @@ function render() {
               ${esc(notification.patientName)}
             </h3>
 
-            <span class="rounded-full px-2.5 py-1 text-[10px] font-bold ${notification.box}">
+            <span class="rounded-full px-2.5 py-1 text-[10px] font-bold notification-tone notification-tone-${notification.tone}">
               ${esc(notification.type)}
             </span>
           </div>
@@ -307,9 +307,9 @@ function showError(error) {
   console.error('Notifications error:', error);
 
   $('loading').innerHTML = `
-    <div class="rounded-2xl bg-white p-6 text-center shadow-sm">
-      <div class="text-red-600 font-bold">تعذر تحميل الإشعارات</div>
-      <div class="mt-2 text-xs text-slate-400">
+    <div class="notification-error-panel rounded-2xl p-6 text-center shadow-sm">
+      <div class="notification-error-title font-bold">تعذر تحميل الإشعارات</div>
+      <div class="notification-error-detail mt-2 text-xs">
         ${esc(error?.message || 'حدث خطأ غير معروف')}
       </div>
     </div>
