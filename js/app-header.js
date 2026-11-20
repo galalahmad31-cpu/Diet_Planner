@@ -5,7 +5,7 @@
   if (window.__DP_APP_HEADER__) return;
   window.__DP_APP_HEADER__ = true;
 
-  const path = location.pathname.split("/").pop() || "index.html";
+  const path = decodeURIComponent(location.pathname.split("/").pop() || "index.html");
   if (new URLSearchParams(location.search).get("embed") === "1") return;
   if (document.documentElement.classList.contains("visit-embedded") ||
       document.documentElement.classList.contains("nsp-embedded")) return;
