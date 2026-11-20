@@ -12,3 +12,19 @@
       border:1px solid rgba(226,232,240,.9);
       box-shadow:0 10px 35px rgba(15,71,67,.06);
     }
+
+.privacy-policy-content{
+  color:var(--dp-text,#263238);
+  font-size:14px;
+  line-height:2;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  text-align:start;
+}
+.privacy-policy-empty{
+  color:var(--dp-text-2,#64748b);
+  font-size:14px;
+  line-height:1.9;
+  text-align:center;
+  padding:24px 8px;
+}
