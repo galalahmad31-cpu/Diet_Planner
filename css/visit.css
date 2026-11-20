@@ -885,14 +885,14 @@ html.visit-embedded #dp-theme-toggle{display:none!important}
   border-color:var(--dp-primary);color:var(--dp-primary);
 }
 body .diet-modal-portal-layer{
-  position:fixed!important;inset:0!important;z-index:2147483647!important;
+  position:fixed!important;inset:0!important;z-index:20000!important;
   display:flex!important;align-items:center;justify-content:center;
   isolation:isolate;pointer-events:auto;
 }
 body .diet-modal-portal-layer.hidden{display:none!important}
 body .day-details-modal[hidden]{display:none!important}
 body .day-details-modal{
-  position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
   margin:0!important;padding:clamp(8px,2.5vw,24px);box-sizing:border-box;
 }
 body .day-details-backdrop{
