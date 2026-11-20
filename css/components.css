@@ -1,0 +1,233 @@
+/* Diet Planner — Official Design System
+   Shared visual tokens and safe global foundations.
+   Page-specific layout and behavior remain in their own files. */
+html,body{min-height:100%;background:var(--dp-bg)}
+body{
+  background:var(--dp-bg)!important;
+  color:var(--dp-text)!important;
+  font-family:var(--dp-font);
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:auto;
+  -moz-osx-font-smoothing:auto;
+  font-synthesis:none;
+}
+button,input,select,textarea{font-family:var(--dp-font)}
+h1,h2,h3,h4,h5,h6{color:var(--dp-text)}
+body{font-size:14px;line-height:1.65}
+.title h1,.page-header h1,.page-title{
+  font-size:clamp(22px,2.2vw,26px);
+  line-height:1.35;
+  font-weight:800;
+}
+.dashboard-section-heading h3,.measurements-table-heading h3,.section-title{
+  font-size:17px;
+  line-height:1.45;
+  font-weight:800;
+}
+.text-slate-400,.text-gray-400{color:var(--dp-muted)}
+.text-slate-500,.text-gray-500{color:var(--dp-text-2)}
+.bg-slate-50,.bg-gray-50{background-color:var(--dp-surface-2)}
+.bg-slate-100,.bg-gray-100{background-color:var(--dp-surface-3)}
+.border-slate-100,.border-slate-200,.border-gray-100,.border-gray-200{border-color:var(--dp-border)}
+a{ -webkit-tap-highlight-color:transparent }
+:where(input,select,textarea){
+  color:var(--dp-text);
+  border-color:var(--dp-input-border);
+}
+:where(input,select,textarea):focus-visible{
+  border-color:var(--dp-primary);
+  outline:2px solid rgba(8,127,107,.16);
+  outline-offset:1px;
+}
+:where(button,a,[role="button"]):focus-visible{
+  outline:2px solid rgba(8,127,107,.35);
+  outline-offset:2px;
+}
+
+/* Shared content surfaces: retain each page's geometry, unify finish. */
+:where(.glass,.card,.main-container,.patient-name-bar,.dashboard-panel,.section-card,.toolbar,.tabs){
+  border-color:var(--dp-border);
+}
+:where(.glass,.card,.main-container,.patient-name-bar,.dashboard-panel,.section-card,.toolbar,.tabs){
+  box-shadow:0 2px 12px var(--dp-shadow);
+}
+
+/* Consistent primary action colors for shared action components. */
+:is(.btn-primary,.dashboard-primary-btn,.followup-add-button,.measurements-add-button,.patient-save-actions button:first-child){
+  background-color:var(--dp-primary);
+}
+:is(.btn-primary,.dashboard-primary-btn,.followup-add-button,.measurements-add-button,.patient-save-actions button:first-child):hover{
+  background-color:var(--dp-primary-hover);
+}
+.bg-brand-500,.bg-brand-600,.bg-brand-700{background-color:var(--dp-primary)}
+.text-brand-600,.text-brand-700{color:var(--dp-primary)}
+.border-brand-500,.border-brand-600{border-color:var(--dp-primary)}
+
+/* Branded application headers share one restrained green gradient. */
+.patient-profile-page-header,
+.profile-page-header,
+.finance-page-header,
+.about-branded-header,
+.patient-page-header,
+.feedback-branded-header,
+.food-page-header,
+.recipe-page-header,
+.support-header{
+  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
+  color:#fff;
+}
+.patient-profile-page-header :where(h1,h2,h3),
+.profile-page-header :where(h1,h2,h3),
+.finance-page-header :where(h1,h2,h3),
+.about-branded-header :where(h1,h2,h3),
+.patient-page-header :where(h1,h2,h3),
+.feedback-branded-header :where(h1,h2,h3),
+.food-page-header :where(h1,h2,h3),
+.recipe-page-header :where(h1,h2,h3),
+.support-header :where(h1,h2,h3){color:#fff}
+
+/* Dashboard home and administration headers use one high-contrast brand treatment. */
+body:has(.dashboard-services-section) header.glass,
+body:has(.product-modern) main>.mx-auto>header,
+body:has(#sub-content-quick-calc) .page-header,
+header.header{
+  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+}
+
+/* Brand copy must stay readable even when Tailwind text utilities are present. */
+body:has(.dashboard-services-section) header.glass :is(h1,h2,h3),
+body:has(.product-modern) main>.mx-auto>header :is(h1,h2,h3),
+body:has(#sub-content-quick-calc) .page-header :is(h1,h2,h3),
+header.header :is(h1,h2,h3){
+  color:#fff!important;
+}
+body:has(.dashboard-services-section) header.glass .flex.items-center.gap-4 > div:last-child :is(h1,h2,h3,p,span,small,strong,div),
+body:has(.dashboard-services-section) header.glass #accountInfo,
+body:has(.dashboard-services-section) header.glass #doctorName{
+  color:#fff!important;
+}
+body:has(.dashboard-services-section) header.glass .flex.items-center.gap-4 > div:last-child p,
+body:has(.dashboard-services-section) header.glass #accountInfo .text-xs,
+body:has(.dashboard-services-section) header.glass .brand-sub,
+body:has(.product-modern) main>.mx-auto>header p,
+body:has(#sub-content-quick-calc) .page-header p,
+header.header .brand-sub{
+  color:#F4FBF8!important;
+}
+
+/* White utility controls retain a dark, legible icon on the branded header. */
+body:has(.dashboard-services-section) header.glass #logoutBtn{
+  color:var(--dp-primary-dark)!important;
+}
+
+/* Dashboard header authentication actions — contrast-safe
+   Scoped to the branded public dashboard header; auth behavior is unchanged. */
+body:has(.dashboard-services-section) header.glass #headerActions #loginCta,
+body:has(.dashboard-services-section) header.glass #headerActions #registerCta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:9px 16px;
+  border-radius:12px;
+  font-weight:700;
+  line-height:1.35;
+  text-decoration:none;
+  transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+body:has(.dashboard-services-section) header.glass #headerActions #loginCta{
+  color:#FFFFFF!important;
+  background:rgba(255,255,255,.10)!important;
+  border:1px solid rgba(255,255,255,.82)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+body:has(.dashboard-services-section) header.glass #headerActions #loginCta:hover{
+  color:#174D43!important;
+  background:#FFFFFF!important;
+  border-color:#FFFFFF!important;
+}
+body:has(.dashboard-services-section) header.glass #headerActions #registerCta{
+  color:#174D43!important;
+  background:#FFFFFF!important;
+  border:1px solid #FFFFFF!important;
+  box-shadow:0 2px 8px rgba(8,48,40,.16);
+}
+body:has(.dashboard-services-section) header.glass #headerActions #registerCta:hover{
+  color:#123D35!important;
+  background:#EAF5F2!important;
+  border-color:#EAF5F2!important;
+}
+body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta):focus-visible{
+  outline:3px solid #FFFFFF!important;
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta){transition:none}
+}
+
+/* Dark mode inherits the semantic palette from css/theme.css. */
+html[data-theme="dark"] body{background:var(--dp-bg);color:var(--dp-text)}
+html[data-theme="dark"] :where(h1,h2,h3,h4,h5,h6){color:var(--dp-text)}
+html[data-theme="dark"] :where(input,select,textarea){color:var(--dp-text);border-color:var(--dp-input-border)}
+html[data-theme="dark"] :where(.glass,.card,.main-container,.patient-name-bar,.dashboard-panel,.section-card,.toolbar,.tabs){
+  border-color:var(--dp-border);
+  box-shadow:0 2px 12px var(--dp-shadow);
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* =========================================================
+   Readability normalization — centralized application layer
+   Keep page layouts intact; normalize shared text contrast.
+   ========================================================= */
+
+/* Clinical text on light surfaces must remain clearly readable. */
+.patient-fields label,
+.dashboard-card-head p,
+.patient-finance-heading small,
+.patient-data-title small,
+.patient-module-tab-copy small,
+.measurements-table-heading p,
+.measurements-table th span,
+.measurements-table td,
+.patient-finance-empty,
+.patient-finance-access-note,
+.finance-state,
+.profile-plans-heading p,
+.profile-plans-loading,
+.profile-plans-empty,
+.profile-subscribe-help,
+.profile-detail-line strong,
+.profile-confirm-message,
+.dashboard-notification-action,
+.dashboard-notification-date,
+.dashboard-announcement-card p,
+.dashboard-announcement-card-footer,
+.articles-heading p,
+.article-card-meta,
+.article-card-footer,
+.announcement-admin-meta,
+.formula-section-title small,
+.formula-title-wrap span,
+.metric small,
+.qc-tab small,
+.field-hint,
+.auth-bottom-note,
+.editor:empty::before{
+  color:var(--dp-text-2);
+}
+
+/* The dashboard hero is a branded surface: headings must not inherit
+   the dark body heading color on its green gradient. */
+body:has(.dashboard-services-section) main section .bg-gradient-to-l h1,
+body:has(.dashboard-services-section) main section .bg-gradient-to-l h2,
+body:has(.dashboard-services-section) main section .bg-gradient-to-l h3{
+  color:#FFFFFF;
+}
+body:has(.dashboard-services-section) main section .bg-gradient-to-l p{
+  color:#EAF5F2;
+}
+
