@@ -37,7 +37,7 @@ function showToast(msg,type='success'){
 function ensureDietModalPortal(id){
  const modal=document.getElementById(id);
  if(!modal)return null;
- if(modal.parentElement!==document.body)document.body.appendChild(modal);
+ document.body.appendChild(modal);
  modal.classList.add('diet-modal-portal-layer');
  modal.setAttribute('role','dialog');
  modal.setAttribute('aria-modal','true');
