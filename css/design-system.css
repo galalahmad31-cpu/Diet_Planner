@@ -86,29 +86,41 @@ a{ -webkit-tap-highlight-color:transparent }
 .recipe-page-header :where(h1,h2,h3),
 .support-header :where(h1,h2,h3){color:#fff}
 
-/* Dashboard home and administration headers use the same brand anchor. */
+/* Dashboard home and administration headers use one high-contrast brand treatment. */
 body:has(.dashboard-services-section) header.glass,
 body:has(.product-modern) main>.mx-auto>header,
 body:has(#sub-content-quick-calc) .page-header,
 header.header{
-  background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%);
-  color:#fff;
-  border-color:transparent;
-}
-body:has(#sub-content-quick-calc) .page-header{
   background:linear-gradient(118deg,var(--dp-primary-dark) 0%,var(--dp-primary) 68%,#15957F 100%)!important;
+  color:#fff!important;
   border-color:transparent!important;
+}
+
+/* Brand copy must stay readable even when Tailwind text utilities are present. */
+body:has(.dashboard-services-section) header.glass :is(h1,h2,h3),
+body:has(.product-modern) main>.mx-auto>header :is(h1,h2,h3),
+body:has(#sub-content-quick-calc) .page-header :is(h1,h2,h3),
+header.header :is(h1,h2,h3){
   color:#fff!important;
 }
-body:has(#sub-content-quick-calc) .page-header h1{color:#fff!important}
-body:has(.dashboard-services-section) header.glass :where(h1,h2,h3),
-body:has(.product-modern) main>.mx-auto>header :where(h1,h2,h3),
-body:has(#sub-content-quick-calc) .page-header :where(h1,h2,h3),
-header.header :where(h1,h2,h3){color:#fff}
-body:has(.dashboard-services-section) header.glass p,
+body:has(.dashboard-services-section) header.glass .flex.items-center.gap-4 > div:last-child :is(h1,h2,h3,p,span,small,strong,div),
+body:has(.dashboard-services-section) header.glass #accountInfo,
+body:has(.dashboard-services-section) header.glass #doctorName{
+  color:#fff!important;
+}
+body:has(.dashboard-services-section) header.glass .flex.items-center.gap-4 > div:last-child p,
+body:has(.dashboard-services-section) header.glass #accountInfo .text-xs,
+body:has(.dashboard-services-section) header.glass .brand-sub,
 body:has(.product-modern) main>.mx-auto>header p,
 body:has(#sub-content-quick-calc) .page-header p,
-header.header .brand-sub{color:#DCEFE8}
+header.header .brand-sub{
+  color:#EAF5F2!important;
+}
+
+/* White utility controls retain a dark, legible icon on the branded header. */
+body:has(.dashboard-services-section) header.glass #logoutBtn{
+  color:var(--dp-primary-dark)!important;
+}
 
 /* Dark mode inherits the semantic palette from css/theme.css. */
 html[data-theme="dark"] body{background:var(--dp-bg);color:var(--dp-text)}
