@@ -14,9 +14,6 @@
     accountName: document.getElementById("doctorName"),
     logout: document.getElementById("logoutBtn"),
     adminCard: document.getElementById("adminCard"),
-    featureCards: document.querySelectorAll(
-      "a.nav-card:not(#adminCard)"
-    )
   };
 
   // ---------------------------------------------------------
@@ -110,194 +107,6 @@
     card.removeAttribute("aria-hidden");
     card.removeAttribute("tabindex");
     card.style.removeProperty("display");
-  }
-
-  // ---------------------------------------------------------
-  // Locked cards
-  // ---------------------------------------------------------
-  function addLockStyles() {
-    if (document.getElementById("dp-feature-lock-style")) {
-      return;
-    }
-
-    const style = document.createElement("style");
-    style.id = "dp-feature-lock-style";
-
-    style.textContent = `
-      .dp-feature-locked {
-        position: relative;
-        cursor: pointer !important;
-        opacity: .88;
-      }
-
-      .dp-feature-locked:hover {
-        transform: none !important;
-        box-shadow: none !important;
-        border-color: rgba(226,232,240,.85) !important;
-      }
-
-      .dp-lock-overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: inherit;
-        background: rgba(248,250,252,.68);
-        backdrop-filter: blur(2px);
-      }
-
-      .dp-lock-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 7px 12px;
-        border-radius: 999px;
-        background: rgba(255,255,255,.96);
-        border: 1px solid rgba(203,213,225,.9);
-        color: #64748b;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1.5;
-        text-align: center;
-        white-space: nowrap;
-        box-shadow: 0 8px 20px rgba(15,23,42,.08);
-      }
-    `;
-
-    document.head.appendChild(style);
-  }
-
-  function lockCard(card, visitor = false) {
-    if (!card) return;
-
-    card.classList.add("dp-feature-locked");
-    card.setAttribute(
-      "aria-disabled",
-      "true"
-    );
-    card.setAttribute(
-      "title",
-      visitor ? "سجّل الدخول لاستخدام هذه الخدمة" : "هذه الخدمة غير متاحة في اشتراكك الحالي"
-    );
-
-
-  }
-
-  function bindLockedCard(card) {
-    if (card.dataset.lockHandlerBound === "true") {
-      return;
-    }
-
-    card.dataset.lockHandlerBound = "true";
-
-    card.addEventListener("click", (event) => {
-      if (!card.classList.contains("dp-feature-locked")) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      showLockedMessage(card.dataset.visitorLocked === "true");
-    });
-  }
-
-  function showLockedMessage(visitor = false) {
-    let message =
-      document.getElementById("dpLockedMessage");
-
-    if (!message) {
-      message = document.createElement("div");
-      message.id = "dpLockedMessage";
-
-      message.style.cssText = `
-        position: fixed;
-        left: 50%;
-        bottom: 24px;
-        transform: translateX(-50%);
-        z-index: 200;
-        max-width: calc(100% - 32px);
-        padding: 12px 18px;
-        border-radius: 14px;
-        background: #17252a;
-        color: #fff;
-        font-family: Cairo, sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        text-align: center;
-        box-shadow: 0 15px 40px rgba(15,23,42,.18);
-      `;
-
-      document.body.appendChild(message);
-    }
-
-    message.textContent =
-      visitor ? "للوصول إلى أدوات Diet Planner، سجّل الدخول أو أنشئ حسابًا جديدًا." : "هذه الخدمة غير متاحة في اشتراكك الحالي.";
-
-    message.style.display = "block";
-
-    clearTimeout(window.__dpLockedMessageTimer);
-
-    window.__dpLockedMessageTimer =
-      setTimeout(() => {
-        message.style.display = "none";
-      }, 2600);
-  }
-
-  async function renderFeatureCards(userId, isAdmin) {
-    if (isAdmin || !elements.featureCards.length) {
-      return;
-    }
-
-    const access = window.DietPlannerAccess;
-
-    if (!access?.hasFeature) {
-      console.error(
-        "auth-access.js feature API is unavailable."
-      );
-      return;
-    }
-
-    addLockStyles();
-
-    // Check each distinct feature once through the centralized API.
-    const featureCache = new Map();
-
-    const featureResults = await Promise.all(
-      Array.from(elements.featureCards).map(
-        async (card) => {
-          const feature = card.dataset.feature;
-
-          if (!feature) {
-            return { card, allowed: true };
-          }
-
-          if (!featureCache.has(feature)) {
-            featureCache.set(
-              feature,
-              access.hasFeature(userId, feature)
-                .then(value => value === true)
-            );
-          }
-
-          const allowed = await featureCache.get(feature);
-
-          return { card, allowed };
-        }
-      )
-    );
-
-    featureResults.forEach(
-      ({ card, allowed }) => {
-        bindLockedCard(card);
-
-        if (!allowed) {
-          lockCard(card);
-        }
-      }
-    );
   }
 
   // ---------------------------------------------------------
@@ -477,29 +286,6 @@
     }
   }
 
-  // ---------------------------------------------------------
-  // Dashboard services ribbon
-  // ---------------------------------------------------------
-  function bindDashboardServiceRibbon() {
-    const strip = document.getElementById("dashboardServicesStrip");
-    if (!strip || strip.dataset.scrollControlsBound === "true") return;
-    strip.dataset.scrollControlsBound = "true";
-
-    document.querySelectorAll("[data-dashboard-scroll]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const direction = button.dataset.dashboardScroll === "next" ? 1 : -1;
-        const distance = Math.max(220, Math.round(strip.clientWidth * 0.72));
-        strip.scrollBy({ left: direction * distance, behavior: "smooth" });
-      });
-    });
-  }
-
-  function bindDashboardServiceRibbonAndNotifications() {
-    bindDashboardServiceRibbon();
-    renderDashboardNotifications([], "loading");
-  }
-
-
   // Public announcements feed; RLS limits this query to published items.
   const ANNOUNCEMENT_PRESENTATION = {
     update: { label: "تحديث جديد", icon: "fa-wand-magic-sparkles", className: "update" },
@@ -605,20 +391,6 @@
     elements.accountName?.classList.add("hidden");
     if (elements.accountName) elements.accountName.textContent = "";
     document.getElementById("accountInfo")?.classList.add("hidden");
-    addLockStyles();
-    elements.featureCards.forEach(card => {
-      const href = (card.getAttribute("href") || "").split("?")[0];
-      // Public pages should remain accessible to visitors.
-      if (href === "article.html" || href === "about.html" || href === "feedback.html" || href === "quickcalc.html") {
-        card.classList.remove("dp-feature-locked");
-        card.removeAttribute("aria-disabled");
-        card.removeAttribute("title");
-        return;
-      }
-      card.dataset.visitorLocked = "true";
-      bindLockedCard(card);
-      lockCard(card, true);
-    });
   }
 
   async function initializeDashboard() {
@@ -641,7 +413,6 @@
         await access.getAccessStatus();
 
       if (!status.authenticated || !status.user) {
-        renderAdminCard(false);
         renderVisitorDashboard();
         return;
       }
@@ -654,13 +425,6 @@
       }
 
       await renderAccountName(status.user, status.isAdmin === true);
-      renderAdminCard(status.isAdmin);
-
-      await renderFeatureCards(
-        status.user.id,
-        status.isAdmin
-      );
-
       // Load the dashboard notification summary after authentication.
       await loadDashboardNotifications(status.user.id);
     } catch (error) {
@@ -674,7 +438,7 @@
   // Start
   // ---------------------------------------------------------
   function start() {
-    bindDashboardServiceRibbonAndNotifications();
+    renderDashboardNotifications([], "loading");
     initializeDashboard();
   }
 
