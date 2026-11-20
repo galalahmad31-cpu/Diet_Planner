@@ -166,7 +166,7 @@
       salary_min: salaryMin === null ? null : Number(salaryMin),
       salary_max: salaryMax === null ? null : Number(salaryMax),
       salary_currency: $("jobAdminCurrency").value,
-      salary_period: valueOrNull("jobAdminSalaryPeriod"),
+      salary_period: salaryMin !== null || salaryMax !== null ? valueOrNull("jobAdminSalaryPeriod") : null,
       application_url: applicationUrl,
       contact_email: email,
       contact_phone: phone,
