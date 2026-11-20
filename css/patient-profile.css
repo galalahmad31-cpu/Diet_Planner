@@ -802,3 +802,18 @@ body.support-delete-modal-open{overflow:hidden}
  .followup-plan-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .followup-plan-actions .followup-add-button{width:100%;padding-inline:8px;font-size:10px}
 }
+
+/* Exchange plan: one spacious, auto-growing free-text editor. */
+#exchangePlanContent{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important}
+#exchangePlanContent>.exchange-plan-module{padding:0!important}
+#exchangePlanContent .exchange-plan-module>section:first-child{background:var(--dp-surface)!important;border:1px solid var(--dp-border)!important;border-radius:14px!important;box-shadow:none!important;padding:clamp(12px,2vw,20px)!important}
+#exchangePlanContent .exchange-plan-module>section:first-child .exchange-day-summary{margin:0 0 12px!important}
+#exchangePlanContent .exchange-plan-module>section:first-child .exchange-scroll{border-radius:10px!important}
+#exchangePlanContent .exchange-notes-section{margin-top:12px;padding:0;border:0;background:transparent}
+#exchangePlanContent .exchange-notes-label{display:block;margin:0 0 8px;color:var(--dp-text);font-size:13px;font-weight:900}
+#exchangePlanContent .exchange-plan-notes{display:block;width:100%;min-height:300px;resize:vertical;box-sizing:border-box;padding:16px;border:1px solid var(--dp-input-border);border-radius:12px;background:var(--dp-input);color:var(--dp-text);font:500 13px/2 Cairo,sans-serif;white-space:pre-wrap;overflow:hidden}
+#exchangePlanContent .exchange-plan-notes:disabled{opacity:1;cursor:default;background:var(--dp-surface-2)}
+#exchangePlanContent .exchange-plan-notes:focus{outline:2px solid var(--dp-primary);outline-offset:1px}
+#exchangePlanContent .exchange-notes-hint{margin:6px 2px 0;color:var(--dp-muted);font-size:10px}
+@media(max-width:640px){#exchangePlanContent .exchange-plan-notes{min-height:260px;padding:12px;font-size:12px}}
+@media print{#exchangePlanContent .exchange-plan-notes{min-height:0;border:0;padding:0;background:#fff;color:#111}}
