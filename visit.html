@@ -17,7 +17,7 @@
         </script>
 <script src="js/visit.js?v=20261119-auto-open-grams-v2" defer>
         </script>
-        <link rel="stylesheet" href="css/visit.css?v=20261120-centralized-v3">
+        <link rel="stylesheet" href="css/visit.css?v=20261120-visit-redesign-v1">
         <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -57,7 +57,7 @@
     </nav>
   </div>
 </header>
-        <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        <main class="visit-main-shell">
             <section id="loadingState" class="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 text-center text-sm text-slate-400">
                 جاري تحميل الخطة الغذائية...
             </section>
@@ -74,7 +74,7 @@
             </section>
             <div id="visitContent" class="hidden">
                 <!-- PATIENT NUTRITION PLAN HEADER -->
-                <section class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
+                <section class="visit-patient-strip">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div class="min-w-0 flex-1">
                             <h2 id="patientName" class="font-black text-slate-800 text-xl">
@@ -88,7 +88,7 @@
                     </div>
                 </section>
                 <!-- NUTRITION PLAN MODULES -->
-                <section class="mt-6">
+                <section class="visit-module-section">
         <div class="visit-module-grid grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 items-stretch">
                         <button id="dietPlanCard" type="button" data-action="toggleModule" data-module="dietPlan"
            class="module-card diet-module w-full text-right block rounded-2xl p-2.5 sm:p-5 shadow-sm hover:border-emerald-400 hover:shadow-md">
