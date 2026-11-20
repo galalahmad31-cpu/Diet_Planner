@@ -15,7 +15,7 @@
 ## Page/script map
 - Public entry/auth routing: `index.html` → `js/auth-access.js`; authenticated dashboard routing is handled by `js/auth-access.js`.
 - Main dashboard: `app.html` → `js/auth-access.js`, `js/app-dashboard.js`; `index.html` also contains a public-facing dashboard/entry layout and loads the dashboard script. Keep their routing and access behavior distinct unless regression-tested.
-- Admin: `admin.html` → `js/admin.js` (subscription management and inline user-role editing)
+- Admin: `admin.html` → `js/admin.js` (subscription management, user-role editing, announcements, and privacy policy); the separate `js/admin-jobs.js` module owns job-post CRUD and is loaded only on the admin page
 - Patient records and patient-linked plan workspace: `patient.html` → `js/patient.js`; `patient-profile.html` → `js/patient-profile.js`, which loads `js/visit-diet-plan.js` and `js/visit-exchange-plan.js` directly for the selected plan.
 - Legacy visit URL: `visit.html` is a compatibility redirect to `patient-profile.html?id=...` (or `patient.html` when no patient ID is supplied). The former standalone controller `js/visit.js` is removed. Keep `js/visit-diet-plan.js` and `js/visit-exchange-plan.js` as shared plan modules loaded by `patient-profile.js`; keep `css/visit.css` because the patient profile workspace still uses it.
 - Diet/calculation: `diet.html` → `js/diet.js`; `quickcalc.html` → `js/quickcalc.js`
@@ -23,6 +23,7 @@
 - Finance/weight: `finance.html` → `js/finance.js`; the repository's standalone weight page uses the Arabic-named `weightم.html`, `css/weightم.css`, and `js/weightم.js`.
 - Nutrition support: the standalone `nutritionsupport.html` page is retained temporarily but is no longer exposed in shared navigation; patient-linked nutrition support remains in `nutritionsupport-patient.html` → `js/nutritionsupport-patient.js`.
 - Subscriptions: plans and subscription actions are presented inside `profile.html` using `js/profile.js` and `js/subscription-plans.js`.
+- Public healthcare jobs: `jobs.html` → `js/jobs.js` (public listing and filters); `/jobs/:id` is server-rendered by `api/job.js` with `JobPosting` structured data. `job_posts` is a dedicated table, separate from `announcements`; `js/admin-jobs.js` manages it from the admin tab. `api/sitemap.js` includes only published, unexpired job detail URLs.
 - Other modules include profile, articles, feedback, notifications, about, and password recovery/update pages.
 
 ## Subscription/security flow
