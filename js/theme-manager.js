@@ -63,7 +63,11 @@
     // Pages may opt out of the floating switch while still using this
     // centralized theme manager and its cross-page synchronization.
     if (!document.body) return;
-    if (document.body.dataset.dpThemeToggle === "off") {
+    // Embedded modules inherit the host page's theme and must never
+    // create a second floating switch inside the iframe.
+    if (document.body.dataset.dpThemeToggle === "off" ||
+        root.classList.contains("nsp-embedded") ||
+        window.parent !== window) {
       document.getElementById("dp-theme-toggle")?.remove();
       return;
     }
@@ -82,10 +86,10 @@
   // Versioning here prevents stale page-level URLs from retaining an old theme.
   const ensureCentralStylesheets = () => {
     const files = [
-      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v13"],
-      ["light-theme.css", "css/light-theme.css?v=20261120-central-v13"],
-      ["components.css", "css/components.css?v=20261120-central-v13"],
-      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v13"]
+      ["design-tokens.css", "css/design-tokens.css?v=20261120-central-v14"],
+      ["light-theme.css", "css/light-theme.css?v=20261120-central-v14"],
+      ["components.css", "css/components.css?v=20261120-central-v14"],
+      ["dark-theme.css", "css/dark-theme.css?v=20261120-central-v14"]
     ];
     const allLinks = Array.from(document.querySelectorAll('link[rel~="stylesheet"]'));
     files.forEach(([filename, href]) => {
