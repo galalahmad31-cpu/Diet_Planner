@@ -2176,6 +2176,86 @@ html[data-theme="dark"] .embedded-diet-plan .bg-amber-50{
 html[data-theme="dark"] .embedded-diet-plan .text-amber-600,
 html[data-theme="dark"] .embedded-diet-plan .text-amber-800{color:#E0A43B!important}
 
+/* Canonical embedded-plan controls and labels.
+   These selectors intentionally outrank legacy visit.css colors without changing layout. */
+html[data-theme="dark"] #visitContent .visit-module-grid .module-card,
+html[data-theme="dark"] #visitContent #dietPlanCard,
+html[data-theme="dark"] #visitContent #exchangePlanCard{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #visitContent .visit-module-grid .module-card :is(h1,h2,h3,h4,strong){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #visitContent .visit-module-grid .module-card :is(p,small,span){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #visitContent #daysContainer :is(
+  .day-card-header,.meal-card-header,.meal-items-table th,
+  .day-macros-grid>div>div:last-child
+){
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #visitContent #daysContainer :is(
+  .day-card-actions button:not(.day-save-btn):not(.day-fixed-meal-btn),
+  .meal-card-actions button:not(.meal-add-food-btn)
+){
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] #visitContent #daysContainer :is(
+  .day-title-input,.day-note-input,.meal-title-input,
+  .meal-items-table input:not([type=checkbox])
+){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] #visitContent #daysContainer :is(
+  .day-summary-heading strong,.day-macros-grid>div span,
+  .day-macros-grid>div>div:nth-child(2) span:first-child,
+  .meal-food-name,.meal-title-input,.day-card-title
+){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #visitContent #daysContainer :is(
+  .day-card-meta,.day-summary-heading span,.day-micros-row,
+  .day-micros-row span,.day-micros-row small,.day-notes-wrap>span,
+  .meal-items-table td,.meal-items-count,.meal-quantity span,
+  .meal-empty-state,.day-empty-state
+){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #visitContent #daysContainer :is(
+  .day-card,.day-card-body,.day-summary,.day-macros-grid>div,
+  .day-meals-list,.meal-card,.meal-card-header,.meal-table-wrap,
+  .meal-items-table,.meal-items-table td
+){
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #visitContent #exchangePlanContent,
+html[data-theme="dark"] #visitContent .exchange-plan-module,
+html[data-theme="dark"] #visitContent .exchange-plan-module>section{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #visitContent .exchange-plan-module :is(h1,h2,h3,h4,strong,label,th){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #visitContent .exchange-plan-module :is(p,small,span,td){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #visitContent .exchange-plan-module :is(input,select,textarea){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+}
+
 /* The embedded page is a same-origin document: it reads the shared theme key. */
 html[data-theme="dark"].visit-embedded,
 html[data-theme="dark"].visit-embedded body,
