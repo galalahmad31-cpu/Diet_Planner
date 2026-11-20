@@ -54,28 +54,28 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #editButton.hidden{display:none!important}
 
 /* Subscription and follow-up section inside the patient data card */
-.patient-finance-details{margin-top:14px;border-top:1px solid #e7eef1}
+.patient-finance-details{margin-top:14px;border-top:1px solid var(--dp-border)}
 .patient-finance-summary{display:flex;align-items:center;gap:10px;min-height:62px;padding:10px 2px;cursor:pointer;list-style:none}
 .patient-finance-summary::-webkit-details-marker{display:none}
 .patient-finance-heading{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}
-.patient-finance-heading strong{color:#163541;font-size:12px;font-weight:900}
-.patient-finance-heading small{color:#82919a;font-size:9px;font-weight:600}
-.patient-finance-chevron{flex:0 0 auto;color:#94a3b8;font-size:10px;transition:transform .2s}
-.patient-finance-details[open] .patient-finance-chevron{transform:rotate(180deg);color:#7654bd}
-.patient-finance-details[open]>.patient-finance-summary{background:#faf9ff}
-.patient-finance-content{padding:14px 2px 4px;border-top:1px solid #edf1f4}
+.patient-finance-heading strong{color:var(--dp-text);font-size:12px;font-weight:900}
+.patient-finance-heading small{color:var(--dp-text-2);font-size:9px;font-weight:600}
+.patient-finance-chevron{flex:0 0 auto;color:var(--dp-muted);font-size:10px;transition:transform .2s}
+.patient-finance-details[open] .patient-finance-chevron{transform:rotate(180deg);color:var(--dp-accent)}
+.patient-finance-details[open]>.patient-finance-summary{background:var(--dp-surface-2)}
+.patient-finance-content{padding:14px 2px 4px;border-top:1px solid var(--dp-border);color:var(--dp-text)}
 .patient-finance-fields{display:flex;flex-direction:column;gap:12px}
 .patient-finance-fields[hidden]{display:none!important}
 .patient-finance-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .patient-finance-row>div{min-width:0}
 .patient-finance-fields input,.patient-finance-fields select{box-sizing:border-box;width:100%;min-width:0}
-.patient-finance-fields input:disabled,.patient-finance-fields select:disabled{background:#f4f7f8;color:#52636e;opacity:1}
-.patient-finance-discounted output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid #d7ebe4;border-radius:8px;background:#eff8f4;color:#176b63;font-size:12px;font-weight:900}
-.patient-finance-readonly output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid #e2e8ee;border-radius:8px;background:#f4f7f8;color:#52636e;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
-.patient-finance-empty{margin-bottom:12px;padding:10px 12px;border:1px dashed #d9e5e9;border-radius:9px;color:#718096;background:#fafcfd;font-size:10px;font-weight:700}
-.patient-finance-error{margin-top:12px;padding:9px 11px;border-radius:9px;background:#fff1f0;color:#b42318;font-size:11px;font-weight:700}
- .patient-finance-access-note{display:block;margin-top:10px;color:#82919a;font-size:9px;font-weight:700}
-.finance-state{padding:14px 8px;text-align:center;color:#718096;font-size:11px;font-weight:700}
+.patient-finance-fields input:disabled,.patient-finance-fields select:disabled{background:var(--dp-surface-2);color:var(--dp-text-2);border-color:var(--dp-border);opacity:1}
+.patient-finance-discounted output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface-2);color:var(--dp-primary);font-size:12px;font-weight:900}
+.patient-finance-readonly output{display:flex;align-items:center;min-height:35px;padding:8px 10px;border:1px solid var(--dp-border);border-radius:8px;background:var(--dp-surface-2);color:var(--dp-text-2);font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
+.patient-finance-empty{margin-bottom:12px;padding:10px 12px;border:1px dashed var(--dp-border);border-radius:9px;color:var(--dp-text-2);background:var(--dp-surface-2);font-size:10px;font-weight:700}
+.patient-finance-error{margin-top:12px;padding:9px 11px;border:1px solid color-mix(in srgb,var(--dp-danger) 28%,var(--dp-border));border-radius:9px;background:color-mix(in srgb,var(--dp-danger) 10%,var(--dp-surface));color:var(--dp-danger);font-size:11px;font-weight:700}
+ .patient-finance-access-note{display:block;margin-top:10px;color:var(--dp-text-2);font-size:9px;font-weight:700}
+.finance-state{padding:14px 8px;text-align:center;color:var(--dp-text-2);font-size:11px;font-weight:700}
 .patient-finance-success-toast{
   position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;
   transform:translate(-50%,-12px);opacity:0;pointer-events:none;
@@ -113,16 +113,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 }
 
 
-/* Brief, non-blocking confirmation after saving patient finances */
-.patient-finance-success-toast{
-  position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;
-  transform:translate(-50%,-12px);opacity:0;pointer-events:none;
-  width:max-content;max-width:calc(100vw - 32px);padding:11px 18px;
-  border:1px solid #cce9df;border-radius:12px;background:#eaf7f1;color:#176b57;
-  box-shadow:0 8px 28px rgba(16,42,53,.16);font:800 12px Cairo,sans-serif;
-  text-align:center;transition:opacity .2s ease,transform .2s ease;
-}
-.patient-finance-success-toast.is-visible{opacity:1;transform:translate(-50%,0)}
 
 
 /* Patient profile visibility: Tailwind utility must win over the dashboard grid rule. */
