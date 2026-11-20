@@ -683,7 +683,6 @@ function renderDays(){
   const targetCarb=num(patientInfo.targetCarb);
   const targetFat=num(patientInfo.targetFat);
   const meals=d.meals||[];
-  const itemCount=meals.reduce((sum,meal)=>sum+(meal.items||[]).length,0);
 
   return `<section class="day-card" data-day-id="${escapeHtml(d.id)}">
    <header class="day-card-header">
@@ -693,7 +692,6 @@ function renderDays(){
      </button>
      <div class="day-title-group">
       <input value="${escapeHtml(d.title||`اليوم ${di+1}`)}" onchange="window.dietPlan.updateDayTitle('${escapeHtml(d.id)}',this.value)" aria-label="اسم اليوم" class="day-title-input">
-      <span class="day-card-meta">${itemCount} أصناف</span>
      </div>
     </div>
     <div class="day-card-actions no-print">
@@ -708,7 +706,6 @@ function renderDays(){
     <section class="day-summary" aria-label="ملخص القيمة الغذائية لليوم">
      <div class="day-summary-heading">
       <div><strong>ملخص اليوم</strong><span>متابعة الإنجاز مقارنة بالهدف الغذائي</span></div>
-      <small>${itemCount} أصناف مضافة</small>
      </div>
      <div class="day-summary-layout">
       <div class="day-rings-grid" aria-label="تحقيق الأهداف الغذائية">
@@ -738,7 +735,7 @@ function renderDays(){
       const foods=(m.items||[]).map(it=>({item:it,food:foodDatabase.find(x=>String(x.id)===String(it.foodId))})).filter(x=>x.food);
       return `<article class="meal-card">
        <header class="meal-card-header">
-        <div class="meal-title-wrap"><span class="meal-order">${String(mi+1).padStart(2,'0')}</span><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" aria-label="اسم الوجبة" class="meal-title-input"><span class="meal-items-count">${foods.length} أصناف</span></div>
+        <div class="meal-title-wrap"><span class="meal-order">${String(mi+1).padStart(2,'0')}</span><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" aria-label="اسم الوجبة" class="meal-title-input"></div>
         <div class="meal-card-actions no-print">
          <button type="button" onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',-1)" ${mi===0?'disabled':''} class="meal-order-btn" title="تحريك لأعلى" aria-label="تحريك لأعلى"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
          <button type="button" onclick="window.dietPlan.moveMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}',1)" ${mi===meals.length-1?'disabled':''} class="meal-order-btn" title="تحريك لأسفل" aria-label="تحريك لأسفل"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
@@ -748,15 +745,16 @@ function renderDays(){
        </header>
        <div class="meal-table-wrap">
         <table class="meal-items-table">
-         <thead><tr><th>الصنف</th><th>الكمية</th><th>المقياس المنزلي</th><th>التكرار</th><th>ملاحظة</th><th class="no-print">حساب</th></tr></thead>
-         <tbody>${foods.length?foods.map(({item:it,food:f})=>`<tr>
+         <thead><tr><th>الصنف</th><th>الكمية</th><th>المقياس المنزلي</th><th>التكرار</th><th>ملاحظة</th><th class="no-print">حساب</th><th class="no-print">إجراء</th></tr></thead>
+         <tbody>${foods.map(({item:it,food:f})=>`<tr>
           <td class="meal-food-name">${escapeHtml(f.name)}</td>
           <td class="meal-quantity"><input type="number" min="0" step="1" value="${num(it.grams)}" onchange="window.dietPlan.updateMealItemGrams('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" aria-label="الكمية بالجرام"><span>جم</span></td>
           <td class="meal-household">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td>
           <td><input type="text" value="${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="7/7" aria-label="التكرار" class="meal-repeat-input"></td>
           <td><input type="text" value="${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="ملاحظة" aria-label="ملاحظة الصنف" class="meal-item-note"></td>
-          <td class="meal-calc-cell no-print"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)" aria-label="إدراج الصنف في الحساب"><button type="button" onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" class="meal-item-delete" title="حذف الصنف" aria-label="حذف الصنف"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
-         </tr>`).join(''):'<tr><td colspan="6" class="meal-empty-state">لا توجد أصناف في هذه الوجبة. استخدم «إضافة صنف» للبدء.</td></tr>'}</tbody>
+          <td class="meal-calc-cell no-print"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)" aria-label="إدراج الصنف في الحساب"></td>
+          <td class="meal-action-cell no-print"><button type="button" onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" class="meal-item-delete" title="حذف الصنف" aria-label="حذف الصنف"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
+         </tr>`).join('')}</tbody>
         </table>
        </div>
       </article>`;
