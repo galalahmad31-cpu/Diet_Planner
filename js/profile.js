@@ -269,6 +269,10 @@
   async function continueToSubscription() {
     const selectedPlan = state.selectedPlan;
     if (!selectedPlan) return;
+    if (!state.user) {
+      showToast('سجّل الدخول أولًا حتى تتمكن من الاشتراك في هذه الخطة.');
+      return;
+    }
 
     const isPending = Boolean(pendingSubscriptionForPlan(selectedPlan.id));
     const button = $('planDetailsSubscribe');
