@@ -302,17 +302,28 @@
   }
 
   function openProfileEditor() {
-    $('editDoctorName').value = state.profile.full_name;
-    $('editDoctorSpecialty').value = state.profile.profession;
-    $('editDoctorPhone').value = state.profile.phone;
+    const readView = $('profileReadView');
+    const editForm = $('profileEditForm');
+    if (!readView || !editForm) return;
+
+    $('editDoctorName').value = state.profile.full_name || '';
+    $('editDoctorSpecialty').value = state.profile.profession || '';
+    $('editDoctorPhone').value = state.profile.phone || '';
     $('editDoctorEmail').textContent = state.user?.email || '—';
-    $('editProfileModal').classList.remove('hidden');
-    $('editProfileModal').classList.add('flex');
+
+    readView.hidden = true;
+    editForm.hidden = false;
+    $('editDoctorName').focus();
   }
 
   function closeProfileEditor() {
-    $('editProfileModal').classList.add('hidden');
-    $('editProfileModal').classList.remove('flex');
+    const readView = $('profileReadView');
+    const editForm = $('profileEditForm');
+    if (!readView || !editForm) return;
+
+    editForm.reset();
+    editForm.hidden = true;
+    readView.hidden = false;
   }
 
   async function canWriteProfile() {
@@ -403,11 +414,11 @@
     });
     $('editProfileBtn')?.addEventListener('click', openProfileEditor);
     $('cancelProfileBtn')?.addEventListener('click', closeProfileEditor);
-    $('saveProfileBtn')?.addEventListener('click', saveProfile);
-    $('logoutBtn')?.addEventListener('click', logout);
-    $('editProfileModal')?.addEventListener('click', (event) => {
-      if (event.target === event.currentTarget) closeProfileEditor();
+    $('profileEditForm')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveProfile();
     });
+    $('logoutBtn')?.addEventListener('click', logout);
   }
 
   async function init() {
