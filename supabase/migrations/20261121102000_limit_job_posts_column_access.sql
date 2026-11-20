@@ -1,0 +1,5 @@
+revoke select on table public.job_posts from anon, authenticated;
+grant select (id, title, specialty, organization_name, location_city, country_code, employment_type, workplace_type, description, requirements, salary_min, salary_max, salary_currency, salary_period, application_url, contact_email, contact_phone, status, published_at, expires_at, created_at, updated_at) on table public.job_posts to anon, authenticated;
+revoke update on table public.job_posts from authenticated;
+grant update (title, specialty, organization_name, location_city, country_code, employment_type, workplace_type, description, requirements, salary_min, salary_max, salary_currency, salary_period, application_url, contact_email, contact_phone, status, published_at, expires_at, updated_at)
+on table public.job_posts to authenticated;
