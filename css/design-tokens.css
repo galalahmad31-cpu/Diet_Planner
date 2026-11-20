@@ -2,6 +2,7 @@
    One token set, switched by the active theme. */
 :root{
   --dp-primary:#087F6B;
+  --dp-accent:#20A88A;
   --dp-primary-hover:#066B5B;
   --dp-primary-dark:#174D43;
   --dp-success:#16845B;
@@ -23,12 +24,21 @@
   --dp-input:#FFFFFF;
   --dp-input-border:#CBD9D5;
   --dp-shadow:rgba(23,77,67,.08);
+  --page-bg:var(--dp-bg);
+  --surface-bg:var(--dp-surface);
+  --surface-elevated:var(--dp-surface-3);
+  --primary-text:var(--dp-text);
+  --secondary-text:var(--dp-text-2);
+  --border-color:var(--dp-border);
+  --primary-color:var(--dp-primary);
+  --accent-color:var(--dp-accent);
 }
 
 html[data-theme="dark"]{
   color-scheme:dark;
-  --dp-primary:#20A88A;
-  --dp-primary-hover:#55C5A4;
+  --dp-primary:#087F6B;
+  --dp-accent:#20A88A;
+  --dp-primary-hover:#20A88A;
   --dp-primary-dark:#174D43;
   --dp-success:#27AE78;
   --dp-warning:#E0A43B;
@@ -45,5 +55,13 @@ html[data-theme="dark"]{
   --dp-input:#172622;
   --dp-input-border:#40574E;
   --dp-shadow:rgba(0,0,0,.28);
+  --page-bg:var(--dp-bg);
+  --surface-bg:var(--dp-surface);
+  --surface-elevated:var(--dp-surface-3);
+  --primary-text:var(--dp-text);
+  --secondary-text:var(--dp-text-2);
+  --border-color:var(--dp-border);
+  --primary-color:var(--dp-primary);
+  --accent-color:var(--dp-accent);
 }
 
