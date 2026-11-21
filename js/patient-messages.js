@@ -361,7 +361,12 @@
       }
     });
 
-    refreshButton.addEventListener("click", () => void loadMessages());
+    refreshButton.addEventListener("click", () => {
+      void loadRequestState().then(loadMessages).catch(error => {
+        console.error("Patient conversation refresh failed:", error);
+        setStatus(root, "تعذر تحديث المحادثة. حاول مرة أخرى.", "error");
+      });
+    });
     await loadRequestState();
     await loadMessages();
   }
