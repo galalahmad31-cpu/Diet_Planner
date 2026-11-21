@@ -88,7 +88,8 @@
     if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
       alert("يرجى اختيار صورة JPG أو PNG أو WEBP لا يتجاوز حجمها 5 ميجابايت."); return;
     }
-    const originalText = button.textContent;\n    button.disabled = true; button.textContent = "جاري إرسال الطلب...";
+    const originalText = button.textContent;
+    button.disabled = true; button.textContent = "جاري إرسال الطلب...";
     const extension = ({ "image/jpeg":"jpg","image/png":"png","image/webp":"webp" })[file.type];
     const path = state.user.id + "/" + crypto.randomUUID() + "." + extension;
     try {
