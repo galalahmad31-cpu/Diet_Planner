@@ -144,6 +144,10 @@
             retry.id = "portalMeasurementsRetry";
             retry.className = "portal-primary-button";
             retry.textContent = "إعادة تحميل القياسات";
+            retry.addEventListener("click", () => {
+              state.loadedPanels.delete("portalMeasurementsPanel");
+              void ensureHealthPanelLoaded("portalMeasurementsPanel");
+            });
             target.append(" ", retry);
           }
         }
@@ -641,10 +645,6 @@
       $("portalWeight")?.focus({ preventScroll: true });
     });
     $("portalCancelMeasurementEdit")?.addEventListener("click", resetMeasurementForm);
-    $("portalMeasurementsRetry")?.addEventListener("click", () => {
-      state.loadedPanels.delete("portalMeasurementsPanel");
-      void ensureHealthPanelLoaded("portalMeasurementsPanel");
-    });
     $("portalMeasurementsTable")?.addEventListener("click", event => {
       const edit = event.target.closest("[data-edit-measurement]");
       const remove = event.target.closest("[data-delete-measurement]");
