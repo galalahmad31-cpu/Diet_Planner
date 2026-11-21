@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
-
 :root{
   --app-bg:#f5f8f8;
   --surface:#ffffff;
@@ -49,7 +47,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 .detail-patient-area{padding:7px 18px 0}
 .detail-top{display:flex;justify-content:flex-start;align-items:center;gap:10px;margin:5px 10px 9px;direction:rtl}
 .detail-top h2{margin:0;color:var(--ink);font-size:clamp(19px,2.1vw,24px);font-weight:900;line-height:1.4}
-.selected-actions:empty{display:none}
 /* Support days */
 .support-days{margin:7px 18px 0;padding:10px 12px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 12px rgba(15,71,67,.035)}
 .days-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
@@ -131,11 +128,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 
 
 /* Common clinical callouts */
-.bg-low-risk{background:#ecfdf5;border-left:4px solid #10b981;direction:ltr;text-align:left}
-.bg-mod-risk{background:#fffbeb;border-left:4px solid #f59e0b;direction:ltr;text-align:left}
-.bg-high-risk{background:#fef2f2;border-left:4px solid #ef4444;direction:ltr;text-align:left}
-.infograph-step{position:relative;padding-left:20px;margin-bottom:15px;border-left:2px dashed #cbd5e0;direction:ltr;text-align:left}
-.infograph-step::before{content:'';position:absolute;left:-7px;top:0;width:12px;height:12px;background:var(--en);border-radius:50%}
 .highlight-box{background:var(--en-soft);border:1px solid var(--en-line);border-radius:10px;padding:15px;position:relative}
 .monitoring-section{margin-top:2rem;padding:1.5rem;background:#f3f8f5;border:1px solid #dbece4;border-radius:.75rem}
 .component-select{background:#f1f5f9;font-weight:700;font-size:.8rem;border:0;cursor:pointer}
@@ -358,102 +350,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
  #en-calories-content .cb-formula-grid input,
  #en-calories-content .cb-feeding-rate-grid input{font-size:.72rem!important;padding-inline:3px!important}
 }
-
-/* Nutrition Support Patient: green brand card and swipe navigation */
-.nsp-page-header{
-  position:relative;isolation:isolate;z-index:20;display:block;width:100%;max-width:none;
-  margin:0 0 20px!important;padding:0!important;overflow:hidden;
-  border:0!important;border-radius:24px!important;color:#fff!important;
-  background:linear-gradient(120deg,#123d46 0%,#176c68 58%,#1e9384 100%)!important;
-  box-shadow:0 14px 32px rgba(15,90,85,.16);
-}
-.nsp-page-header:after{
-  content:"";position:absolute;z-index:-1;width:230px;height:230px;left:-65px;top:-125px;
-  border:35px solid rgba(255,255,255,.07);border-radius:50%;pointer-events:none;
-}
-.nsp-header-inner{position:relative;z-index:1;width:100%;margin:0 auto;padding:12px 16px 10px;box-sizing:border-box}
-.nsp-brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
-.nsp-brand{display:flex;align-items:center;gap:13px;min-width:0}
-.nsp-brand-logo{
-  display:grid;place-items:center;width:52px;height:52px;flex:0 0 52px;border-radius:15px;
-  color:#fff;background:rgba(255,255,255,.16);box-shadow:0 8px 22px rgba(0,0,0,.12);font-size:22px;
-}
-.nsp-brand-copy h1{margin:0!important;color:#fff!important;font-size:20px!important;font-weight:900;line-height:1.3}
-.nsp-brand-copy p{margin:3px 0 0!important;color:#bcebe0!important;font-size:11px;font-weight:800}
-.nsp-page-label{
-  flex:0 0 auto;padding:6px 11px;border:1px solid rgba(255,255,255,.2);
-  border-radius:999px;background:rgba(255,255,255,.11);color:#e7fff8;font-size:10px;font-weight:800;white-space:nowrap;
-}
-.nsp-access-nav{
-  display:block!important;position:relative;z-index:2;width:100%;max-width:none;
-  margin:8px 0 0;padding:8px 0 3px!important;background:transparent!important;
-  border:0;border-top:1px solid rgba(255,255,255,.16);overflow:hidden;box-sizing:border-box;
-}
-.nsp-access-track{
-  display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;
-  gap:8px!important;width:100%;overflow-x:auto!important;overflow-y:hidden!important;
-  padding:2px 1px 5px!important;direction:rtl;white-space:nowrap;scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
-}
-.nsp-access-track::-webkit-scrollbar{display:none!important}
-.nsp-access-card{
-  display:inline-flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;
-  justify-content:center!important;gap:7px!important;min-width:max-content!important;min-height:36px!important;
-  padding:6px 12px!important;margin:0!important;border:1px solid rgba(255,255,255,.18)!important;
-  border-radius:11px!important;background:rgba(255,255,255,.10)!important;color:#e9fffa!important;
-  box-shadow:none!important;font-family:'Cairo',sans-serif!important;font-size:10px!important;font-weight:800!important;
-  line-height:1.3!important;text-decoration:none!important;white-space:nowrap!important;scroll-snap-align:start;
-  transition:background .16s ease,border-color .16s ease;
-}
-.nsp-access-card i{display:inline-block!important;flex:0 0 auto!important;font-size:12px!important;line-height:1!important;color:#a9e7d9!important}
-.nsp-access-card span{display:inline-block!important;font-size:inherit!important;line-height:inherit!important;white-space:nowrap!important}
-.nsp-access-card:hover{background:rgba(255,255,255,.19)!important;border-color:rgba(255,255,255,.34)!important;color:#fff!important}
-.nsp-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
-@media(max-width:700px){
-  .nsp-page-header{border-radius:22px!important;margin-bottom:16px!important}
-  .nsp-header-inner{padding:9px 10px 7px}
-  .nsp-brand-row{min-height:48px}
-  .nsp-brand{gap:10px}
-  .nsp-brand-logo{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:18px}
-  .nsp-brand-copy h1{font-size:18px!important}
-  .nsp-brand-copy p{font-size:10px}
-  .nsp-page-label{font-size:9px;padding:4px 8px}
-  .nsp-access-nav{margin-top:7px;padding:7px 0 2px!important}
-  .nsp-access-track{gap:7px!important}
-  .nsp-access-card{min-height:33px!important;padding:5px 9px!important;border-radius:9px!important;font-size:9px!important;gap:5px!important}
-  .nsp-access-card i{font-size:11px!important}
-}
-@media print{.nsp-page-header{display:none!important}}
-
-
-/* Single header alignment rule: brand right, page label left */
-.nsp-page-header .nsp-header-inner > .nsp-brand-row{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) auto!important;
-  grid-template-areas:"page-label brand"!important;
-  direction:ltr!important;
-  align-items:center!important;
-  width:100%!important;
-  min-width:0!important;
-  column-gap:12px!important;
-}
-.nsp-page-header .nsp-brand-row > .nsp-page-label{
-  grid-area:page-label!important;
-  justify-self:start!important;
-  align-self:center!important;
-  margin:0!important;
-  text-align:center!important;
-}
-.nsp-page-header .nsp-brand-row > .nsp-brand{
-  grid-area:brand!important;
-  justify-self:end!important;
-  align-self:center!important;
-  direction:rtl!important;
-  text-align:right!important;
-  margin:0!important;
-  min-width:0!important;
-}
-.nsp-page-header .nsp-brand-copy{direction:rtl!important;text-align:right!important}
 
 /* Embedded mode: compact document flow; host iframe height follows the rendered root. */
 html.nsp-embedded{display:flow-root;width:100%;max-width:100%;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#f5f8f8!important}
