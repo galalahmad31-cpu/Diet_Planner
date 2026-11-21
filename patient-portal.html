@@ -15,8 +15,10 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261121-v1">
+  <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
+  <script src="js/patient-messages.js?v=20261121-v1" defer></script>
   <script src="js/patient-portal.js?v=20261121-v1" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
@@ -89,6 +91,14 @@
         <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
         <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
         <div id="portalPlansList" class="portal-plans-list"></div>
+      </section>
+
+      <section class="portal-section" aria-labelledby="portalMessagesTitle">
+        <div class="portal-section-heading">
+          <div><span class="portal-section-kicker">SECURE MESSAGING</span><h2 id="portalMessagesTitle">التواصل مع المختص</h2><p>راسل المختص المرتبط بملفك لمتابعة التغذية العلاجية.</p></div>
+          <span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span>
+        </div>
+        <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
       </section>
 
       <section class="portal-section" aria-labelledby="portalMeasurementsTitle">
