@@ -109,3 +109,32 @@
 .portal-food-household{color:var(--dp-muted)}
 .portal-plan-empty-meal{margin:0;padding:8px 2px;color:var(--dp-muted);font-size:10px}
 @media(max-width:520px){.portal-plan-summary{padding:11px 10px}.portal-plan-summary-copy strong{font-size:12px}.portal-plan-summary-meta{gap:6px}.portal-plan-content{padding-inline:9px}.portal-food-row{grid-template-columns:minmax(0,1.3fr) minmax(55px,.65fr) minmax(72px,1fr);gap:5px;padding:8px 7px;font-size:9px}.portal-food-row-head{font-size:8px}}
+
+/* Shared patient measurement table: same presentation in doctor and patient workspaces. */
+.measurements-table-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
+.measurements-table-heading h3{margin:0;color:var(--portal-ink);font-size:13px;font-weight:900}
+.measurements-table-heading p{margin:3px 0 0;color:var(--portal-muted);font-size:9px;font-weight:600}
+.measurements-table-unit{padding:5px 9px;border-radius:7px;background:var(--portal-soft);color:var(--portal-accent-dark);font-size:9px;font-weight:800;white-space:nowrap}
+.measurements-table-wrap{width:100%;max-width:100%;overflow-x:auto;border:1px solid var(--portal-line);border-radius:11px;background:var(--portal-card);overscroll-behavior-inline:contain}
+.measurements-table-wrap:focus-visible{outline:3px solid var(--portal-accent);outline-offset:2px}
+.measurements-table{width:100%;min-width:1200px;border-collapse:separate;border-spacing:0;table-layout:fixed;text-align:center;font-family:"Cairo",sans-serif}
+.measurements-table-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.measurements-table th{padding:11px 8px;background:var(--portal-bg);color:var(--portal-muted);font-size:10px;font-weight:900;white-space:nowrap;border-bottom:1px solid var(--portal-line)}
+.measurements-table th:first-child{width:9%}.measurements-table th:nth-child(2){width:9%}
+.measurements-table th:nth-child(3),.measurements-table th:nth-child(4),.measurements-table th:nth-child(5){width:9%}
+.measurements-table th:nth-child(6),.measurements-table th:nth-child(7){width:10%}
+.measurements-table th:nth-child(8){width:10%}.measurements-table th:nth-child(9){width:18%;white-space:normal}.measurements-table th:last-child{width:12%}
+.measurements-table th span{color:var(--portal-muted);font-size:9px;font-weight:700}
+.measurements-table td{padding:10px 8px;border-bottom:1px solid var(--portal-line);color:var(--portal-ink);font-size:10px;font-weight:700;line-height:1.6;vertical-align:middle}
+.measurements-table tbody tr:last-child td{border-bottom:0}.measurements-table tbody tr:nth-child(even){background:var(--portal-bg)}
+.measurements-table tbody tr:hover{background:var(--portal-soft)}
+.measurements-table .measurement-weight{color:var(--portal-accent-dark);font-weight:900;font-size:11px;font-variant-numeric:tabular-nums}
+.measurements-table td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+.measurements-table .measurement-notes-cell{min-width:160px;white-space:pre-wrap;overflow-wrap:anywhere;text-align:right}
+.measurements-state{padding:18px 12px!important;text-align:center;color:var(--portal-muted)!important;font-size:11px!important;font-weight:700!important}
+.measurement-row-actions{white-space:nowrap;min-width:118px}
+.measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
+.measurement-edit-button{border:1px solid var(--portal-line);background:var(--portal-soft);color:var(--portal-accent-dark)}
+.measurement-delete-button{border:1px solid #fee2e2;background:#fff7f7;color:#e11d48}
+.portal-measurement-readonly{font-size:10px;color:var(--portal-muted)}
+@media(max-width:600px){.measurements-table-heading{align-items:flex-start}.measurements-table{min-width:1200px}}
