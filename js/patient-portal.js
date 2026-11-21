@@ -616,10 +616,21 @@
       $("patientPortalMessages")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
-    loadSelfProfile().catch(error => {
-      console.error("Patient profile load failed:", error);
-      setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
-    });
+    const initialSection = window.location.hash.slice(1);
+    const patientSections = new Set([
+      "portalHome",
+      "portalContent",
+      "portalDietBuilder",
+      "portalEducation",
+      "portalTools",
+      "portalProfileArea"
+    ]);
+    if (initialSection !== "portalProfileArea") {
+      loadSelfProfile().catch(error => {
+        console.error("Patient profile load failed:", error);
+        setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
+      });
+    }
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
     $("portalCancelMeasurementEdit")?.addEventListener("click", resetMeasurementForm);
     $("portalMeasurementsRows")?.addEventListener("click", event => {
@@ -633,7 +644,11 @@
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
     $("portalHome")?.querySelector("[data-portal-open-health]")?.addEventListener("click", openHealthArea);
-    if (new URLSearchParams(window.location.search).has("invite")) openHealthArea();
+    if (new URLSearchParams(window.location.search).has("invite")) {
+      openHealthArea();
+    } else if (patientSections.has(initialSection)) {
+      await window.DietPlannerPatientPortal.navigateToSection(initialSection);
+    }
   }
 
   window.DietPlannerPatientPortal = Object.freeze({
