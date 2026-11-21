@@ -70,9 +70,21 @@
             <div><span>معامل الوجبة ICR</span><strong id="portalInsulinIcrResult">—</strong></div>
             <div><span>معامل التصحيح ISF</span><strong id="portalInsulinIsfResult">—</strong></div>
           </div>
+          <div class="portal-insulin-correction">
+            <div class="portal-insulin-correction-heading"><strong>مساعد فهم تصحيح سكر الدم</strong><span>أداة تعليمية فقط</span></div>
+            <div class="portal-insulin-fields portal-insulin-glucose-fields">
+              <div><label for="portalCurrentGlucose">قياس السكر الحالي (mg/dL)</label><input id="portalCurrentGlucose" type="number" min="20" max="600" step="1" inputmode="numeric" placeholder="مثال: 250"></div>
+              <div><label for="portalTargetGlucose">السكر المستهدف (mg/dL)</label><input id="portalTargetGlucose" type="number" min="70" max="250" step="1" inputmode="numeric" placeholder="يحدده الطبيب"></div>
+            </div>
+            <div class="portal-insulin-correction-results" aria-live="polite">
+              <div><span>الفرق عن الهدف</span><strong id="portalGlucoseDifference">—</strong></div>
+              <div><span>الناتج الحسابي النظري</span><strong id="portalCorrectionEstimate">—</strong></div>
+            </div>
+            <p id="portalCorrectionMessage" class="portal-insulin-message" role="status">أدخل قياس السكر الحالي والهدف، مع إدخال TDD صالح لعرض المثال الحسابي.</p>
+          </div>
           <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل إجمالي الإنسولين اليومي واختر نظام العلاج لعرض التقدير.</p>
-          <div class="portal-insulin-explainer"><strong>ما المقصود بالإنسولين النشط (IOB)؟</strong><p>هو جزء من جرعة إنسولين سابقة ما زال تأثيره قائمًا في الجسم. يجب أخذه في الاعتبار عند حساب جرعات التصحيح لتجنب تكرار الجرعات وهبوط السكر. هذه النسخة لا تحسب IOB ولا تخصمه آليًا.</p></div>
-          <p class="portal-tool-footnote">تنبيه: ICR وISF هنا تقديرات تعليمية أولية باستخدام قواعد 500 و1800/1500، وليست معاملات علاجية معتمدة للمريض. لا تُستخدم لتحديد أو تعديل جرعة الإنسولين. يلزم اعتماد الطبيب/فريق السكري، وقد تختلف النسب بين الوجبات. في النظام القاعدي فقط أو الإنسولين المخلوط لا تُطبّق هذه المعاملات تلقائيًا.</p>
+          <div class="portal-insulin-explainer"><strong>ما المقصود بالإنسولين النشط (IOB)؟</strong><p>هو جزء من جرعة إنسولين سابقة ما زال تأثيره قائمًا. قد يؤثر في التصحيح ويزيد خطر هبوط السكر عند تكرار الجرعات. هذه النسخة لا تتصل بسجل الجرعات، ولا تحسب IOB أو تخصمه؛ لذلك لا يمكن اعتبار الناتج جرعة مقترحة.</p></div>
+          <p class="portal-tool-footnote">تنبيه مهم: الناتج الحسابي النظري للتصحيح ليس جرعة للحقن ولا توصية علاجية. يعتمد على ISF تقديري من قاعدة 1800/1500، ولا يراعي الإنسولين النشط (IOB) أو اختلاف الحساسية خلال اليوم أو عوامل المرض والنشاط. لا تستخدمه لاتخاذ قرار جرعة أو تعديلها؛ اتبع خطة التصحيح المكتوبة من الطبيب. عند انخفاض السكر أو وجود أعراض هبوط، لا تستخدم هذه الحاسبة للتصحيح.</p>
         </section>
       </section>
 
