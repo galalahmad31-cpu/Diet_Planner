@@ -76,7 +76,7 @@
           <button class="btn btn-outline" type="button" data-job-edit="${esc(job.id)}"><i class="fa-solid fa-pen"></i> تعديل</button>
           <button class="btn btn-outline" type="button" data-job-toggle="${esc(job.id)}">${job.status === "published" ? "تحويل لمسودة" : "نشر الوظيفة"}</button>
           <button class="btn btn-danger" type="button" data-job-delete="${esc(job.id)}"><i class="fa-solid fa-trash"></i> حذف</button>
-          ${job.status === "published" ? '<a class="btn btn-outline" target="_blank" rel="noopener" href="job.html?id=' + encodeURIComponent(job.id) + '">معاينة</a>' : ""}
+          ${job.status === "published" ? '<a class="btn btn-outline" target="_blank" rel="noopener" href="https://nutrition-3.vercel.app/jobs/' + encodeURIComponent(job.id) + '">معاينة</a>' : ""}
         </div>
       </article>`).join("");
   }
