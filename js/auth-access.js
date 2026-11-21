@@ -335,6 +335,7 @@
     }
 
     if (role === "admin") {
+      clearGoogleSignupIntent();
       window.location.replace("app.html");
       return true;
     }
@@ -349,6 +350,12 @@
     if (!accountType) {
       showAuthMessage("تعذر التحقق من نوع الحساب حاليًا. حاول مرة أخرى.");
       return false;
+    }
+
+    if (accountType !== "pending") {
+      // Existing accounts always follow the account type already stored in profiles.
+      // A type selected before Google sign-in must never overwrite an existing account.
+      clearGoogleSignupIntent();
     }
 
     if (accountType === "pending") {
@@ -623,29 +630,83 @@
   }
 
 
-  function showAccountTypeSelection() {
+  let accountTypeSelectionMode = "complete";
+
+  function showAccountTypeSelection(mode = "complete") {
     const panel = document.getElementById("accountTypeOnboarding");
     if (!panel) {
       showAuthMessage("هذا الحساب يحتاج إلى تحديد نوعه. حدّث الصفحة وحاول مرة أخرى.");
       return;
     }
+
+    accountTypeSelectionMode = mode === "google" ? "google" : "complete";
     document.querySelectorAll(".auth-form").forEach(form => { form.style.display = "none"; });
     document.querySelectorAll("[data-auth-tab]").forEach(tab => tab.classList.remove("active"));
+
+    const tabs = document.querySelector(".tabs");
+    if (tabs) tabs.hidden = true;
+
+    const actionButton = document.getElementById("completeAccountTypeButton");
+    const cancelButton = document.getElementById("cancelAccountTypeSelectionButton");
+    const heading = panel.querySelector("h2");
+    const description = panel.querySelector(":scope > p");
+
+    if (heading) heading.textContent = accountTypeSelectionMode === "google"
+      ? "اختر نوع الحساب"
+      : "كيف ستستخدم Diet Planner؟";
+    if (description) description.textContent = accountTypeSelectionMode === "google"
+      ? "حدد نوع حسابك أولًا، ثم أكمل المتابعة باستخدام Google."
+      : "اختر نوع الحساب لاستكمال إعداد مساحتك.";
+    if (actionButton) actionButton.textContent = accountTypeSelectionMode === "google"
+      ? "المتابعة باستخدام Google"
+      : "متابعة";
+    if (cancelButton) cancelButton.hidden = accountTypeSelectionMode !== "google";
+
     panel.hidden = false;
+
     const requestedAccountType = new URLSearchParams(window.location.search).get("account_type");
     if (["patient", "professional"].includes(requestedAccountType)) {
       const preferred = panel.querySelector(`input[name="onboardingAccountType"][value="${requestedAccountType}"]`);
       if (preferred) preferred.checked = true;
     }
+
     document.getElementById("authMessage")?.style.setProperty("display", "none");
+  }
+
+  function cancelAccountTypeSelection() {
+    const panel = document.getElementById("accountTypeOnboarding");
+    const tabs = document.querySelector(".tabs");
+    if (panel) panel.hidden = true;
+    if (tabs) tabs.hidden = false;
+
+    document.querySelectorAll('input[name="onboardingAccountType"]').forEach(input => {
+      input.checked = false;
+    });
+
+    document.querySelectorAll(".auth-form").forEach(form => {
+      form.style.display = form.id === "loginForm" ? "block" : "none";
+    });
+    document.querySelectorAll("[data-auth-tab]").forEach(tab => {
+      const active = tab.dataset.authTab === "loginForm";
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+    accountTypeSelectionMode = "complete";
   }
 
   async function completeAccountTypeSelection() {
     if (signupBusy) return;
+
     const accountType = document.querySelector('input[name="onboardingAccountType"]:checked')?.value;
     const button = document.getElementById("completeAccountTypeButton");
+
     if (!["professional", "patient"].includes(accountType)) {
       showAuthMessage("اختر نوع الحساب أولًا.");
+      return;
+    }
+
+    if (accountTypeSelectionMode === "google") {
+      await startGoogleOAuth(button, accountType);
       return;
     }
 
@@ -732,7 +793,9 @@
   }
 
   async function loginWithGoogle() {
-    return startGoogleOAuth(document.getElementById("googleLoginButton"));
+    // Ask for the intended account type before starting Google OAuth.
+    // For existing users, the saved profiles.account_type remains authoritative.
+    showAccountTypeSelection("google");
   }
 
   async function registerWithGoogle() {
@@ -800,6 +863,9 @@
     document
       .getElementById("completeAccountTypeButton")
       ?.addEventListener("click", completeAccountTypeSelection);
+    document
+      .getElementById("cancelAccountTypeSelectionButton")
+      ?.addEventListener("click", cancelAccountTypeSelection);
 
     if (window.location.hash === "#register") {
       document.querySelector('[data-auth-tab="registerForm"]')?.click();
