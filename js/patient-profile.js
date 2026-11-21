@@ -257,7 +257,7 @@
   function renderMeasurements() {
     updateMeasurementSummary();
     window.DietPlannerWeightLogs?.render({
-      tbody: $("weightTableBody"),
+      container: $("weightTableContainer"),
       logs: measurementState.logs,
       actionCell: (_log, index) => `
         <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
@@ -1462,7 +1462,7 @@
       openPlanWorkspace(button.dataset.openPlan, button.dataset.planType);
     });
     $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
-    $('weightTableBody')?.addEventListener('click', (event) => {
+    $('weightTableContainer')?.addEventListener('click', (event) => {
       const save = event.target.closest('[data-measurement-save]');
       const cancel = event.target.closest('[data-measurement-cancel]');
       const edit = event.target.closest('[data-measurement-edit]');
