@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-tool-food-row-v2">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-insulin-calc-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
@@ -24,7 +24,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261121-tool-food-row-v2" defer></script>
+  <script src="js/patient-portal.js?v=20261121-insulin-calc-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -56,6 +56,26 @@
           <div class="portal-tool-total"><span>إجمالي كربوهيدرات اليوم</span><strong id="portalCarbDayTotal">0 جم</strong></div>
           <div id="portalCarbMeals" class="portal-carb-meals"><div class="portal-tool-loading">جاري تجهيز الحاسبة...</div></div>
           <p class="portal-tool-footnote">الحساب يعتمد على قيمة الكربوهيدرات المسجلة لكل 100 جم في مكتبة الأغذية.</p>
+        </section>
+        <section class="portal-tool-card portal-insulin-card" aria-labelledby="insulinToolTitle">
+          <div class="portal-tool-heading"><span class="portal-tool-icon"><i class="fa-solid fa-syringe" aria-hidden="true"></i></span><div><h3 id="insulinToolTitle">حساب جرعة الإنسولين للوجبة</h3><p>حساب رياضي باستخدام المعاملات التي حددها الطبيب للمريض.</p></div></div>
+          <div class="portal-insulin-fields">
+            <div><label for="portalInsulinMeal">الوجبة</label><select id="portalInsulinMeal"><option value="breakfast">الفطور</option><option value="lunch">الغداء</option><option value="dinner">العشاء</option><option value="snacks">الوجبات الخفيفة</option></select></div>
+            <div><label for="portalInsulinUnit">وحدة قياس السكر</label><select id="portalInsulinUnit"><option value="mg">mg/dL</option><option value="mmol">mmol/L</option></select></div>
+            <div><label for="portalInsulinCurrent">سكر الدم الحالي</label><input id="portalInsulinCurrent" type="number" min="0" step="any" inputmode="decimal" placeholder="أدخل القراءة"></div>
+            <div><label for="portalInsulinTarget">السكر المستهدف</label><input id="portalInsulinTarget" type="number" min="0" step="any" inputmode="decimal" placeholder="حسب الخطة الطبية"></div>
+            <div><label for="portalInsulinIcr">معامل الوجبة ICR</label><input id="portalInsulinIcr" type="number" min="0.1" step="any" inputmode="decimal" placeholder="جرام كربوهيدرات / وحدة"></div>
+            <div><label for="portalInsulinIsf">معامل التصحيح ISF</label><input id="portalInsulinIsf" type="number" min="0.1" step="any" inputmode="decimal" placeholder="mg/dL لكل وحدة"></div>
+            <div><label for="portalInsulinIob">الإنسولين النشط IOB (اختياري)</label><input id="portalInsulinIob" type="number" min="0" step="any" inputmode="decimal" placeholder="0 إذا لم يوجد"></div>
+          </div>
+          <div class="portal-insulin-result" aria-live="polite">
+            <div><span>كربوهيدرات الوجبة</span><strong id="portalInsulinCarbs">—</strong></div>
+            <div><span>جرعة تغطية الوجبة</span><strong id="portalInsulinMealDose">—</strong></div>
+            <div><span>جرعة التصحيح</span><strong id="portalInsulinCorrectionDose">—</strong></div>
+            <div><span>بعد طرح الإنسولين النشط</span><strong id="portalInsulinNetDose">—</strong></div>
+          </div>
+          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل بيانات المريض والمعاملات الموصوفة لعرض الحساب.</p>
+          <p class="portal-tool-footnote">هذه أداة حسابية تعليمية وليست وصفة جرعة. يجب أن تكون قيم ICR وISF والهدف محددة من الطبيب، مع مراجعة الإنسولين النشط وتوقيت آخر جرعة. لا تستخدم الناتج لاتخاذ قرار علاجي مستقل.</p>
         </section>
       </section>
 
