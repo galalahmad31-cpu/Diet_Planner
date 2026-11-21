@@ -50,18 +50,6 @@
 
 
 
-/* About page account actions — central theme tokens only */
-.about-account-actions{display:flex;justify-content:flex-start;margin:16px 0 20px}
-.about-account-actions-inner{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.about-account-action{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:10px 17px;border:1px solid var(--dp-border);border-radius:12px;font-family:var(--dp-font);font-size:12px;font-weight:900;text-decoration:none;transition:background .16s ease,border-color .16s ease,transform .16s ease}
-.about-account-action-primary{border-color:var(--dp-primary);background:var(--dp-primary);color:#fff;box-shadow:0 5px 14px var(--dp-shadow)}
-.about-account-action-primary:hover{border-color:var(--dp-primary-hover);background:var(--dp-primary-hover);transform:translateY(-1px)}
-.about-account-action-secondary{background:var(--dp-surface);color:var(--dp-text)}
-.about-account-action-secondary:hover{background:var(--dp-surface-3)}
-.about-account-action:focus-visible{outline:3px solid var(--dp-accent);outline-offset:3px}
-@media(max-width:560px){.about-account-actions-inner{width:100%}.about-account-action{flex:1 1 auto}}
-@media(prefers-reduced-motion:reduce){.about-account-action{transition:none}}
-
 /* About content cards: two-column ordered grid */
 .about-sections-grid{
   display:grid;
