@@ -65,6 +65,19 @@
           </div>
         </form>
         <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية. تأكيد الدفع إقرار من صاحبه، وليس تحققًا بنكيًا من المنصة.</p>
+        <dialog class="patient-confirm-dialog" data-confirm-dialog aria-labelledby="patientConfirmTitle" aria-describedby="patientConfirmDescription">
+          <div class="patient-confirm-dialog__content">
+            <span class="patient-confirm-dialog__icon" aria-hidden="true"><i class="fa-solid fa-shield-heart"></i></span>
+            <small class="patient-confirm-dialog__eyebrow" data-confirm-kicker>تأكيد خطوة المتابعة</small>
+            <h3 id="patientConfirmTitle" data-confirm-title>تأكيد الإجراء</h3>
+            <p id="patientConfirmDescription" data-confirm-description></p>
+            <div class="patient-confirm-dialog__notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span data-confirm-note></span></div>
+            <div class="patient-confirm-dialog__actions">
+              <button type="button" class="patient-confirm-dialog__cancel" data-confirm-cancel>رجوع للمحادثة</button>
+              <button type="button" class="patient-confirm-dialog__accept" data-confirm-accept>تأكيد</button>
+            </div>
+          </div>
+        </dialog>
       </div>`;
 
     const user = await access.getCurrentUser();
@@ -81,12 +94,53 @@
     const recipientWrap = root.querySelector("[data-message-contact]");
     const recipientSelect = root.querySelector("[data-message-recipient]");
     const quickActions = root.querySelector("[data-message-quick-actions]");
+    const confirmationDialog = root.querySelector("[data-confirm-dialog]");
     let recipientId = null;
     let requestId = options.requestId || null;
     let requestState = null;
     let busy = false;
     let loading = false;
     let counterpartLabel = role === "patient" ? "المختص" : "المريض";
+
+    function askStepConfirmation(copy) {
+      return new Promise(resolve => {
+        const kicker = confirmationDialog.querySelector("[data-confirm-kicker]");
+        const title = confirmationDialog.querySelector("[data-confirm-title]");
+        const description = confirmationDialog.querySelector("[data-confirm-description]");
+        const note = confirmationDialog.querySelector("[data-confirm-note]");
+        const cancelButton = confirmationDialog.querySelector("[data-confirm-cancel]");
+        const acceptButton = confirmationDialog.querySelector("[data-confirm-accept]");
+        const previousFocus = document.activeElement;
+        let settled = false;
+        const finish = confirmed => {
+          if (settled) return;
+          settled = true;
+          cancelButton.removeEventListener("click", onCancel);
+          acceptButton.removeEventListener("click", onAccept);
+          confirmationDialog.removeEventListener("cancel", onNativeCancel);
+          confirmationDialog.removeEventListener("click", onBackdropClick);
+          if (confirmationDialog.open) confirmationDialog.close();
+          if (previousFocus?.isConnected) previousFocus.focus();
+          resolve(confirmed);
+        };
+        const onCancel = () => finish(false);
+        const onAccept = () => finish(true);
+        const onNativeCancel = event => { event.preventDefault(); finish(false); };
+        const onBackdropClick = event => { if (event.target === confirmationDialog) finish(false); };
+
+        kicker.textContent = copy.kicker;
+        title.textContent = copy.title;
+        description.textContent = copy.description;
+        note.textContent = copy.note;
+        acceptButton.textContent = copy.action;
+        cancelButton.addEventListener("click", onCancel);
+        acceptButton.addEventListener("click", onAccept);
+        confirmationDialog.addEventListener("cancel", onNativeCancel);
+        confirmationDialog.addEventListener("click", onBackdropClick);
+        confirmationDialog.showModal();
+        acceptButton.focus();
+      });
+    }
 
     try {
       if (role === "patient") {
@@ -336,12 +390,31 @@
       const button = event.target.closest("[data-message-confirm]");
       if (!button || !requestId || busy) return;
       const step = button.dataset.messageConfirm;
-      const prompts = {
-        agreement: "هل تؤكد موافقتك على الخدمة والسعر والمدة الموضحة في المحادثة؟",
-        payment_sent: "هل تؤكد أنك أرسلت المبلغ بالفعل؟",
-        payment_received: "هل تحققت من وصول المبلغ وتؤكد استلامه بالفعل؟"
+      const confirmationCopy = {
+        agreement: {
+          kicker: "المرحلة الأولى · الاتفاق",
+          title: "تأكيد الموافقة على الاتفاق",
+          description: "هل راجعت تفاصيل الخدمة والسعر والمدة المتفق عليها، وتؤكد موافقتك عليها؟",
+          note: "سيُسجّل تأكيدك للطرفين، ولن تنتقل الخطوة التالية إلا بعد تأكيد الطرف الآخر أيضًا.",
+          action: "أؤكد الاتفاق"
+        },
+        payment_sent: {
+          kicker: "المرحلة الثانية · الدفع",
+          title: "تأكيد إرسال المبلغ",
+          description: "هل أرسلت المبلغ المتفق عليه بالفعل إلى المختص بالطريقة التي اتفقتما عليها؟",
+          note: "لا تضغط تأكيد قبل إتمام التحويل أو الدفع فعليًا. هذا الإجراء ليس تحققًا بنكيًا من المنصة.",
+          action: "نعم، أرسلت المبلغ"
+        },
+        payment_received: {
+          kicker: "المرحلة الثالثة · استلام المبلغ",
+          title: "تأكيد استلام المبلغ",
+          description: "هل تحققت بنفسك من وصول المبلغ المتفق عليه إلى حسابك؟",
+          note: "لا تؤكد الاستلام اعتمادًا على صورة إيصال أو رسالة من الطرف الآخر فقط؛ تحقق من وصول المبلغ فعليًا.",
+          action: "نعم، استلمت المبلغ"
+        }
       };
-      if (!window.confirm(prompts[step] || "هل تريد تأكيد هذه الخطوة؟")) return;
+      const copy = confirmationCopy[step];
+      if (!copy || !await askStepConfirmation(copy)) return;
       busy = true;
       sendButton.disabled = true;
       button.disabled = true;
