@@ -89,7 +89,7 @@
     professionalLink.href = appBasePath + "professional-directory-manage.html";
     professionalLink.dataset.pageHref = "professional-directory-manage.html";
     professionalLink.innerHTML = '<i class="fa-solid fa-id-card" aria-hidden="true"></i><span>ملفي المهني</span>';
-    professionalLink.hidden = true;
+    professionalLink.style.display = "none";
     if (path === "professional-directory-manage.html") {
       professionalLink.classList.add("is-active");
       professionalLink.setAttribute("aria-current", "page");
@@ -131,7 +131,7 @@
         try { accountType = await window.DietPlannerAccess?.getUserAccountType(user.id); }
         catch (error) { console.error("Professional navigation access check failed:", error); }
       }
-      professionalLink.hidden = accountType !== "professional";
+      professionalLink.style.display = accountType === "professional" ? "" : "none";
     }
   }
 
