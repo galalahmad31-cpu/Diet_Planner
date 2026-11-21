@@ -29,3 +29,12 @@
 @media(max-width:600px){.measurements-table-heading{align-items:flex-start;}.measurements-table-tools{justify-content:flex-end;}.measurements-table{min-width:1200px;}}
 @media(prefers-reduced-motion:reduce){.measurement-entry-row{animation:none;}}
 [data-theme="dark"] .measurement-entry-row{background:var(--portal-card,var(--card-bg,#172b27))!important;}
+
+.measurements-state{padding:18px 12px!important;text-align:center;color:var(--portal-muted,var(--text-muted,#94a3b8))!important;font-size:11px!important;font-weight:700!important;}
+.measurements-error{color:#be123c!important;}
+.measurement-row-actions{white-space:nowrap;min-width:118px;}
+.measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px "Cairo",sans-serif;cursor:pointer;}
+.measurement-edit-button{border:1px solid var(--portal-line,var(--border-color,#dfe9e8));background:var(--portal-soft,var(--surface-muted,#eef6f4));color:var(--portal-accent-dark,var(--primary-color,#176b63));}
+.measurement-delete-button{border:1px solid #fee2e2;background:#fff7f7;color:#e11d48;}
+.measurement-delete-button:focus-visible{outline:3px solid var(--portal-accent,var(--primary-color,#8bd2c2));outline-offset:2px;}
+.portal-measurement-readonly{font-size:10px;color:var(--portal-muted,var(--text-muted,#82919a));}
