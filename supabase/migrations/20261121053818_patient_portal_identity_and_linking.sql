@@ -5,6 +5,8 @@
 
 begin;
 
+create schema if not exists private;
+
 create table public.patient_accounts (
   id uuid primary key default gen_random_uuid(),
   patient_id uuid not null unique references public.patients(id) on delete cascade,
