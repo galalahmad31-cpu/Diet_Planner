@@ -153,9 +153,14 @@
           .order("created_at", { ascending: false });
         if (requestError) throw requestError;
 
-        const contactsById = new Map((requests || []).map(item => [item.professional_id, {
-          id: item.professional_id, requestId: item.id, status: item.status
-        }]));
+        const contactsById = new Map();
+        (requests || []).forEach(item => {
+          if (!contactsById.has(item.professional_id)) {
+            contactsById.set(item.professional_id, {
+              id: item.professional_id, requestId: item.id, status: item.status
+            });
+          }
+        });
         const { data: team, error: teamError } = await supabase
           .from("patient_care_team")
           .select("professional_id,relationship_role")
