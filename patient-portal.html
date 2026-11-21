@@ -21,7 +21,7 @@
   <script src="js/app-header.js?v=20261121-patient-ia-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261121-subscription-followup" defer></script>
+  <script src="js/patient-portal.js?v=20261121-connection-flow-v2" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
   <div data-dp-patient-header></div>
@@ -39,7 +39,7 @@
         <article class="portal-service-card portal-service-upcoming" id="portalTools"><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدوات التغذية</strong><small>حساب الاحتياجات ومتابعة الوزن والتقدم.</small><em>قريبًا</em></span></article>
         <article class="portal-service-card portal-service-upcoming" id="portalEducation"><span class="portal-service-icon"><i class="fa-solid fa-book-open"></i></span><span class="portal-service-copy"><strong>المكتبة والتثقيف</strong><small>محتوى علمي وإرشادات غذائية مبسطة.</small><em>قريبًا</em></span></article>
       </section>
-      <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استخدام الخدمات العامة دون الارتباط بمختص. الوصول إلى الملف الصحي يتطلب ربط حسابك بملفك الموجود.</p>
+      <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استخدام الخدمات العامة دون الارتباط بمختص. أرسل طلب متابعة من دليل المتخصصين؛ وبعد قبول المختص يُنشأ ملفك الصحي تلقائيًا، أو يمكنك ربط ملف موجود.</p>
     </section>
     <section id="portalProfileArea" class="portal-profile-area" hidden>
       <div class="portal-section-heading"><div><span class="portal-section-kicker">PERSONAL PROFILE</span><h2>الملف الشخصي</h2><p>إدارة بيانات حسابك ووسائل التواصل.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-pen"></i></span></div>
@@ -76,8 +76,12 @@
 
     <section id="portalUnlinked" class="portal-state-card" hidden>
       <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
-      <h1>اربط حسابك بملفك الصحي</h1>
-      <p>أدخل رمز الدعوة الذي أرسله إليك المختص لربط حسابك بملفك الموجود بالفعل. لا تنشئ ملفًا جديدًا.</p>
+      <h1>ملفك الصحي لم يُنشأ بعد</h1>
+      <p>يمكنك استكشاف دليل المتخصصين وإرسال طلب متابعة. عند قبول المختص للطلب، سيتم إنشاء ملفك الصحي وربطه به تلقائيًا. إذا كان لديك ملف موجود بالفعل، استخدم رمز الدعوة الذي أرسله إليك المختص.</p>
+      <section class="portal-section portal-unlinked-requests" aria-labelledby="portalUnlinkedRequestsTitle">
+        <div class="portal-section-heading"><div><h2 id="portalUnlinkedRequestsTitle">طلبات المتابعة</h2><p>تابع الطلبات المرسلة للمختصين قبل إنشاء ملفك الصحي.</p></div></div>
+        <div id="patientProfessionalRequestsUnlinked" class="portal-empty-state">جاري تحميل الطلبات...</div>
+      </section>
       <form id="portalInviteForm" class="portal-invite-form">
         <label for="portalInviteToken">رمز الدعوة</label>
         <input id="portalInviteToken" type="text" inputmode="text" autocomplete="off" placeholder="الصق رمز الدعوة هنا" required>
