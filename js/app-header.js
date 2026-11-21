@@ -10,6 +10,7 @@
   const publicPages = [
     ["index.html", "الرئيسية", "fa-house"],
     ["article.html", "المقالات", "fa-newspaper"],
+    ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["about.html", "عن المنصة", "fa-circle-info"],
     ["feedback.html", "شاركنا رأيك", "fa-comment-dots"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
