@@ -101,6 +101,7 @@
   function activateHealthTab(panelId) {
     const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel"];
     if (!allowed.includes(panelId)) return;
+    if (!state.hasActiveCareTeam && panelId !== "portalCommunicationPanel") return;
     document.querySelectorAll("[data-health-tab]").forEach(tab => {
       const active = tab.dataset.healthTab === panelId;
       tab.classList.toggle("is-active", active);
