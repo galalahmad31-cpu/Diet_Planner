@@ -298,6 +298,14 @@
       return true;
     }
 
+    // A validated patient invitation may return the user to the patient portal
+    // after authentication. Only this local page is accepted (no open redirects).
+    const requestedNext = new URLSearchParams(window.location.search).get("next") || "";
+    if (requestedNext === "patient-portal.html" || requestedNext.startsWith("patient-portal.html?invite=")) {
+      window.location.replace(requestedNext);
+      return true;
+    }
+
     const active = await hasActiveSubscription(userId);
 
     if (active === null) {
@@ -307,6 +315,24 @@
 
     if (active === true) {
       window.location.replace("app.html");
+      return true;
+    }
+
+    const { data: patientAccount, error: patientAccountError } = await supabaseClient
+      .from("patient_accounts")
+      .select("patient_id")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .maybeSingle();
+
+    if (patientAccountError) {
+      console.error("Patient account lookup failed:", patientAccountError);
+      showAuthMessage("تعذر التحقق من ربط حساب المريض حاليًا. حاول مرة أخرى.");
+      return false;
+    }
+
+    if (patientAccount?.patient_id) {
+      window.location.replace("patient-portal.html");
       return true;
     }
 
