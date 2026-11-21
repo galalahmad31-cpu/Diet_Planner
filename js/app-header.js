@@ -173,6 +173,9 @@
         </a>
         <div class="dp-app-header__page-meta">
           <span class="dp-app-header__page-title"></span>
+          <a id="dpNotificationLink" class="dp-app-header__notification-link" href="${appBasePath}notifications.html" aria-label="الإشعارات" title="الإشعارات" hidden>
+            <i class="fa-solid fa-bell" aria-hidden="true"></i><span id="dpNotificationBadge" class="dp-app-header__notification-badge" hidden>0</span>
+          </a>
           <button id="logoutBtn" type="button" class="dp-app-header__logout hidden" title="تسجيل الخروج" aria-label="تسجيل الخروج">
             <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>خروج</span>
           </button>
