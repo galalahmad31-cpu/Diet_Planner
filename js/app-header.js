@@ -16,13 +16,14 @@
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
     ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"]
   ];
+  // Patient navigation: keep this list as the single source of truth.
+  // Internal portal sections remain in patient-portal.html; standalone destinations keep their own pages.
   const patientPages = [
     ["patient-portal.html#portalHome", "الرئيسية", "fa-house"],
     ["patient-portal.html#portalContent", "الملف الصحي", "fa-heart-pulse"],
     ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
-    ["notifications.html", "الإشعارات", "fa-bell"],
-    ["patient-portal.html#portalDietBuilder", "النظام الغذائي", "fa-bowl-food"],
-    ["patient-portal.html#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
+    ["patient-portal.html#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
+    ["article.html", "المقالات", "fa-newspaper"],
     ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
     ["patient-portal.html#portalProfileArea", "الملف الشخصي", "fa-user"]
