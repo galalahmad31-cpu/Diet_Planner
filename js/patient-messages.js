@@ -143,7 +143,10 @@
           recipientId = selected?.id || null;
           requestId = selected?.requestId || null;
           counterpartLabel = selected?.name || "المختص";
-          void loadRequestState().then(loadMessages);
+          void loadRequestState().then(loadMessages).catch(error => {
+            console.error("Conversation state refresh failed:", error);
+            setStatus(root, "تعذر تحديث حالة المحادثة.", "error");
+          });
         });
       } else {
         let request = null;
@@ -354,7 +357,9 @@
       } catch (error) {
         console.error("Connection confirmation failed:", error);
         setStatus(root, error.message || "تعذر تسجيل التأكيد.", "error");
-        await loadRequestState();
+        try { await loadRequestState(); } catch (refreshError) {
+          console.error("Conversation state refresh failed:", refreshError);
+        }
       } finally {
         busy = false;
         sendButton.disabled = false;
@@ -367,7 +372,10 @@
         setStatus(root, "تعذر تحديث المحادثة. حاول مرة أخرى.", "error");
       });
     });
-    await loadRequestState();
+    try { await loadRequestState(); } catch (error) {
+      console.error("Conversation state load failed:", error);
+      setStatus(root, "تعذر تحميل حالة الاتفاق والدفع.", "error");
+    }
     await loadMessages();
   }
 
