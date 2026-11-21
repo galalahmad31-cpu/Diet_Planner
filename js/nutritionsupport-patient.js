@@ -54,33 +54,6 @@
        PATIENT DATA COLLAPSE
        ========================================================= */
 
-    function togglePatientHeader() {
-
-        const content =
-            document.getElementById('patient-info-content');
-
-        const button =
-            document.getElementById('patient-collapse-btn');
-
-        if (!content || !button) {
-            return;
-        }
-
-        const isCollapsed =
-            content.classList.toggle('hidden');
-
-        button.setAttribute(
-            'aria-expanded',
-            String(!isCollapsed)
-        );
-
-        button.innerText =
-            isCollapsed
-                ? 'Show patient data ▼'
-                : 'Hide patient data ▲';
-    }
-
-
     /* =========================================================
        GLUCOSE INPUT MODE
        ========================================================= */
@@ -1386,7 +1359,6 @@ function restoreDayState(state){
   switchTab(st.__tab==='tpn'?'tpn':'en');
   try { calculateCalorieBased(); } catch(error) { console.error('Enteral calorie restore failed:',error); }
   try { toggleGlucoseInputMode(); } catch(error) { console.error('Glucose mode restore failed:',error); }
-  try { calculateTPN(); } catch(error) { console.error('TPN restore failed:',error); }
   try { runGlucoseMixing(); } catch(error) { console.error('Glucose mixing restore failed:',error); }
 }
 function setDayEditMode(editing){
@@ -1713,9 +1685,6 @@ async function loadPatientData(){
           case 'smart-print':
             smartPrint();
             break;
-          case 'toggle-patient-header':
-            togglePatientHeader();
-            break;
           case 'tab-en':
             switchTab('en');
             break;
@@ -1738,13 +1707,6 @@ async function loadPatientData(){
         return;
       }
 
-      // The print/delete overlays are placed after the script tag in the HTML.
-      // Use delegated IDs so their buttons work even when they are created after
-      // the page initializer has already run.
-      const id=event.target.closest('button')?.id;
-      if(id==='printConfirmBtn') confirmSupportPrint();
-      else if(id==='printCancelBtn') closePrintSettings();
-      else if(id==='printCompletionBtn') closePrintCompletion();
     });
 
     document.addEventListener('input', event=>{
@@ -1786,7 +1748,6 @@ async function loadPatientData(){
           break;
         case 'tpn-type-change':
           toggleTpnTypeMode();
-          calculateTPN();
           break;
       }
     });
