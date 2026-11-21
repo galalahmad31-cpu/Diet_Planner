@@ -339,7 +339,7 @@
       return true;
     }
 
-    const requestedNext = new URLSearchParams(window.location.search).get("next") || "";
+
     if (requestedNext === "patient-portal.html" || requestedNext.startsWith("patient-portal.html?invite=")) {
       window.location.replace(requestedNext);
       return true;
