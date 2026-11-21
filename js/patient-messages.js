@@ -147,7 +147,8 @@
       refreshButton.disabled = true;
       try {
         const { error: readError } = await supabase.rpc("mark_patient_messages_read", {
-          p_patient_id: patientId
+          p_patient_id: patientId,
+          p_other_user_id: recipientId
         });
         if (readError) throw readError;
         const { data, error } = await supabase
@@ -157,7 +158,10 @@
           .order("created_at", { ascending: false })
           .limit(200);
         if (error) throw error;
-        const messages = (data || []).reverse();
+        const messages = (data || []).filter(message =>
+          (message.sender_id === user.id && message.recipient_id === recipientId)
+          || (message.sender_id === recipientId && message.recipient_id === user.id)
+        ).reverse();
         if (!messages.length) {
           list.innerHTML = '<div class="patient-messages-empty">لا توجد رسائل بعد. يمكنك بدء المحادثة برسالة قصيرة.</div>';
           return;
