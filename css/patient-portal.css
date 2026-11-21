@@ -178,7 +178,7 @@
 .portal-food-modal>label{display:block;margin:14px 0 8px;font-size:15px;font-weight:900;color:var(--dp-text)}
 .portal-food-modal>input{min-height:52px!important;padding:12px 15px!important;font-size:16px!important;background:var(--dp-bg)!important;border:1.5px solid var(--dp-border)!important}
 .portal-modal-close{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-surface-2);color:var(--dp-text);font-size:20px;cursor:pointer}
-.portal-food-search-results{display:grid;gap:9px;max-height:min(34dvh,330px);overflow:auto;margin-top:12px;padding:2px}
+.portal-food-search-results{display:grid;gap:9px;max-height:min(42dvh,420px);overflow:auto;overscroll-behavior:contain;margin-top:12px;padding:4px 3px}
 .portal-food-search-item{display:flex;flex-direction:column;align-items:flex-start;gap:5px;width:100%;min-height:58px;padding:13px 15px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-bg);color:var(--dp-text);text-align:right;cursor:pointer}
 .portal-food-search-item:hover,.portal-food-search-item:focus-visible{border-color:var(--dp-primary);background:var(--dp-surface-2);outline:2px solid color-mix(in srgb,var(--dp-primary) 22%,transparent);outline-offset:1px}
 .portal-food-search-item strong{font-size:15px;font-weight:900;color:var(--dp-text)}
