@@ -29,6 +29,12 @@
     showOnly("portalError");
   }
 
+  function localToday() {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    return new Date(now.getTime() - offset * 60000).toISOString().slice(0, 10);
+  }
+
   function formatDate(value) {
     if (!value) return "—";
     const date = new Date(value + "T00:00:00");
@@ -263,7 +269,7 @@
       const { error } = await supabase.from("weight_logs").insert(record);
       if (error) throw error;
       $("portalMeasurementForm").reset();
-      $("portalMeasurementDate").value = new Date().toISOString().slice(0, 10);
+      $("portalMeasurementDate").value = localToday();
       await loadMeasurements();
       setMessage("portalMeasurementMessage", "تم حفظ القياس بنجاح.", "success");
     } catch (error) {
@@ -291,7 +297,7 @@
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
-    $("portalMeasurementDate").value = new Date().toISOString().slice(0, 10);
+    $("portalMeasurementDate").value = localToday();
     $("portalThemeToggle")?.addEventListener("click", () => {
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
