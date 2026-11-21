@@ -261,13 +261,20 @@
       const stage = root.querySelector("[data-message-stage]");
       const note = root.querySelector("[data-message-stage-note]");
       const buttons = root.querySelector("[data-message-confirmation-buttons]");
-      if (!requestState || !["accepted", "active"].includes(requestState.status)) {
+      if (!requestState || !["accepted", "active", "ended"].includes(requestState.status)) {
         quickActions.hidden = true;
         return;
       }
       quickActions.hidden = false;
       buttons.replaceChildren();
       const isPatient = role === "patient";
+      if (requestState.status === "ended") {
+        stage.textContent = "انتهت المتابعة";
+        note.textContent = "تم إنهاء المتابعة. يمكنك الاطلاع على سجل المحادثة، لكن لا يمكن إرسال رسائل جديدة.";
+        form.hidden = true;
+        return;
+      }
+      form.hidden = false;
       const patientAgreed = Boolean(requestState.patient_agreement_at);
       const professionalAgreed = Boolean(requestState.professional_agreement_at);
       const makeButton = (step, label) => {
@@ -311,11 +318,13 @@
       loading = true;
       refreshButton.disabled = true;
       try {
-        const { error: readError } = await supabase.rpc("mark_patient_messages_read", {
-          p_patient_id: patientId,
-          p_other_user_id: recipientId
-        });
-        if (readError) throw readError;
+        if (requestState?.status !== "ended") {
+          const { error: readError } = await supabase.rpc("mark_patient_messages_read", {
+            p_patient_id: patientId,
+            p_other_user_id: recipientId
+          });
+          if (readError) throw readError;
+        }
         const { data, error } = await supabase
           .from("patient_messages")
           .select("id,sender_id,recipient_id,body,created_at,read_at")
