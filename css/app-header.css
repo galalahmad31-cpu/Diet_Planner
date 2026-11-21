@@ -177,3 +177,7 @@
 @media(max-width:640px){
  .dp-app-header__notification-link{flex-basis:34px;width:34px;height:32px;font-size:13px}
 }
+
+.dp-app-header__notification-nav-link{position:relative}
+.dp-patient-header__nav .dp-app-header__notification-nav-link{min-width:0;width:auto;flex:initial;height:auto;min-height:38px}
+.dp-patient-header__nav .dp-app-header__notification-badge{top:2px;inset-inline-start:5px;border-color:#087765}
