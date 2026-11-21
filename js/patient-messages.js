@@ -50,7 +50,7 @@
         <section class="patient-messages-quick-actions" data-message-quick-actions hidden aria-label="تأكيدات الاتفاق والدفع">
           <div class="patient-messages-quick-actions-heading">
             <strong>تأكيدات الاتفاق والدفع</strong>
-            <small>تُسجل كتأكيدات مؤرخة داخل المحادثة.</small>
+            <small>تُسجل كتأكيدات مؤرخة، ولا تتحقق المنصة من وصول التحويل.</small>
           </div>
           <div class="patient-messages-quick-actions-buttons">
             <button type="button" data-message-confirm="agreement">تأكيد الاتفاق</button>
@@ -67,7 +67,7 @@
             <button type="submit" data-message-send><i class="fa-solid fa-paper-plane"></i> إرسال</button>
           </div>
         </form>
-        <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية.</p>
+        <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية. تأكيد الدفع إقرار من صاحبه، وليس تحققًا بنكيًا من المنصة.</p>
       </div>`;
 
     const user = await access.getCurrentUser();
@@ -253,7 +253,7 @@
 
         if (!window.confirm(prompt)) return;
         void sendMessage(body, {
-          successMessage: isAgreement ? "تم إرسال تأكيد الاتفاق." : "تم إرسال تأكيد الدفع."
+          successMessage: isAgreement ? "تم إرسال تأكيد الاتفاق." : role === "patient" ? "تم إرسال تأكيد إرسال المبلغ." : "تم إرسال تأكيد استلام المبلغ."
         });
       });
     });
