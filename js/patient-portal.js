@@ -763,7 +763,7 @@
     const icr = Number($("portalInsulinIcr")?.value);
     const isf = Number($("portalInsulinIsf")?.value);
     const iobRaw = $("portalInsulinIob")?.value;
-    const iob = iobRaw === "" ? 0 : Number(iobRaw);
+    const iob = Number(iobRaw);
     const outputIds = ["portalInsulinCarbs", "portalInsulinMealDose", "portalInsulinCorrectionDose", "portalInsulinNetDose"];
     const message = $("portalInsulinMessage");
     const setOutputs = values => outputIds.forEach((id, index) => { const node = $(id); if (node) node.textContent = values[index]; });
@@ -780,9 +780,10 @@
       message.dataset.state = "warning";
       return;
     }
-    const required = [currentRaw, targetRaw, icr, isf];
-    if (required.some(value => !Number.isFinite(value) || value <= 0) || !Number.isFinite(iob) || iob < 0) {
-      message.textContent = "أدخل قراءة السكر والهدف وICR وISF. يمكن ترك IOB فارغًا إذا لم توجد جرعة نشطة معروفة.";
+    const validCurrent = Number.isFinite(currentRaw) && currentRaw >= 0;
+    const validSettings = [targetRaw, icr, isf].every(value => Number.isFinite(value) && value > 0);
+    if (!validCurrent || !validSettings || iobRaw === "" || !Number.isFinite(iob) || iob < 0) {
+      message.textContent = "أدخل قراءة السكر والهدف وICR وISF، وأدخل IOB صراحةً؛ اكتب 0 إذا لم توجد جرعة نشطة.";
       message.dataset.state = "notice";
       return;
     }
