@@ -16,14 +16,14 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261121-shared-table-clean-v8">
-  <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-central-table-v2">
+  <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
   <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
   <script src="js/app-header.js?v=20261121-books-nav-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
-  <script src="js/weight-logs-table.js?v=20261121-shared-table-inline-v5" defer></script>
+  <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
   <script src="js/patient-portal.js?v=20261121-measurements-inline-v15" defer></script>
 </head>
 <body class="patient-portal-page">
@@ -143,10 +143,7 @@
           <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>أضف قياساتك لمتابعة التغير مع الوقت.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
         </div>
-        <div class="measurements-toolbar portal-measurements-toolbar">
-          <p id="portalMeasurementAccessStatus" class="measurements-access-status">يمكنك إضافة قياساتك ومتابعة التغير مع الوقت.</p>
-          
-        </div>
+        <p id="portalMeasurementAccessStatus" class="measurements-access-status">يمكنك إضافة قياساتك ومتابعة التغير مع الوقت.</p>
         <div id="portalMeasurementsLoading" class="portal-muted-state" hidden>جاري تحميل القياسات...</div>
         <div id="portalMeasurementsError" class="portal-measurements-error" role="alert" hidden></div>
         <p id="portalMeasurementMessage" class="portal-inline-message" role="status"></p>
