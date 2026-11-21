@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, loadedPanels: new Set(), loadingPanels: new Map() };
+  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeCarbMeal: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -169,17 +169,23 @@
   }
 
   function showPortalDestination(id) {
-    const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea");
-    if (home) home.hidden = !["portalHome", "portalDietBuilder", "portalEducation", "portalTools"].includes(id);
+    const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
+    const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
+    if (home) home.hidden = !["portalHome", "portalDietBuilder", "portalEducation"].includes(id) || toolsOpen;
     if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
+    if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
       if (id === "portalContent") activateHealthTab("portalPlansPanel");
       else if (id.startsWith("portal")) activateHealthTab(id);
     }
-    if (["portalDietBuilder","portalEducation","portalTools"].includes(id)) {
-      const target = $(id);
-      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (toolsOpen) {
+      void ensurePatientFoods().then(() => { renderCarbMeals(); renderRenalFoods(); }).catch(error => showToolsLoadError(error));
+      tools?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (["portalDietBuilder","portalEducation"].includes(id)) {
+      $(id)?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     const target = id === "portalContent" ? health : id === "portalProfileArea" ? profile : $(id);
@@ -512,6 +518,143 @@
     }));
   }
 
+  const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
+  const FOOD_SEARCH_LIMIT = 30;
+
+  function normalizeFoodSearch(value) {
+    return String(value || "").toLocaleLowerCase("ar").normalize("NFKD").replace(/[\\u064B-\\u065F\\u0670]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").trim();
+  }
+
+  async function ensurePatientFoods() {
+    if (state.foods) return state.foods;
+    if (state.foodsPromise) return state.foodsPromise;
+    state.foodsPromise = (async () => {
+      const { data, error } = await supabase.from("foods").select(FOOD_COLUMNS).order("name_ar", { ascending: true });
+      if (error) throw error;
+      state.foods = Array.isArray(data) ? data : [];
+      return state.foods;
+    })();
+    try { return await state.foodsPromise; }
+    finally { state.foodsPromise = null; }
+  }
+
+  function showToolsLoadError(error) {
+    const message = error?.message || "تعذر تحميل مكتبة الأغذية.";
+    setMessage("portalToolsStatus", message, "error");
+    ["portalCarbMeals", "portalRenalResults"].forEach(id => {
+      const node = $(id);
+      if (node) node.textContent = message;
+    });
+  }
+
+  function findFoods(query) {
+    const needle = normalizeFoodSearch(query);
+    if (!needle) return [];
+    return state.foods.filter(food => normalizeFoodSearch(food.name_ar + " " + (food.name_en || "")).includes(needle)).slice(0, FOOD_SEARCH_LIMIT);
+  }
+
+  function foodSearchMarkup(food, mode) {
+    return `<button type="button" class="portal-food-search-item" data-patient-food="${escapeHtml(food.id)}" data-food-mode="${mode}">
+      <strong>${escapeHtml(food.name_ar || food.name_en || "غذاء")}</strong>
+      <small>${food.household ? escapeHtml(food.household) : "القيم الغذائية لكل 100 جم"}</small>
+    </button>`;
+  }
+
+  function renderCarbMeals() {
+    const root = $("portalCarbMeals");
+    if (!root) return;
+    root.innerHTML = state.carbMeals.map(meal => {
+      const total = meal.items.reduce((sum, item) => sum + (Number(item.food.carb) * Number(item.grams) / 100), 0);
+      const items = meal.items.length ? meal.items.map(item => {
+        const carb = Number(item.food.carb) * Number(item.grams) / 100;
+        return `<div class="portal-carb-item" data-carb-item="${escapeHtml(item.id)}">
+          <div class="portal-carb-item-copy"><strong>${escapeHtml(item.food.name_ar)}</strong><small>${optionalNumber(item.grams, " جم")} · ${optionalNumber(carb, " جم كربوهيدرات")}</small></div>
+          <label class="portal-carb-grams"><span>الكمية (جم)</span><input type="number" min="0.1" max="10000" step="1" value="${escapeHtml(item.grams)}" data-carb-grams="${escapeHtml(item.id)}" inputmode="decimal"></label>
+          <button type="button" class="portal-tool-icon-button" data-remove-carb-item="${escapeHtml(item.id)}" aria-label="حذف الصنف"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+      }).join("") : '<p class="portal-tool-hint">لم تضف أصنافًا لهذه الوجبة بعد.</p>';
+      return `<section class="portal-carb-meal" data-carb-meal="${meal.id}">
+        <div class="portal-carb-meal-heading"><div><h4>${meal.name}</h4><small>إجمالي الوجبة: <strong>${optionalNumber(total, " جم")}</strong> كربوهيدرات</small></div>
+          <button type="button" class="portal-tool-add" data-add-carb-food="${meal.id}"><i class="fa-solid fa-plus"></i> إضافة صنف</button></div>
+        <div class="portal-carb-items">${items}</div>
+      </section>`;
+    }).join("");
+    const dayTotal = state.carbMeals.reduce((sum, meal) => sum + meal.items.reduce((part, item) => part + Number(item.food.carb) * Number(item.grams) / 100, 0), 0);
+    $("portalCarbDayTotal").textContent = optionalNumber(dayTotal, " جم");
+  }
+
+  function renderCarbSearchResults(query) {
+    const root = $("portalCarbSearchResults");
+    if (!root) return;
+    if (!query.trim()) { root.innerHTML = '<p class="portal-tool-hint">اكتب اسم الغذاء للبحث في المكتبة.</p>'; return; }
+    const matches = findFoods(query);
+    root.innerHTML = matches.length ? matches.map(food => foodSearchMarkup(food, "carb")).join("") : '<p class="portal-tool-hint">لا توجد نتائج مطابقة.</p>';
+  }
+
+  function renderRenalFoods() {
+    const root = $("portalRenalResults");
+    if (!root) return;
+    const query = $("portalRenalSearch")?.value || "";
+    const nutrient = $("portalRenalNutrient")?.value || "potassium";
+    const labels = { potassium: "البوتاسيوم", phosphorus: "الفوسفور", sodium: "الصوديوم", protein: "البروتين" };
+    if (!query.trim()) { root.innerHTML = '<p class="portal-tool-hint">ابدأ بكتابة اسم الغذاء لعرض بياناته.</p>'; return; }
+    const matches = findFoods(query);
+    root.innerHTML = matches.length ? matches.map(food => {
+      const value = food[nutrient];
+      const display = value === null || value === undefined || value === "" ? "غير مسجل" : optionalNumber(value, " مجم");
+      return `<article class="portal-renal-food"><div><strong>${escapeHtml(food.name_ar || food.name_en || "غذاء")}</strong><small>${escapeHtml(food.household || "—")}</small></div><span><small>${labels[nutrient]} / 100 جم</small><strong>${display}</strong></span></article>`;
+    }).join("") : '<p class="portal-tool-hint">لا توجد نتائج مطابقة.</p>';
+  }
+
+  function openCarbPicker(mealId) {
+    state.activeCarbMeal = mealId;
+    const picker = $("portalCarbPicker");
+    if (!picker) return;
+    picker.hidden = false;
+    $("portalCarbSearch").value = "";
+    $("portalCarbSearchResults").innerHTML = '<p class="portal-tool-hint">اكتب اسم الغذاء للبحث في المكتبة.</p>';
+    picker.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    $("portalCarbSearch").focus({ preventScroll: true });
+  }
+
+  function addCarbFood(foodId) {
+    const food = state.foods?.find(item => String(item.id) === String(foodId));
+    const meal = state.carbMeals.find(item => item.id === state.activeCarbMeal);
+    if (!food || !meal) return;
+    meal.items.push({ id: window.crypto?.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2), food, grams: 100 });
+    $("portalCarbPicker").hidden = true;
+    state.activeCarbMeal = null;
+    renderCarbMeals();
+  }
+
+  function handlePatientToolsClick(event) {
+    const add = event.target.closest("[data-add-carb-food]");
+    const selected = event.target.closest("[data-patient-food]");
+    const remove = event.target.closest("[data-remove-carb-item]");
+    const back = event.target.closest("[data-tools-back]");
+    if (add) openCarbPicker(add.dataset.addCarbFood);
+    else if (selected && selected.dataset.foodMode === "carb") addCarbFood(selected.dataset.patientFood);
+    else if (remove) {
+      state.carbMeals.forEach(meal => { meal.items = meal.items.filter(item => item.id !== remove.dataset.removeCarbItem); });
+      renderCarbMeals();
+    } else if (back) {
+      history.replaceState({}, "", location.pathname + location.search + "#portalHome");
+      showPortalDestination("portalHome");
+    }
+  }
+
+  function handleCarbQuantity(event) {
+    const input = event.target.closest("[data-carb-grams]");
+    if (!input) return;
+    const value = Number(input.value);
+    if (!Number.isFinite(value) || value <= 0 || value > 10000) return;
+    state.carbMeals.forEach(meal => {
+      const item = meal.items.find(entry => entry.id === input.dataset.carbGrams);
+      if (item) item.grams = value;
+    });
+    renderCarbMeals();
+  }
+
   async function loadPortal() {
     showOnly("portalLoading");
     const account = await getPatientAccount();
@@ -650,6 +793,15 @@
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
     $("portalHome")?.querySelector("[data-portal-open-health]")?.addEventListener("click", openHealthArea);
+    $("portalHome")?.querySelector("[data-open-patient-tools]")?.addEventListener("click", () => {
+      history.replaceState({}, "", location.pathname + location.search + "#portalTools");
+      showPortalDestination("portalToolsPanel");
+    });
+    $("portalToolsPanel")?.addEventListener("click", handlePatientToolsClick);
+    $("portalToolsPanel")?.addEventListener("change", handleCarbQuantity);
+    $("portalCarbSearch")?.addEventListener("input", event => renderCarbSearchResults(event.target.value));
+    $("portalRenalSearch")?.addEventListener("input", renderRenalFoods);
+    $("portalRenalNutrient")?.addEventListener("change", renderRenalFoods);
     if (new URLSearchParams(window.location.search).has("invite")) {
       openHealthArea();
     } else if (patientSections.has(initialSection)) {
@@ -668,11 +820,12 @@
           if ($("portalContent")?.hidden) return;
         }
       }
+      if (id === "portalTools") { showPortalDestination("portalToolsPanel"); return; }
       if (id === "portalProfileArea") {
         try { await loadSelfProfile(); }
         catch (error) { setMessage("selfProfileMessage", error.message || "تعذر تحميل بيانات الحساب.", "error"); }
       }
-      showPortalDestination(id);
+      showPortalDestination(id === "portalTools" ? "portalToolsPanel" : id);
     }
   });
 
