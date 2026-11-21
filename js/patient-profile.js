@@ -256,7 +256,12 @@
 
   function renderMeasurements() {
     updateMeasurementSummary();
-    window.DietPlannerWeightLogs?.render({
+    const tableRenderer = window.DietPlannerWeightLogs;
+    if (!tableRenderer || typeof tableRenderer.render !== "function") {
+      showMeasurementError("تعذر تحميل مكوّن جدول القياسات. حدّث الصفحة وحاول مرة أخرى.");
+      return;
+    }
+    tableRenderer.render({
       container: $("weightTableContainer"),
       logs: measurementState.logs,
       actionCell: (_log, index) => `
