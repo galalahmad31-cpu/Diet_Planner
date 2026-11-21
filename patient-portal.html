@@ -140,12 +140,17 @@
           <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>أضف قياساتك لمتابعة التغير مع الوقت.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
         </div>
+        <div class="measurements-toolbar portal-measurements-toolbar">
+          <p id="portalMeasurementAccessStatus" class="measurements-access-status">يمكنك إضافة قياساتك ومتابعة التغير مع الوقت.</p>
+          <button type="button" id="portalAddMeasurement" class="measurements-add-button">＋ إضافة قياس</button>
+        </div>
+        <div id="portalMeasurementsError" class="portal-measurements-error" role="alert" hidden></div>
         <div class="portal-measurement-summary" aria-label="ملخص تغيرات الوزن ومؤشر كتلة الجسم">
           <article><span>التغير من أول قياس</span><strong id="portalWeightChangeOverall">—</strong><small id="portalWeightChangeOverallNote">لا توجد بيانات كافية</small></article>
           <article><span>التغير بين آخر وزنين</span><strong id="portalWeightChangeRecent">—</strong><small id="portalWeightChangeRecentNote">يلزم تسجيل قياسين</small></article>
           <article><span>مؤشر كتلة الجسم (BMI)</span><strong id="portalLatestBmi">—</strong><small id="portalLatestBmiNote">يعتمد على آخر وزن والطول المسجل</small></article>
         </div>
-        <form id="portalMeasurementForm" class="portal-measurement-form">
+        <form id="portalMeasurementForm" class="portal-measurement-form" hidden>
           <input id="portalEditingMeasurementId" type="hidden">
           <div class="portal-form-grid">
             <div><label for="portalWeight">الوزن (كجم) *</label><input id="portalWeight" type="number" min="0.1" max="500" step="0.1" required></div>
