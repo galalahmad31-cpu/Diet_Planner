@@ -39,11 +39,24 @@
             <button id="logoutBtn" type="button" class="dp-app-header__logout" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
           </div>
         </div>
-        <nav class="dp-app-header__nav is-expanded dp-patient-header__nav" aria-label="التنقل في بوابة المريض">
-          <div class="dp-app-header__nav-top"><span class="dp-patient-header__nav-label">التنقل بين صفحات بوابة المريض</span></div>
-          <div class="dp-app-header__track"></div>
+        <nav class="dp-app-header__nav is-collapsed dp-patient-header__nav" aria-label="التنقل في بوابة المريض">
+          <div class="dp-app-header__nav-top">
+            <button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-patient-header-track">
+              <span>التنقل بين صفحات بوابة المريض</span>
+              <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="dp-app-header__track" id="dp-patient-header-track"></div>
         </nav>`;
       const track = header.querySelector(".dp-app-header__track");
+      const nav = header.querySelector(".dp-patient-header__nav");
+      const toggle = header.querySelector(".dp-app-header__toggle");
+      toggle.addEventListener("click", () => {
+        const expanded = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", String(!expanded));
+        nav.classList.toggle("is-expanded", !expanded);
+        nav.classList.toggle("is-collapsed", expanded);
+      });
       patientPages.forEach(([href, label, icon]) => {
         const link = document.createElement("a");
         link.className = "dp-app-header__link";
@@ -61,9 +74,17 @@
         const link = event.target.closest("[data-patient-target]");
         if (!link) return;
         const target = link.dataset.patientTarget;
+        if (!target.startsWith("#")) {
+          toggle.setAttribute("aria-expanded", "false");
+          nav.classList.remove("is-expanded");
+          nav.classList.add("is-collapsed");
+        }
         if (target.startsWith("#")) {
           event.preventDefault();
           window.DietPlannerPatientPortal?.navigateToSection(target.slice(1));
+          toggle.setAttribute("aria-expanded", "false");
+          nav.classList.remove("is-expanded");
+          nav.classList.add("is-collapsed");
           track.querySelectorAll(".dp-app-header__link").forEach(item => {
             const active = item === link;
             item.classList.toggle("is-active", active);
