@@ -752,6 +752,56 @@
     renderToolMeals(tool);
   }
 
+  function calculateInsulinEstimate() {
+    const mealId = $("portalInsulinMeal")?.value || "breakfast";
+    const meal = state.carbMeals.find(item => item.id === mealId);
+    const carbResult = meal ? getMealNutrientTotal(meal, "carb") : { total: 0, missing: 0 };
+    const carbs = carbResult.total;
+    const unit = $("portalInsulinUnit")?.value || "mg";
+    const currentRaw = Number($("portalInsulinCurrent")?.value);
+    const targetRaw = Number($("portalInsulinTarget")?.value);
+    const icr = Number($("portalInsulinIcr")?.value);
+    const isf = Number($("portalInsulinIsf")?.value);
+    const iobRaw = $("portalInsulinIob")?.value;
+    const iob = iobRaw === "" ? 0 : Number(iobRaw);
+    const outputIds = ["portalInsulinCarbs", "portalInsulinMealDose", "portalInsulinCorrectionDose", "portalInsulinNetDose"];
+    const message = $("portalInsulinMessage");
+    const setOutputs = values => outputIds.forEach((id, index) => { const node = $(id); if (node) node.textContent = values[index]; });
+    const formatUnits = value => Number.isFinite(value) ? value.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة" : "—";
+    setOutputs([optionalNumber(carbs, " جم"), "—", "—", "—"]);
+    if (!message) return;
+    if (!meal || meal.items.length === 0) {
+      message.textContent = "أضف أصنافًا إلى الوجبة المحددة أولًا حتى يمكن حساب جرعة تغطية الكربوهيدرات.";
+      message.dataset.state = "notice";
+      return;
+    }
+    if (carbResult.missing > 0) {
+      message.textContent = "توجد أصناف في الوجبة لا تتوفر لها قيمة كربوهيدرات مسجلة؛ لا يمكن إكمال الحساب بدقة.";
+      message.dataset.state = "warning";
+      return;
+    }
+    const required = [currentRaw, targetRaw, icr, isf];
+    if (required.some(value => !Number.isFinite(value) || value <= 0) || !Number.isFinite(iob) || iob < 0) {
+      message.textContent = "أدخل قراءة السكر والهدف وICR وISF. يمكن ترك IOB فارغًا إذا لم توجد جرعة نشطة معروفة.";
+      message.dataset.state = "notice";
+      return;
+    }
+    const glucoseFactor = unit === "mmol" ? 18 : 1;
+    const currentMg = currentRaw * glucoseFactor;
+    const targetMg = targetRaw * glucoseFactor;
+    if (currentMg < 70) {
+      message.textContent = "قراءة السكر أقل من 70 mg/dL؛ تم إيقاف حساب الجرعة. اتبع خطة التعامل مع انخفاض السكر الموصوفة لك.";
+      message.dataset.state = "warning";
+      return;
+    }
+    const mealDose = carbs / icr;
+    const correctionDose = Math.max(0, (currentMg - targetMg) / isf);
+    const netDose = Math.max(0, mealDose + correctionDose - iob);
+    setOutputs([optionalNumber(carbs, " جم"), formatUnits(mealDose), formatUnits(correctionDose), formatUnits(netDose)]);
+    message.textContent = "نتيجة حسابية غير معتمدة كقرار جرعة. راجع خطة الإنسولين، توقيت الجرعة، IOB، ومعدل امتصاص الوجبة مع الفريق المعالج. لا تُجرِ تقريبًا تلقائيًا.";
+    message.dataset.state = "notice";
+  }
+
   async function loadPortal() {
     showOnly("portalLoading");
     const account = await getPatientAccount();
@@ -896,9 +946,16 @@
     });
     $("portalToolsPanel")?.addEventListener("click", handlePatientToolsClick);
     $("portalToolsPanel")?.addEventListener("change", handleToolQuantity);
+    $("portalToolsPanel")?.addEventListener("input", event => {
+      if (event.target.closest(".portal-insulin-fields")) calculateInsulinEstimate();
+    });
+    $("portalToolsPanel")?.addEventListener("change", event => {
+      if (event.target.matches("#portalInsulinMeal, #portalInsulinUnit")) calculateInsulinEstimate();
+    });
     $("portalCarbSearch")?.addEventListener("input", event => renderFoodSearchResults(event.target.value));
     $("portalCarbPicker")?.addEventListener("keydown", event => { if (event.key === "Escape") closeFoodPicker(); });
     activateToolsTab("portalCarbPanel");
+    calculateInsulinEstimate();
     if (new URLSearchParams(window.location.search).has("invite")) {
       openHealthArea();
     } else if (patientSections.has(initialSection)) {
