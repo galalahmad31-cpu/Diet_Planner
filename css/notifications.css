@@ -15,7 +15,7 @@ body.notifications-page{
 .notifications-page .notifications-tabs{padding:14px}
 .notifications-page .notifications-tab-list{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:8px;
   padding:6px;
   border-radius:16px;
@@ -138,3 +138,11 @@ body.notifications-page{
 }
 .notifications-page .notification-error-title{color:var(--dp-danger)!important}
 .notifications-page .notification-error-detail{color:var(--dp-text-2)!important}
+
+.notifications-page .notification-event-card{border-color:var(--dp-border)}
+.notifications-page .notification-event-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:14px;background:var(--dp-notification-info-bg);color:var(--dp-notification-info-text)}
+.notifications-page .notification-unread-label{padding:3px 8px;border-radius:999px;background:var(--dp-notification-warning-bg);color:var(--dp-notification-warning-text);font-size:10px;font-weight:900}
+.notifications-page .notification-open-button{display:inline-flex;align-items:center;gap:5px;margin-top:12px;padding:8px 12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.notifications-page .notification-open-button:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
+.notifications-page .notification-open-button:disabled{opacity:.6;cursor:wait}
+@media(max-width:520px){.notifications-page .notifications-tab-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
