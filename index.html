@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/landing.css?v=20261121-books-grid-v1">
+  <link rel="stylesheet" href="css/landing.css?v=20261121-home-workflow-v2">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
   <script src="js/app-header.js?v=20261121-books-nav-v2" defer></script>
@@ -75,51 +75,45 @@
 
 <p class="dp-landing-account-status" id="landingAccountStatus" role="status" aria-live="polite" hidden></p>
 
-    <section class="dp-landing-services" id="public-services" aria-labelledby="landingServicesTitle">
+    <section class="dp-landing-workflow" aria-labelledby="landingWorkflowTitle">
       <div class="dp-landing-section-heading">
-        <span>خدمات متاحة للجميع</span>
-        <h2 id="landingServicesTitle">استكشف خدمات Diet Planner</h2>
-        <p>يمكنك تصفح هذه الخدمات دون الدخول إلى مساحة المريض أو المختص.</p>
+        <span>منهج عمل متكامل</span>
+        <h2 id="landingWorkflowTitle">من التقييم إلى متابعة النتائج</h2>
+        <p>خطوات مترابطة لتنظيم رحلة التغذية العلاجية.</p>
       </div>
-      <div class="dp-landing-service-grid">
-        <a class="dp-landing-service" href="article.html">
-          <span><i class="fa-solid fa-newspaper" aria-hidden="true"></i></span>
-          <strong>المقالات العلمية</strong>
-          <small>محتوى علمي في التغذية العلاجية والإكلينيكية</small>
-          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
-        </a>
-        <a class="dp-landing-service" href="books.html">
-          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i></span>
-          <strong>مكتبة الكتب العلمية</strong>
-          <small>تصفح الكتب والمراجع المتخصصة في التغذية والعلوم الصحية</small>
-          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
-        </a>
-        <a class="dp-landing-service" href="about.html">
-          <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
-          <strong>عن التطبيق</strong>
-          <small>تعرّف على المنصة وأدواتها وطريقة استخدامها</small>
-          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
-        </a>
-        <a class="dp-landing-service" href="feedback.html">
-          <span><i class="fa-solid fa-comment-dots" aria-hidden="true"></i></span>
-          <strong>شاركنا رأيك</strong>
-          <small>أرسل ملاحظاتك واقتراحاتك لتطوير المنصة</small>
-          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
-        </a>
-        <a class="dp-landing-service" href="jobs.html">
-          <span><i class="fa-solid fa-briefcase" aria-hidden="true"></i></span>
-          <strong>الوظائف الطبية</strong>
-          <small>تصفح فرص العمل في المجالات الطبية والصحية</small>
-          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
-        </a>
-        <a class="dp-landing-service" href="quickcalc.html">
-          <span><i class="fa-solid fa-calculator" aria-hidden="true"></i></span>
-          <strong>الحاسبة السريعة</strong>
-          <small>أدوات حساب غذائية وسريرية سريعة</small>
-          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
-        </a>
-      </div>
+      <ol class="dp-landing-workflow-grid">
+        <li class="dp-landing-workflow-step">
+          <span class="dp-landing-step-number">01</span>
+          <span class="dp-landing-step-icon"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i></span>
+          <h3>التقييم الغذائي</h3>
+          <p>تجميع بيانات الحالة والقياسات وتحديد الاحتياجات الغذائية.</p>
+        </li>
+        <li class="dp-landing-workflow-step">
+          <span class="dp-landing-step-number">02</span>
+          <span class="dp-landing-step-icon"><i class="fa-solid fa-utensils" aria-hidden="true"></i></span>
+          <h3>تخطيط الوجبات</h3>
+          <p>إعداد خطة غذائية منظمة بالوجبات والأصناف والكميات.</p>
+        </li>
+        <li class="dp-landing-workflow-step">
+          <span class="dp-landing-step-number">03</span>
+          <span class="dp-landing-step-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+          <h3>متابعة الاستجابة</h3>
+          <p>تسجيل القياسات ومراجعة تطور الحالة وتحديث الخطة.</p>
+        </li>
+      </ol>
     </section>
+
+    <section class="dp-landing-latest" aria-labelledby="landingLatestTitle">
+      <div class="dp-landing-section-heading dp-landing-latest-heading">
+        <span>المعرفة والتطوير العلمي</span>
+        <h2 id="landingLatestTitle">أحدث المقالات العلمية</h2>
+        <p>محتوى منشور من مكتبة المقالات العلمية في Diet Planner.</p>
+      </div>
+      <div class="dp-landing-article-grid" id="landingLatestArticles" aria-live="polite">
+        <p class="dp-landing-articles-state">جاري تحميل أحدث المقالات...</p>
+      </div>
+      <a class="dp-landing-all-articles" href="article.html">استكشف مكتبة المقالات <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+    </section>ion>
   </main>
 
   <footer class="dp-landing-footer">
@@ -129,6 +123,6 @@
   </footer>
 
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
-  <script src="js/landing.js?v=20261121-public-home-v2"></script>
+  <script src="js/landing.js?v=20261121-home-workflow-v2"></script>
 </body>
 </html>
