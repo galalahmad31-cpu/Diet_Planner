@@ -210,6 +210,9 @@
     // This also prevents a temporary RPC failure from locking the entire UI.
     const role = await getUserRole(userId);
     if (role === "admin") return true;
+    const accountType = await getUserAccountType(userId);
+    if (accountType === "patient" || accountType === "pending") return false;
+    if (accountType !== "professional") return null;
 
     const { data, error } = await supabaseClient.rpc(
       "has_active_subscription",
@@ -226,6 +229,9 @@
 
   async function canAddPatient(userId) {
     if (!userId) return false;
+    const role = await getUserRole(userId);
+    if (role === "admin") return true;
+    if (await getUserAccountType(userId) !== "professional") return false;
 
     const { data, error } = await supabaseClient.rpc(
       "can_add_patient",
@@ -252,6 +258,8 @@
   // ---------------------------------------------------------
   async function hasFeature(userId, featureKey) {
     if (!userId || !featureKey) return false;
+    const role = await getUserRole(userId);
+    if (role !== "admin" && await getUserAccountType(userId) !== "professional") return false;
 
     const { data, error } = await supabaseClient.rpc(
       "has_feature",
@@ -301,7 +309,7 @@
       accountType,
       isAdmin: role === "admin",
       hasActiveSubscription: activeSubscription === true,
-      accessVerificationFailed: role === null || activeSubscription === null
+      accessVerificationFailed: role === null || accountType === null || activeSubscription === null
     };
   }
 
