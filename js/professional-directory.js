@@ -95,7 +95,7 @@ async function submitRequest(){
   const accountType=await window.DietPlannerAccess?.getUserAccountType(user.id);if(accountType!=="patient")throw new Error("patient_account_required");
   const {error}=await db.rpc("request_professional_connection",{p_professional_id:p.user_id,p_message:message||null});if(error)throw error;
   state.requestStatus.set(p.user_id,"pending");$("directoryModalStatus").textContent="تم إرسال طلب المحادثة. يمكنك إلغاءه من بوابة المريض ما دام قيد الانتظار.";
-  $("directoryModalStatus").className="directory-modal-status is-success";send.textContent="تم إرسال الطلب";send.disabled=true;renderProfiles();
+  $("directoryModalStatus").className="directory-modal-status is-success";send.textContent="تم إرسال طلب المحادثة";send.disabled=true;renderProfiles();
  }catch(error){
   console.error("[Professional Directory] Request failed:",error);
   const messages={patient_account_required:"هذه الخدمة متاحة لحسابات المرضى فقط.",professional_not_available:"هذا الملف لم يعد متاحًا لاستقبال الطلبات.",already_in_care_team:"أنت مرتبط بالفعل بهذا المختص.",connection_already_open:"لديك محادثة مفتوحة بالفعل مع هذا المختص.",message_too_long:"الرسالة أطول من الحد المسموح."};
@@ -109,6 +109,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("directoryModalClose").addEventListener("click",closeModal);
  $("directoryModal").addEventListener("click",e=>{if(e.target===$("directoryModal"))closeModal();});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("directoryModal").hidden)closeModal();});
- $("directorySendRequest").addEventListener("click",submitRequest);void loadMyRequests().finally(loadProfiles);
+ $("directorySendRequest").addEventListener("click",submitRequest);void loadMyRequests().catch(error=>console.warn("[Professional Directory] Request status load failed:",error)).finally(loadProfiles);
 });
 })();
