@@ -414,7 +414,7 @@
 
     try {
       const status = await window.DietPlannerAccess?.getAccessStatus?.();
-      if (!status || status.accessVerificationFailed || !status.accountType) {
+      if (!status || status.accessVerificationFailed || (!status.accountType && !status.isAdmin)) {
         account.href = appBasePath + "login.html";
         account.textContent = "استكمال الحساب";
         return;
