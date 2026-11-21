@@ -20,7 +20,7 @@ let isNewPlan=params.get('new_plan')==='1';
 let patientId=initialUrlPatientId;
 let activePlanStartDate=null, activePlanName=null;
 
-let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
+let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], foodById=new Map(), daysData=[], savedDaysData=[], dayEditModes={};
 const savingDayIds=new Set();
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
 let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
@@ -93,10 +93,14 @@ async function loadFoods(options={}){
  const isFullLoad=!ids;
 
  if(isFullLoad && foodsFullyLoaded)return true;
- if(foodsLoadPromise)return foodsLoadPromise;
+ if(foodsLoadPromise){
+  await foodsLoadPromise;
+  if(isFullLoad&&!foodsFullyLoaded)return loadFoods(options);
+  return true;
+ }
 
  foodsLoadPromise=(async()=>{
-  let query=sb.from('foods').select('*',{count:'exact'}).order('name_ar',{ascending:true});
+  let query=sb.from('foods').select('id,name_ar,household,kcal,protein,carb,fat,sodium,potassium,phosphorus').order('name_ar',{ascending:true});
   if(ids?.length)query=query.in('id',ids);
   else if(ids){
    foodDatabase=[];
@@ -115,6 +119,7 @@ async function loadFoods(options={}){
    id:String(f.id),
    name:String(f.name_ar??'').trim(),
    household:f.household||'',
+   searchName:normalizeFoodSearch(f.name_ar??''),
    calories:Number(f.kcal||0),
    protein:Number(f.protein||0),
    carbs:Number(f.carb||0),
@@ -127,10 +132,12 @@ async function loadFoods(options={}){
   if(isFullLoad){
    foodDatabase=mapped;
    foodsFullyLoaded=true;
+   foodById=new Map(mapped.map(food=>[String(food.id),food]));
   }else{
    const existing=new Map(foodDatabase.map(f=>[String(f.id),f]));
    mapped.forEach(f=>existing.set(String(f.id),f));
    foodDatabase=[...existing.values()];
+   foodById=new Map(foodDatabase.map(food=>[String(food.id),food]));
   }
 
   console.info(`Foods loaded: ${mapped.length}${isFullLoad?' (full library)':' (plan references)'}`);
@@ -176,7 +183,11 @@ async function loadPlan(shouldRender=true){
   const ids=(dayRows||[]).map(x=>x.id);
   let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
   const mids=meals.map(x=>x.id); let items=[]; if(mids.length){const r=await sb.from('plan_items').select('id,meal_id,food_id,quantity_g,frequency,notes').in('meal_id',mids);items=r.data||[];}
-  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:meals.filter(m=>m.day_id===d.id).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:items.filter(i=>i.meal_id===m.id).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
+  const mealsByDay=new Map();
+  const itemsByMeal=new Map();
+  meals.forEach(meal=>{const group=mealsByDay.get(meal.day_id)||[];group.push(meal);mealsByDay.set(meal.day_id,group);});
+  items.forEach(item=>{const group=itemsByMeal.get(item.meal_id)||[];group.push(item);itemsByMeal.set(item.meal_id,group);});
+  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:(mealsByDay.get(d.id)||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:(itemsByMeal.get(m.id)||[]).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
   savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
 }
 
@@ -232,7 +243,7 @@ async function saveDay(id){
 
   const missingFoods=[];
   (day.meals||[]).forEach(meal=>(meal.items||[]).forEach(item=>{
-   if(item.foodId&&!foodDatabase.some(food=>String(food.id)===String(item.foodId)))missingFoods.push(String(item.foodId));
+   if(item.foodId&&!foodById.has(String(item.foodId)))missingFoods.push(String(item.foodId));
   }));
   if(missingFoods.length)throw new Error('أصناف غير موجودة في مكتبة الأغذية: '+[...new Set(missingFoods)].join(', '));
 
@@ -362,8 +373,7 @@ function closeAddMealModal(){
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
-async function openFoodModal(did,mid){
- await ensureAllFoods();
+function openFoodModal(did,mid){
  const modal=ensureDietModalPortal('foodModal');
  if(!modal)return;
  currentModalContext={dayId:did,mealId:mid};
@@ -375,8 +385,20 @@ async function openFoodModal(did,mid){
  document.getElementById('foodModalHouseholdBox').classList.add('hidden');
 
  modal.classList.remove('hidden');
- filterFoodList();
+ const drop=document.getElementById('foodDropdownList');
+ if(drop)drop.innerHTML=foodsFullyLoaded ? '' : '<div class="p-3 text-xs text-slate-400 text-center font-bold">جارٍ تحميل الأصناف...</div>';
  document.getElementById('foodSearchInput').focus({preventScroll:true});
+ if(foodsFullyLoaded){filterFoodList();return;}
+ const contextKey=`${did}|${mid}`;
+ ensureAllFoods().then(ok=>{
+  if(!ok||document.getElementById('foodModal')?.classList.contains('hidden'))return;
+  if(`${currentModalContext.dayId}|${currentModalContext.mealId}`!==contextKey)return;
+  filterFoodList();
+ }).catch(error=>{
+  console.error('Food picker load failed:',error);
+  if(`${currentModalContext.dayId}|${currentModalContext.mealId}`===contextKey&&drop)
+   drop.innerHTML='<div class="p-3 text-xs text-rose-500 text-center font-bold">تعذر تحميل الأصناف. حاول مرة أخرى.</div>';
+ });
 }
 function closeFoodModal(){
  const modal=document.getElementById('foodModal');
@@ -385,7 +407,7 @@ function closeFoodModal(){
  }
  currentModalContext={dayId:null,mealId:null};
 }
-function updateFoodModalHousehold(){const f=foodDatabase.find(x=>x.id===document.getElementById('selectedFoodId').value),g=parseFloat(document.getElementById('foodGramsInput').value),box=document.getElementById('foodModalHouseholdBox');if(f?.household&&Number.isFinite(g)){document.getElementById('foodModalHousehold').textContent=scaleHouseholdMeasure(f.household,g);box.classList.remove('hidden')}else box.classList.add('hidden');}
+function updateFoodModalHousehold(){const f=foodById.get(String(document.getElementById('selectedFoodId').value)),g=parseFloat(document.getElementById('foodGramsInput').value),box=document.getElementById('foodModalHouseholdBox');if(f?.household&&Number.isFinite(g)){document.getElementById('foodModalHousehold').textContent=scaleHouseholdMeasure(f.household,g);box.classList.remove('hidden')}else box.classList.add('hidden');}
 function normalizeFoodSearch(value){
  return String(value??'')
   .normalize('NFD')
@@ -408,9 +430,8 @@ function filterFoodList(){
 
  const q=normalizeFoodSearch(input.value);
  const selectedId=String(document.getElementById('selectedFoodId')?.value||'');
- const list=q
-  ? foodDatabase.filter(f=>normalizeFoodSearch(f.name).includes(q))
-  : foodDatabase;
+ const matches=q ? foodDatabase.filter(f=>(f.searchName||'').includes(q)) : foodDatabase;
+ const list=matches.slice(0,40);
 
  if(!list.length){
   drop.innerHTML='<div class="p-3 text-xs text-slate-400 text-center font-bold">لا توجد نتائج مطابقة</div>';
@@ -436,7 +457,7 @@ function selectFoodForMeal(id){
  if(String(selected.value)===foodId){
   selected.value='';
  }else{
-  const food=foodDatabase.find(item=>String(item.id)===foodId);
+  const food=foodById.get(foodId);
   if(!food)return;
   selected.value=foodId;
  }
@@ -487,7 +508,7 @@ function updateMealItemCalculation(did,mid,iid,checked){const d=daysData.find(x=
 
 function calculateDay(day){
  let cal=0,pro=0,carb=0,fat=0,sod=0,pot=0,pho=0;
- (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{if(it.includeInCalculation===false)return;const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
+ (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{if(it.includeInCalculation===false)return;const f=foodById.get(String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
  return {cal,pro,carb,fat,sod,pot,pho};
 }
 function metricRing(label,value,unit,target,kind){
@@ -732,7 +753,7 @@ function serializePlanDay(day){
   meals:(day.meals||[]).map(meal=>({
    name:meal.name||'',
    items:(meal.items||[]).map(item=>{
-    const food=foodDatabase.find(f=>String(f.id)===String(item.foodId));
+    const food=foodById.get(String(item.foodId));
     return {
      foodId:item.foodId?String(item.foodId):null,
      grams:num(item.grams),
@@ -804,7 +825,7 @@ function renderDayCard(d,di){
 
    <section class="day-meals-list" aria-label="وجبات اليوم">
     ${meals.map((m,mi)=>{
-     const foods=(m.items||[]).map(it=>({item:it,food:foodDatabase.find(x=>String(x.id)===String(it.foodId))})).filter(x=>x.food);
+     const foods=(m.items||[]).map(it=>({item:it,food:foodById.get(String(it.foodId))})).filter(x=>x.food);
      return `<article class="meal-card">
       <header class="meal-card-header">
        <div class="meal-title-wrap"><span class="meal-order">${String(mi+1).padStart(2,'0')}</span><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" aria-label="اسم الوجبة" class="meal-title-input"></div>
@@ -950,7 +971,7 @@ function buildPrintPlan(){
  container.innerHTML=rows.length?rows.map((day,di)=>{
    const meals=(day.meals||[]).filter(m=>(m.items||[]).some(it=>foodDatabase.some(f=>String(f.id)===String(it.foodId))));
    return `<section class="print-day"><h2 class="print-day-title">${escapeHtml(day.title||`اليوم ${di+1}`)}</h2>
-   ${meals.length?meals.map(meal=>`<div class="print-meal"><h3 class="print-meal-title">${escapeHtml(meal.name||'وجبة')}</h3><table><thead><tr><th>الصنف</th><th style="width:18%;text-align:center">الكمية</th><th style="width:28%;text-align:center">المقياس المنزلي</th><th style="width:15%;text-align:center">التكرار</th><th style="width:22%;text-align:center">ملاحظة</th></tr></thead><tbody>${(meal.items||[]).map(it=>{const f=foodDatabase.find(x=>String(x.id)===String(it.foodId));if(!f)return'';return `<tr><td>${escapeHtml(f.name)}</td><td style="text-align:center">${num(it.grams)} جم</td><td style="text-align:center">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td style="text-align:center">${escapeHtml(it.repeat||'—')}</td><td>${escapeHtml(it.notes||'—')}</td></tr>`}).join('')}</tbody></table></div>`).join(''):`<p class="print-note">لا توجد أصناف مسجلة لهذا اليوم.</p>`}
+   ${meals.length?meals.map(meal=>`<div class="print-meal"><h3 class="print-meal-title">${escapeHtml(meal.name||'وجبة')}</h3><table><thead><tr><th>الصنف</th><th style="width:18%;text-align:center">الكمية</th><th style="width:28%;text-align:center">المقياس المنزلي</th><th style="width:15%;text-align:center">التكرار</th><th style="width:22%;text-align:center">ملاحظة</th></tr></thead><tbody>${(meal.items||[]).map(it=>{const f=foodById.get(String(it.foodId));if(!f)return'';return `<tr><td>${escapeHtml(f.name)}</td><td style="text-align:center">${num(it.grams)} جم</td><td style="text-align:center">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td style="text-align:center">${escapeHtml(it.repeat||'—')}</td><td>${escapeHtml(it.notes||'—')}</td></tr>`}).join('')}</tbody></table></div>`).join(''):`<p class="print-note">لا توجد أصناف مسجلة لهذا اليوم.</p>`}
    ${day.notes?`<p class="print-note">ملاحظات اليوم: ${escapeHtml(day.notes)}</p>`:''}</section>`;
  }).join(''):`<p class="print-note">لا توجد أيام غذائية مسجلة.</p>`;
 }
