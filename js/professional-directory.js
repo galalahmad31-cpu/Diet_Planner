@@ -124,7 +124,7 @@ async function submitRequest(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
  $("directoryMore").addEventListener("click",loadProfiles);
- ["directorySearch","directoryGovernorate","directoryMode"].forEach(id=>$ (id).addEventListener(id==="directorySearch"?"input":"change",renderProfiles));
+ ["directorySearch","directoryGovernorate","directoryMode"].forEach(id=>$(id).addEventListener(id==="directorySearch"?"input":"change",renderProfiles));
  $("directoryCards").addEventListener("click",event=>{
   const view=event.target.closest("[data-view-profile]");
   const request=event.target.closest("[data-request-profile]");
