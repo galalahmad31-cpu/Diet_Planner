@@ -5,6 +5,7 @@
     patientCard: document.getElementById("landingPatientCard"),
     professionalCard: document.getElementById("landingProfessionalCard"),
     patientAction: document.getElementById("landingPatientAction"),
+    guestAction: document.getElementById("landingGuestAction"),
     professionalAction: document.getElementById("landingProfessionalAction"),
     status: document.getElementById("landingAccountStatus"),
     themeToggle: document.getElementById("landingThemeToggle")
@@ -12,6 +13,8 @@
 
   function showAccountRoute(accountType, hasActiveSubscription) {
     if (accountType === "patient") {
+      elements.guestAction.hidden = true;
+      elements.patientAction.hidden = false;
       elements.professionalCard.hidden = true;
       elements.patientAction.href = "patient-portal.html";
       elements.patientAction.innerHTML = 'دخول بوابة المريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>';
@@ -20,6 +23,8 @@
     }
 
     if (accountType === "professional") {
+      elements.guestAction.hidden = true;
+      elements.professionalAction.hidden = false;
       elements.patientCard.hidden = true;
       elements.professionalAction.href = hasActiveSubscription ? "app.html" : "profile.html";
       elements.professionalAction.innerHTML = hasActiveSubscription
@@ -30,6 +35,7 @@
     }
 
     if (accountType === "pending") {
+      elements.guestAction.hidden = true;
       elements.patientCard.hidden = true;
       elements.professionalCard.hidden = true;
       elements.status.hidden = false;
@@ -59,6 +65,7 @@
       }
 
       if (status.isAdmin) {
+        elements.guestAction.hidden = true;
         elements.patientCard.hidden = true;
         elements.professionalCard.hidden = true;
         elements.status.hidden = false;
