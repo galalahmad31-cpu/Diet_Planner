@@ -467,7 +467,7 @@
     const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
     if (error) { root.textContent = "تعذر تحميل طلبات المحادثة."; return; }
     if (!data?.length) { root.textContent = "لم ترسل طلبات محادثة حتى الآن."; return; }
-    const status = { pending: "طلب المحادثة قيد الانتظار", accepted: "المحادثة مفتوحة · بانتظار الاتفاق والدفع", active: "المتابعة نشطة", declined: "لم يتم قبول الطلب", cancelled: "ملغي" };
+    const status = { pending: "طلب المحادثة قيد الانتظار", accepted: "المحادثة مفتوحة · بانتظار الاتفاق والدفع", active: "المتابعة نشطة", ended: "انتهت المتابعة", declined: "لم يتم قبول الطلب", cancelled: "ملغي" };
     root.className = "portal-plans-list";
     root.innerHTML = data.map(item => `<article class="portal-plan-card"><div class="portal-plan-head"><div><strong>${escapeHtml(item.professional_name || "مختص")}</strong><small>${escapeHtml(item.professional_title || "")}</small></div><span class="portal-plan-status">${escapeHtml(status[item.status] || item.status)}</span></div>${item.status === "pending" ? `<button type="button" class="portal-primary-button" data-cancel-professional-request="${escapeHtml(item.request_id)}">إلغاء الطلب</button>` : ""}</article>`).join("");
     root.querySelectorAll("[data-cancel-professional-request]").forEach(button => button.addEventListener("click", async () => {
