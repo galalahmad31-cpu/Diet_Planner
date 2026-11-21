@@ -1,5 +1,5 @@
 /* Shared measurement table — one visual system for patient and specialist areas. */
-.measurements-table-container{width:100%;min-width:0;color:var(--portal-ink,var(--text-color,#263b3b));}
+.measurements-table-container{--portal-ink:var(--dp-text,var(--text-color,#263b3b));--portal-muted:var(--dp-muted,var(--text-muted,#82919a));--portal-line:var(--dp-border,var(--border-color,#e5edf0));--portal-bg:var(--dp-surface-2,var(--surface-muted,#f1f7f6));--portal-card:var(--dp-surface,var(--card-bg,#fff));--portal-accent:var(--dp-primary,var(--primary-color,#059669));--portal-accent-dark:var(--dp-primary-hover,var(--primary-hover,#047857));--portal-soft:var(--dp-surface-3,var(--surface-muted,#eef6f4));width:100%;min-width:0;color:var(--portal-ink);}
 .measurements-table-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;}
 .measurements-table-heading h3{margin:0;color:var(--portal-ink,var(--text-color,#163541));font-size:13px;font-weight:900;}
 .measurements-table-heading p{margin:3px 0 0;color:var(--portal-muted,var(--text-muted,#82919a));font-size:9px;font-weight:600;}
