@@ -181,3 +181,5 @@
 .dp-app-header__notification-nav-link{position:relative}
 .dp-patient-header__nav .dp-app-header__notification-nav-link{min-width:0;width:auto;flex:initial;height:auto;min-height:38px}
 .dp-patient-header__nav .dp-app-header__notification-badge{top:2px;inset-inline-start:5px;border-color:#087765}
+
+.dp-app-header__notification-nav-link[hidden]{display:none!important}
