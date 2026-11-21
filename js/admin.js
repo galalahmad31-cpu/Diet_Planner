@@ -164,6 +164,15 @@ function openSubAssignment(profile){
  <div class="field full"><div style="font-size:11px;color:#718683;background:#f7faf9;border-radius:9px;padding:9px">هذه عملية إضافة اشتراك جديد وليست عرضًا لحالة المستخدم الحالية. عند اختيار «تفعيل فوري» يبدأ الاشتراك من اليوم وتُحسب نهايته تلقائيًا حسب مدة الباقة.</div></div>
  </div><div class="modal-foot"><button class="btn btn-primary" type="submit">إضافة الاشتراك</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`);
  $('cancelModal').onclick=closeModal;
+ const planSelect=$('new_sub_plan'),statusSelect=$('new_sub_status');
+ planSelect.addEventListener('change',()=>{
+  const selectedPlan=availablePlans.find(item=>item.id===planSelect.value);
+  const pendingOption=statusSelect.querySelector('option[value="pending"]');
+  if(!pendingOption)return;
+  pendingOption.disabled=selectedPlan?.is_free_trial===true;
+  if(selectedPlan?.is_free_trial===true)statusSelect.value='paid';
+  else if(statusSelect.value==='paid'&&pendingOption.disabled===false)statusSelect.value='';
+ });
  $('subAssignmentForm').addEventListener('submit',async event=>{
   event.preventDefault();
   const form=$('subAssignmentForm');
@@ -173,6 +182,7 @@ function openSubAssignment(profile){
   if(!plan){toast('الباقة المحددة غير موجودة في سجل الخطط.');return}
   const status=$('new_sub_status').value;
   if(!['paid','pending'].includes(status)){toast('اختر حالة الاشتراك الجديد.');return}
+  if(plan.is_free_trial===true&&status!=='paid'){toast('التجربة المجانية تُفعّل فورًا ولا تُرسل للمراجعة.');return}
   if(!Number.isInteger(Number(plan.duration_days))||Number(plan.duration_days)<=0){toast('مدة الباقة المحددة غير صحيحة.');return}
   button.disabled=true;button.textContent='جاري إضافة الاشتراك...';
   try{
