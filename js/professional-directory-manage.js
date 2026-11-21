@@ -161,7 +161,6 @@ async function load(){
 document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("hashchange",()=>{if(setPageView())void loadRequests();else setPageView();});
  $("addProfessionalOffer").addEventListener("click",addOffer);
- $("saveProfessionalOffers").addEventListener("click",saveOffers);
  $("professionalProfileForm").addEventListener("submit",async e=>{e.preventDefault();if(await save()){}});
  $("submitForReview").addEventListener("click",async()=>{
   if(!await save())return;
