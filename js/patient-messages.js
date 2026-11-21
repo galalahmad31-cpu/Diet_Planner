@@ -75,6 +75,7 @@
     const recipientSelect = root.querySelector("[data-message-recipient]");
     let recipientId = null;
     let busy = false;
+    let loading = false;
     let counterpartLabel = role === "patient" ? "المختص" : "المريض";
 
     try {
@@ -144,7 +145,8 @@
     }
 
     async function loadMessages() {
-      if (busy) return;
+      if (loading) return;
+      loading = true;
       refreshButton.disabled = true;
       try {
         const { error: readError } = await supabase.rpc("mark_patient_messages_read", {
@@ -176,6 +178,7 @@
         list.innerHTML = '<div class="patient-messages-empty is-error">تعذر تحميل الرسائل. اضغط تحديث للمحاولة مرة أخرى.</div>';
         setStatus(root, error.message || "تعذر تحميل الرسائل.", "error");
       } finally {
+        loading = false;
         refreshButton.disabled = false;
       }
     }
