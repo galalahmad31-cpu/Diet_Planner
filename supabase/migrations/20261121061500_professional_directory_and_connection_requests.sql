@@ -1,5 +1,5 @@
 create table if not exists public.professional_directory_profiles (
- user_id uuid primary key references auth.users(id) on delete cascade,
+ user_id uuid primary key default auth.uid() references auth.users(id) on delete cascade,
  display_name text not null check(char_length(btrim(display_name)) between 2 and 120),
  professional_title text not null check(char_length(btrim(professional_title)) between 2 and 160),
  bio text not null default '' check(char_length(bio)<=2000),
