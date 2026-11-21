@@ -15,7 +15,7 @@
       elements.professionalCard.hidden = true;
       elements.patientAction.href = "patient-portal.html";
       elements.patientAction.innerHTML = 'دخول بوابة المريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>';
-      elements.patientCard.querySelector(".dp-landing-create-link")?.remove();
+      
       return;
     }
 
@@ -25,7 +25,7 @@
       elements.professionalAction.innerHTML = hasActiveSubscription
         ? 'دخول لوحة المختص <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>'
         : 'استكمال الملف والاشتراك <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>';
-      elements.professionalCard.querySelector(".dp-landing-create-link")?.remove();
+      
       return;
     }
 
