@@ -20,7 +20,7 @@
    const url=coverUrl(book.cover_path);
    return '<article class="books-admin-book">'+(url?'<img src="'+esc(url)+'" alt="">':'<div class="books-admin-book-placeholder"><i class="fa-solid fa-book"></i></div>')+
     '<div class="books-admin-book-copy"><strong>'+esc(book.title)+'</strong><small>'+esc(book.category||"بدون تصنيف")+' · '+(book.is_free?"مجاني":esc(money(book.price)))+' · '+esc(({draft:"مسودة",published:"منشور",archived:"مؤرشف"})[book.status]||book.status)+'</small>'+
-    '<div class="books-admin-book-actions"><button type="button" data-book-edit="'+esc(book.id)+'">تعديل</button></div></div></article>';
+    '<div class="books-admin-book-actions"><button type="button" data-book-edit="'+esc(book.id)+'">تعديل</button><button type="button" data-book-delete="'+esc(book.id)+'">حذف</button></div></div></article>';
   }).join("");
  }
  function renderOrders(){
@@ -102,6 +102,41 @@
   }catch(error){if(uploadedPath)await sb.storage.from("book-covers").remove([uploadedPath]);console.error("Book save failed:",error);toast(error.message||"تعذر حفظ الكتاب.")}
   finally{state.busy=false;button.disabled=false;button.textContent="حفظ الكتاب"}
  }
+ async function deleteBook(id,button){
+  const book=state.books.find(item=>item.id===id);
+  if(!book||state.busy)return;
+  if(!window.confirm("حذف الكتاب «"+book.title+"» نهائيًا؟ لن يمكن التراجع عن الحذف."))return;
+  state.busy=true;
+  if(button){button.disabled=true;button.textContent="جاري الحذف..."}
+  try{
+   const {count,error:ordersError}=await sb.from("book_orders").select("id",{count:"exact",head:true}).eq("book_id",id);
+   if(ordersError)throw ordersError;
+   if(count>0){
+    toast("لا يمكن حذف هذا الكتاب لوجود "+count+" طلب شراء مرتبط به. غيّر حالته إلى «مؤرشف» بدلًا من الحذف.");
+    return;
+   }
+   const {error:deleteError}=await sb.from("books").delete().eq("id",id);
+   if(deleteError){
+    if(deleteError.code==="23503")throw new Error("لا يمكن حذف الكتاب لوجود سجلات مرتبطة به. تم الحفاظ على السجلات.");
+    throw deleteError;
+   }
+   let coverCleanupFailed=false;
+   if(book.cover_path){
+    const {error:storageError}=await sb.storage.from("book-covers").remove([book.cover_path]);
+    if(storageError){coverCleanupFailed=true;console.error("Deleted book cover cleanup failed:",storageError)}
+   }
+   state.books=state.books.filter(item=>item.id!==id);
+   state.links.delete(id);
+   renderBooks();
+   toast(coverCleanupFailed?"تم حذف الكتاب، لكن تعذر حذف صورة الغلاف من التخزين.":"تم حذف الكتاب وصورة غلافه.");
+  }catch(error){
+   console.error("Book deletion failed:",error);
+   toast(error.message||"تعذر حذف الكتاب.");
+  }finally{
+   state.busy=false;
+   if(button){button.disabled=false;button.textContent="حذف"}
+  }
+ }
  async function saveSettings(){
   const button=$("booksSettingsSave");button.disabled=true;
   try{const {error}=await sb.from("book_store_settings").update({payment_method:$("booksPaymentMethod").value.trim(),payment_details:$("booksPaymentDetails").value.trim(),payment_instructions:$("booksPaymentInstructions").value.trim(),updated_at:new Date().toISOString()}).eq("id",true);if(error)throw error;toast("تم حفظ بيانات التحويل.");state.loaded=false;await loadAll(true)}
@@ -141,7 +176,7 @@
   $("booksSettingsSave").addEventListener("click",saveSettings);
   $("booksOrdersRefresh").addEventListener("click",()=>loadAll(true));
   document.querySelectorAll("[data-book-order-filter]").forEach(button=>button.addEventListener("click",()=>{state.filter=button.dataset.bookOrderFilter;renderOrders()}));
-  $("booksAdminList").addEventListener("click",event=>{const button=event.target.closest("[data-book-edit]");if(button){const book=state.books.find(item=>item.id===button.dataset.bookEdit);if(book)openForm(book)}});
+  $("booksAdminList").addEventListener("click",event=>{const deleteButton=event.target.closest("[data-book-delete]"),editButton=event.target.closest("[data-book-edit]");if(deleteButton)deleteBook(deleteButton.dataset.bookDelete,deleteButton);else if(editButton){const book=state.books.find(item=>item.id===editButton.dataset.bookEdit);if(book)openForm(book)}});
   $("booksOrdersList").addEventListener("click",event=>{const proof=event.target.closest("[data-order-proof]"),approve=event.target.closest("[data-order-approve]"),reject=event.target.closest("[data-order-reject]");if(proof)openProof(proof.dataset.orderProof,proof);else if(approve)reviewOrder(approve.dataset.orderApprove,"approved");else if(reject)reviewOrder(reject.dataset.orderReject,"rejected")});
   document.querySelector('[data-tab="books"]')?.addEventListener("click",()=>loadAll(true));
  }
