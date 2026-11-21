@@ -21,6 +21,7 @@ let patientId=initialUrlPatientId;
 let activePlanStartDate=null, activePlanName=null;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], daysData=[], savedDaysData=[], dayEditModes={};
+const savingDayIds=new Set();
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
 let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
 const FIXED_DIET_CACHE_V2='fixed-diet-cache-v2';
@@ -204,48 +205,45 @@ function setDayEditMode(id,editing){
  card.classList.toggle('day-locked',!editing);
  card.querySelectorAll('input,select,textarea').forEach(e=>e.disabled=!editing);
  card.querySelectorAll('button').forEach(b=>{if(b.classList.contains('day-action-always'))return;b.disabled=!editing;});
- const e=card.querySelector('.day-edit-btn'),s=card.querySelector('.day-save-btn'); if(e)e.disabled=editing;if(s)s.disabled=!editing;
+ const e=card.querySelector('.day-edit-btn'),s=card.querySelector('.day-save-btn'); if(e)e.disabled=editing||savingDayIds.has(String(id));if(s){s.disabled=!editing||savingDayIds.has(String(id));s.textContent=savingDayIds.has(String(id))?'جارٍ الحفظ...':'حفظ';}
 }
 function editDay(id){if(daysData.find(d=>String(d.id)===String(id)))setDayEditMode(id,true);}
 async function saveDay(id){
- const day=daysData.find(item=>String(item.id)===String(id));
+ const dayKey=String(id);
+ if(savingDayIds.has(dayKey))return;
+ const day=daysData.find(item=>String(item.id)===dayKey);
  if(!day||!isDayEditing(id))return;
- if(!(window.currentPatientId||patientId)){
-  showToast('لم يتم تحديد المريض','error');
-  return;
- }
- if(!(await canWriteVisitData())){
-  showToast('حفظ الخطة الغذائية متاح أثناء الاشتراك المدفوع فقط','error');
-  return;
- }
 
- const user=await currentUser();
- if(!user){
-  showToast('تعذر التحقق من المستخدم الحالي','error');
-  return;
+ const card=document.querySelector(`[data-day-id="${CSS.escape(dayKey)}"]`);
+ const saveButton=card?.querySelector('.day-save-btn');
+ savingDayIds.add(dayKey);
+ if(saveButton){
+  saveButton.disabled=true;
+  saveButton.textContent='جارٍ الحفظ...';
+  saveButton.setAttribute('aria-busy','true');
  }
-
- const missingFoods=[];
- (day.meals||[]).forEach(meal=>(meal.items||[]).forEach(item=>{
-  if(item.foodId&&!foodDatabase.some(food=>String(food.id)===String(item.foodId))){
-   missingFoods.push(String(item.foodId));
-  }
- }));
- if(missingFoods.length){
-  showToast('أصناف غير موجودة في مكتبة الأغذية: '+[...new Set(missingFoods)].join(', '),'error');
-  return;
- }
-
- const patient=window.currentPatientId||patientId;
- const planData={
-  id:activeCloudPlanId||null,
-  patient_id:patient,
-  plan_name:activePlanName||'الخطة الغذائية باستخدام الجرامات',
-  start_date:activePlanStartDate||new Date().toISOString().slice(0,10),
-  notes:null
- };
 
  try{
+  if(!(window.currentPatientId||patientId))throw new Error('لم يتم تحديد المريض');
+  if(!(await canWriteVisitData()))throw new Error('حفظ الخطة الغذائية متاح أثناء الاشتراك المدفوع فقط');
+
+  const user=await currentUser();
+  if(!user)throw new Error('تعذر التحقق من المستخدم الحالي');
+
+  const missingFoods=[];
+  (day.meals||[]).forEach(meal=>(meal.items||[]).forEach(item=>{
+   if(item.foodId&&!foodDatabase.some(food=>String(food.id)===String(item.foodId)))missingFoods.push(String(item.foodId));
+  }));
+  if(missingFoods.length)throw new Error('أصناف غير موجودة في مكتبة الأغذية: '+[...new Set(missingFoods)].join(', '));
+
+  const planData={
+   id:activeCloudPlanId||null,
+   patient_id:window.currentPatientId||patientId,
+   plan_name:activePlanName||'الخطة الغذائية باستخدام الجرامات',
+   start_date:activePlanStartDate||new Date().toISOString().slice(0,10),
+   notes:null
+  };
+
   const {data,error}=await sb.rpc('save_nutrition_plan_day',{
    p_plan:planData,
    p_day:serializePlanDay(day)
@@ -253,18 +251,17 @@ async function saveDay(id){
   if(error)throw error;
   if(!data?.plan_id||!data?.day_id)throw new Error('لم تُرجع قاعدة البيانات معرّفات اليوم المحفوظ');
 
-  const oldId=String(day.id);
   const newId=String(data.day_id);
   activeCloudPlanId=data.plan_id;
   activePlanName=planData.plan_name;
   day.id=newId;
 
-  if(activeDayDetailsId===oldId)activeDayDetailsId=newId;
-  delete dayEditModes[oldId];
+  if(activeDayDetailsId===dayKey)activeDayDetailsId=newId;
+  delete dayEditModes[dayKey];
   dayEditModes[newId]=false;
 
   const savedDay=cloneDays([day])[0];
-  const savedIndex=savedDaysData.findIndex(item=>String(item.id)===newId||String(item.id)===oldId);
+  const savedIndex=savedDaysData.findIndex(item=>String(item.id)===newId||String(item.id)===dayKey);
   if(savedIndex>=0)savedDaysData[savedIndex]=savedDay;
   else savedDaysData.push(savedDay);
 
@@ -273,6 +270,13 @@ async function saveDay(id){
  }catch(error){
   console.error('Single day save failed:',error);
   showToast(error?.message||'تعذر حفظ هذا اليوم','error');
+ }finally{
+  savingDayIds.delete(dayKey);
+  if(saveButton?.isConnected){
+   saveButton.disabled=!isDayEditing(dayKey);
+   saveButton.textContent='حفظ';
+   saveButton.removeAttribute('aria-busy');
+  }
  }
 }
 async function addNewDay(){
