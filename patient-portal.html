@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-measurements-toolbar-v4">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-measurements-toolbar-v5">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
   <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
@@ -23,7 +23,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-shared-table-v3" defer></script>
-  <script src="js/patient-portal.js?v=20261121-measurements-toolbar-v9" defer></script>
+  <script src="js/patient-portal.js?v=20261121-measurements-toolbar-v10" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -144,6 +144,7 @@
           <p id="portalMeasurementAccessStatus" class="measurements-access-status">يمكنك إضافة قياساتك ومتابعة التغير مع الوقت.</p>
           <button type="button" id="portalAddMeasurement" class="measurements-add-button">＋ إضافة قياس</button>
         </div>
+        <div id="portalMeasurementsLoading" class="portal-muted-state" hidden>جاري تحميل القياسات...</div>
         <div id="portalMeasurementsError" class="portal-measurements-error" role="alert" hidden></div>
         <div class="portal-measurement-summary" aria-label="ملخص تغيرات الوزن ومؤشر كتلة الجسم">
           <article><span>التغير من أول قياس</span><strong id="portalWeightChangeOverall">—</strong><small id="portalWeightChangeOverallNote">لا توجد بيانات كافية</small></article>
