@@ -177,7 +177,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
   body.print-tpn #section-tpn{display:block!important}
   #patient-header-section{display:block!important;margin-bottom:20px;border-bottom:2px solid var(--en);padding-bottom:10px}
   #patient-info-content{display:block!important}
-  #patient-collapse-btn{display:none!important}
   input,textarea{border:none!important;background:transparent!important;outline:none!important}
   .component-select{appearance:none;-webkit-appearance:none;background:transparent}
   .support-report-print-header{display:block!important;padding:0 0 9px;margin:0 0 14px;border-bottom:2px solid var(--en);direction:rtl;text-align:right}
