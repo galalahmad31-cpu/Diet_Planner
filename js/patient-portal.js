@@ -231,7 +231,11 @@
 
   function renderMeasurements() {
     renderMeasurementSummary();
-    window.DietPlannerWeightLogs?.render({
+    const tableRenderer = window.DietPlannerWeightLogs;
+    if (!tableRenderer || typeof tableRenderer.render !== "function") {
+      throw new Error("تعذر تحميل مكوّن جدول القياسات. حدّث الصفحة وحاول مرة أخرى.");
+    }
+    tableRenderer.render({
       tbody: $("portalMeasurementsRows"),
       logs: state.logs.map(log => ({
         id: log.id, created_by: log.created_by, date: log.measurement_date, weight: log.weight,
@@ -356,38 +360,15 @@
     list.replaceChildren();
 
     try {
-      // One relational request replaces the previous publication -> plans ->
-      // days -> meals -> items -> food-name request chain.
-      const { data: plans, error } = await supabase
-        .from("nutrition_plans")
-        .select(`
-          id,patient_id,plan_name,start_date,notes,created_at,updated_at,
-          publication:patient_plan_publications!inner(published_at,revoked_at),
-          days:plan_days(
-            id,plan_id,day_number,day_name,notes,
-            meals:plan_meals(
-              id,day_id,meal_name,meal_order,frequency,
-              items:plan_items(
-                id,meal_id,food_id,item_name,quantity_g,household_measure,frequency,notes,
-                food:foods(name_ar)
-              )
-            )
-          )
-        `)
-        .eq("patient_id", state.patientId)
-        .is("patient_plan_publications.revoked_at", null);
-
+      // The SECURITY DEFINER RPC checks the active patient account once and
+      // assembles the published plan tree without triggering per-row plan_items RLS joins.
+      const { data, error } = await supabase.rpc(
+        "get_patient_published_nutrition_plans",
+        { p_patient_id: state.patientId }
+      );
       if (error) throw error;
 
-      const orderedPlans = (plans || []).slice().sort((a, b) => {
-        const publicationDate = plan => {
-          const publication = Array.isArray(plan.publication)
-            ? plan.publication[0]
-            : plan.publication;
-          return publication?.published_at || plan.updated_at || plan.created_at || "";
-        };
-        return new Date(publicationDate(b)).getTime() - new Date(publicationDate(a)).getTime();
-      });
+      const orderedPlans = Array.isArray(data) ? data : [];
 
       if (!orderedPlans.length) {
         empty.hidden = false;
