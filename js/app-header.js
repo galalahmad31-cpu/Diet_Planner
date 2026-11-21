@@ -12,15 +12,16 @@
   if (document.documentElement.classList.contains("visit-embedded") ||
       document.documentElement.classList.contains("nsp-embedded")) return;
 
-  if (path === "patient-portal.html") {
+  if (path === "patient-portal.html" || path === "professional-directory.html") {
+    const isDirectoryPage = path === "professional-directory.html";
     const patientPages = [
-      ["#portalHome", "الرئيسية", "fa-house"],
-      ["#portalContent", "الملف الصحي", "fa-heart-pulse"],
+      [isDirectoryPage ? "patient-portal.html#portalHome" : "#portalHome", "الرئيسية", "fa-house"],
+      [isDirectoryPage ? "patient-portal.html#portalContent" : "#portalContent", "الملف الصحي", "fa-heart-pulse"],
       ["professional-directory.html", "دليل المتخصصين", "fa-user-doctor"],
-      ["#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
-      ["#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
-      ["#portalTools", "أدوات التغذية", "fa-calculator"],
-      ["#portalProfileArea", "الملف الشخصي", "fa-user"]
+      [isDirectoryPage ? "patient-portal.html#portalDietBuilder" : "#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
+      [isDirectoryPage ? "patient-portal.html#portalEducation" : "#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
+      [isDirectoryPage ? "patient-portal.html#portalTools" : "#portalTools", "أدوات التغذية", "fa-calculator"],
+      [isDirectoryPage ? "patient-portal.html#portalProfileArea" : "#portalProfileArea", "الملف الشخصي", "fa-user"]
     ];
 
     function mountPatientHeader() {
@@ -64,7 +65,8 @@
         link.dataset.patientTarget = href;
         link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
         link.querySelector("span").textContent = label;
-        if (href === "#portalHome") {
+        if ((!isDirectoryPage && href === "#portalHome") ||
+            (isDirectoryPage && href === "professional-directory.html")) {
           link.classList.add("is-active");
           link.setAttribute("aria-current", "page");
         }
