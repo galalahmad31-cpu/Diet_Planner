@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مكتبة الكتب العلمية | Diet Planner</title>
+<meta name="description" content="تصفح الكتب والمراجع العلمية في التغذية العلاجية والعلوم الصحية من مكتبة Diet Planner.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://nutrition-3.vercel.app/books.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Diet Planner">
+<meta property="og:title" content="مكتبة الكتب العلمية | Diet Planner">
+<meta property="og:description" content="كتب ومراجع علمية مختارة في التغذية العلاجية والعلوم الصحية.">
+<meta property="og:url" content="https://nutrition-3.vercel.app/books.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
+<link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
+<link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
+<link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+<link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
+<link rel="stylesheet" href="css/books.css?v=20261121-books-v1">
+<script src="js/theme.js?v=20261121-header-only-v15" defer></script>
+<script src="js/app-header.js?v=20261121-header-persist-six-v2" defer></script>
+</head>
+<body>
+<main class="books-page">
+  <div data-dp-app-header data-dp-header-variant="public" data-page-title="مكتبة الكتب العلمية"></div>
+  <section class="books-hero">
+    <div class="books-hero-copy">
+      <span class="books-eyebrow"><i class="fa-solid fa-book-open"></i> KNOWLEDGE LIBRARY</span>
+      <h1>مراجع علمية<br><span>تدعم رحلتك المهنية</span></h1>
+      <p>تصفح الكتب والمراجع المختارة في التغذية العلاجية والعلوم الصحية. استعرض التفاصيل والمميزات، واحصل على كتابك بسهولة.</p>
+      <div class="books-hero-points"><span><i class="fa-solid fa-eye"></i> تصفح مجاني</span><span><i class="fa-solid fa-shield-halved"></i> تسليم بعد التأكيد</span></div>
+    </div>
+    <div class="books-hero-art" aria-hidden="true"><i class="fa-solid fa-book-bookmark"></i><span></span></div>
+  </section>
+  <section class="books-catalog" aria-labelledby="booksCatalogTitle">
+    <div class="books-section-heading"><div><span>مكتبة Diet Planner</span><h2 id="booksCatalogTitle">اكتشف الكتب</h2><p>اختر الكتاب لعرض مميزاته وطريقة الحصول عليه.</p></div><span class="books-count" id="booksCount">—</span></div>
+    <div class="books-tools">
+      <label class="books-search"><i class="fa-solid fa-magnifying-glass"></i><input id="booksSearch" type="search" placeholder="ابحث باسم الكتاب أو المؤلف..." autocomplete="off"></label>
+      <label class="books-category"><i class="fa-solid fa-filter"></i><select id="booksCategory"><option value="">كل التصنيفات</option></select></label>
+    </div>
+    <div id="booksGrid" class="books-grid" aria-live="polite"><div class="books-state"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الكتب...</div></div>
+    <div id="booksEmpty" class="books-state" hidden><i class="fa-regular fa-folder-open"></i><span>لا توجد كتب منشورة تطابق بحثك حاليًا.</span></div>
+  </section>
+  <footer class="books-footer">Diet Planner <span>•</span> مكتبة الكتب العلمية</footer>
+</main>
+<div class="books-modal-backdrop" id="bookModalBackdrop" hidden>
+  <section class="books-modal" role="dialog" aria-modal="true" aria-labelledby="bookModalTitle">
+    <header class="books-modal-head"><div><span>تفاصيل الكتاب</span><h2 id="bookModalTitle">—</h2></div><button type="button" id="bookModalClose" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button></header>
+    <div id="bookModalBody" class="books-modal-body"></div>
+  </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth-access.js?v=20261121-account-type-v2"></script>
+<script src="js/books.js?v=20261121-books-v1"></script>
+</body>
+</html>
