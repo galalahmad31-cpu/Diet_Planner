@@ -423,16 +423,20 @@
 #qc-formula-conc-content .fc-normal-density-grid label,
 #qc-formula-conc-content .fc-required-fields label,
 #qc-formula-conc-content .fc-volume-fields label{min-height:2.6em}
+#qc-formula-conc-content .fc-volume-fields{
+  grid-template-columns:minmax(0,1fr)!important;
+  align-items:start;
+  gap:10px!important;
+}
 #qc-formula-conc-content .fc-normal-density-grid .grid.grid-cols-2,
 #qc-formula-conc-content .fc-required-fields .grid.grid-cols-2{
   grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
   gap:8px!important;
 }
 #qc-formula-conc-content .fc-volume-fields .text-xs{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  min-height:42px;
+  display:block;
+  min-height:0;
+  padding:10px 12px;
   border:1px solid var(--dp-border);
   border-radius:10px;
   background:var(--dp-surface-2);
