@@ -152,3 +152,12 @@
  .dp-patient-header__nav .dp-app-header__link{min-height:38px;padding:7px 6px;font-size:10px}
  .dp-patient-header__nav-label{font-size:10px;min-height:34px}
 }
+
+.dp-patient-header__actions .dp-app-header__logout{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;
+ padding:7px 12px;border:1px solid rgba(255,255,255,.85);border-radius:11px;
+ background:#fff;color:#15594d;font-family:var(--dp-font,Cairo,sans-serif);
+ font-size:11px;font-weight:900;line-height:1.35;white-space:nowrap;cursor:pointer;
+}
+.dp-patient-header__actions .dp-app-header__logout:hover{background:#edf8f3}
+@media(max-width:640px){.dp-patient-header__actions .dp-app-header__logout{min-height:32px;padding:6px 8px;font-size:10px}.dp-patient-header__actions .dp-app-header__logout span{display:inline}}
