@@ -27,6 +27,13 @@
 - Public healthcare jobs: `jobs.html` → `js/jobs.js` (public listing and filters); `job.html?id=...` → `js/job-details.js` (static detail page compatible with GitHub Pages and Vercel). On Vercel, the legacy `/jobs/:id` route remains server-rendered by `api/job.js` with `JobPosting` structured data. `job_posts` is a dedicated table, separate from `announcements`; `js/admin-jobs.js` manages it from the admin tab. `api/sitemap.js` includes only published, unexpired job detail URLs.
 - Other modules include profile, articles, feedback, notifications, about, and password recovery/update pages.
 
+## Professional directory foundation
+- `professional-directory.html` is a public discovery page that reads only explicitly published and verified directory profiles; it never queries or exposes `profiles.email`, phone, or patient records.
+- `professional-directory-manage.html` lets a professional opt in, edit their own draft/rejected profile, submit it for review, and respond to patient connection requests. Listing status and verification cannot be changed by the profile owner.
+- `professional-directory-review.html` is admin-only and moderates pending listings through a guarded RPC. Approval is an explicit administrative action; no profile is public by default.
+- `professional_connection_requests` connects an already-linked patient account to a listed professional. The professional's acceptance creates or reactivates the `patient_care_team` relationship; it does not create a duplicate patient chart.
+- Service catalog, prices, payment processing, commissions, and payouts are not part of this foundation.
+
 ## Subscription/security flow
 1. The public dashboard remains accessible; subscription plans and subscription actions are managed from `profile.html`.
 2. Subscription UI loads active plans and only the current user's subscriptions.
