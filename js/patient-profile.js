@@ -1334,7 +1334,8 @@
       measurements: { tab: 'measurementsTab', panel: 'measurementsPanel' },
       energy: { tab: 'energyTab', panel: 'patientEnergyPanel' },
       plans: { tab: 'plansTab', panel: 'plansPanel' },
-      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' }
+      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' },
+      messages: { tab: 'patientMessagesTab', panel: 'patientMessagesPanel' }
     };
     if (moduleName !== null && !modules[moduleName]) return;
 
@@ -1362,6 +1363,12 @@
       void loadNutritionPlans({ autoOpenLatest: true });
     }
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
+    if (moduleName === 'messages') {
+      void window.DietPlannerPatientMessages?.mount($('patientProfileMessages'), {
+        patientId: state.patient?.id || patientId,
+        role: 'professional'
+      });
+    }
   }
 
   function loadNutritionSupportFrame() {
