@@ -883,3 +883,7 @@ body.patient-conversation-open{overflow:hidden}
 }
 @keyframes patientConversationSlideUp{from{transform:translateY(28px);opacity:.8}to{transform:translateY(0);opacity:1}}
 @media(prefers-reduced-motion:reduce){.patient-conversation-drawer{animation:none}}
+
+
+/* Numeric values in the shared measurement table must not be reordered by RTL text flow. */
+.measurement-number{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
