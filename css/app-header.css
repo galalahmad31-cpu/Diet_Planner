@@ -36,8 +36,8 @@
 .dp-app-header__toggle:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4)}
 .dp-app-header__toggle i{font-size:11px;transition:transform .18s ease}
 .dp-app-header__toggle[aria-expanded="true"] i{transform:rotate(180deg)}
-.dp-app-header__track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;width:100%;min-width:0}
-.dp-app-header__nav.is-collapsed .dp-app-header__link:nth-child(n+5){display:none}
+.dp-app-header__track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;width:100%;min-width:0}
+.dp-app-header__nav.is-collapsed .dp-app-header__link:nth-child(n+7){display:none}
 .dp-app-header__link{
   position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:40px;
   padding:8px 7px;border:1px solid rgba(255,255,255,.12);border-radius:12px;
@@ -59,6 +59,8 @@
 .dp-app-header__context :is(button,a,[role="button"]){max-width:100%;min-height:36px}
 .dp-app-header__context .hidden{display:none!important}
 @media(max-width:640px){
+  .dp-app-header__track{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .dp-app-header__nav.is-collapsed .dp-app-header__link:nth-child(n+4){display:none}
   .dp-app-header{width:calc(100% - 16px);margin:8px auto 12px;padding:11px 10px 9px;border-radius:18px}
   .dp-app-header__brand-row{gap:7px;margin-bottom:9px}
   .dp-app-header__logo{width:38px;height:38px;flex-basis:38px;border-radius:12px;font-size:17px}
@@ -72,6 +74,10 @@
   .dp-app-header__link{min-height:37px;padding:6px 4px;gap:5px;font-size:9px;border-radius:9px}
   .dp-app-header__link i{font-size:10px}
   .dp-app-header__toggle{width:28px;height:25px}
+}
+@media(max-width:390px){
+  .dp-app-header__track{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dp-app-header__nav.is-collapsed .dp-app-header__link:nth-child(n+3){display:none}
 }
 @media(prefers-reduced-motion:reduce){.dp-app-header__link,.dp-app-header__toggle,.dp-app-header__toggle i{transition:none}}
 @media print{.dp-app-header{display:none!important}}
