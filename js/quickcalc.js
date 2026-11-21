@@ -200,13 +200,7 @@ function calculateFormulaConcentration() {
         const resultEl =
             document.getElementById('fc-res-text');
 
-        const densityEl =
-            document.getElementById('fc-res-density');
-
-        const changeEl =
-            document.getElementById('fc-res-change');
-
-        const normalDisplayEl =
+const normalDisplayEl =
             document.getElementById('fc-normal-density-display');
 
 
@@ -225,12 +219,7 @@ function calculateFormulaConcentration() {
             resultEl.innerText =
                 "Enter valid parameters to calculate.";
 
-            densityEl.innerText =
-                "Required Caloric Density: —";
-
-            changeEl.innerText = "";
-
-            if (normalDisplayEl) {
+if (normalDisplayEl) {
                 normalDisplayEl.innerText = "—";
             }
 
@@ -279,12 +268,7 @@ function calculateFormulaConcentration() {
             resultEl.innerText =
                 "Required Caloric Density should be higher than Normal Caloric Density for this adjustment.";
 
-            densityEl.innerText =
-                `Required Caloric Density: ${requiredDensityInput.toFixed(2)} ${requiredDensityUnit}`;
-
-            changeEl.innerText = "";
-
-            return;
+return;
 
         }
 
@@ -355,12 +339,7 @@ function calculateFormulaConcentration() {
             resultEl.innerText =
                 "The calculated water volume is not valid. Please review the selected densities.";
 
-            densityEl.innerText =
-                `Required Caloric Density: ${requiredDensityInput.toFixed(2)} ${requiredDensityUnit}`;
-
-            changeEl.innerText = "";
-
-            return;
+return;
 
         }
 
@@ -417,20 +396,7 @@ function calculateFormulaConcentration() {
         }
 
 
-        densityEl.innerText =
-
-            `Required Caloric Density: ` +
-
-            `${requiredDensityInput.toFixed(2)} ${requiredDensityUnit} ` +
-
-            `| Volume Multiplier: ×${multiplier}`;
-
-
-        changeEl.innerText =
-
-            `Concentration change: ${percentChange.toFixed(1)}%`;
-
-    }
+}
 
 function calculateQuickGIR() {
 
@@ -837,9 +803,7 @@ window.addEventListener("DOMContentLoaded", () => {
         !Number.isFinite(multiplier) || multiplier <= 0
       ) {
         setResult('fc-res-text', 'Enter valid positive parameters to calculate.');
-        setResult('fc-res-density', 'Required Caloric Density: —');
-        setResult('fc-res-change', '');
-        return;
+return;
       }
 
       return originalFormulaCalc();
