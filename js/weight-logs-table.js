@@ -5,7 +5,7 @@
   const number = (value, suffix = "") => {
     if (value === null || value === undefined || value === "") return "—";
     const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed.toFixed(1) + suffix : "—";
+    return Number.isFinite(parsed) ? `<bdi dir="ltr" class="measurement-number">${parsed.toFixed(1)}${escapeHtml(suffix)}</bdi>` : "—";
   };
   const date = value => {
     if (!value) return "—";
