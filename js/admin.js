@@ -100,11 +100,14 @@ function renderDoctors(){
  $('doctorCount').textContent=state.profiles.length;$('doctorActiveCount').textContent=state.profiles.filter(p=>isActivePaidSub(latestSub(p.id))).length;
  const body=$('doctorsBody');if(!doctors.length){setState('doctor','لا توجد نتائج.');return}
  body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);const max=s?.max_patients_snapshot;
+ const actions=s
+  ? '<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>'
+  : '<button class="icon-btn" title="إضافة اشتراك" data-add-sub="'+esc(p.id)+'"><i class="fa-solid fa-pen"></i></button>';
  return `<tr><td><span class="name">${esc(p.full_name||'بدون اسم')}</span><span class="meta">${esc(p.email||'')}</span></td>
  <td><span class="badge ${p.role==='admin'?'active':'off'}">${roleLabel(p.role)}</span></td>
  <td>${s?esc(planName(s.plan_id)):'—'}</td><td>${date(s?.start_date)}</td><td>${date(s?.expiry_date)}</td>
  <td>${count} / ${max==null?'∞':esc(max)}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
- <td class="actions-cell">${s?'<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>':'<button class="icon-btn" title="تعديل الدور" data-edit-role="'+esc(p.id)+'" '+(p.id===state.currentUserId?'disabled':'')+'><i class="fa-solid fa-user-shield"></i></button>'}</td></tr>`}).join('');
+ <td class="actions-cell">${actions}</td></tr>`}).join('');
  setState('doctor','',true)
 }
 
@@ -144,6 +147,45 @@ function subForm(s){
  </div><div class="modal-foot"><button class="btn btn-primary" type="submit">حفظ التعديل</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`
 }
 function openSub(s){openModal('تعديل الاشتراك',subForm(s));$('subForm').addEventListener('submit',async e=>{e.preventDefault();await saveSub(s)});$('cancelModal').onclick=closeModal}
+function openSubAssignment(profile){
+ const availablePlans=state.plans.filter(p=>!p.is_free_trial);
+ if(!availablePlans.length){toast('لا توجد باقات مدفوعة متاحة للإسناد.');return}
+ openModal('إضافة اشتراك للمستخدم',`<form id="subAssignmentForm"><div class="grid">
+ <div class="field"><label for="new_sub_name">اسم الطبيب</label><input id="new_sub_name" value="${esc(profile.full_name||'')}" readonly></div>
+ <div class="field"><label for="new_sub_role">الدور</label><select id="new_sub_role" ${profile.id===state.currentUserId?'disabled':''}>${roleOptions(profile.role||'user')}</select></div>
+ <div class="field"><label for="new_sub_plan">الباقة</label><select id="new_sub_plan" required>${availablePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ${money(p.price)} / ${esc(p.duration_days)} يوم</option>`).join('')}</select></div>
+ <div class="field"><label for="new_sub_status">حالة الاشتراك</label><select id="new_sub_status"><option value="paid" selected>مفعّل الآن</option><option value="pending">قيد المراجعة</option></select></div>
+ <div class="field full"><label for="new_sub_notes">ملاحظات (اختياري)</label><textarea id="new_sub_notes" placeholder="سبب الإضافة أو تفاصيل الاتفاق..."></textarea></div>
+ <div class="field full"><div style="font-size:11px;color:#718683;background:#f7faf9;border-radius:9px;padding:9px">عند اختيار «مفعّل الآن» يبدأ الاشتراك من اليوم ويُحسب تاريخ الانتهاء تلقائيًا حسب مدة الباقة.</div></div>
+ </div><div class="modal-foot"><button class="btn btn-primary" type="submit">إضافة الاشتراك</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`);
+ $('cancelModal').onclick=closeModal;
+ $('subAssignmentForm').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const button=$('subAssignmentForm').querySelector('[type="submit"]');
+  const plan=availablePlans.find(item=>item.id===$('new_sub_plan').value);
+  if(!plan){toast('الباقة المحددة غير موجودة.');return}
+  const status=$('new_sub_status').value;
+  if(!['paid','pending'].includes(status)){toast('حالة الاشتراك غير صالحة.');return}
+  button.disabled=true;button.textContent='جاري إضافة الاشتراك...';
+  try{
+   const result=await sb.from('subscriptions').insert({
+    user_id:profile.id,full_name:profile.full_name||null,plan_id:plan.id,status,
+    notes:$('new_sub_notes').value.trim()||null,is_free_trial:false,
+    duration_days_snapshot:plan.duration_days,max_patients_snapshot:plan.max_patients,
+    features_snapshot:plan.features||{}
+   }).select('id').single();
+   if(result.error)throw result.error;
+   const selectedRole=profile.id===state.currentUserId?profile.role:$('new_sub_role').value;
+   if(selectedRole!==profile.role){
+    const roleResult=await sb.rpc('admin_set_profile_role',{target_user_id:profile.id,new_role:selectedRole});
+    if(roleResult.error){closeModal();toast('تمت إضافة الاشتراك، لكن تعذر تحديث الدور: '+(roleResult.error.message||'خطأ غير معروف'));await loadAll();return}
+    profile.role=selectedRole;
+   }
+   closeModal();toast('تمت إضافة الاشتراك للمستخدم بنجاح.');await loadAll();
+  }catch(error){console.error('Admin subscription assignment failed:',error);toast(error?.message||'تعذرت إضافة الاشتراك.')}
+  finally{if(button.isConnected){button.disabled=false;button.textContent='إضافة الاشتراك'}}
+ });
+}
 async function saveSub(s){
  const selectedPlan=state.plans.find(p=>p.id===$('s_plan').value);
  const profile=state.profiles.find(p=>p.id===s.user_id);
@@ -187,8 +229,14 @@ function openRoleEditor(profile){
  });
 }
 function deleteSubscription(s){
- askConfirm('حذف الاشتراك','هل أنت متأكد من حذف اشتراك <b>'+esc(s.full_name||'هذا الطبيب')+'</b>؟<br>سيتم حذف سجل الاشتراك نهائيًا. هذه العملية لا تحذف حساب الطبيب أو مرضاه.',async()=>{
-  const r=await sb.from('subscriptions').delete().eq('id',s.id);if(r.error){toast(r.error.message||'تعذر حذف الاشتراك');return}toast('تم حذف الاشتراك');await loadAll()
+ askConfirm('حذف الاشتراك','هل أنت متأكد من حذف اشتراك <b>'+esc(s.full_name||'هذا الطبيب')+'</b>؟<br>سيتم حذف سجل الاشتراك نهائيًا، دون حذف حساب المستخدم أو مرضاه.',async()=>{
+  const r=await sb.from('subscriptions').delete().eq('id',s.id);
+  if(r.error){toast(r.error.message||'تعذر حذف الاشتراك');return}
+  if(s.payment_proof_path){
+   const proofResult=await sb.storage.from('subscription-proofs').remove([s.payment_proof_path]);
+   if(proofResult.error){toast('تم حذف الاشتراك، لكن تعذر حذف ملف إثبات الدفع.');await loadAll();return}
+  }
+  toast('تم حذف الاشتراك');await loadAll()
  })
 }
 function deletePlan(p){
@@ -360,10 +408,10 @@ $('plansBody').onclick=e=>{
  if(edit){const p=state.plans.find(x=>x.id===edit.dataset.editPlan);if(p)openPlan(p)}else if(del){const p=state.plans.find(x=>x.id===del.dataset.delPlan);if(p)deletePlan(p)}
 };
 $('doctorsBody').onclick=e=>{
- const edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-del-sub]'),role=e.target.closest('[data-edit-role]');
+ const edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-del-sub]'),add=e.target.closest('[data-add-sub]');
  if(edit){const s=state.subs.find(x=>x.id===edit.dataset.editSub);if(s)openSub(s)}
  else if(del){const s=state.subs.find(x=>x.id===del.dataset.delSub);if(s)deleteSubscription(s)}
- else if(role){const profile=state.profiles.find(x=>x.id===role.dataset.editRole);if(profile&&profile.id!==state.currentUserId)openRoleEditor(profile)}
+ else if(add){const profile=state.profiles.find(x=>x.id===add.dataset.addSub);if(profile)openSubAssignment(profile)}
 };
 
 (async function init(){try{if(await requireAdmin())await loadAll()}catch(e){console.error(e);['request','plan','doctor'].forEach(x=>setState(x,e.message||'حدث خطأ'))}})();
