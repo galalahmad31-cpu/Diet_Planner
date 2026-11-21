@@ -12,6 +12,38 @@
  function toast(message){const box=$("booksAdminToast");box.textContent=message;box.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove("show"),2800)}
  function setState(id,message,show=false){$(id).textContent=message;$(id).hidden=show}
  function statusLabel(status){return ({pending:"قيد المراجعة",approved:"تم التأكيد",rejected:"مرفوض"})[status]||status}
+ function confirmDialog({title,message,confirmText="تأكيد",danger=false}){
+  return new Promise(resolve=>{
+   const previousFocus=document.activeElement;
+   const overlay=document.createElement("div");
+   overlay.className="books-admin-confirm-overlay";
+   overlay.innerHTML='<section class="books-admin-confirm" role="alertdialog" aria-modal="true" aria-labelledby="booksConfirmTitle" aria-describedby="booksConfirmMessage"><div class="books-admin-confirm-icon '+(danger?"is-danger":"")+'"><i class="fa-solid '+(danger?"fa-trash-can":"fa-circle-check")+'" aria-hidden="true"></i></div><span class="books-admin-confirm-kicker">DIET PLANNER</span><h2 id="booksConfirmTitle"></h2><p id="booksConfirmMessage"></p><div class="books-admin-confirm-actions"><button type="button" class="books-admin-confirm-cancel">إلغاء</button><button type="button" class="books-admin-confirm-submit '+(danger?"is-danger":"")+'"></button></div></section>';
+   overlay.querySelector("#booksConfirmTitle").textContent=title;
+   overlay.querySelector("#booksConfirmMessage").textContent=message;
+   const cancel=overlay.querySelector(".books-admin-confirm-cancel");
+   const submit=overlay.querySelector(".books-admin-confirm-submit");
+   submit.textContent=confirmText;
+   let settled=false;
+   const finish=value=>{
+    if(settled)return;
+    settled=true;
+    document.removeEventListener("keydown",onKeydown);
+    overlay.remove();
+    document.body.style.overflow=previousOverflow;
+    if(previousFocus&&typeof previousFocus.focus==="function")previousFocus.focus();
+    resolve(value);
+   };
+   const previousOverflow=document.body.style.overflow;
+   const onKeydown=event=>{if(event.key==="Escape"){event.preventDefault();finish(false)}};
+   cancel.addEventListener("click",()=>finish(false));
+   submit.addEventListener("click",()=>finish(true));
+   overlay.addEventListener("click",event=>{if(event.target===overlay)finish(false)});
+   document.addEventListener("keydown",onKeydown);
+   document.body.appendChild(overlay);
+   document.body.style.overflow="hidden";
+   submit.focus();
+  });
+ }
  function renderBooks(){
   const list=$("booksAdminList");
   if(!state.books.length){list.hidden=true;setState("booksAdminState","لا توجد كتب حتى الآن. أضف أول كتاب.");return}
@@ -105,7 +137,8 @@
  async function deleteBook(id,button){
   const book=state.books.find(item=>item.id===id);
   if(!book||state.busy)return;
-  if(!window.confirm("حذف الكتاب «"+book.title+"» نهائيًا؟ لن يمكن التراجع عن الحذف."))return;
+  const confirmed=await confirmDialog({title:"تأكيد حذف الكتاب",message:"هل تريد حذف «"+book.title+"» نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",confirmText:"حذف الكتاب",danger:true});
+  if(!confirmed)return;
   state.busy=true;
   if(button){button.disabled=true;button.textContent="جاري الحذف..."}
   try{
@@ -146,8 +179,9 @@
  async function reviewOrder(id,status){
   const order=state.orders.find(item=>item.id===id);if(!order||order.status!=="pending")return;
   if(status==="approved"&&!state.links.has(order.book_id)){toast("لا يمكن التأكيد قبل إضافة رابط Telegram للكتاب.");return}
-  const prompt=status==="approved"?"تأكيد استلام التحويل وإتاحة رابط الكتاب للمستخدم؟":"رفض طلب الشراء؟";
-  if(!window.confirm(prompt))return;
+  const approved=status==="approved";
+  const confirmed=await confirmDialog({title:approved?"تأكيد الدفع وإتاحة الكتاب":"تأكيد رفض الطلب",message:approved?"سيتم تسجيل استلام التحويل وإتاحة رابط الكتاب للمستخدم. هل تريد المتابعة؟":"سيتم رفض طلب الشراء ولن يتم إتاحة رابط الكتاب. هل تريد المتابعة؟",confirmText:approved?"تأكيد الدفع":"تأكيد الرفض",danger:!approved});
+  if(!confirmed)return;
   try{const user=await access.getCurrentUser();const {error}=await sb.from("book_orders").update({status,reviewed_by:user.id,reviewed_at:new Date().toISOString()}).eq("id",id).eq("status","pending");if(error)throw error;toast(status==="approved"?"تم تأكيد الدفع وإتاحة رابط الكتاب.":"تم رفض الطلب.");state.loaded=false;await loadAll(true)}
   catch(error){console.error(error);toast(error.message||"تعذر تحديث حالة الطلب.")}
  }
