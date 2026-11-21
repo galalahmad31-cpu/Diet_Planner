@@ -193,13 +193,8 @@
   const measurementState = { logs: [], loaded: false, loading: false };
 
   function updateMeasurementWriteAccess() {
-    const button = $('weightTableContainer')?.querySelector('[data-add-measurement]');
     const status = $('measurementAccessStatus');
-    if (!button) return;
     const allowed = canWrite();
-    button.disabled = !allowed;
-    button.title = allowed ? 'إضافة قياس جديد' : 'إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط';
-    button.classList.toggle('is-disabled', !allowed);
     if (status) {
       status.textContent = state.isAdmin
         ? 'وضع المدير: يمكنك إضافة القياسات وإدارتها.'
@@ -264,6 +259,7 @@
     tableRenderer.render({
       container: $("weightTableContainer"),
       logs: measurementState.logs,
+      addDisabled: !canWrite(),
       actionCell: (_log, index) => `
         <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
         <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>`
