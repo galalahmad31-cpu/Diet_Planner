@@ -34,7 +34,7 @@
     return row;
   }
 
-  function render({container,logs,actionCell,emptyMessage="لا توجد قياسات مسجلة لهذا المريض."}) {
+  function render({container,logs,actionCell,addDisabled=false,emptyMessage="لا توجد قياسات مسجلة لهذا المريض."}) {
     if (!container) throw new Error("عنصر جدول القياسات غير موجود في الصفحة.");
     const rows = Array.isArray(logs) ? logs : [];
     const body = rows.length ? rows.map((log,index) => {
@@ -54,7 +54,7 @@
     }).join("") : `<tr><td colspan="10" class="measurements-state">${escapeHtml(emptyMessage)}</td></tr>`;
     const bodyId = container.id === "weightTableContainer" ? "weightTableBody" : "portalMeasurementsRows";
     container.innerHTML = `
-      <div class="measurements-table-heading"><div><h3>سجل القياسات</h3><p>تاريخ وقياسات المريض المسجلة بترتيب زمني</p></div><div class="measurements-table-tools"><span class="measurements-table-unit">الوزن ومحيطات الجسم</span><button type="button" class="measurements-add-button" data-add-measurement>＋ إضافة قياس</button></div></div>
+      <div class="measurements-table-heading"><div><h3>سجل القياسات</h3><p>تاريخ وقياسات المريض المسجلة بترتيب زمني</p></div><div class="measurements-table-tools"><span class="measurements-table-unit">الوزن ومحيطات الجسم</span><button type="button" class="measurements-add-button" data-add-measurement ${addDisabled ? "disabled" : ""}>＋ إضافة قياس</button></div></div>
       <div class="measurements-table-wrap" role="region" aria-label="جدول سجل القياسات" tabindex="0">
         <table class="measurements-table">
           <caption class="measurements-table-caption">سجل قياسات المريض: التاريخ والوزن ونسب الدهون والعضلات والماء ومحيطات الجسم والالتزام والملاحظات</caption>
