@@ -293,7 +293,7 @@ alter table public.patient_plan_publications enable row level security;
 revoke all on public.patient_plan_publications from anon, authenticated;
 grant select on public.patient_plan_publications to authenticated;
 
-create or replace function public.is_linked_patient_for_plan(p_plan_id uuid)
+create or replace function private.is_linked_patient_for_plan(p_plan_id uuid)
 returns boolean
 language sql
 stable
@@ -310,15 +310,15 @@ as $$
   );
 $$;
 
-revoke all on function public.is_linked_patient_for_plan(uuid) from public, anon;
-grant execute on function public.is_linked_patient_for_plan(uuid) to authenticated;
+revoke all on function private.is_linked_patient_for_plan(uuid) from public, anon;
+grant execute on function private.is_linked_patient_for_plan(uuid) to authenticated;
 
 create policy patient_plan_publications_select_linked_patient_or_owner
   on public.patient_plan_publications for select to authenticated
   using (
     revoked_at is null and (
       published_by = (select auth.uid())
-      or (select public.is_linked_patient_for_plan(plan_id))
+      or (select private.is_linked_patient_for_plan(plan_id))
     )
   );
 
