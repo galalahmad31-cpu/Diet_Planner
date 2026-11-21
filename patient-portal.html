@@ -14,14 +14,14 @@
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-v1">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-dashboard-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
   <link rel="stylesheet" href="css/patient-appointments.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
   <script src="js/patient-appointments.js?v=20261121-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261121-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261121-dashboard-v1" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
   <header class="portal-header">
@@ -36,6 +36,23 @@
   </header>
 
   <main class="portal-main">
+    <section id="portalHome" class="portal-home">
+      <section class="portal-welcome portal-home-welcome">
+        <div><span class="portal-eyebrow">PATIENT SPACE</span><h1>أهلًا بك في <strong>Diet Planner</strong></h1><p>مساحتك لإدارة صحتك الغذائية، واكتشاف المختصين، والوصول إلى خدمات التغذية من مكان واحد.</p></div>
+        <div class="portal-welcome-icon"><i class="fa-solid fa-leaf"></i></div>
+      </section>
+      <section class="portal-services" aria-label="خدمات بوابة المريض">
+        <button type="button" class="portal-service-card portal-service-featured" data-portal-open-health><span class="portal-service-icon"><i class="fa-solid fa-folder-heart"></i></span><span class="portal-service-copy"><strong>ملفي الصحي</strong><small>بياناتي الصحية، القياسات، الخطط والمتابعة مع المختص.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></button>
+        <a class="portal-service-card" href="professional-directory.html"><span class="portal-service-icon"><i class="fa-solid fa-user-doctor"></i></span><span class="portal-service-copy"><strong>استكشف المختصين</strong><small>ابحث عن مختص تغذية واطلب المتابعة معه.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></a>
+        <article class="portal-service-card portal-service-upcoming"><span class="portal-service-icon"><i class="fa-solid fa-bowl-food"></i></span><span class="portal-service-copy"><strong>صمم نظامك الغذائي</strong><small>أنشئ نظامك الغذائي وتابع التزامك بنفسك.</small><em>قريبًا</em></span></article>
+        <article class="portal-service-card portal-service-upcoming"><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدواتي الغذائية</strong><small>حساب الاحتياجات ومتابعة الوزن والتقدم.</small><em>قريبًا</em></span></article>
+        <article class="portal-service-card portal-service-upcoming"><span class="portal-service-icon"><i class="fa-solid fa-book-open"></i></span><span class="portal-service-copy"><strong>المكتبة والتثقيف</strong><small>محتوى علمي وإرشادات غذائية مبسطة.</small><em>قريبًا</em></span></article>
+      </section>
+      <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استكشاف المختصين والخدمات دون ربط ملف صحي. ربط الملف مطلوب فقط للوصول إلى بياناتك الطبية.</p>
+    </section>
+    <section id="portalHealthArea" class="portal-health-area" hidden>
+      <button type="button" id="portalBackHome" class="portal-back-button"><i class="fa-solid fa-arrow-right"></i> العودة إلى الرئيسية</button>
+
     <section id="portalLoading" class="portal-state-card">
       <span class="portal-spinner"></span>
       <p>جاري تحميل ملفك الصحي...</p>
@@ -141,6 +158,7 @@
         <div><strong>خصوصيتك وسلامة بياناتك</strong><p>يمكنك الاطلاع على بياناتك وإضافة قياساتك. تعديل التشخيص والخطة العلاجية يظل من اختصاص مقدم الرعاية، ولا تظهر لك إلا الخطط التي يشاركها معك.</p></div>
       </section>
     </div>
+    </section>
   </main>
   <footer class="portal-footer">Diet Planner <span>•</span> بوابتك لمتابعة التغذية العلاجية</footer>
 </body>

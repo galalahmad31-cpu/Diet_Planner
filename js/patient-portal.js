@@ -24,6 +24,20 @@
     if ($("portalContent")) $("portalContent").hidden = id !== "portalContent";
   }
 
+  function openHealthArea() {
+    $("portalHome").hidden = true;
+    $("portalHealthArea").hidden = false;
+    loadPortal().catch(error => {
+      console.error("Patient health area load failed:", error);
+      fail(error.message || "تعذر تحميل الملف الصحي.");
+    });
+  }
+
+  function returnHome() {
+    $("portalHealthArea").hidden = true;
+    $("portalHome").hidden = false;
+  }
+
   function fail(message) {
     $("portalErrorText").textContent = message;
     showOnly("portalError");
@@ -327,12 +341,9 @@
     $("portalThemeToggle")?.addEventListener("click", () => {
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
-    try {
-      await loadPortal();
-    } catch (error) {
-      console.error("Patient portal load failed:", error);
-      fail(error.message || "تعذر تحميل ملفك الصحي.");
-    }
+    $("portalHome")?.querySelector("[data-portal-open-health]")?.addEventListener("click", openHealthArea);
+    $("portalBackHome")?.addEventListener("click", returnHome);
+    if (new URLSearchParams(window.location.search).has("invite")) openHealthArea();
   }
 
   document.addEventListener("DOMContentLoaded", init, { once: true });
