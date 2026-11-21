@@ -394,6 +394,7 @@ async function loadNotifications() {
       icon: event.event_type === 'connection_request_received' ? 'fa-user-plus'
         : event.event_type === 'message_received' ? 'fa-comment-dots'
         : event.event_type === 'followup_activated' ? 'fa-circle-check'
+        : event.event_type === 'followup_ended' ? 'fa-handshake-slash'
         : 'fa-bell'
     }))
   };
