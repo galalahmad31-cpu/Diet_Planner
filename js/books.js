@@ -3,7 +3,7 @@
   const access = window.DietPlannerAccess;
   const sb = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { books: [], settings: null, user: null, activeBook: null, orders: new Map(), loading: false };
+  const state = { books: [], settings: null, user: null, activeBook: null };
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[ch]));
   const money = value => Number(value || 0).toLocaleString("ar-EG",{maximumFractionDigits:2}) + " جنيه";
   const coverUrl = path => path ? sb.storage.from("book-covers").getPublicUrl(path).data.publicUrl : "";
@@ -101,7 +101,6 @@
         if (error.code === "23505") throw new Error("لديك طلب شراء قائم لهذا الكتاب بالفعل.");
         throw error;
       }
-      state.orders.set(book.id,"pending");
       renderBookDetails(book);
       const area = $("bookAccessArea");
       area.innerHTML = '<div class="book-status pending"><i class="fa-solid fa-clock"></i> تم إرسال طلبك بنجاح، وهو الآن قيد المراجعة. سيظهر رابط الكتاب بعد تأكيد الدفع.</div>';
