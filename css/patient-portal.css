@@ -75,4 +75,3 @@
 .portal-followup-contact strong{font-size:12px;color:var(--portal-ink)}
 .portal-followup-contact p{font-size:10px;color:var(--portal-muted);margin:4px 0 0;line-height:1.8}
 @media(max-width:650px){.portal-followup-grid{grid-template-columns:1fr;gap:8px}.portal-followup-grid article{min-height:82px}.portal-followup-contact{align-items:stretch;flex-direction:column}.portal-followup-contact .portal-primary-button{width:100%}}
-
