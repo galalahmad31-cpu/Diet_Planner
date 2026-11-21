@@ -15,12 +15,12 @@
   if (path === "patient-portal.html") {
     const patientPages = [
       ["#portalHome", "الرئيسية", "fa-house"],
-      ["#portalContent", "ملفي الصحي", "fa-folder-heart"],
-      ["#portalPlansTitle", "خطتي الغذائية", "fa-bowl-food"],
-      ["#portalAppointmentsTitle", "مواعيدي", "fa-calendar-check"],
-      ["#portalMessagesTitle", "رسائلي", "fa-comments"],
-      ["#portalMeasurementsTitle", "قياساتي", "fa-chart-line"],
-      ["professional-directory.html", "دليل المختصين", "fa-user-doctor"]
+      ["#portalContent", "الملف الصحي", "fa-heart-pulse"],
+      ["professional-directory.html", "دليل المتخصصين", "fa-user-doctor"],
+      ["#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
+      ["#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
+      ["#portalTools", "أدوات التغذية", "fa-calculator"],
+      ["#portalProfileArea", "الملف الشخصي", "fa-user"]
     ];
 
     function mountPatientHeader() {

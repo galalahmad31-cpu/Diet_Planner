@@ -59,6 +59,79 @@
     return value === null || value === undefined || value === "" ? "—" : Number(value).toLocaleString("ar-EG", { maximumFractionDigits: 1 }) + suffix;
   }
 
+  async function loadSelfProfile() {
+    const { data, error } = await supabase.from("profiles")
+      .select("full_name,email,phone,account_type")
+      .eq("id", state.user.id).maybeSingle();
+    if (error) throw error;
+    const profile = data || {};
+    $("selfProfileName").value = profile.full_name || state.user.user_metadata?.full_name || "";
+    $("selfProfilePhone").value = profile.phone || "";
+    $("selfProfileEmail").value = profile.email || state.user.email || "";
+    $("selfProfileType").value = profile.account_type === "patient" ? "مريض" : "حساب مريض";
+    $("portalWelcomeName") && ($("portalWelcomeName").textContent = profile.full_name || "مرحبًا بك");
+  }
+
+  async function saveSelfProfile(event) {
+    event.preventDefault();
+    const form = $("patientSelfProfileForm");
+    const button = form.querySelector('button[type="submit"]');
+    const fullName = $("selfProfileName").value.trim();
+    const phone = $("selfProfilePhone").value.trim();
+    if (fullName.length < 2 || fullName.length > 120) {
+      setMessage("selfProfileMessage", "يرجى إدخال اسم صحيح (2 إلى 120 حرفًا).", "error");
+      return;
+    }
+    if (phone.length > 25) {
+      setMessage("selfProfileMessage", "رقم الهاتف أطول من المسموح.", "error");
+      return;
+    }
+    button.disabled = true;
+    setMessage("selfProfileMessage", "جاري حفظ البيانات...");
+    try {
+      const { error } = await supabase.from("profiles")
+        .update({ full_name: fullName, phone: phone || null })
+        .eq("id", state.user.id);
+      if (error) throw error;
+      setMessage("selfProfileMessage", "تم تحديث بيانات حسابك بنجاح.", "success");
+      if ($("portalPatientName")) $("portalPatientName").textContent = fullName;
+    } catch (error) {
+      console.error("Patient self profile update failed:", error);
+      setMessage("selfProfileMessage", error.message || "تعذر حفظ البيانات.", "error");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function activateHealthTab(panelId) {
+    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel"];
+    if (!allowed.includes(panelId)) return;
+    document.querySelectorAll("[data-health-tab]").forEach(tab => {
+      const active = tab.dataset.healthTab === panelId;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+    allowed.forEach(id => { const panel = $(id); if (panel) panel.hidden = id !== panelId; });
+  }
+
+  function showPortalDestination(id) {
+    const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea");
+    if (home) home.hidden = !["portalHome", "portalDietBuilder", "portalEducation", "portalTools"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel"].includes(id);
+    if (profile) profile.hidden = id !== "portalProfileArea";
+    if (health && !health.hidden) {
+      if (id === "portalContent") activateHealthTab("portalPlansPanel");
+      else if (id.startsWith("portal")) activateHealthTab(id);
+    }
+    if (["portalDietBuilder","portalEducation","portalTools"].includes(id)) {
+      const target = $(id);
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    const target = id === "portalContent" ? health : id === "portalProfileArea" ? profile : $(id);
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   async function getPatientAccount() {
     const { data, error } = await supabase
       .from("patient_accounts")
@@ -336,6 +409,12 @@
     $("portalLogout")?.addEventListener("click", () => access.logout());
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
+    $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
+    document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
+    loadSelfProfile().catch(error => {
+      console.error("Patient profile load failed:", error);
+      setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
+    });
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
     $("portalMeasurementDate").value = localToday();
     $("portalThemeToggle")?.addEventListener("click", () => {
@@ -348,27 +427,20 @@
 
   window.DietPlannerPatientPortal = Object.freeze({
     async navigateToSection(id) {
-      if (id === "portalHome") {
-        returnHome();
-        document.getElementById("portalHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
+      if (id === "portalContent" || ["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel"].includes(id)) {
+        if (!state.patientId || $("portalContent")?.hidden) {
+          $("portalHome").hidden = true;
+          $("portalHealthArea").hidden = false;
+          try { await loadPortal(); }
+          catch (error) { fail(error.message || "تعذر تحميل الملف الصحي."); return; }
+          if ($("portalContent")?.hidden) return;
+        }
       }
-      if (!state.patientId) {
-        $("portalHome").hidden = true;
-        $("portalHealthArea").hidden = false;
-        try { await loadPortal(); }
-        catch (error) { fail(error.message || "تعذر تحميل الملف الصحي."); return; }
-        if ($("portalContent")?.hidden) return;
+      if (id === "portalProfileArea") {
+        try { await loadSelfProfile(); }
+        catch (error) { setMessage("selfProfileMessage", error.message || "تعذر تحميل بيانات الحساب.", "error"); }
       }
-      if ($("portalHealthArea")?.hidden) {
-        $("portalHome").hidden = true;
-        $("portalHealthArea").hidden = false;
-      }
-      if (!$("portalContent") || $("portalContent").hidden) {
-        try { await loadPortal(); }
-        catch (error) { fail(error.message || "تعذر تحميل الملف الصحي."); return; }
-      }
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      showPortalDestination(id);
     }
   });
 

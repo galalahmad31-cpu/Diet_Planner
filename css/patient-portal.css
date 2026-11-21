@@ -27,3 +27,18 @@
 
 
 @media(max-width:640px){.portal-services{grid-template-columns:1fr;gap:10px}.portal-service-card{min-height:94px;padding:14px;border-radius:15px}.portal-service-icon{width:43px;height:43px;flex-basis:43px}.portal-service-copy strong{font-size:13px}.portal-service-copy small{font-size:10px}.portal-home{gap:12px}.portal-health-area{gap:10px}}
+
+/* Patient portal information architecture: shared tokens, one tab system. */
+.portal-health-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 16px;padding:7px;border:1px solid var(--dp-border);border-radius:15px;background:var(--dp-surface-2)}
+.portal-health-tabs button{min-width:0;min-height:42px;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--dp-text-2);font:800 11px/1.5 var(--dp-font);cursor:pointer}
+.portal-health-tabs button:hover{background:var(--dp-surface-3);color:var(--dp-text)}
+.portal-health-tabs button.is-active{background:var(--dp-primary);color:var(--dp-on-primary);box-shadow:0 3px 10px var(--dp-shadow)}
+.portal-health-tab-panel[hidden],.portal-profile-area[hidden]{display:none!important}
+.portal-profile-area{padding:clamp(14px,2.5vw,24px);border:1px solid var(--dp-border);border-radius:18px;background:var(--dp-surface);color:var(--dp-text);box-shadow:0 8px 24px var(--dp-shadow)}
+.portal-profile-area .portal-section-heading{margin-bottom:18px}
+.portal-profile-area .portal-measurement-form{background:var(--dp-surface-2);border-color:var(--dp-border)}
+.portal-profile-area input{background:var(--dp-input);border-color:var(--dp-input-border);color:var(--dp-text)}
+.portal-profile-area input:disabled{opacity:.8;color:var(--dp-muted)}
+.portal-profile-area .portal-home-note{margin-top:14px;color:var(--dp-muted)}
+.portal-home-note{color:var(--dp-muted)}
+@media(max-width:700px){.portal-health-tabs{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:6px}.portal-health-tabs button{font-size:10px;min-height:40px;padding:7px 5px}}

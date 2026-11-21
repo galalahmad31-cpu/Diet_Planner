@@ -15,15 +15,15 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-patient-header-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-central-theme-v2">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-patient-ia-v2">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
   <link rel="stylesheet" href="css/patient-appointments.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
-  <script src="js/app-header.js?v=20261121-patient-header-v3" defer></script>
+  <script src="js/app-header.js?v=20261121-patient-ia-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
   <script src="js/patient-appointments.js?v=20261121-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261121-dashboard-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261121-patient-ia-v1" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
   <div data-dp-patient-header></div>
@@ -37,14 +37,33 @@
       <section class="portal-services" aria-label="خدمات بوابة المريض">
         <button type="button" class="portal-service-card portal-service-featured" data-portal-open-health><span class="portal-service-icon"><i class="fa-solid fa-folder-heart"></i></span><span class="portal-service-copy"><strong>ملفي الصحي</strong><small>بياناتي الصحية، القياسات، الخطط والمتابعة مع المختص.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></button>
         <a class="portal-service-card" href="professional-directory.html"><span class="portal-service-icon"><i class="fa-solid fa-user-doctor"></i></span><span class="portal-service-copy"><strong>استكشف المختصين</strong><small>ابحث عن مختص تغذية واطلب المتابعة معه.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></a>
-        <article class="portal-service-card portal-service-upcoming"><span class="portal-service-icon"><i class="fa-solid fa-bowl-food"></i></span><span class="portal-service-copy"><strong>صمم نظامك الغذائي</strong><small>أنشئ نظامك الغذائي وتابع التزامك بنفسك.</small><em>قريبًا</em></span></article>
-        <article class="portal-service-card portal-service-upcoming"><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدواتي الغذائية</strong><small>حساب الاحتياجات ومتابعة الوزن والتقدم.</small><em>قريبًا</em></span></article>
-        <article class="portal-service-card portal-service-upcoming"><span class="portal-service-icon"><i class="fa-solid fa-book-open"></i></span><span class="portal-service-copy"><strong>المكتبة والتثقيف</strong><small>محتوى علمي وإرشادات غذائية مبسطة.</small><em>قريبًا</em></span></article>
+        <article class="portal-service-card portal-service-upcoming" id="portalDietBuilder"><span class="portal-service-icon"><i class="fa-solid fa-bowl-food"></i></span><span class="portal-service-copy"><strong>صمم نظامك الغذائي</strong><small>أنشئ نظامك الغذائي وتابع التزامك بنفسك.</small><em>قريبًا</em></span></article>
+        <article class="portal-service-card portal-service-upcoming" id="portalTools"><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدوات التغذية</strong><small>حساب الاحتياجات ومتابعة الوزن والتقدم.</small><em>قريبًا</em></span></article>
+        <article class="portal-service-card portal-service-upcoming" id="portalEducation"><span class="portal-service-icon"><i class="fa-solid fa-book-open"></i></span><span class="portal-service-copy"><strong>المكتبة والتثقيف</strong><small>محتوى علمي وإرشادات غذائية مبسطة.</small><em>قريبًا</em></span></article>
       </section>
-      <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استكشاف المختصين والخدمات دون ربط ملف صحي. ربط الملف مطلوب فقط للوصول إلى بياناتك الطبية.</p>
+      <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استخدام الخدمات العامة دون الارتباط بمختص. الوصول إلى الملف الصحي يتطلب ربط حسابك بملفك الموجود.</p>
+    </section>
+    <section id="portalProfileArea" class="portal-profile-area" hidden>
+      <div class="portal-section-heading"><div><span class="portal-section-kicker">PERSONAL PROFILE</span><h2>الملف الشخصي</h2><p>إدارة بيانات حسابك ووسائل التواصل.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-pen"></i></span></div>
+      <form id="patientSelfProfileForm" class="portal-measurement-form">
+        <div class="portal-form-grid">
+          <div><label for="selfProfileName">الاسم</label><input id="selfProfileName" type="text" maxlength="120" autocomplete="name" required></div>
+          <div><label for="selfProfilePhone">رقم الهاتف</label><input id="selfProfilePhone" type="tel" maxlength="25" autocomplete="tel" dir="ltr"></div>
+          <div><label for="selfProfileEmail">البريد الإلكتروني</label><input id="selfProfileEmail" type="email" readonly disabled></div>
+          <div><label for="selfProfileType">نوع الحساب</label><input id="selfProfileType" type="text" readonly disabled></div>
+        </div>
+        <div class="portal-form-footer"><p id="selfProfileMessage" class="portal-inline-message" role="status"></p><button type="submit" class="portal-primary-button">حفظ البيانات</button></div>
+      </form>
+      <p class="portal-home-note">يمكن تعديل بيانات الحساب ووسائل التواصل هنا. البيانات الطبية والخطة والقياسات تدار داخل الملف الصحي، ولا تتغير بتعديل الملف الشخصي.</p>
     </section>
     <section id="portalHealthArea" class="portal-health-area" hidden>
       <button type="button" id="portalBackHome" class="portal-back-button"><i class="fa-solid fa-arrow-right"></i> العودة إلى الرئيسية</button>
+      <nav class="portal-health-tabs" role="tablist" aria-label="أقسام الملف الصحي">
+        <button type="button" role="tab" aria-selected="true" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel" class="is-active">الخطة الغذائية</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalAppointmentsPanel" data-health-tab="portalAppointmentsPanel">المواعيد</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalCommunicationPanel" data-health-tab="portalCommunicationPanel">التواصل مع المختص</button>
+      </nav>
 
     <section id="portalLoading" class="portal-state-card">
       <span class="portal-spinner"></span>
@@ -95,17 +114,17 @@
         </article>
       </section>
 
-      <section class="portal-section" aria-labelledby="portalPlansTitle">
+      <div id="portalPlansPanel" class="portal-health-tab-panel" role="tabpanel"><section class="portal-section" aria-labelledby="portalPlansTitle">
         <div class="portal-section-heading">
-          <div><span class="portal-section-kicker">NUTRITION PLAN</span><h2 id="portalPlansTitle">خطتي الغذائية</h2><p>الخطط التي اعتمد مختصك مشاركتها معك فقط.</p></div>
+          <div><span class="portal-section-kicker">NUTRITION PLAN</span><h2 id="portalPlansTitle">الخطة الغذائية</h2><p>الخطط التي اعتمد مختصك مشاركتها معك فقط.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-bowl-food"></i></span>
         </div>
         <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
         <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
         <div id="portalPlansList" class="portal-plans-list"></div>
-      </section>
+      </section></div>
 
-      <section class="portal-section" aria-labelledby="portalDirectoryRequestsTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL REQUESTS</span><h2 id="portalDirectoryRequestsTitle">طلبات المتابعة مع المختصين</h2><p>تابع حالة طلباتك التي أرسلتها من دليل المختصين.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div><div id="patientProfessionalRequests" class="portal-empty-state">جاري تحميل الطلبات...</div></section>
+      <div id="portalCommunicationPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalDirectoryRequestsTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL REQUESTS</span><h2 id="portalDirectoryRequestsTitle">طلبات المتابعة مع المختصين</h2><p>تابع حالة طلباتك التي أرسلتها من دليل المختصين.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div><div id="patientProfessionalRequests" class="portal-empty-state">جاري تحميل الطلبات...</div></section>
       <section class="portal-section" aria-labelledby="portalMessagesTitle">
         <div class="portal-section-heading">
           <div><span class="portal-section-kicker">SECURE MESSAGING</span><h2 id="portalMessagesTitle">التواصل مع المختص</h2><p>راسل المختص المرتبط بملفك لمتابعة التغذية العلاجية.</p></div>
@@ -114,15 +133,15 @@
         <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
       </section>
 
-      <section class="portal-section" aria-labelledby="portalAppointmentsTitle">
+      <div id="portalAppointmentsPanel" class="portal-health-tab-panel" role="tabpanel" hidden></div><section class="portal-section" aria-labelledby="portalAppointmentsTitle">
         <div class="portal-section-heading">
           <div><span class="portal-section-kicker">APPOINTMENTS</span><h2 id="portalAppointmentsTitle">حجز ومتابعة المواعيد</h2><p>أرسل طلب موعد مع أحد المختصين المرتبطين بملفك.</p></div>
           <span class="portal-section-icon"><i class="fa-regular fa-calendar-check"></i></span>
         </div>
         <div id="patientPortalAppointments" data-patient-appointments data-patient-role="patient"></div>
-      </section>
+      </section></div>
 
-      <section class="portal-section" aria-labelledby="portalMeasurementsTitle">
+      <div id="portalMeasurementsPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalMeasurementsTitle">
         <div class="portal-section-heading">
           <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>أضف قياساتك لمتابعة التغير مع الوقت.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
@@ -144,7 +163,7 @@
             <tbody id="portalMeasurementsRows"><tr><td colspan="5">جاري تحميل القياسات...</td></tr></tbody>
           </table>
         </div>
-      </section>
+      </section></div>
 
       <section class="portal-section portal-care-note">
         <span><i class="fa-solid fa-shield-heart"></i></span>
