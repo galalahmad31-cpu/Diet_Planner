@@ -22,8 +22,11 @@
 <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
 <link rel="stylesheet" href="css/books.css?v=20261121-books-v1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="js/auth-access.js?v=20261121-books-auth-v3" defer></script>
 <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
-<script src="js/app-header.js?v=20261121-books-nav-v1" defer></script>
+<script src="js/app-header.js?v=20261121-books-nav-v2" defer></script>
+<script src="js/books.js?v=20261121-books-v5" defer></script>
 </head>
 <body>
 <main class="books-page">
@@ -54,50 +57,6 @@
     <div id="bookModalBody" class="books-modal-body"></div>
   </section>
 </div>
-<script>
-(() => {
-  "use strict";
-  const grid = document.getElementById("booksGrid");
-  const empty = document.getElementById("booksEmpty");
-  const showLoadError = (message) => {
-    grid.replaceChildren();
-    empty.hidden = false;
-    empty.textContent = message;
-  };
-  const loadLocalScript = (src, onload) => {
-    const script = document.createElement("script");
-    script.src = src;
-    script.onload = onload;
-    script.onerror = () => showLoadError("تعذر تحميل مكونات المكتبة. حدّث الصفحة أو حاول لاحقًا.");
-    document.body.appendChild(script);
-  };
-  const sdkSources = [
-    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-    "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"
-  ];
-  const loadSdk = (index) => {
-    if (window.supabase?.createClient) {
-      loadLocalScript("js/auth-access.js?v=20261121-books-return-v2", () => {
-        if (!window.DietPlannerAccess?.supabaseClient) {
-          showLoadError("تعذر تهيئة الاتصال بالمكتبة. حدّث الصفحة أو حاول لاحقًا.");
-          return;
-        }
-        loadLocalScript("js/books.js?v=20261121-books-v4");
-      });
-      return;
-    }
-    if (index >= sdkSources.length) {
-      showLoadError("تعذر الاتصال بخدمة المكتبة. تحقق من اتصال الإنترنت وحاول مرة أخرى.");
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = sdkSources[index];
-    script.onload = () => window.supabase?.createClient ? loadSdk(sdkSources.length) : loadSdk(index + 1);
-    script.onerror = () => loadSdk(index + 1);
-    document.head.appendChild(script);
-  };
-  loadSdk(0);
-})();
-</script>
+
 </body>
 </html>
