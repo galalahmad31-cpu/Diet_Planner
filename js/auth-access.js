@@ -298,9 +298,11 @@
 
     const role = await getUserRole(user.id);
     const accountType = role === "admin" ? "admin" : await getUserAccountType(user.id);
-    const activeSubscription = role === "admin" || accountType === "patient"
+    const activeSubscription = role === "admin"
       ? true
-      : await hasActiveSubscription(user.id);
+      : accountType === "professional"
+        ? await hasActiveSubscription(user.id)
+        : false;
 
     return {
       authenticated: true,
