@@ -758,32 +758,72 @@
     const kind = $("portalInsulinKind")?.value || "rapid";
     const tddInput = $("portalInsulinTdd")?.value ?? "";
     const tdd = Number(tddInput);
+    const currentInput = $("portalCurrentGlucose")?.value ?? "";
+    const targetInput = $("portalTargetGlucose")?.value ?? "";
+    const current = Number(currentInput);
+    const target = Number(targetInput);
     const tddOutput = $("portalInsulinTddResult");
     const icrOutput = $("portalInsulinIcrResult");
     const isfOutput = $("portalInsulinIsfResult");
+    const differenceOutput = $("portalGlucoseDifference");
+    const correctionOutput = $("portalCorrectionEstimate");
     const message = $("portalInsulinMessage");
+    const correctionMessage = $("portalCorrectionMessage");
     const show = (node, value) => { if (node) node.textContent = value; };
-    [tddOutput, icrOutput, isfOutput].forEach(node => show(node, "—"));
-    if (!message) return;
+    const setState = (node, state) => { if (node) node.dataset.state = state; };
+    [tddOutput, icrOutput, isfOutput, differenceOutput, correctionOutput].forEach(node => show(node, "—"));
+    if (!message || !correctionMessage) return;
+
+    const validTdd = tddInput !== "" && Number.isFinite(tdd) && tdd > 0 && tdd <= 500;
     if (regimen !== "basal_bolus") {
       show(message, regimen === "basal_only"
-        ? "النظام القاعدي فقط لا يستخدم عادةً ICR وISF لحساب جرعات الوجبات. لا يمكن تقديرهما بهذه الحاسبة."
+        ? "النظام القاعدي فقط لا يستخدم عادةً ICR وISF لحساب جرعات الوجبات؛ لا يمكن اشتقاق المعاملات بهذه الأداة."
         : "الإنسولين المخلوط أو الجرعات الثابتة تحتاج خطة مختلفة؛ لا نشتق منها ICR وISF تلقائيًا.");
-      message.dataset.state = "notice";
+      show(correctionMessage, "مساعد التصحيح غير متاح لهذا النظام؛ اتبع خطة الطبيب المكتوبة.");
+      setState(message, "notice");
+      setState(correctionMessage, "warning");
       return;
     }
-    if (tddInput === "" || !Number.isFinite(tdd) || tdd <= 0 || tdd > 500) {
+    if (!validTdd) {
       show(message, "أدخل إجمالي وحدات الإنسولين المستخدمة خلال 24 ساعة، شاملًا القاعدي وجرعات الوجبات والتصحيح.");
-      message.dataset.state = "notice";
+      show(correctionMessage, "يلزم إدخال TDD صالح أولًا حتى يظهر ISF التقديري والمثال الحسابي.");
+      setState(message, "notice");
+      setState(correctionMessage, "notice");
       return;
     }
+
     const icr = 500 / tdd;
     const isf = (kind === "regular" ? 1500 : 1800) / tdd;
     show(tddOutput, tdd.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " وحدة");
     show(icrOutput, "1 وحدة لكل " + icr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
     show(isfOutput, isf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " mg/dL لكل وحدة");
-    show(message, `تقدير تعليمي أولي لمريض السكري ${diabetesType === "type1" ? "النوع الأول" : "النوع الثاني"} الذي يستخدم نظام القاعدي مع إنسولين الوجبات. لا تغيّر جرعاتك بناءً عليه؛ يجب أن يراجع الطبيب النتيجة ويضبطها حسب قراءات السكر واستجابة المريض. قد تختلف نسبة ICR بين الوجبات.`);
-    message.dataset.state = "notice";
+    show(message, `تقدير تعليمي أولي لمريض السكري ${diabetesType === "type1" ? "النوع الأول" : "النوع الثاني"} باستخدام نظام القاعدي مع إنسولين الوجبات. القواعد تقديرية ولا تستبدل ISF المعتمد من الطبيب.`);
+    setState(message, "notice");
+
+    if (currentInput === "" || targetInput === "") {
+      show(correctionMessage, "أدخل قياس السكر الحالي والهدف لعرض الفرق والمثال الحسابي.");
+      setState(correctionMessage, "notice");
+      return;
+    }
+    if (!Number.isFinite(current) || !Number.isFinite(target) || current < 20 || current > 600 || target < 70 || target > 250) {
+      show(correctionMessage, "تحقق من القيم: قياس السكر بين 20 و600، والهدف بين 70 و250 mg/dL.");
+      setState(correctionMessage, "warning");
+      return;
+    }
+    const difference = current - target;
+    show(differenceOutput, (difference > 0 ? "+" : "") + difference.toLocaleString("en-US") + " mg/dL");
+    if (difference <= 0) {
+      show(correctionOutput, "لا يوجد تصحيح حسابي");
+      show(correctionMessage, difference < 0
+        ? "القراءة أقل من الهدف. لا تستخدم هذه الأداة لحساب جرعة تصحيح؛ اتبع خطة التعامل مع انخفاض السكر أو تعليمات فريقك المعالج."
+        : "القراءة تساوي الهدف؛ لا يظهر فرق تصحيح حسابي.");
+      setState(correctionMessage, difference < 0 ? "warning" : "notice");
+      return;
+    }
+    const theoreticalUnits = difference / isf;
+    show(correctionOutput, theoreticalUnits.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة (نظريًا)");
+    show(correctionMessage, "هذا ناتج رياضي توضيحي فقط من فرق السكر ÷ ISF التقديري، وليس جرعة للحقن. لا يخصم IOB ولا يراعي عوامل الأمان الفردية؛ لا تستخدم الرقم لاتخاذ قرار جرعة.");
+    setState(correctionMessage, "warning");
   }
 
   async function loadPortal() {
@@ -931,7 +971,7 @@
     $("portalToolsPanel")?.addEventListener("click", handlePatientToolsClick);
     $("portalToolsPanel")?.addEventListener("change", handleToolQuantity);
     $("portalToolsPanel")?.addEventListener("input", event => {
-      if (event.target.matches("#portalInsulinTdd")) calculateInsulinEstimate();
+      if (event.target.matches("#portalInsulinTdd, #portalCurrentGlucose, #portalTargetGlucose")) calculateInsulinEstimate();
     });
     $("portalToolsPanel")?.addEventListener("change", event => {
       if (event.target.matches("#portalDiabetesType, #portalInsulinRegimen, #portalInsulinKind")) calculateInsulinEstimate();
