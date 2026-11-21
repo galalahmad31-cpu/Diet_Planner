@@ -81,8 +81,8 @@
   const id=$("booksAdminId").value||null,title=$("booksAdminTitle").value.trim(),isFree=$("booksAdminFree").checked;
   const telegram=$("booksAdminTelegram").value.trim(),status=$("booksAdminStatus").value,file=$("booksAdminCover").files[0];
   if(!title){toast("اكتب اسم الكتاب.");return}
-  if(status==="published"&&!/^https:\/\/(t\.me|telegram\.me)\//i.test(telegram)){toast("أضف رابط Telegram صحيحًا قبل نشر الكتاب.");return}
-  if(telegram&&!/^https:\/\/(t\.me|telegram\.me)\//i.test(telegram)){toast("رابط Telegram غير صحيح.");return}
+  if(status==="published"&&!/^https:\/\/(t\.me|telegram\.me)\/(\+|joinchat\/)[A-Za-z0-9_-]+\/?$/i.test(telegram)){toast("أضف رابط Telegram صحيحًا قبل نشر الكتاب.");return}
+  if(telegram&&!/^https:\/\/(t\.me|telegram\.me)\/(\+|joinchat\/)[A-Za-z0-9_-]+\/?$/i.test(telegram)){toast("رابط Telegram غير صحيح.");return}
   if(file&&(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024)){toast("الغلاف يجب أن يكون JPG أو PNG أو WEBP وبحد أقصى 5MB.");return}
   const existing=state.books.find(book=>book.id===id);
   const payload={title,author:$("booksAdminAuthor").value.trim(),category:$("booksAdminCategory").value.trim(),description:$("booksAdminDescription").value.trim(),features:$("booksAdminFeatures").value.split("\n").map(x=>x.trim()).filter(Boolean),price:isFree?0:Number($("booksAdminPrice").value),is_free:isFree,status,sort_order:Math.max(0,Number($("booksAdminSort").value)||0),updated_at:new Date().toISOString()};
