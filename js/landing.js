@@ -20,7 +20,6 @@
     }
 
     if (accountType === "professional") {
-      elements.guestAction.hidden = true;
       elements.patientCard.hidden = true;
       elements.professionalAction.href = hasActiveSubscription ? "app.html" : "profile.html";
       elements.professionalAction.innerHTML = hasActiveSubscription
@@ -31,7 +30,6 @@
     }
 
     if (accountType === "pending") {
-      elements.guestAction.hidden = true;
       elements.patientCard.hidden = true;
       elements.professionalCard.hidden = true;
       elements.status.hidden = false;
@@ -61,7 +59,6 @@
       }
 
       if (status.isAdmin) {
-        elements.guestAction.hidden = true;
         elements.patientCard.hidden = true;
         elements.professionalCard.hidden = true;
         elements.status.hidden = false;
