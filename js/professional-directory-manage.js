@@ -88,19 +88,54 @@ function renderIncomingRequests(requests){
 }
 function renderConversationHistory(requests){
  const root=$("professionalConversationHistory");
- const conversations=requests.filter(item=>["accepted","active"].includes(item.status));
+ const conversations=requests.filter(item=>["accepted","active","ended"].includes(item.status));
  if(!conversations.length){root.innerHTML='<div class="directory-empty-state">لا توجد محادثات مقبولة حتى الآن. ستظهر المحادثات هنا بعد قبول طلب جديد.</div>';return;}
  root.innerHTML=conversations.map(r=>{
   const active=r.status==="active";
+  const ended=r.status==="ended";
   const chat='<div class="professional-request-chat" data-request-chat data-request-id="'+esc(r.request_id)+'" data-patient-id="'+esc(r.patient_id)+'"></div>';
   const activeLink=active?'<a class="directory-secondary-button" href="patient-profile.html?id='+encodeURIComponent(r.patient_id)+'">فتح ملف المريض</a>':"";
-  return '<article class="directory-card professional-conversation-card" id="connection-request-'+esc(r.request_id)+'"><div class="directory-card-heading"><strong>'+esc(r.patient_name||"مريض")+'</strong><span class="directory-chip">'+(active?"المتابعة نشطة":"محادثة مفتوحة · بانتظار الاتفاق والدفع")+'</span></div><p>'+esc(r.message||"بدأت المحادثة دون رسالة افتتاحية.")+'</p>'+activeLink+chat+'</article>';
+  const endButton=active?'<button type="button" class="professional-end-followup-button" data-end-followup="'+esc(r.request_id)+'">إنهاء المتابعة</button>':"";
+  const state=ended?"انتهت المتابعة":active?"المتابعة نشطة":"محادثة مفتوحة · بانتظار الاتفاق والدفع";
+  return '<article class="directory-card professional-conversation-card" id="connection-request-'+esc(r.request_id)+'"><div class="directory-card-heading"><strong>'+esc(r.patient_name||"مريض")+'</strong><span class="directory-chip">'+state+'</span></div><p>'+esc(r.message||"بدأت المحادثة دون رسالة افتتاحية.")+'</p><div class="professional-conversation-actions">'+activeLink+endButton+'</div>'+chat+'</article>';
  }).join("");
  root.querySelectorAll("[data-request-chat]").forEach(node=>{
   void window.DietPlannerPatientMessages?.mount(node,{
    patientId:node.dataset.patientId,requestId:node.dataset.requestId,role:"professional"
   });
  });
+ root.querySelectorAll("[data-end-followup]").forEach(button=>button.addEventListener("click",()=>{
+  openEndFollowupDialog(button.dataset.endFollowup);
+ }));
+}
+function openEndFollowupDialog(requestId){
+ const dialog=$("endProfessionalFollowupDialog");
+ if(!dialog||!requestId)return;
+ dialog.dataset.requestId=requestId;
+ $("endProfessionalFollowupReason").value="";
+ $("endProfessionalFollowupStatus").textContent="";
+ $("endProfessionalFollowupStatus").className="";
+ $("endProfessionalFollowupDialog").showModal();
+}
+async function endFollowup(){
+ const dialog=$("endProfessionalFollowupDialog");
+ const requestId=dialog?.dataset.requestId;
+ const confirmButton=dialog?.querySelector("[data-end-followup-confirm]");
+ if(!requestId||confirmButton?.disabled)return;
+ confirmButton.disabled=true;
+ $("endProfessionalFollowupStatus").textContent="جارٍ إنهاء المتابعة...";
+ const {error}=await db.rpc("end_professional_followup",{
+  p_request_id:requestId,
+  p_reason:$("endProfessionalFollowupReason").value.trim()||null
+ });
+ if(error){
+  $("endProfessionalFollowupStatus").textContent="تعذر إنهاء المتابعة: "+error.message;
+  confirmButton.disabled=false;
+  return;
+ }
+ dialog.close();
+ setStatus("تم إنهاء المتابعة. تم الاحتفاظ بملف المريض وسجل المحادثة.");
+ await loadRequests();
 }
 async function loadRequests(){
  const incomingRoot=$("professionalConnectionRequests");
@@ -168,6 +203,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(error){setStatus("تعذر إرسال الملف: "+error.message);return;}
   setStatus("تم إرسال الملف للمراجعة. لن يظهر للعامة حتى يعتمد من إدارة المنصة.");await load();
  });
+ $("endProfessionalFollowupDialog").querySelector("[data-end-followup-cancel]").addEventListener("click",()=> $("endProfessionalFollowupDialog").close());
+ $("endProfessionalFollowupDialog").querySelector("[data-end-followup-confirm]").addEventListener("click",endFollowup);
+ $("endProfessionalFollowupDialog").addEventListener("click",event=>{if(event.target===$("endProfessionalFollowupDialog"))$("endProfessionalFollowupDialog").close();});
  $("withdrawDirectoryProfile").addEventListener("click",async()=>{
   if(!confirm("سيختفي ملفك من الدليل، لكن علاقات الرعاية الحالية لن تُحذف. هل تريد المتابعة؟"))return;
   const {error}=await db.rpc("withdraw_professional_directory_profile");
