@@ -93,7 +93,7 @@ async function submitRequest(){
  const profile=state.selectedProfile;
  if(!profile)return;
  const user=await window.DietPlannerAccess?.getCurrentUser();
- if(!user){window.location.href="login.html?next="+encodeURIComponent("professional-directory.html");return;}
+ if(!user){window.location.href="login.html?next="+encodeURIComponent("patient-portal.html");return;}
  const send=$("directorySendRequest"),message=$("directoryRequestMessage").value.trim();
  if(message.length>1000){$("directoryModalStatus").textContent="الرسالة يجب ألا تتجاوز 1000 حرف.";return;}
  send.disabled=true;$("directoryModalStatus").textContent="جاري إرسال طلب المتابعة...";
