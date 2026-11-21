@@ -41,7 +41,7 @@
     ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"],
     ["finance.html", "اشتراكات المرضى", "fa-wallet"],
     ["notifications.html", "الإشعارات", "fa-bell"],
-    ["professional-directory-manage.html#requests", "التواصل مع المرضى", "fa-comments"],
+    ["professional-directory-manage.html#communication", "التواصل مع المرضى", "fa-comments"],
     ["profile.html", "الصفحة الشخصية", "fa-user"],
     ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
@@ -80,9 +80,12 @@
         return path === "patient-portal.html" &&
           (location.hash === "#" + fragment || (!location.hash && fragment === "portalHome"));
       }
-      return role === "professional" && path === target && location.hash === "#" + fragment;
+      return role === "professional" && path === target && (location.hash === "#" + fragment || (fragment === "communication" && location.hash === "#requests"));
     }
-    if (path === target) return true;
+    if (path === target) {
+      if (role === "professional" && target === "professional-directory-manage.html") return !location.hash || location.hash === "#profile";
+      return true;
+    }
     if (role === "professional" &&
         ((path === "patient-profile.html" && target === "patient.html") ||
          (path === "visit.html" && target === "diet.html") ||
@@ -181,6 +184,15 @@
           else node.removeAttribute("aria-current");
         });
       }
+    });
+    window.addEventListener("hashchange", () => {
+      if (role !== "professional" || path !== "professional-directory-manage.html") return;
+      track.querySelectorAll(".dp-app-header__link").forEach(node => {
+        const active = activeFor(node.dataset.headerHref, role);
+        node.classList.toggle("is-active", active);
+        if (active) node.setAttribute("aria-current", "page");
+        else node.removeAttribute("aria-current");
+      });
     });
     header.querySelector(".dp-app-header__theme").addEventListener("click", () => window.DietPlannerTheme?.toggle?.());
     const logout = header.querySelector(".dp-app-header__logout");
