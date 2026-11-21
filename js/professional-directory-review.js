@@ -8,13 +8,14 @@ async function load(){
  if(role!=="admin"){$("directoryReviewStatus").textContent="هذه الصفحة مخصصة لإدارة المنصة.";return}
  const {data,error}=await db.from("professional_directory_profiles")
   .select("user_id,display_name,professional_title,bio,specialties,city,governorate,experience_years,service_modes,submitted_at,listing_status")
-  .in("listing_status",["pending_review","published"]).order("submitted_at");
+  .in("listing_status",["pending_review","published","suspended"]).order("submitted_at");
  if(error){$("directoryReviewStatus").textContent="تعذر تحميل الملفات: "+error.message;return}
  if(!data?.length){$("directoryReviewStatus").textContent="لا توجد ملفات تنتظر المراجعة أو تحتاج إجراءً.";return}
  $("directoryReviewStatus").textContent="ملفات تنتظر المراجعة أو تحتاج إجراءً: "+data.length;
  $("directoryReviewList").innerHTML=data.map(p=>{
   const pending=p.listing_status==="pending_review";
-  return '<article class="directory-card"><h2>'+esc(p.display_name)+'</h2><strong>'+esc(p.professional_title)+'</strong><p>'+esc(p.bio)+'</p><p>'+esc((p.specialties||[]).join("، "))+'</p><span class="directory-chip">'+esc(p.city)+'، '+esc(p.governorate)+'</span><span class="directory-chip">'+(pending?"قيد المراجعة":"منشور ومعتمد")+'</span><div>'+(pending?'<button data-decision="published" data-user="'+p.user_id+'">اعتماد ونشر</button><button data-decision="rejected" data-user="'+p.user_id+'">رفض وإعادة للتعديل</button>':'<button data-decision="suspended" data-user="'+p.user_id+'">إيقاف النشر</button>')+'</div></article>';
+  const suspended=p.listing_status==="suspended";
+  return '<article class="directory-card"><h2>'+esc(p.display_name)+'</h2><strong>'+esc(p.professional_title)+'</strong><p>'+esc(p.bio)+'</p><p>'+esc((p.specialties||[]).join("، "))+'</p><span class="directory-chip">'+esc(p.city)+'، '+esc(p.governorate)+'</span><span class="directory-chip">'+(pending?"قيد المراجعة":suspended?"موقوف":"منشور ومعتمد")+'</span><div>'+(pending?'<button data-decision="published" data-user="'+p.user_id+'">اعتماد ونشر</button><button data-decision="rejected" data-user="'+p.user_id+'">رفض وإعادة للتعديل</button>':suspended?'<button data-decision="published" data-user="'+p.user_id+'">إعادة الاعتماد والنشر</button>':'<button data-decision="suspended" data-user="'+p.user_id+'">إيقاف النشر</button>')+'</div></article>';
  }).join("");
  $("directoryReviewList").querySelectorAll("[data-decision]").forEach(b=>b.addEventListener("click",async()=>{
   let note="";
