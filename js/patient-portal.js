@@ -219,6 +219,10 @@
     await loadPatient();
     await Promise.all([loadMeasurements(), loadPlans()]);
     showOnly("portalContent");
+    void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
+      patientId: state.patientId,
+      role: "patient"
+    });
   }
 
   async function handleInviteSubmit(event) {
