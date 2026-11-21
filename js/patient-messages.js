@@ -47,6 +47,16 @@
           <label for="patientMessageRecipient">المختص</label>
           <select id="patientMessageRecipient" data-message-recipient></select>
         </div>
+        <section class="patient-messages-quick-actions" data-message-quick-actions hidden aria-label="تأكيدات الاتفاق والدفع">
+          <div class="patient-messages-quick-actions-heading">
+            <strong>تأكيدات الاتفاق والدفع</strong>
+            <small>تُسجل كتأكيدات مؤرخة، ولا تتحقق المنصة من وصول التحويل.</small>
+          </div>
+          <div class="patient-messages-quick-actions-buttons">
+            <button type="button" data-message-confirm="agreement">تأكيد الاتفاق</button>
+            <button type="button" data-message-confirm="payment">${role === "patient" ? "تأكيد إرسال المبلغ" : "تأكيد استلام المبلغ"}</button>
+          </div>
+        </section>
         <div class="patient-messages-list" data-message-list aria-live="polite">
           <div class="patient-messages-empty">جاري تحميل المحادثة...</div>
         </div>
@@ -57,7 +67,7 @@
             <button type="submit" data-message-send><i class="fa-solid fa-paper-plane"></i> إرسال</button>
           </div>
         </form>
-        <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية.</p>
+        <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية. تأكيد الدفع إقرار من صاحبه، وليس تحققًا بنكيًا من المنصة.</p>
       </div>`;
 
     const user = await access.getCurrentUser();
@@ -73,6 +83,7 @@
     const refreshButton = root.querySelector("[data-message-refresh]");
     const recipientWrap = root.querySelector("[data-message-contact]");
     const recipientSelect = root.querySelector("[data-message-recipient]");
+    const quickActions = root.querySelector("[data-message-quick-actions]");
     let recipientId = null;
     let busy = false;
     let loading = false;
@@ -143,6 +154,8 @@
       return;
     }
 
+    quickActions.hidden = false;
+
     async function loadMessages() {
       if (loading) return;
       loading = true;
@@ -185,13 +198,15 @@
       }
     }
 
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-      const body = input.value.trim();
-      if (!body || busy || !recipientId) return;
+    async function sendMessage(body, options = {}) {
+      const { clearInput = false, successMessage = "تم إرسال الرسالة." } = options;
+      if (!body || busy || !recipientId) return false;
+
       busy = true;
       sendButton.disabled = true;
+      root.querySelectorAll("[data-message-confirm]").forEach(button => { button.disabled = true; });
       setStatus(root, "جاري إرسال الرسالة...");
+
       try {
         const { error } = await supabase.from("patient_messages").insert({
           patient_id: patientId,
@@ -200,17 +215,49 @@
           body
         });
         if (error) throw error;
-        input.value = "";
-        setStatus(root, "تم إرسال الرسالة.", "success");
+
+        if (clearInput) input.value = "";
+        setStatus(root, successMessage, "success");
         await loadMessages();
+        return true;
       } catch (error) {
         console.error("Patient message send failed:", error);
         setStatus(root, error.message || "تعذر إرسال الرسالة.", "error");
+        return false;
       } finally {
         busy = false;
         sendButton.disabled = false;
+        root.querySelectorAll("[data-message-confirm]").forEach(button => { button.disabled = false; });
       }
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      void sendMessage(input.value.trim(), { clearInput: true });
     });
+
+    root.querySelectorAll("[data-message-confirm]").forEach(button => {
+      button.addEventListener("click", () => {
+        const action = button.dataset.messageConfirm;
+        const isAgreement = action === "agreement";
+        const body = isAgreement
+          ? "تأكيد الاتفاق\nأؤكد موافقتي على تفاصيل الخدمة والسعر والمدة التي اتفقنا عليها في هذه المحادثة."
+          : role === "patient"
+            ? "تأكيد إرسال المبلغ\nأؤكد أنني أرسلت المبلغ المتفق عليه للمختص."
+            : "تأكيد استلام المبلغ\nأؤكد أنني استلمت المبلغ المتفق عليه من المريض.";
+        const prompt = isAgreement
+          ? "هل تؤكد موافقتك على تفاصيل الخدمة والسعر والمدة التي اتفقتما عليها؟"
+          : role === "patient"
+            ? "هل تؤكد أنك أرسلت المبلغ بالفعل؟"
+            : "هل تؤكد أنك استلمت المبلغ بالفعل؟";
+
+        if (!window.confirm(prompt)) return;
+        void sendMessage(body, {
+          successMessage: isAgreement ? "تم إرسال تأكيد الاتفاق." : role === "patient" ? "تم إرسال تأكيد إرسال المبلغ." : "تم إرسال تأكيد استلام المبلغ."
+        });
+      });
+    });
+
     refreshButton.addEventListener("click", () => void loadMessages());
     await loadMessages();
   }
