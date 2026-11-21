@@ -298,16 +298,45 @@
       return true;
     }
 
-    const active = await hasActiveSubscription(userId);
+    // A validated patient invitation may return the user to the patient portal
+    // after authentication. Only this local page is accepted (no open redirects).
+    const requestedNext = new URLSearchParams(window.location.search).get("next") || "";
+    if (requestedNext === "patient-portal.html" || requestedNext.startsWith("patient-portal.html?invite=")) {
+      window.location.replace(requestedNext);
+      return true;
+    }
 
-    if (active === null) {
-      showAuthMessage("تعذر التحقق من الاشتراك حاليًا. لم يتم منح الوصول. حاول مرة أخرى.");
+    // Patient identity is independent of the professional workspace subscription.
+    // Resolve the patient's own account first so an RPC outage in subscription
+    // checks cannot block access to the patient portal.
+    const { data: patientAccount, error: patientAccountError } = await supabaseClient
+      .from("patient_accounts")
+      .select("patient_id")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .maybeSingle();
+
+    if (patientAccountError) {
+      console.error("Patient account lookup failed:", patientAccountError);
+      showAuthMessage("تعذر التحقق من ربط حساب المريض حاليًا. حاول مرة أخرى.");
       return false;
     }
+
+    const active = await hasActiveSubscription(userId);
 
     if (active === true) {
       window.location.replace("app.html");
       return true;
+    }
+
+    if (patientAccount?.patient_id) {
+      window.location.replace("patient-portal.html");
+      return true;
+    }
+
+    if (active === null) {
+      showAuthMessage("تعذر التحقق من الاشتراك حاليًا. لم يتم منح الوصول. حاول مرة أخرى.");
+      return false;
     }
 
     window.location.replace("profile.html");
