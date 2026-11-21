@@ -321,6 +321,12 @@
   async function checkUserAccess(session) {
     if (!session?.user) return false;
 
+    const requestedNext = new URLSearchParams(window.location.search).get("next") || "";
+    if (requestedNext === "books.html") {
+      window.location.replace("books.html");
+      return true;
+    }
+
     const userId = session.user.id;
     const role = await getUserRole(userId);
     if (role === null) {
