@@ -116,7 +116,7 @@
       const { data,error } = await sb.rpc("get_book_delivery_link",{p_book_id:book.id});
       if (error) throw error;
       if (!data || !/^https:\/\/(t\.me|telegram\.me)\//.test(data)) throw new Error("رابط تسليم الكتاب غير متاح حاليًا.");
-      window.open(data,"_blank","noopener,noreferrer");
+      window.location.assign(data);
     } catch (error) {
       console.error("Book delivery lookup failed:",error);
       alert(error.message || "تعذر فتح رابط الكتاب.");
