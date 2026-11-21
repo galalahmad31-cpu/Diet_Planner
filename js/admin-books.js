@@ -6,6 +6,7 @@
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const money=v=>Number(v||0).toLocaleString("ar-EG",{maximumFractionDigits:2})+" ج.م";
  const date=v=>v?new Date(v).toLocaleString("ar-EG",{dateStyle:"medium",timeStyle:"short"}):"—";
+ const isValidTelegramUrl=value=>/^https:\/\/(?:t\.me|telegram\.me)\/(?:\+(?:[A-Za-z0-9_-]+)|joinchat\/[A-Za-z0-9_-]+|[A-Za-z][A-Za-z0-9_]{4,31})\/?$/i.test(value);
  const coverUrl=path=>path?sb.storage.from("book-covers").getPublicUrl(path).data.publicUrl:"";
  let toastTimer=null;
  function toast(message){const box=$("booksAdminToast");box.textContent=message;box.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove("show"),2800)}
@@ -81,8 +82,8 @@
   const id=$("booksAdminId").value||null,title=$("booksAdminTitle").value.trim(),isFree=$("booksAdminFree").checked;
   const telegram=$("booksAdminTelegram").value.trim(),status=$("booksAdminStatus").value,file=$("booksAdminCover").files[0];
   if(!title){toast("اكتب اسم الكتاب.");return}
-  if(status==="published"&&!/^https:\/\/(t\.me|telegram\.me)\/(\+|joinchat\/)[A-Za-z0-9_-]+\/?$/i.test(telegram)){toast("أضف رابط Telegram صحيحًا قبل نشر الكتاب.");return}
-  if(telegram&&!/^https:\/\/(t\.me|telegram\.me)\/(\+|joinchat\/)[A-Za-z0-9_-]+\/?$/i.test(telegram)){toast("رابط Telegram غير صحيح.");return}
+  if(status==="published"&&!isValidTelegramUrl(telegram)){toast("أضف رابط Telegram صحيحًا قبل نشر الكتاب.");return}
+  if(telegram&&!isValidTelegramUrl(telegram)){toast("رابط Telegram غير صحيح.");return}
   if(file&&(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024)){toast("الغلاف يجب أن يكون JPG أو PNG أو WEBP وبحد أقصى 5MB.");return}
   const existing=state.books.find(book=>book.id===id);
   const payload={title,author:$("booksAdminAuthor").value.trim(),category:$("booksAdminCategory").value.trim(),description:$("booksAdminDescription").value.trim(),features:$("booksAdminFeatures").value.split("\n").map(x=>x.trim()).filter(Boolean),price:isFree?0:Number($("booksAdminPrice").value),is_free:isFree,status,sort_order:Math.max(0,Number($("booksAdminSort").value)||0),updated_at:new Date().toISOString()};
