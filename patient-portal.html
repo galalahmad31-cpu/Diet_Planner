@@ -22,7 +22,8 @@
   <script src="js/app-header.js?v=20261121-books-nav-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
-  <script src="js/patient-portal.js?v=20261121-remove-summary-v4" defer></script>
+  <script src="js/weight-logs-table.js?v=20261121-shared-table-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261121-shared-weight-table-v5" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -159,10 +160,18 @@
           </div>
           <div class="portal-form-footer"><p id="portalMeasurementMessage" class="portal-inline-message" role="status"></p><div class="portal-measurement-actions"><button type="button" id="portalCancelMeasurementEdit" class="portal-secondary-button" hidden>إلغاء التعديل</button><button type="submit" id="portalSaveMeasurement" class="portal-primary-button"><i class="fa-solid fa-plus"></i> حفظ القياس</button></div></div>
         </form>
-        <div class="portal-table-wrap">
-          <table class="portal-measurements-table">
-            <thead><tr><th>التاريخ</th><th>الوزن (كجم)</th><th>نسبة الدهون</th><th>نسبة العضلات</th><th>نسبة الماء</th><th>محيط الوسط</th><th>محيط الأرداف</th><th>الالتزام</th><th>ملاحظات المريض</th><th>إجراء</th></tr></thead>
-            <tbody id="portalMeasurementsRows"><tr><td colspan="10">جاري تحميل القياسات...</td></tr></tbody>
+        <div class="measurements-table-heading"><div><h3>سجل القياسات</h3><p>تاريخ وقياساتك المسجلة بترتيب زمني</p></div><span class="measurements-table-unit">الوزن ومحيطات الجسم</span></div>
+        <div class="measurements-table-wrap" role="region" aria-label="جدول سجل القياسات" tabindex="0">
+          <table class="measurements-table">
+            <caption class="measurements-table-caption">سجل قياسات المريض: التاريخ والوزن ونسب الدهون والعضلات والماء ومحيطات الجسم والالتزام والملاحظات</caption>
+            <thead><tr>
+              <th scope="col">التاريخ</th><th scope="col">الوزن <span>(كجم)</span></th>
+              <th scope="col">نسبة الدهون <span>(%)</span></th><th scope="col">نسبة العضلات <span>(%)</span></th>
+              <th scope="col">نسبة الماء <span>(%)</span></th><th scope="col">محيط الوسط <span>(سم)</span></th>
+              <th scope="col">محيط الأرداف <span>(سم)</span></th><th scope="col">الالتزام الغذائي</th>
+              <th scope="col">ملاحظات المريض</th><th scope="col" class="no-print">إجراء</th>
+            </tr></thead>
+            <tbody id="portalMeasurementsRows"><tr><td colspan="10" class="measurements-state">جاري تحميل القياسات...</td></tr></tbody>
           </table>
         </div>
       </section></div>
