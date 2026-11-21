@@ -89,7 +89,6 @@
         .eq("id", state.user.id);
       if (error) throw error;
       setMessage("selfProfileMessage", "تم تحديث بيانات حسابك بنجاح.", "success");
-      if ($("portalPatientName")) $("portalPatientName").textContent = fullName;
     } catch (error) {
       console.error("Patient self profile update failed:", error);
       setMessage("selfProfileMessage", error.message || "تعذر حفظ البيانات.", "error");
@@ -198,10 +197,7 @@
     if (error) throw error;
     if (!data) throw new Error("لم نتمكن من الوصول إلى ملفك الصحي المرتبط. تواصل مع مختصك.");
     state.patient = data;
-    $("portalPatientName").textContent = data.name || "مرحبًا بك";
-    $("portalHeight").textContent = optionalNumber(data.height, " سم");
-    $("portalAge").textContent = optionalNumber(data.age, " سنة");
-    $("portalDiagnosis").textContent = data.diagnosis || "غير مسجل";
+
   }
 
   function measurementDelta(value) {
