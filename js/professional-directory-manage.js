@@ -88,7 +88,7 @@ async function loadRequests(){
   const actions=r.status==="pending"
    ? '<div class="directory-card-actions"><button type="button" class="directory-primary-button" data-answer="accepted" data-id="'+esc(r.request_id)+'">قبول المحادثة</button><button type="button" class="directory-secondary-button" data-answer="declined" data-id="'+esc(r.request_id)+'">رفض الطلب</button></div>'
    : "";
-  return '<article class="directory-card"><strong>'+esc(r.patient_name||"مريض")+'</strong><p>'+esc(r.message||"لم يرسل المريض رسالة.")+'</p><span class="directory-chip">'+esc(status[r.status]||r.status)+'</span>'+actions+chat+activeLink+'</article>';
+  return '<article class="directory-card" id="connection-request-'+esc(r.request_id)+'"><strong>'+esc(r.patient_name||"مريض")+'</strong><p>'+esc(r.message||"لم يرسل المريض رسالة.")+'</p><span class="directory-chip">'+esc(status[r.status]||r.status)+'</span>'+actions+chat+activeLink+'</article>';
  }).join("");
  root.querySelectorAll("[data-answer]").forEach(btn=>btn.addEventListener("click",async()=>{
   btn.disabled=true;
@@ -101,6 +101,11 @@ async function loadRequests(){
    patientId:node.dataset.patientId,requestId:node.dataset.requestId,role:"professional"
   });
  });
+ const requestedId=new URLSearchParams(location.search).get("request");
+ if(requestedId){
+  const target=document.getElementById("connection-request-"+requestedId);
+  if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
+ }
 }
 async function load(){
  user=await window.DietPlannerAccess?.getCurrentUser();if(!user){location.href="login.html";return;}
