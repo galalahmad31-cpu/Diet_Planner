@@ -196,8 +196,15 @@
     if (!account?.patient_id) {
       const token = new URLSearchParams(window.location.search).get("invite");
       if (token) {
-        await acceptInvitation(token);
-        return loadPortal();
+        try {
+          await acceptInvitation(token);
+          return loadPortal();
+        } catch (error) {
+          showOnly("portalUnlinked");
+          $("portalInviteToken").value = token;
+          setMessage("portalInviteMessage", error.message || "تعذر قبول الدعوة. تحقق من صلاحيتها.", "error");
+          return;
+        }
       }
       showOnly("portalUnlinked");
       return;
@@ -286,10 +293,7 @@
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
     $("portalMeasurementDate").value = new Date().toISOString().slice(0, 10);
     $("portalThemeToggle")?.addEventListener("click", () => {
-      const dark = document.body.classList.contains("dark-theme") || document.body.classList.contains("dark-mode");
-      document.body.classList.toggle("dark-theme", !dark);
-      document.body.classList.toggle("dark-mode", !dark);
-      localStorage.setItem("dp-theme", dark ? "light" : "dark");
+      if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
     try {
       await loadPortal();
