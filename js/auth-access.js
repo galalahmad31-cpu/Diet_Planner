@@ -42,12 +42,14 @@
   // ---------------------------------------------------------
   const accessCache = {
     userId: null,
-    role: null
+    role: null,
+    accountType: null
   };
 
   function clearAccessCache() {
     accessCache.userId = null;
     accessCache.role = null;
+    accessCache.accountType = null;
   }
   // ---------------------------------------------------------
   function getToday() {
@@ -176,6 +178,28 @@
     return role;
   }
 
+  async function getUserAccountType(userId) {
+    if (!userId) return null;
+    if (accessCache.userId === userId && accessCache.accountType !== null) {
+      return accessCache.accountType;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("account_type")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error || !data?.account_type) {
+      console.error("Account type lookup failed:", error);
+      return null;
+    }
+
+    accessCache.userId = userId;
+    accessCache.accountType = data.account_type;
+    return data.account_type;
+  }
+
   // ---------------------------------------------------------
   // Subscription
   // ---------------------------------------------------------
@@ -265,7 +289,8 @@
     }
 
     const role = await getUserRole(user.id);
-    const activeSubscription = role === "admin"
+    const accountType = role === "admin" ? "admin" : await getUserAccountType(user.id);
+    const activeSubscription = role === "admin" || accountType === "patient"
       ? true
       : await hasActiveSubscription(user.id);
 
@@ -273,6 +298,7 @@
       authenticated: true,
       user,
       role,
+      accountType,
       isAdmin: role === "admin",
       hasActiveSubscription: activeSubscription === true,
       accessVerificationFailed: role === null || activeSubscription === null
@@ -287,7 +313,6 @@
 
     const userId = session.user.id;
     const role = await getUserRole(userId);
-
     if (role === null) {
       showAuthMessage("تعذر التحقق من صلاحية الحساب حاليًا. حاول مرة أخرى.");
       return false;
@@ -298,42 +323,38 @@
       return true;
     }
 
-    // A validated patient invitation may return the user to the patient portal
-    // after authentication. Only this local page is accepted (no open redirects).
     const requestedNext = new URLSearchParams(window.location.search).get("next") || "";
     if (requestedNext === "patient-portal.html" || requestedNext.startsWith("patient-portal.html?invite=")) {
       window.location.replace(requestedNext);
       return true;
     }
 
-    // Patient identity is independent of the professional workspace subscription.
-    // Resolve the patient's own account first so an RPC outage in subscription
-    // checks cannot block access to the patient portal.
-    const { data: patientAccount, error: patientAccountError } = await supabaseClient
-      .from("patient_accounts")
-      .select("patient_id")
-      .eq("user_id", userId)
-      .eq("status", "active")
-      .maybeSingle();
-
-    if (patientAccountError) {
-      console.error("Patient account lookup failed:", patientAccountError);
-      showAuthMessage("تعذر التحقق من ربط حساب المريض حاليًا. حاول مرة أخرى.");
+    const accountType = await getUserAccountType(userId);
+    if (!accountType) {
+      showAuthMessage("تعذر التحقق من نوع الحساب حاليًا. حاول مرة أخرى.");
       return false;
     }
 
-    const active = await hasActiveSubscription(userId);
-
-    if (active === true) {
-      window.location.replace("app.html");
-      return true;
+    if (accountType === "pending") {
+      showAccountTypeSelection();
+      return false;
     }
 
-    if (patientAccount?.patient_id) {
+    if (accountType === "patient") {
       window.location.replace("patient-portal.html");
       return true;
     }
 
+    if (accountType !== "professional") {
+      showAuthMessage("نوع الحساب غير معروف. تواصل مع الدعم.");
+      return false;
+    }
+
+    const active = await hasActiveSubscription(userId);
+    if (active === true) {
+      window.location.replace("app.html");
+      return true;
+    }
     if (active === null) {
       showAuthMessage("تعذر التحقق من الاشتراك حاليًا. لم يتم منح الوصول. حاول مرة أخرى.");
       return false;
@@ -434,9 +455,10 @@
     const name = document.getElementById("registerName")?.value.trim();
     const email = document.getElementById("registerEmail")?.value.trim().toLowerCase();
     const password = document.getElementById("registerPassword")?.value;
+    const accountType = document.querySelector('input[name="registerAccountType"]:checked')?.value;
     const button = document.getElementById("registerButton");
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !["professional", "patient"].includes(accountType)) {
       showAuthMessage("من فضلك أكمل جميع البيانات.");
       return;
     }
@@ -451,7 +473,7 @@
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name } }
+        options: { data: { full_name: name, account_type: accountType } }
       });
 
       if (error) {
@@ -570,6 +592,46 @@
   }
 
 
+  function showAccountTypeSelection() {
+    const panel = document.getElementById("accountTypeOnboarding");
+    if (!panel) {
+      showAuthMessage("هذا الحساب يحتاج إلى تحديد نوعه. حدّث الصفحة وحاول مرة أخرى.");
+      return;
+    }
+    document.querySelectorAll(".auth-form").forEach(form => { form.style.display = "none"; });
+    document.querySelectorAll("[data-auth-tab]").forEach(tab => tab.classList.remove("active"));
+    panel.hidden = false;
+    document.getElementById("authMessage")?.style.setProperty("display", "none");
+  }
+
+  async function completeAccountTypeSelection() {
+    if (signupBusy) return;
+    const accountType = document.querySelector('input[name="onboardingAccountType"]:checked')?.value;
+    const button = document.getElementById("completeAccountTypeButton");
+    if (!["professional", "patient"].includes(accountType)) {
+      showAuthMessage("اختر نوع الحساب أولًا.");
+      return;
+    }
+
+    signupBusy = true;
+    setBusy(button, true, "جارٍ حفظ الاختيار...");
+    try {
+      const { error } = await supabaseClient.rpc("complete_account_type_selection", {
+        p_account_type: accountType
+      });
+      if (error) throw error;
+      clearAccessCache();
+      const user = await getCurrentUser();
+      await checkUserAccess({ user });
+    } catch (error) {
+      console.error("Account type selection failed:", error);
+      showAuthMessage(error?.message || "تعذر حفظ نوع الحساب. حاول مرة أخرى.");
+    } finally {
+      signupBusy = false;
+      setBusy(button, false, "متابعة");
+    }
+  }
+
   async function loginWithGoogle() {
     const button =
       document.getElementById("googleLoginButton");
@@ -655,6 +717,9 @@
     document
       .getElementById("googleLoginButton")
       ?.addEventListener("click", loginWithGoogle);
+    document
+      .getElementById("completeAccountTypeButton")
+      ?.addEventListener("click", completeAccountTypeSelection);
 
     if (window.location.hash === "#register") {
       document.querySelector('[data-auth-tab="registerForm"]')?.click();
@@ -776,6 +841,7 @@
     supabaseClient,
     getCurrentUser,
     getUserRole,
+    getUserAccountType,
     hasActiveSubscription,
     canAddPatient,
     canWrite,
