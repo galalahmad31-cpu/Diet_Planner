@@ -284,30 +284,10 @@
     if (empty) empty.hidden = true;
     if (content) content.hidden = true;
     try {
-      const { data: team, error: teamError } = await supabase
-        .from("patient_care_team")
-        .select("professional_id,relationship_role")
-        .eq("patient_id", state.patientId)
-        .eq("status", "active");
-      if (teamError) throw teamError;
-      const orderedTeam = (team || []).slice().sort((a,b) =>
-        (a.relationship_role === "primary" ? 0 : 1) - (b.relationship_role === "primary" ? 0 : 1)
-      );
-      const professionalIds = [...new Set(orderedTeam.map(row => row.professional_id).filter(Boolean))];
-      if (!professionalIds.length) {
-        if (empty) empty.hidden = false;
-        return;
-      }
-      const { data: finances, error: financeError } = await supabase
-        .from("patient_finances")
-        .select("id,user_id,subscription_start_date,subscription_end_date,next_follow_up_date,created_at,updated_at")
-        .eq("patient_id", state.patientId)
-        .in("user_id", professionalIds)
-        .order("updated_at", { ascending: false })
-        .order("created_at", { ascending: false });
-      if (financeError) throw financeError;
-      const primaryId = orderedTeam[0].professional_id;
-      const record = (finances || []).find(row => row.user_id === primaryId) || (finances || [])[0];
+      // A narrow RPC returns only the three dates; it does not expose finance amounts.
+      const { data, error } = await supabase.rpc("get_patient_subscription_follow_up");
+      if (error) throw error;
+      const record = Array.isArray(data) ? data[0] : data;
       if (!record) {
         if (empty) empty.hidden = false;
         return;
@@ -320,7 +300,9 @@
         if (!record.next_follow_up_date) hint.textContent = "لم يحدد المختص موعد المتابعة القادمة بعد";
         else {
           const today = localToday();
-          hint.textContent = record.next_follow_up_date < today ? "موعد المتابعة المحدد قد مضى؛ تواصل مع مختصك لتحديثه" : "يحدده المختص المسؤول عن ملفك";
+          hint.textContent = record.next_follow_up_date < today
+            ? "موعد المتابعة المحدد قد مضى؛ تواصل مع مختصك لتحديثه"
+            : "يحدده المختص المسؤول عن ملفك";
         }
       }
       if (content) content.hidden = false;
