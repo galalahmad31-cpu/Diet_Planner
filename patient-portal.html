@@ -24,7 +24,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261121-show-all-foods-v4" defer></script>
+  <script src="js/patient-portal.js?v=20261121-renal-meal-calculator-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -66,18 +66,12 @@
 
       <section id="portalRenalPanel" class="portal-tools-tab-panel" role="tabpanel" aria-labelledby="portalRenalTab" hidden>
         <section class="portal-tool-card" aria-labelledby="renalToolTitle">
-          <div class="portal-tool-heading"><span class="portal-tool-icon portal-tool-icon-blue"><i class="fa-solid fa-heart-pulse"></i></span><div><h3 id="renalToolTitle">دليل أغذية مرضى الكلى</h3><p>ابحث عن غذاء واعرض قيم عناصره الغذائية.</p></div></div>
-          <label for="portalRenalSearch">ابحث عن الغذاء</label>
-          <input id="portalRenalSearch" type="search" autocomplete="off" placeholder="اكتب اسم الغذاء">
-          <label for="portalRenalNutrient">العنصر الغذائي</label>
-          <select id="portalRenalNutrient">
-            <option value="potassium">البوتاسيوم</option>
-            <option value="phosphorus">الفوسفور</option>
-            <option value="sodium">الصوديوم</option>
-            <option value="protein">البروتين</option>
-          </select>
-          <div id="portalRenalResults" class="portal-renal-results" aria-live="polite"><p class="portal-tool-hint">ابدأ بكتابة اسم الغذاء لعرض بياناته.</p></div>
-          <p class="portal-tool-footnote">القيم المعروضة لكل 100 جم. لا تعني هذه البيانات أن الغذاء مناسب أو غير مناسب لكل مرضى الكلى؛ فالاختيار يعتمد على الحالة والتحاليل وخطة العلاج.</p>
+          <div class="portal-tool-heading"><span class="portal-tool-icon portal-tool-icon-blue"><i class="fa-solid fa-heart-pulse"></i></span><div><h3 id="renalToolTitle">دليل أغذية مرضى الكلى</h3><p>أضف الأصناف إلى الوجبات وحدد الكمية بالجرام لمتابعة البوتاسيوم والفسفور والصوديوم تلقائيًا.</p></div></div>
+          <div id="portalRenalDayTotals" class="portal-renal-day-totals" aria-live="polite">
+            <div class="portal-renal-total"><span>البوتاسيوم</span><strong>0 مجم</strong></div><div class="portal-renal-total"><span>الفسفور</span><strong>0 مجم</strong></div><div class="portal-renal-total"><span>الصوديوم</span><strong>0 مجم</strong></div>
+          </div>
+          <div id="portalRenalMeals" class="portal-carb-meals"><div class="portal-tool-loading">جاري تجهيز الدليل...</div></div>
+          <p class="portal-tool-footnote">تُحسب القيم من بيانات مكتبة الأغذية لكل 100 جم حسب الكمية المدخلة. (*) يعني أن إجمالي العنصر غير مكتمل لوجود صنف لا تتوفر له قيمة مسجلة. هذه أداة حسابية ولا تصنف الغذاء وحدها إلى مسموح أو ممنوع؛ القرار يعتمد على الحالة والتحاليل والخطة العلاجية.</p>
         </section>
       </section>
 
