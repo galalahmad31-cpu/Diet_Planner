@@ -758,7 +758,8 @@
     const carbResult = meal ? getMealNutrientTotal(meal, "carb") : { total: 0, missing: 0 };
     const carbs = carbResult.total;
     const unit = $("portalInsulinUnit")?.value || "mg";
-    const currentRaw = Number($("portalInsulinCurrent")?.value);
+    const currentInput = $("portalInsulinCurrent")?.value ?? "";
+    const currentRaw = Number(currentInput);
     const targetRaw = Number($("portalInsulinTarget")?.value);
     const icr = Number($("portalInsulinIcr")?.value);
     const isf = Number($("portalInsulinIsf")?.value);
@@ -780,7 +781,7 @@
       message.dataset.state = "warning";
       return;
     }
-    const validCurrent = Number.isFinite(currentRaw) && currentRaw >= 0;
+    const validCurrent = currentInput !== "" && Number.isFinite(currentRaw) && currentRaw >= 0;
     const validSettings = [targetRaw, icr, isf].every(value => Number.isFinite(value) && value > 0);
     if (!validCurrent || !validSettings || iobRaw === "" || !Number.isFinite(iob) || iob < 0) {
       message.textContent = "أدخل قراءة السكر والهدف وICR وISF، وأدخل IOB صراحةً؛ اكتب 0 إذا لم توجد جرعة نشطة.";
