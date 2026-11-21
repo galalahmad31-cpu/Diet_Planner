@@ -318,9 +318,10 @@ grant execute on function private.is_linked_patient_for_plan(uuid) to authentica
 create policy patient_plan_publications_select_linked_patient_or_owner
   on public.patient_plan_publications for select to authenticated
   using (
-    revoked_at is null and (
-      published_by = (select auth.uid())
-      or (select private.is_linked_patient_for_plan(plan_id))
+    published_by = (select auth.uid())
+    or (
+      revoked_at is null
+      and (select private.is_linked_patient_for_plan(plan_id))
     )
   );
 
