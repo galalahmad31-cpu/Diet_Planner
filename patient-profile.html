@@ -15,6 +15,7 @@
   <script src="js/patient-energy-calculator.js?v=20261119-patient-energy-v1" defer></script>
   <script src="js/patient-profile.js?v=20261121-measurement-actions-v3" defer></script>
   <script src="js/patient-portal-link.js?v=20261121-v1" defer></script>
+  <script src="js/patient-messages.js?v=20261121-v1" defer></script>
 
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v14">
@@ -23,6 +24,7 @@
   <link rel="stylesheet" href="css/diet-plan.css?v=20261121">
   <link rel="stylesheet" href="css/patient-profile.css?v=20261121-finance-theme-v4">
   <link rel="stylesheet" href="css/patient-portal-link.css?v=20261121-v1">
+  <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v14" defer></script>
   
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-cleanup-v11">
@@ -122,6 +124,9 @@
       </button>
       <button type="button" class="patient-module-tab" id="nutritionSupportTab" role="tab" aria-selected="false" aria-controls="nutritionSupportPanel" data-module="nutrition-support">
         <span class="dashboard-icon nutrition-support-icon">🩺</span><span class="patient-module-tab-copy"><strong>الدعم الغذائي</strong><small>التغذية الأنبوبية والوريدية</small></span>
+      </button>
+      <button type="button" class="patient-module-tab" id="patientMessagesTab" role="tab" aria-selected="false" aria-controls="patientMessagesPanel" data-module="messages">
+        <span class="dashboard-icon teal"><i class="fa-solid fa-comments"></i></span><span class="patient-module-tab-copy"><strong>مراسلة المريض</strong><small>متابعة الرسائل مع المريض</small></span>
       </button>
     </div>
 
@@ -400,6 +405,11 @@
 
     <section id="nutritionSupportPanel" class="patient-module-panel patient-support-panel" role="tabpanel" aria-labelledby="nutritionSupportTab" hidden>
       <iframe id="nutritionSupportFrame" title="الدعم الغذائي للمريض" loading="lazy" referrerpolicy="same-origin"></iframe>
+    </section>
+    <section id="patientMessagesPanel" class="patient-module-panel" role="tabpanel" aria-labelledby="patientMessagesTab" hidden>
+      <div class="dashboard-panel">
+        <div id="patientProfileMessages" data-patient-messages data-patient-role="professional"></div>
+      </div>
     </section>
   </section>
 </main>
