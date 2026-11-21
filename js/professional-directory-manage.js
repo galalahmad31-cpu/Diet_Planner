@@ -78,6 +78,13 @@ function renderIncomingRequests(requests){
  const incoming=requests.filter(item=>item.status==="pending");
  if(!incoming.length){root.innerHTML='<div class="directory-empty-state">لا توجد طلبات محادثة واردة حاليًا.</div>';return;}
  root.innerHTML=incoming.map(r=>'<article class="directory-card" id="connection-request-'+esc(r.request_id)+'"><div class="directory-card-heading"><strong>'+esc(r.patient_name||"مريض")+'</strong><span class="directory-chip">طلب جديد</span></div><p>'+esc(r.message||"لم يرسل المريض رسالة.")+'</p><div class="directory-card-actions"><button type="button" class="directory-primary-button" data-answer="accepted" data-id="'+esc(r.request_id)+'">قبول المحادثة</button><button type="button" class="directory-secondary-button" data-answer="declined" data-id="'+esc(r.request_id)+'">رفض الطلب</button></div></article>').join("");
+ root.querySelectorAll("[data-answer]").forEach(button=>button.addEventListener("click",async()=>{
+  if(button.disabled)return;
+  button.disabled=true;
+  const {error}=await db.rpc("respond_professional_connection_request",{p_request_id:button.dataset.id,p_decision:button.dataset.answer});
+  if(error){setStatus("تعذر تنفيذ الطلب: "+error.message);button.disabled=false;return;}
+  await loadRequests();
+ }));
 }
 function renderConversationHistory(requests){
  const root=$("professionalConversationHistory");
