@@ -44,6 +44,12 @@
   let notificationChannel = null;
   let notificationUserId = null;
   let renderRevision = 0;
+  const NAV_STATE_KEY = "dp-app-header-nav-state";
+
+  function getSavedCollapsedState() {
+    try { return localStorage.getItem(NAV_STATE_KEY) !== "expanded"; }
+    catch { return true; }
+  }
 
   if (new URLSearchParams(location.search).get("embed") === "1" ||
       document.documentElement.classList.contains("visit-embedded") ||
@@ -69,12 +75,16 @@
     return false;
   }
 
-  function setCollapsed(nav, toggle, collapsed) {
+  function setCollapsed(nav, toggle, collapsed, persist = true) {
     nav.classList.toggle("is-collapsed", collapsed);
     nav.classList.toggle("is-expanded", !collapsed);
     toggle.setAttribute("aria-expanded", String(!collapsed));
     toggle.setAttribute("aria-label", collapsed ? "إظهار الصف الثاني من التابات" : "طي الصف الثاني من التابات");
-    toggle.title = collapsed ? "إظهار الصف الثاني" : "طي الصف الثاني";
+    toggle.title = collapsed ? "إظهار باقي التابات" : "طي باقي التابات";
+    if (persist) {
+      try { localStorage.setItem(NAV_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
+      catch (error) { console.warn("Could not save header navigation preference:", error); }
+    }
   }
 
   function makeLink(item, role) {
@@ -125,7 +135,7 @@
         </div>
       </div>
       <nav class="dp-app-header__nav is-collapsed" aria-label="التنقل الرئيسي">
-        <div class="dp-app-header__nav-top"><button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-app-header-track" aria-label="إظهار الصف الثاني من التابات" title="إظهار الصف الثاني"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button></div>
+        <div class="dp-app-header__nav-top"><button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-app-header-track" aria-label="إظهار باقي التابات" title="إظهار باقي التابات"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button></div>
         <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
       <div class="dp-app-header__page-title"></div>
@@ -138,6 +148,7 @@
     toggle.addEventListener("click", () => {
       setCollapsed(nav, toggle, toggle.getAttribute("aria-expanded") === "true");
     });
+    setCollapsed(nav, toggle, getSavedCollapsedState(), false);
     track.addEventListener("click", event => {
       const link = event.target.closest(".dp-app-header__link");
       if (!link) return;
@@ -154,7 +165,6 @@
           else node.removeAttribute("aria-current");
         });
       }
-      setCollapsed(nav, toggle, true);
     });
     header.querySelector(".dp-app-header__theme").addEventListener("click", () => window.DietPlannerTheme?.toggle?.());
     const logout = header.querySelector(".dp-app-header__logout");
