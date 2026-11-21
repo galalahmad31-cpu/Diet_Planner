@@ -79,7 +79,7 @@
     nav.classList.toggle("is-collapsed", collapsed);
     nav.classList.toggle("is-expanded", !collapsed);
     toggle.setAttribute("aria-expanded", String(!collapsed));
-    toggle.setAttribute("aria-label", collapsed ? "إظهار الصف الثاني من التابات" : "طي الصف الثاني من التابات");
+    toggle.setAttribute("aria-label", collapsed ? "إظهار باقي التابات" : "طي باقي التابات");
     toggle.title = collapsed ? "إظهار باقي التابات" : "طي باقي التابات";
     if (persist) {
       try { localStorage.setItem(NAV_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
