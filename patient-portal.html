@@ -16,9 +16,11 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261121-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
+  <link rel="stylesheet" href="css/patient-appointments.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
+  <script src="js/patient-appointments.js?v=20261121-v1" defer></script>
   <script src="js/patient-portal.js?v=20261121-v1" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
@@ -99,6 +101,14 @@
           <span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span>
         </div>
         <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
+      </section>
+
+      <section class="portal-section" aria-labelledby="portalAppointmentsTitle">
+        <div class="portal-section-heading">
+          <div><span class="portal-section-kicker">APPOINTMENTS</span><h2 id="portalAppointmentsTitle">حجز ومتابعة المواعيد</h2><p>أرسل طلب موعد مع أحد المختصين المرتبطين بملفك.</p></div>
+          <span class="portal-section-icon"><i class="fa-regular fa-calendar-check"></i></span>
+        </div>
+        <div id="patientPortalAppointments" data-patient-appointments data-patient-role="patient"></div>
       </section>
 
       <section class="portal-section" aria-labelledby="portalMeasurementsTitle">
