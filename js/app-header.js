@@ -40,7 +40,8 @@
     ["notifications.html", "الإشعارات", "fa-bell"],
     ["professional-directory-manage.html#requests", "التواصل مع المرضى", "fa-comments"],
     ["profile.html", "الصفحة الشخصية", "fa-user"],
-    ["professional-directory-manage.html", "الملف المهني", "fa-id-card"]
+    ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
+    ["about.html", "عن المنصة", "fa-circle-info"]
   ];
   const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
   const titles = {
