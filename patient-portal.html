@@ -16,12 +16,12 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-patient-header-v2">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261121-patient-ia-v2">
-  <link rel="stylesheet" href="css/patient-messages.css?v=20261121-confirmations-v1">
+  <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
   <script src="js/app-header.js?v=20261121-patient-ia-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-confirmations-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261121-connection-flow-v2" defer></script>
+  <script src="js/patient-portal.js?v=20261121-conversation-flow-v1" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
   <div data-dp-patient-header></div>
@@ -76,10 +76,10 @@
 
     <section id="portalUnlinked" class="portal-state-card" hidden>
       <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
-      <h1>ملفك الصحي لم يُنشأ بعد</h1>
-      <p>يمكنك استكشاف دليل المتخصصين وإرسال طلب متابعة. عند قبول المختص للطلب، سيتم إنشاء ملفك الصحي وربطه به تلقائيًا. إذا كان لديك ملف موجود بالفعل، استخدم رمز الدعوة الذي أرسله إليك المختص.</p>
+      <h1>لم تبدأ المتابعة بعد</h1>
+      <p>يمكنك استكشاف دليل المختصين وإرسال طلب محادثة. بعد قبول المختص، يمكنكما الاتفاق على الخدمة والسعر والمدة ثم تأكيد الدفع. لا تبدأ المتابعة ولا يُتاح ملفها الصحي إلا بعد تأكيد المختص استلام المبلغ. إذا كان لديك ملف موجود بالفعل، استخدم رمز الدعوة الذي أرسله إليك المختص.</p>
       <section class="portal-section portal-unlinked-requests" aria-labelledby="portalUnlinkedRequestsTitle">
-        <div class="portal-section-heading"><div><h2 id="portalUnlinkedRequestsTitle">طلبات المتابعة</h2><p>تابع الطلبات المرسلة للمختصين قبل إنشاء ملفك الصحي.</p></div></div>
+        <div class="portal-section-heading"><div><h2 id="portalUnlinkedRequestsTitle">طلبات المحادثة</h2><p>تابع طلبات المحادثة المرسلة للمختصين.</p></div></div>
         <div id="patientProfessionalRequestsUnlinked" class="portal-empty-state">جاري تحميل الطلبات...</div>
       </section>
       <form id="portalInviteForm" class="portal-invite-form">
@@ -125,10 +125,10 @@
         <div id="portalPlansList" class="portal-plans-list"></div>
       </section></div>
 
-      <div id="portalCommunicationPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalDirectoryRequestsTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL REQUESTS</span><h2 id="portalDirectoryRequestsTitle">طلبات المتابعة مع المختصين</h2><p>تابع حالة طلباتك التي أرسلتها من دليل المختصين.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div><div id="patientProfessionalRequests" class="portal-empty-state">جاري تحميل الطلبات...</div></section>
+      <div id="portalCommunicationPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalDirectoryRequestsTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL REQUESTS</span><h2 id="portalDirectoryRequestsTitle">طلبات المحادثة مع المختصين</h2><p>تابع حالة المحادثات والاتفاقات مع المختصين.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div><div id="patientProfessionalRequests" class="portal-empty-state">جاري تحميل الطلبات...</div></section>
       <section class="portal-section" aria-labelledby="portalMessagesTitle">
         <div class="portal-section-heading">
-          <div><span class="portal-section-kicker">SECURE MESSAGING</span><h2 id="portalMessagesTitle">التواصل مع المختص</h2><p>راسل المختص المرتبط بملفك لمتابعة التغذية العلاجية.</p></div>
+          <div><span class="portal-section-kicker">SECURE MESSAGING</span><h2 id="portalMessagesTitle">التواصل مع المختص</h2><p>تواصل مع المختص، واتفقا على الخدمة قبل بدء المتابعة.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span>
         </div>
         <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
