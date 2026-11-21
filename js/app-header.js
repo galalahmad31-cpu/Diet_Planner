@@ -71,7 +71,11 @@
     const target = href.split("#")[0];
     if (href.includes("#")) {
       const fragment = href.split("#")[1];
-      return path === "patient-portal.html" && (location.hash === "#" + fragment || (!location.hash && fragment === "portalHome"));
+      if (role === "patient") {
+        return path === "patient-portal.html" &&
+          (location.hash === "#" + fragment || (!location.hash && fragment === "portalHome"));
+      }
+      return role === "professional" && path === target && location.hash === "#" + fragment;
     }
     if (path === target) return true;
     if (role === "professional" &&
