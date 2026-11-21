@@ -45,6 +45,11 @@
 </form>
 <form id="registerForm" class="auth-form" style="display:none">
 <div id="registerFields">
+<div class="field account-type-field">
+  <span class="account-type-label">نوع الحساب</span>
+  <label class="account-type-option"><input type="radio" name="registerAccountType" value="professional" checked><span><i class="fa-solid fa-user-doctor"></i><strong>مختص / طبيب</strong><small>مساحة العمل المهنية وإدارة المرضى والخطط</small></span></label>
+  <label class="account-type-option"><input type="radio" name="registerAccountType" value="patient"><span><i class="fa-solid fa-user"></i><strong>مريض / عميل</strong><small>الملف الصحي والخطط والمتابعة مع المختص</small></span></label>
+</div>
 <div class="field"><label for="registerName">الاسم بالكامل</label><input id="registerName" name="name" type="text" autocomplete="name" placeholder="اسمك" required></div>
 <div class="field"><label for="registerEmail">البريد الإلكتروني</label><input id="registerEmail" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required></div>
 <div class="field"><label for="registerPassword">كلمة المرور</label><div class="password-wrap"><input id="registerPassword" name="new-password" type="password" autocomplete="new-password" placeholder="8 أحرف على الأقل" required><button type="button" class="show-password" data-toggle-password="registerPassword" aria-label="إظهار كلمة المرور"><i class="fa-regular fa-eye"></i></button></div><p class="field-hint">استخدم كلمة مرور قوية تحتوي على أحرف وأرقام ورمز.</p></div>
@@ -60,6 +65,13 @@
   <button id="resendSignupOtpButton" type="button" class="google-btn" style="margin-top:10px;">إعادة إرسال الرمز</button>
 </div>
 </form>
+<section id="accountTypeOnboarding" class="account-type-onboarding" hidden>
+  <h2>كيف ستستخدم Diet Planner؟</h2>
+  <p>اختر نوع الحساب لاستكمال إعداد مساحتك.</p>
+  <label class="account-type-option"><input type="radio" name="onboardingAccountType" value="professional"><span><i class="fa-solid fa-user-doctor"></i><strong>مختص / طبيب</strong><small>إدارة المرضى والخطط والمتابعة المهنية</small></span></label>
+  <label class="account-type-option"><input type="radio" name="onboardingAccountType" value="patient"><span><i class="fa-solid fa-user"></i><strong>مريض / عميل</strong><small>عرض ملفك الصحي وخططك ومتابعتك</small></span></label>
+  <button id="completeAccountTypeButton" type="button" class="btn">متابعة</button>
+</section>
 <div class="auth-bottom-note">بياناتك وحسابك في مكان واحد — Diet Planner</div>
 </div>
 <script>
