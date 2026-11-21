@@ -6,7 +6,6 @@
   --dp-primary-hover:#066B5B;
   --dp-primary-dark:#174D43;
   --dp-on-primary:#FFFFFF;
-  --dp-on-primary:#FFFFFF;
   --dp-success:#16845B;
   --dp-warning:#D99A24;
   --dp-danger:#C64B4B;
@@ -51,6 +50,7 @@
 
 html[data-theme="dark"]{
   color-scheme:dark;
+  --dp-on-primary:#FFFFFF;
   --dp-primary:#087F6B;
   --dp-accent:#20A88A;
   --dp-primary-hover:#20A88A;
