@@ -24,7 +24,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261121-insulin-calc-v3" defer></script>
+  <script src="js/patient-portal.js?v=20261121-insulin-factors-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -58,24 +58,21 @@
           <p class="portal-tool-footnote">الحساب يعتمد على قيمة الكربوهيدرات المسجلة لكل 100 جم في مكتبة الأغذية.</p>
         </section>
         <section class="portal-tool-card portal-insulin-card" aria-labelledby="insulinToolTitle">
-          <div class="portal-tool-heading"><span class="portal-tool-icon"><i class="fa-solid fa-syringe" aria-hidden="true"></i></span><div><h3 id="insulinToolTitle">حساب جرعة الإنسولين للوجبة</h3><p>حساب رياضي باستخدام المعاملات التي حددها الطبيب للمريض.</p></div></div>
+          <div class="portal-tool-heading"><span class="portal-tool-icon"><i class="fa-solid fa-syringe" aria-hidden="true"></i></span><div><h3 id="insulinToolTitle">تقدير معاملات الإنسولين</h3><p>أدخل إجمالي الإنسولين اليومي لمعرفة تقدير مبدئي لمعامل الوجبة ومعامل التصحيح.</p></div></div>
           <div class="portal-insulin-fields">
-            <div><label for="portalInsulinMeal">الوجبة</label><select id="portalInsulinMeal"><option value="breakfast">الفطور</option><option value="lunch">الغداء</option><option value="dinner">العشاء</option><option value="snacks">الوجبات الخفيفة</option></select></div>
-            <div><label for="portalInsulinUnit">وحدة قياس السكر</label><select id="portalInsulinUnit"><option value="mg">mg/dL</option><option value="mmol">mmol/L</option></select></div>
-            <div><label for="portalInsulinCurrent">سكر الدم الحالي</label><input id="portalInsulinCurrent" type="number" min="0" step="any" inputmode="decimal" placeholder="أدخل القراءة"></div>
-            <div><label for="portalInsulinTarget">السكر المستهدف</label><input id="portalInsulinTarget" type="number" min="0" step="any" inputmode="decimal" placeholder="حسب الخطة الطبية"></div>
-            <div><label for="portalInsulinIcr">معامل الوجبة ICR (للوجبة المحددة)</label><input id="portalInsulinIcr" type="number" min="0.1" step="any" inputmode="decimal" placeholder="جرام كربوهيدرات / وحدة"></div>
-            <div><label for="portalInsulinIsf">معامل التصحيح ISF</label><input id="portalInsulinIsf" type="number" min="0.1" step="any" inputmode="decimal" placeholder="mg/dL لكل وحدة"></div>
-            <div><label for="portalInsulinIob">الإنسولين النشط IOB (اختياري)</label><input id="portalInsulinIob" type="number" min="0" step="any" inputmode="decimal" placeholder="أدخل القيمة أو 0"></div>
+            <div><label for="portalDiabetesType">نوع السكري</label><select id="portalDiabetesType"><option value="type1">النوع الأول</option><option value="type2">النوع الثاني</option></select></div>
+            <div><label for="portalInsulinRegimen">نظام الإنسولين</label><select id="portalInsulinRegimen"><option value="basal_bolus">قاعدي + سريع مع الوجبات</option><option value="basal_only">قاعدي فقط</option><option value="premix">إنسولين مخلوط / جرعات ثابتة</option></select></div>
+            <div><label for="portalInsulinKind">نوع إنسولين الوجبات</label><select id="portalInsulinKind"><option value="rapid">سريع المفعول (Rapid-acting)</option><option value="regular">Regular (قصير المفعول)</option></select></div>
+            <div><label for="portalInsulinTdd">إجمالي الإنسولين خلال 24 ساعة (وحدة)</label><input id="portalInsulinTdd" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="مجموع القاعدي والوجبات والتصحيح"></div>
           </div>
           <div class="portal-insulin-result" aria-live="polite">
-            <div><span>كربوهيدرات الوجبة</span><strong id="portalInsulinCarbs">—</strong></div>
-            <div><span>جرعة تغطية الوجبة</span><strong id="portalInsulinMealDose">—</strong></div>
-            <div><span>جرعة التصحيح</span><strong id="portalInsulinCorrectionDose">—</strong></div>
-            <div><span>بعد طرح الإنسولين النشط</span><strong id="portalInsulinNetDose">—</strong></div>
+            <div><span>إجمالي الجرعة اليومية TDD</span><strong id="portalInsulinTddResult">—</strong></div>
+            <div><span>معامل الوجبة ICR</span><strong id="portalInsulinIcrResult">—</strong></div>
+            <div><span>معامل التصحيح ISF</span><strong id="portalInsulinIsfResult">—</strong></div>
           </div>
-          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل بيانات المريض والمعاملات الموصوفة لعرض الحساب.</p>
-          <p class="portal-tool-footnote">هذه أداة حسابية تعليمية وليست وصفة جرعة. يجب أن تكون قيم ICR وISF والهدف محددة من الطبيب، مع مراجعة الإنسولين النشط وتوقيت آخر جرعة. لا تستخدم الناتج لاتخاذ قرار علاجي مستقل.</p>
+          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل إجمالي الإنسولين اليومي واختر نظام العلاج لعرض التقدير.</p>
+          <div class="portal-insulin-explainer"><strong>ما المقصود بالإنسولين النشط (IOB)؟</strong><p>هو جزء من جرعة إنسولين سابقة ما زال تأثيره قائمًا في الجسم. يجب أخذه في الاعتبار عند حساب جرعات التصحيح لتجنب تكرار الجرعات وهبوط السكر. هذه النسخة لا تحسب IOB ولا تخصمه آليًا.</p></div>
+          <p class="portal-tool-footnote">تنبيه: ICR وISF هنا تقديرات تعليمية أولية باستخدام قواعد 500 و1800/1500، وليست معاملات علاجية معتمدة للمريض. لا تُستخدم لتحديد أو تعديل جرعة الإنسولين. يلزم اعتماد الطبيب/فريق السكري، وقد تختلف النسب بين الوجبات. في النظام القاعدي فقط أو الإنسولين المخلوط لا تُطبّق هذه المعاملات تلقائيًا.</p>
         </section>
       </section>
 
