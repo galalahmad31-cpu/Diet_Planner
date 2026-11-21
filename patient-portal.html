@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123c43">
+  <title>بوابة المريض | Diet Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-v1">
+  <script src="js/theme.js?v=20261120-central-v11" defer></script>
+  <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
+  <script src="js/patient-portal.js?v=20261121-v1" defer></script>
+</head>
+<body class="patient-portal-page">
+  <header class="portal-header">
+    <a class="portal-brand" href="patient-portal.html" aria-label="Diet Planner">
+      <span class="portal-brand-mark"><i class="fa-solid fa-leaf"></i></span>
+      <span><strong>Diet Planner</strong><small>بوابة المريض</small></span>
+    </a>
+    <div class="portal-header-actions">
+      <button type="button" id="portalThemeToggle" class="portal-icon-button" aria-label="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke"></i></button>
+      <button type="button" id="portalLogout" class="portal-logout"><i class="fa-solid fa-right-from-bracket"></i><span>تسجيل الخروج</span></button>
+    </div>
+  </header>
+
+  <main class="portal-main">
+    <section id="portalLoading" class="portal-state-card">
+      <span class="portal-spinner"></span>
+      <p>جاري تحميل ملفك الصحي...</p>
+    </section>
+
+    <section id="portalError" class="portal-state-card portal-error" hidden>
+      <span class="portal-state-icon"><i class="fa-solid fa-circle-exclamation"></i></span>
+      <h1>تعذر تحميل البوابة</h1>
+      <p id="portalErrorText">حدث خطأ أثناء تحميل البيانات.</p>
+      <button type="button" id="portalRetry" class="portal-primary-button">إعادة المحاولة</button>
+    </section>
+
+    <section id="portalUnlinked" class="portal-state-card" hidden>
+      <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
+      <h1>اربط حسابك بملفك الصحي</h1>
+      <p>أدخل رمز الدعوة الذي أرسله إليك المختص لربط حسابك بملفك الموجود بالفعل. لا تنشئ ملفًا جديدًا.</p>
+      <form id="portalInviteForm" class="portal-invite-form">
+        <label for="portalInviteToken">رمز الدعوة</label>
+        <input id="portalInviteToken" type="text" inputmode="text" autocomplete="off" placeholder="الصق رمز الدعوة هنا" required>
+        <button type="submit" class="portal-primary-button">تأكيد الربط</button>
+      </form>
+      <p id="portalInviteMessage" class="portal-inline-message" role="status"></p>
+    </section>
+
+    <div id="portalContent" hidden>
+      <section class="portal-welcome">
+        <div>
+          <span class="portal-eyebrow">ملفك الصحي في مكان واحد</span>
+          <h1>أهلًا <strong id="portalPatientName">—</strong></h1>
+          <p>تابع خطتك الغذائية وقياساتك، واطّلع على التحديثات التي يشاركها مختصك معك.</p>
+        </div>
+        <div class="portal-welcome-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+      </section>
+
+      <section class="portal-summary-grid" aria-label="ملخص الملف الصحي">
+        <article class="portal-summary-card">
+          <span class="portal-summary-icon teal"><i class="fa-solid fa-ruler-vertical"></i></span>
+          <div><small>الطول</small><strong id="portalHeight">—</strong></div>
+        </article>
+        <article class="portal-summary-card">
+          <span class="portal-summary-icon blue"><i class="fa-solid fa-cake-candles"></i></span>
+          <div><small>العمر</small><strong id="portalAge">—</strong></div>
+        </article>
+        <article class="portal-summary-card">
+          <span class="portal-summary-icon purple"><i class="fa-solid fa-notes-medical"></i></span>
+          <div><small>التشخيص المسجل</small><strong id="portalDiagnosis">—</strong></div>
+        </article>
+      </section>
+
+      <section class="portal-section" aria-labelledby="portalPlansTitle">
+        <div class="portal-section-heading">
+          <div><span class="portal-section-kicker">NUTRITION PLAN</span><h2 id="portalPlansTitle">خطتي الغذائية</h2><p>الخطط التي اعتمد مختصك مشاركتها معك فقط.</p></div>
+          <span class="portal-section-icon"><i class="fa-solid fa-bowl-food"></i></span>
+        </div>
+        <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
+        <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
+        <div id="portalPlansList" class="portal-plans-list"></div>
+      </section>
+
+      <section class="portal-section" aria-labelledby="portalMeasurementsTitle">
+        <div class="portal-section-heading">
+          <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>أضف قياساتك لمتابعة التغير مع الوقت.</p></div>
+          <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
+        </div>
+        <form id="portalMeasurementForm" class="portal-measurement-form">
+          <div class="portal-form-grid">
+            <div><label for="portalWeight">الوزن (كجم) *</label><input id="portalWeight" type="number" min="1" max="500" step="0.1" required></div>
+            <div><label for="portalMeasurementDate">تاريخ القياس *</label><input id="portalMeasurementDate" type="date" required></div>
+            <div><label for="portalWaist">محيط الخصر (سم)</label><input id="portalWaist" type="number" min="1" max="300" step="0.1"></div>
+            <div><label for="portalHip">محيط الأرداف (سم)</label><input id="portalHip" type="number" min="1" max="300" step="0.1"></div>
+            <div><label for="portalBodyFat">نسبة الدهون (%)</label><input id="portalBodyFat" type="number" min="1" max="75" step="0.1"></div>
+            <div class="portal-form-wide"><label for="portalMeasurementNotes">ملاحظات (اختياري)</label><input id="portalMeasurementNotes" type="text" maxlength="500" placeholder="مثال: القياس صباحًا قبل الإفطار"></div>
+          </div>
+          <div class="portal-form-footer"><p id="portalMeasurementMessage" class="portal-inline-message" role="status"></p><button type="submit" class="portal-primary-button"><i class="fa-solid fa-plus"></i> حفظ القياس</button></div>
+        </form>
+        <div class="portal-table-wrap">
+          <table class="portal-measurements-table">
+            <thead><tr><th>التاريخ</th><th>الوزن</th><th>الخصر</th><th>الأرداف</th><th>دهون الجسم</th></tr></thead>
+            <tbody id="portalMeasurementsRows"><tr><td colspan="5">جاري تحميل القياسات...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="portal-section portal-care-note">
+        <span><i class="fa-solid fa-shield-heart"></i></span>
+        <div><strong>خصوصيتك وسلامة بياناتك</strong><p>يمكنك الاطلاع على بياناتك وإضافة قياساتك. تعديل التشخيص والخطة العلاجية يظل من اختصاص مقدم الرعاية، ولا تظهر لك إلا الخطط التي يشاركها معك.</p></div>
+      </section>
+    </div>
+  </main>
+  <footer class="portal-footer">Diet Planner <span>•</span> بوابتك لمتابعة التغذية العلاجية</footer>
+</body>
+</html>
