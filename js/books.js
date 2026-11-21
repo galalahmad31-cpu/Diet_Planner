@@ -71,6 +71,10 @@
   function renderPaymentForm(book, rejected) {
     const settings = state.settings || {};
     const area = $("bookAccessArea");
+    if (!settings.payment_method || !settings.payment_details) {
+      area.innerHTML = '<div class="book-status">الشراء غير متاح مؤقتًا حتى تضيف الإدارة بيانات التحويل.</div>';
+      return;
+    }
     area.innerHTML = '<div class="book-payment-panel"><h4><i class="fa-solid fa-money-bill-transfer"></i> بيانات التحويل</h4>' +
       '<p><strong>' + esc(settings.payment_method || "طريقة التحويل") + '</strong></p><p>' + esc(settings.payment_details || "لم تُضف الإدارة بيانات التحويل بعد.") + '</p>' +
       (settings.payment_instructions ? '<p>' + esc(settings.payment_instructions) + '</p>' : '') +
@@ -84,7 +88,7 @@
     if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
       alert("يرجى اختيار صورة JPG أو PNG أو WEBP لا يتجاوز حجمها 5 ميجابايت."); return;
     }
-    button.disabled = true; button.textContent = "جاري إرسال الطلب...";
+    const originalText = button.textContent;\n    button.disabled = true; button.textContent = "جاري إرسال الطلب...";
     const extension = ({ "image/jpeg":"jpg","image/png":"png","image/webp":"webp" })[file.type];
     const path = state.user.id + "/" + crypto.randomUUID() + "." + extension;
     try {
