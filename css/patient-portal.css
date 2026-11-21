@@ -210,7 +210,7 @@
 .portal-insulin-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .portal-insulin-fields>div{display:grid;gap:5px;min-width:0}
 .portal-insulin-fields label{font-size:10px;font-weight:800;color:var(--dp-text-2)}
-.portal-insulin-result{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:14px}
+.portal-insulin-result{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}
 .portal-insulin-result>div{display:grid;align-content:center;gap:6px;min-width:0;min-height:76px;padding:12px;border:1px solid var(--dp-border);border-radius:11px;background:var(--dp-surface-2)}
 .portal-insulin-result span{font-size:10px;color:var(--dp-muted);font-weight:800}
 .portal-insulin-result strong{font-size:16px;color:var(--dp-primary);font-weight:900;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
@@ -218,3 +218,7 @@
 .portal-insulin-message[data-state="warning"]{border-color:#d97757;background:color-mix(in srgb,#d97757 10%,var(--dp-surface));color:var(--dp-text)}
 @media(max-width:760px){.portal-insulin-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-insulin-result{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.portal-insulin-fields{gap:9px}.portal-insulin-result{gap:6px}.portal-insulin-result>div{padding:9px;min-height:68px}.portal-insulin-result span{font-size:9px}.portal-insulin-result strong{font-size:14px}}
+
+.portal-insulin-explainer{margin-top:10px;padding:12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text-2);font-size:11px;line-height:1.8}
+.portal-insulin-explainer strong{display:block;margin-bottom:4px;color:var(--dp-text);font-size:12px}
+.portal-insulin-explainer p{margin:0}
