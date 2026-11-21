@@ -15,3 +15,17 @@
 .professional-offer-remove{justify-self:start;border:0;background:transparent;color:#b54747;font:700 10px Cairo,sans-serif}
 .professional-offers-status{margin:0;font-size:10px;color:var(--d-muted)}
 @media(max-width:480px){.professional-offer-row{grid-template-columns:1fr}.professional-offer-row label:first-child,.professional-offer-row label:nth-child(2){grid-column:auto}.professional-offers-heading{align-items:flex-start;flex-direction:column}}
+
+/* Dedicated professional communication view. */
+#professionalProfileHero[hidden],#professionalProfileEditor[hidden],#professionalCommunicationView[hidden]{display:none!important}
+#professionalCommunicationView{display:grid;gap:16px;margin-top:16px}
+#professionalCommunicationView>.directory-editor{margin-top:0}
+.directory-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+.directory-section-heading h2{margin:0;font-size:17px;font-weight:900;color:var(--d-ink)}
+.directory-section-heading p{margin:4px 0 0;font-size:11px;line-height:1.8;color:var(--d-muted)}
+#professionalConnectionRequests,#professionalConversationHistory{display:grid;gap:12px;min-width:0}
+.directory-empty-state{padding:22px 16px;border:1px dashed var(--d-line);border-radius:13px;background:var(--d-bg);color:var(--d-muted);font-size:12px;line-height:1.9;text-align:center}
+.professional-conversation-card{display:grid;gap:12px}
+.professional-conversation-card>.directory-secondary-button{justify-self:start;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.professional-request-chat{min-width:0;padding-top:10px;border-top:1px solid var(--d-line)}
+@media(max-width:600px){#professionalCommunicationView{gap:12px}.directory-section-heading h2{font-size:15px}.professional-conversation-card{padding:12px}}
