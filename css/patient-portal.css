@@ -138,3 +138,8 @@
 .measurement-delete-button{border:1px solid #fee2e2;background:#fff7f7;color:#e11d48}
 .portal-measurement-readonly{font-size:10px;color:var(--portal-muted)}
 @media(max-width:600px){.measurements-table-heading{align-items:flex-start}.measurements-table{min-width:1200px}}
+
+
+/* Keep numeric measurements and signed weight changes in stable left-to-right order inside RTL pages. */
+.measurement-number,.measurement-numeric-value{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.measurement-numeric-value{display:inline-block;text-align:right}
