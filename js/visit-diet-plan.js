@@ -22,6 +22,7 @@ let activePlanStartDate=null, activePlanName=null;
 
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], foodById=new Map(), daysData=[], savedDaysData=[], dayEditModes={};
 const savingDayIds=new Set();
+let daySaveQueue=Promise.resolve();
 let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
 let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
 const FIXED_DIET_CACHE_V2='fixed-diet-cache-v2';
@@ -219,7 +220,15 @@ function setDayEditMode(id,editing){
  const e=card.querySelector('.day-edit-btn'),s=card.querySelector('.day-save-btn'); if(e)e.disabled=editing||savingDayIds.has(String(id));if(s){s.disabled=!editing||savingDayIds.has(String(id));s.textContent=savingDayIds.has(String(id))?'جارٍ الحفظ...':'حفظ';}
 }
 function editDay(id){if(daysData.find(d=>String(d.id)===String(id)))setDayEditMode(id,true);}
-async function saveDay(id){
+function saveDay(id){
+ // A new plan/day has no database ID until its first RPC completes.
+ // Serialize writes so parallel clicks cannot all try to allocate it.
+ const task=daySaveQueue.then(()=>saveDayNow(id),()=>saveDayNow(id));
+ daySaveQueue=task.catch(()=>{});
+ return task;
+}
+
+async function saveDayNow(id){
  const dayKey=String(id);
  if(savingDayIds.has(dayKey))return;
  const day=daysData.find(item=>String(item.id)===dayKey);
@@ -1031,6 +1040,7 @@ function init(){
 
 async function openPlan(planId=null, createNew=false){
  if(dietInitPromise) await dietInitPromise;
+ await daySaveQueue;
  closeDayDetails();
  closeFoodModal();
  closeFixedMeals();
