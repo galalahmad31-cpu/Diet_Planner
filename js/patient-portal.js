@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeCarbMeal: null, selectedCarbFood: null };
+  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeCarbMeal: null, selectedCarbFood: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -519,7 +519,6 @@
   }
 
   const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
-  const FOOD_SEARCH_LIMIT = 30;
 
   function normalizeFoodSearch(value) {
     return String(value || "").toLocaleLowerCase("ar").normalize("NFKD").replace(/[\u064B-\u065F\u0670]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").trim();
@@ -532,6 +531,7 @@
       const { data, error } = await supabase.from("foods").select(FOOD_COLUMNS).order("name_ar", { ascending: true });
       if (error) throw error;
       state.foods = Array.isArray(data) ? data : [];
+      state.foodSearchIndex = state.foods.map(food => ({ food, searchText: normalizeFoodSearch((food.name_ar || "") + " " + (food.name_en || "")) }));
       return state.foods;
     })();
     try { return await state.foodsPromise; }
@@ -550,7 +550,7 @@
   function findFoods(query) {
     const needle = normalizeFoodSearch(query);
     if (!needle) return [];
-    return state.foods.filter(food => normalizeFoodSearch(food.name_ar + " " + (food.name_en || "")).includes(needle)).slice(0, FOOD_SEARCH_LIMIT);
+    return (state.foodSearchIndex || []).filter(entry => entry.searchText.includes(needle)).map(entry => entry.food);
   }
 
   function foodSearchMarkup(food) {
@@ -586,12 +586,10 @@
   function renderCarbSearchResults(query) {
     const root = $("portalCarbSearchResults");
     if (!root) return;
-    const matches = query.trim()
-      ? findFoods(query)
-      : (state.foods || []).slice(0, FOOD_SEARCH_LIMIT);
+    const matches = query.trim() ? findFoods(query) : (state.foods || []);
     root.innerHTML = matches.length
-      ? matches.map(foodSearchMarkup).join("")
-      : '<p class="portal-tool-hint">لا توجد أصناف متاحة للعرض.</p>';
+      ? '<p class="portal-food-results-count">' + (query.trim() ? 'نتائج البحث' : 'جميع الأصناف') + ' · ' + matches.length.toLocaleString('ar-EG') + ' صنف</p>' + matches.map(foodSearchMarkup).join("")
+      : '<p class="portal-tool-hint">لا توجد أصناف مطابقة.</p>';
   }
 
   function renderRenalFoods() {
