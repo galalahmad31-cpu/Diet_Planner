@@ -75,3 +75,37 @@
 .portal-followup-contact strong{font-size:12px;color:var(--portal-ink)}
 .portal-followup-contact p{font-size:10px;color:var(--portal-muted);margin:4px 0 0;line-height:1.8}
 @media(max-width:650px){.portal-followup-grid{grid-template-columns:1fr;gap:8px}.portal-followup-grid article{min-height:82px}.portal-followup-contact{align-items:stretch;flex-direction:column}.portal-followup-contact .portal-primary-button{width:100%}}
+
+
+/* Patient portal collapsible nutrition plans */
+.portal-plans-list{display:grid;gap:12px}
+.portal-plan-card{border:1px solid var(--dp-border);border-radius:15px;overflow:hidden;background:var(--dp-surface);color:var(--dp-text)}
+.portal-plan-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:66px;padding:13px 15px;cursor:pointer;list-style:none;background:var(--dp-surface-2)}
+.portal-plan-summary::-webkit-details-marker{display:none}
+.portal-plan-summary-copy{display:grid;gap:4px;min-width:0}
+.portal-plan-summary-copy strong{font-size:14px;font-weight:900;color:var(--dp-text)}
+.portal-plan-summary-copy small{font-size:10px;color:var(--dp-muted)}
+.portal-plan-summary-meta{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.portal-plan-toggle{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:var(--dp-surface-3);color:var(--dp-primary);transition:transform .18s ease}
+.portal-plan-card[open]>.portal-plan-summary .portal-plan-toggle{transform:rotate(180deg)}
+.portal-plan-content{padding:0 14px 12px}
+.portal-plan-content>.portal-plan-note{padding:10px 2px;margin:0;color:var(--dp-muted);font-size:11px;line-height:1.8}
+.portal-plan-day{padding:13px 2px;border-top:1px solid var(--dp-border)}
+.portal-plan-day:first-child{border-top:0}
+.portal-plan-day>h3{margin:0 0 9px;color:var(--dp-primary);font-size:13px;font-weight:900}
+.portal-plan-day-note{margin:0 0 8px;color:var(--dp-muted);font-size:10px}
+.portal-meal{padding:10px 0;border-top:1px dashed var(--dp-border)}
+.portal-meal:first-of-type{border-top:0}
+.portal-meal-title{display:flex;align-items:center;gap:8px;margin:0 0 8px;color:var(--dp-text);font-size:12px;font-weight:900}
+.portal-meal-title small{color:var(--dp-muted);font-size:9px;font-weight:600}
+.portal-food-table{display:grid;gap:0;border:1px solid var(--dp-border);border-radius:10px;overflow:hidden}
+.portal-food-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(66px,.65fr) minmax(90px,1fr);align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--dp-border);font-size:10px;color:var(--dp-text)}
+.portal-food-row:first-child{border-top:0}
+.portal-food-row-head{background:var(--dp-surface-2);color:var(--dp-muted);font-size:9px;font-weight:900}
+.portal-food-row>span{min-width:0;overflow-wrap:anywhere}
+.portal-food-name{font-weight:800}
+.portal-food-name small{display:block;margin-top:3px;color:var(--dp-muted);font-size:9px;font-weight:500}
+.portal-food-quantity{font-weight:900;font-variant-numeric:tabular-nums}
+.portal-food-household{color:var(--dp-muted)}
+.portal-plan-empty-meal{margin:0;padding:8px 2px;color:var(--dp-muted);font-size:10px}
+@media(max-width:520px){.portal-plan-summary{padding:11px 10px}.portal-plan-summary-copy strong{font-size:12px}.portal-plan-summary-meta{gap:6px}.portal-plan-content{padding-inline:9px}.portal-food-row{grid-template-columns:minmax(0,1.3fr) minmax(55px,.65fr) minmax(72px,1fr);gap:5px;padding:8px 7px;font-size:9px}.portal-food-row-head{font-size:8px}}
