@@ -14,13 +14,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/tailwind.css">
-  <link rel="stylesheet" href="css/nutritionsupport-patient.css?v=20261121-cleanup-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v15">
   <script src="js/theme.js?v=20261120-central-v14"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-cleanup-v11">
+  <link rel="stylesheet" href="css/nutritionsupport-patient.css?v=20261121-monitoring-ui-v2">
   <script src="js/app-header.js?v=20261121-header-cleanup-v10" defer></script>
 </head>
 <body class="p-2 md:p-4" data-dp-theme-toggle="off">
@@ -897,33 +897,48 @@
              MONITORING
              ===================================================== -->
 <div class="hidden" id="section-monitoring-hidden">
-<div id="monitoring-content-actual">
-<h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3 mt-8">
-                    Monitoring
-                </h2>
-<div class="monitoring-section space-y-6">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="p-4 bg-white rounded-lg shadow-sm border">
-<label class="block font-bold mb-2 text-emerald-900">
-                                Lab Values &amp; Monitoring
-                            </label>
-<textarea id="monitoring-labs" placeholder="RBS, Electrolytes, Urea..." rows="4"></textarea>
-</div>
-<div class="p-4 bg-white rounded-lg shadow-sm border">
-<label class="block font-bold mb-2 text-emerald-900">
-                                Clinical Observations
-                            </label>
-<textarea id="monitoring-clinical" placeholder="Weight, residuals..." rows="4"></textarea>
-</div>
-</div>
-<div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
-<label class="block font-bold mb-2 text-amber-900">
-                            Recommendations &amp; Plan
-                        </label>
-<textarea id="monitoring-plan" placeholder="Next steps..." rows="2"></textarea>
-</div>
-</div>
-</div>
+  <div id="monitoring-content-actual" class="nsp-monitoring">
+    <header class="nsp-monitoring-header">
+      <div class="nsp-monitoring-heading">
+        <span class="nsp-monitoring-kicker">CLINICAL FOLLOW-UP</span>
+        <h2>Monitoring</h2>
+        <p>Document laboratory findings, clinical observations and the next nutrition-care steps.</p>
+      </div>
+      <span class="nsp-monitoring-status"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Follow-up record</span>
+    </header>
+    <div class="nsp-monitoring-grid">
+      <section class="nsp-monitoring-card" aria-labelledby="monitoringLabsLabel">
+        <div class="nsp-monitoring-card-heading">
+          <span class="nsp-monitoring-icon nsp-monitoring-icon-labs"><i class="fa-solid fa-flask" aria-hidden="true"></i></span>
+          <div>
+            <label id="monitoringLabsLabel" for="monitoring-labs">Lab Values &amp; Monitoring</label>
+            <p>Laboratory results and biochemical trends</p>
+          </div>
+        </div>
+        <textarea id="monitoring-labs" placeholder="RBS, electrolytes, urea, creatinine..." rows="4"></textarea>
+      </section>
+      <section class="nsp-monitoring-card" aria-labelledby="monitoringClinicalLabel">
+        <div class="nsp-monitoring-card-heading">
+          <span class="nsp-monitoring-icon nsp-monitoring-icon-clinical"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i></span>
+          <div>
+            <label id="monitoringClinicalLabel" for="monitoring-clinical">Clinical Observations</label>
+            <p>Weight, fluid balance, tolerance and residuals</p>
+          </div>
+        </div>
+        <textarea id="monitoring-clinical" placeholder="Weight, fluid balance, feeding tolerance, residuals..." rows="4"></textarea>
+      </section>
+      <section class="nsp-monitoring-card nsp-monitoring-plan" aria-labelledby="monitoringPlanLabel">
+        <div class="nsp-monitoring-card-heading">
+          <span class="nsp-monitoring-icon nsp-monitoring-icon-plan"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span>
+          <div>
+            <label id="monitoringPlanLabel" for="monitoring-plan">Recommendations &amp; Plan</label>
+            <p>Interventions, follow-up targets and next steps</p>
+          </div>
+        </div>
+        <textarea id="monitoring-plan" placeholder="Next steps, nutrition intervention, monitoring targets..." rows="3"></textarea>
+      </section>
+    </div>
+  </div>
 </div>
 <!-- =====================================================
              FOOTER BUTTONS
