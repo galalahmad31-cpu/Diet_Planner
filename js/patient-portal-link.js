@@ -85,13 +85,19 @@
     button.type = "button";
     button.innerHTML = '<i class="fa-solid fa-link"></i><span>ربط حساب المريض</span>';
     button.addEventListener("click", () => createInvitation(button));
-    const heading = section.querySelector("#patientName");
-    if (heading?.parentElement) {
-      const wrap = create("div", "patient-portal-invite-toolbar");
-      wrap.append(button);
-      heading.insertAdjacentElement("afterend", wrap);
+    const toolbar = section.querySelector("#patientActionToolbar");
+    if (toolbar) {
+      button.classList.add("patient-profile-link-button");
+      toolbar.prepend(button);
     } else {
-      section.prepend(button);
+      const heading = section.querySelector("#patientName");
+      if (heading?.parentElement) {
+        const wrap = create("div", "patient-portal-invite-toolbar");
+        wrap.append(button);
+        heading.insertAdjacentElement("afterend", wrap);
+      } else {
+        section.prepend(button);
+      }
     }
   }
 
