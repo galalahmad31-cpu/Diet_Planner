@@ -148,29 +148,37 @@ function subForm(s){
 }
 function openSub(s){openModal('تعديل الاشتراك',subForm(s));$('subForm').addEventListener('submit',async e=>{e.preventDefault();await saveSub(s)});$('cancelModal').onclick=closeModal}
 function openSubAssignment(profile){
- const availablePlans=state.plans.filter(p=>!p.is_free_trial);
- if(!availablePlans.length){toast('لا توجد باقات مدفوعة متاحة للإسناد.');return}
- openModal('إضافة اشتراك للمستخدم',`<form id="subAssignmentForm"><div class="grid">
+ const availablePlans=state.plans;
+ if(!availablePlans.length){toast('لا توجد خطط مسجلة في سجل الخطط.');return}
+ const planOptions=availablePlans.map(plan=>{
+  const flags=[plan.is_free_trial?'تجربة مجانية':'',plan.is_active?'':'غير متاحة'].filter(Boolean);
+  const details=[money(plan.price),`${esc(plan.duration_days)} يوم`,...flags].join(' / ');
+  return `<option value="${esc(plan.id)}">${esc(plan.name)} — ${details}</option>`;
+ }).join('');
+ openModal('إضافة اشتراك جديد للمستخدم',`<form id="subAssignmentForm"><div class="grid">
  <div class="field"><label for="new_sub_name">اسم الطبيب</label><input id="new_sub_name" value="${esc(profile.full_name||'')}" readonly></div>
  <div class="field"><label for="new_sub_role">الدور</label><select id="new_sub_role" ${profile.id===state.currentUserId?'disabled':''}>${roleOptions(profile.role||'user')}</select></div>
- <div class="field"><label for="new_sub_plan">الباقة</label><select id="new_sub_plan" required>${availablePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ${money(p.price)} / ${esc(p.duration_days)} يوم</option>`).join('')}</select></div>
- <div class="field"><label for="new_sub_status">حالة الاشتراك</label><select id="new_sub_status"><option value="paid" selected>مفعّل الآن</option><option value="pending">قيد المراجعة</option></select></div>
+ <div class="field"><label for="new_sub_plan">الباقة (من سجل الخطط)</label><select id="new_sub_plan" required><option value="" selected disabled>اختر الباقة</option>${planOptions}</select></div>
+ <div class="field"><label for="new_sub_status">حالة الاشتراك الجديد</label><select id="new_sub_status" required><option value="" selected disabled>اختر الحالة</option><option value="paid">تفعيل فوري</option><option value="pending">قيد المراجعة</option></select></div>
  <div class="field full"><label for="new_sub_notes">ملاحظات (اختياري)</label><textarea id="new_sub_notes" placeholder="سبب الإضافة أو تفاصيل الاتفاق..."></textarea></div>
- <div class="field full"><div style="font-size:11px;color:#718683;background:#f7faf9;border-radius:9px;padding:9px">عند اختيار «مفعّل الآن» يبدأ الاشتراك من اليوم ويُحسب تاريخ الانتهاء تلقائيًا حسب مدة الباقة.</div></div>
+ <div class="field full"><div style="font-size:11px;color:#718683;background:#f7faf9;border-radius:9px;padding:9px">هذه عملية إضافة اشتراك جديد وليست عرضًا لحالة المستخدم الحالية. عند اختيار «تفعيل فوري» يبدأ الاشتراك من اليوم وتُحسب نهايته تلقائيًا حسب مدة الباقة.</div></div>
  </div><div class="modal-foot"><button class="btn btn-primary" type="submit">إضافة الاشتراك</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`);
  $('cancelModal').onclick=closeModal;
  $('subAssignmentForm').addEventListener('submit',async event=>{
   event.preventDefault();
-  const button=$('subAssignmentForm').querySelector('[type="submit"]');
+  const form=$('subAssignmentForm');
+  if(!form.reportValidity())return;
+  const button=form.querySelector('[type="submit"]');
   const plan=availablePlans.find(item=>item.id===$('new_sub_plan').value);
-  if(!plan){toast('الباقة المحددة غير موجودة.');return}
+  if(!plan){toast('الباقة المحددة غير موجودة في سجل الخطط.');return}
   const status=$('new_sub_status').value;
-  if(!['paid','pending'].includes(status)){toast('حالة الاشتراك غير صالحة.');return}
+  if(!['paid','pending'].includes(status)){toast('اختر حالة الاشتراك الجديد.');return}
+  if(!Number.isInteger(Number(plan.duration_days))||Number(plan.duration_days)<=0){toast('مدة الباقة المحددة غير صحيحة.');return}
   button.disabled=true;button.textContent='جاري إضافة الاشتراك...';
   try{
    const result=await sb.from('subscriptions').insert({
     user_id:profile.id,full_name:profile.full_name||null,plan_id:plan.id,status,
-    notes:$('new_sub_notes').value.trim()||null,is_free_trial:false,
+    notes:$('new_sub_notes').value.trim()||null,is_free_trial:plan.is_free_trial===true,
     duration_days_snapshot:plan.duration_days,max_patients_snapshot:plan.max_patients,
     features_snapshot:plan.features||{}
    }).select('id').single();
