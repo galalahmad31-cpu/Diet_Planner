@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
-  <link rel="stylesheet" href="css/quickcalc.css?v=20261121-gir-grid-v6">
+  <link rel="stylesheet" href="css/quickcalc.css?v=20261121-formula-grid-v7">
   <script src="js/theme.js?v=20261120-central-v11"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-cleanup-v11">
@@ -198,139 +198,90 @@
 </button>
 <div class="hidden p-4 md:p-6 space-y-6 bg-white" id="qc-formula-conc-content">
 <!-- NORMAL PREPARATION -->
-<div class="qc-panel">
-<h4 class="font-bold text-slate-800 border-b border-purple-200 pb-2">
-                                1. Normal Preparation
-                            </h4>
-<div class="fc-compact-grid">
-<div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Scoops
-                                    </label>
-<input class="bg-white" id="fc-normal-scoops" min="0" data-calc="formula" step="0.01" type="number" value="1"/>
+<div class="qc-panel fc-normal-panel">
+  <h4 class="font-bold text-slate-800 border-b border-purple-200 pb-2">1. Normal Preparation</h4>
+  <div class="fc-compact-grid">
+    <div>
+      <label class="block text-xs font-bold mb-1 text-gray-700">Scoops</label>
+      <input class="bg-white" id="fc-normal-scoops" min="0" data-calc="formula" step="0.01" type="number" value="1"/>
+    </div>
+    <div>
+      <label class="block text-xs font-bold mb-1 text-gray-700">Water (mL)</label>
+      <input class="bg-white" id="fc-normal-water" min="0" data-calc="formula" step="0.1" type="number" value="30"/>
+    </div>
+  </div>
+  <div class="fc-normal-density-grid">
+    <div>
+      <label class="block text-xs font-bold mb-1 text-gray-700">Normal Caloric Density</label>
+      <div class="grid grid-cols-2 gap-2">
+        <input class="bg-white" id="fc-normal-density" min="0" data-calc="formula" step="0.01" type="number" value="0.67"/>
+        <select class="bg-white font-bold text-slate-800" id="fc-normal-density-unit" data-calc="formula">
+          <option value="kcal/ml">kcal/mL</option>
+          <option value="kcal/oz">kcal/oz</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex items-end">
+      <div class="w-full bg-white border border-purple-100 rounded-lg p-3 text-xs qc-result-value">
+        <strong>Normal density</strong>
+        <div id="fc-normal-density-display">0.67 kcal/mL</div>
+      </div>
+    </div>
+  </div>
 </div>
-<div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Water (mL)
-                                    </label>
-<input class="bg-white" id="fc-normal-water" min="0" data-calc="formula" step="0.1" type="number" value="30"/>
-</div>
-</div>
-<!-- MODIFIED: Normal Caloric Density + Unit -->
-<div class="fc-normal-density-grid">
-<div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Normal Caloric Density
-                                    </label>
-<div class="grid grid-cols-2 gap-2">
-<input class="bg-white" id="fc-normal-density" min="0" data-calc="formula" step="0.01" type="number" value="0.67"/>
-<select class="bg-white font-bold text-slate-800" id="fc-normal-density-unit" data-calc="formula">
-<option value="kcal/ml">
-                                                kcal/mL
-                                            </option>
-<option value="kcal/oz">
-                                                kcal/oz
-                                            </option>
-</select>
-</div>
-</div>
-<div class="flex items-end">
-<div class="w-full bg-white border border-purple-100 rounded-lg p-3 text-xs qc-result-value">
-<strong>
-                                            Normal density
-                                        </strong>
-<div id="fc-normal-density-display">
-                                            0.67 kcal/mL
-                                        </div>
-</div>
-</div>
-</div>
-</div>
+
 <!-- REQUIRED PREPARATION -->
 <div class="qc-panel fc-required-panel">
-<h4 class="font-bold text-slate-800 border-b border-purple-200 pb-2">
-                                2. Required Preparation
-                            </h4>
-
-<div class="fc-required-fields">
+  <h4 class="font-bold text-slate-800 border-b border-purple-200 pb-2">2. Required Preparation</h4>
+  <div class="fc-required-fields">
     <div>
-        <label class="block text-xs font-bold mb-1 text-gray-700">
-            Required Caloric Density
-        </label>
-        <div class="grid grid-cols-2 gap-2">
-            <input class="bg-white" id="fc-required-density" min="0" data-calc="formula" step="0.01" type="number" value="0.8"/>
-            <select class="bg-white font-bold text-slate-800" id="fc-required-density-unit" data-calc="formula">
-                <option value="kcal/ml">
-                    kcal/mL
-                </option>
-                <option value="kcal/oz">
-                    kcal/oz
-                </option>
-            </select>
-        </div>
-    </div>
-
-    <div>
-        <label class="block text-xs font-bold mb-1 text-gray-700">
-            Adjustment Method
-        </label>
-        <select class="bg-white font-bold text-slate-800" id="fc-method" data-calc="formula">
-            <option value="water">
-                Reduce Water
-            </option>
-            <option value="powder">
-                Increase Powder
-            </option>
+      <label class="block text-xs font-bold mb-1 text-gray-700">Required Caloric Density</label>
+      <div class="grid grid-cols-2 gap-2">
+        <input class="bg-white" id="fc-required-density" min="0" data-calc="formula" step="0.01" type="number" value="0.8"/>
+        <select class="bg-white font-bold text-slate-800" id="fc-required-density-unit" data-calc="formula">
+          <option value="kcal/ml">kcal/mL</option>
+          <option value="kcal/oz">kcal/oz</option>
         </select>
+      </div>
     </div>
+    <div>
+      <label class="block text-xs font-bold mb-1 text-gray-700">Adjustment Method</label>
+      <select class="bg-white font-bold text-slate-800" id="fc-method" data-calc="formula">
+        <option value="water">Reduce Water</option>
+        <option value="powder">Increase Powder</option>
+      </select>
+    </div>
+  </div>
 </div>
-</div>
+
 <!-- VOLUME MULTIPLIER -->
-<div class="qc-panel">
-<div class="fc-volume-fields">
-<div>
-<label class="block text-xs font-bold mb-1 text-gray-700">
-                                        Volume Multiplier
-                                    </label>
-<input class="bg-white" id="fc-volume-multiplier" min="0.1" data-calc="formula" step="0.1" type="number" value="1"/>
+<div class="qc-panel fc-volume-panel">
+  <h4 class="font-bold text-slate-800 border-b border-purple-200 pb-2">3. Volume Multiplier</h4>
+  <div class="fc-volume-fields">
+    <div>
+      <label class="block text-xs font-bold mb-1 text-gray-700">Volume Multiplier</label>
+      <input class="bg-white" id="fc-volume-multiplier" min="0.1" data-calc="formula" step="0.1" type="number" value="1"/>
+    </div>
+    <div class="text-xs text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-lg p-3">
+      Examples: ×2, ×3, ×5.
+      Scales preparation quantities while maintaining the same concentration/caloric density.
+    </div>
+  </div>
 </div>
-<div class="text-xs text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-lg p-3">
 
-                                    Examples:
-                                    ×2, ×3, ×5
-
-                                    <br/>
-
-                                    Scales the preparation quantities while maintaining the same concentration/caloric density.
-
-                                </div>
-</div>
-</div>
-<!-- RESULT -->
-<div class="highlight-box qc-result text-center space-y-3">
-<h4 class="font-bold text-slate-800 text-lg">
-                                Formula Preparation Result
-                            </h4>
-<div class="text-lg font-bold qc-result-value leading-relaxed" id="fc-res-text">
-                                Enter parameters to calculate
-                            </div>
-<div class="text-sm font-bold text-gray-700 border-t border-purple-200 pt-2" id="fc-res-density">
-                                Required Caloric Density: —
-                            </div>
-<div class="text-xs font-semibold text-gray-600" id="fc-res-change">
-</div>
-</div>
-<!-- SAFETY NOTE -->
-<div class="qc-note p-4 text-sm">
-<strong class="block font-bold mb-1">
-                                Note:
-                            </strong>
-<p>
-                                For the exact preparation method, always follow the manufacturer’s instructions.
-                            </p>
-<p class="mt-1 font-semibold">
-                                Use caution regarding Renal Solute Load (RSL).
-                            </p>
+<!-- RESULT AND SAFETY NOTE -->
+<div class="fc-result-group">
+  <div class="highlight-box qc-result text-center space-y-3">
+    <h4 class="font-bold text-slate-800 text-lg">Formula Preparation Result</h4>
+    <div class="text-lg font-bold qc-result-value leading-relaxed" id="fc-res-text">Enter parameters to calculate</div>
+    <div class="text-sm font-bold text-gray-700 border-t border-purple-200 pt-2" id="fc-res-density">Required Caloric Density: —</div>
+    <div class="text-xs font-semibold text-gray-600" id="fc-res-change"></div>
+  </div>
+  <div class="qc-note p-4 text-sm">
+    <strong class="block font-bold mb-1">Note:</strong>
+    <p>For the exact preparation method, always follow the manufacturer’s instructions.</p>
+    <p class="mt-1 font-semibold">Use caution regarding Renal Solute Load (RSL).</p>
+  </div>
 </div>
 </div>
 </div>
