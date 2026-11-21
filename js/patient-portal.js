@@ -753,54 +753,35 @@
   }
 
   function calculateInsulinEstimate() {
-    const mealId = $("portalInsulinMeal")?.value || "breakfast";
-    const meal = state.carbMeals.find(item => item.id === mealId);
-    const carbResult = meal ? getMealNutrientTotal(meal, "carb") : { total: 0, missing: 0 };
-    const carbs = carbResult.total;
-    const unit = $("portalInsulinUnit")?.value || "mg";
-    const currentInput = $("portalInsulinCurrent")?.value ?? "";
-    const currentRaw = Number(currentInput);
-    const targetRaw = Number($("portalInsulinTarget")?.value);
-    const icr = Number($("portalInsulinIcr")?.value);
-    const isf = Number($("portalInsulinIsf")?.value);
-    const iobRaw = $("portalInsulinIob")?.value;
-    const iob = Number(iobRaw);
-    const outputIds = ["portalInsulinCarbs", "portalInsulinMealDose", "portalInsulinCorrectionDose", "portalInsulinNetDose"];
+    const regimen = $("portalInsulinRegimen")?.value || "basal_bolus";
+    const kind = $("portalInsulinKind")?.value || "rapid";
+    const tddInput = $("portalInsulinTdd")?.value ?? "";
+    const tdd = Number(tddInput);
+    const tddOutput = $("portalInsulinTddResult");
+    const icrOutput = $("portalInsulinIcrResult");
+    const isfOutput = $("portalInsulinIsfResult");
     const message = $("portalInsulinMessage");
-    const setOutputs = values => outputIds.forEach((id, index) => { const node = $(id); if (node) node.textContent = values[index]; });
-    const formatUnits = value => Number.isFinite(value) ? value.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة" : "—";
-    setOutputs([optionalNumber(carbs, " جم"), "—", "—", "—"]);
+    const show = (node, value) => { if (node) node.textContent = value; };
+    [tddOutput, icrOutput, isfOutput].forEach(node => show(node, "—"));
     if (!message) return;
-    if (!meal || meal.items.length === 0) {
-      message.textContent = "أضف أصنافًا إلى الوجبة المحددة أولًا حتى يمكن حساب جرعة تغطية الكربوهيدرات.";
+    if (regimen !== "basal_bolus") {
+      show(message, regimen === "basal_only"
+        ? "النظام القاعدي فقط لا يستخدم عادةً ICR وISF لحساب جرعات الوجبات. لا يمكن تقديرهما بهذه الحاسبة."
+        : "الإنسولين المخلوط أو الجرعات الثابتة تحتاج خطة مختلفة؛ لا نشتق منها ICR وISF تلقائيًا.");
       message.dataset.state = "notice";
       return;
     }
-    if (carbResult.missing > 0) {
-      message.textContent = "توجد أصناف في الوجبة لا تتوفر لها قيمة كربوهيدرات مسجلة؛ لا يمكن إكمال الحساب بدقة.";
-      message.dataset.state = "warning";
-      return;
-    }
-    const validCurrent = currentInput !== "" && Number.isFinite(currentRaw) && currentRaw >= 0;
-    const validSettings = [targetRaw, icr, isf].every(value => Number.isFinite(value) && value > 0);
-    if (!validCurrent || !validSettings || iobRaw === "" || !Number.isFinite(iob) || iob < 0) {
-      message.textContent = "أدخل قراءة السكر والهدف وICR وISF، وأدخل IOB صراحةً؛ اكتب 0 إذا لم توجد جرعة نشطة.";
+    if (tddInput === "" || !Number.isFinite(tdd) || tdd <= 0 || tdd > 500) {
+      show(message, "أدخل إجمالي وحدات الإنسولين المستخدمة خلال 24 ساعة، شاملًا القاعدي وجرعات الوجبات والتصحيح.");
       message.dataset.state = "notice";
       return;
     }
-    const glucoseFactor = unit === "mmol" ? 18 : 1;
-    const currentMg = currentRaw * glucoseFactor;
-    const targetMg = targetRaw * glucoseFactor;
-    if (currentMg < 70) {
-      message.textContent = "قراءة السكر أقل من 70 mg/dL؛ تم إيقاف حساب الجرعة. اتبع خطة التعامل مع انخفاض السكر الموصوفة لك.";
-      message.dataset.state = "warning";
-      return;
-    }
-    const mealDose = carbs / icr;
-    const correctionDose = Math.max(0, (currentMg - targetMg) / isf);
-    const netDose = Math.max(0, mealDose + correctionDose - iob);
-    setOutputs([optionalNumber(carbs, " جم"), formatUnits(mealDose), formatUnits(correctionDose), formatUnits(netDose)]);
-    message.textContent = "نتيجة حسابية غير معتمدة كقرار جرعة. راجع خطة الإنسولين، توقيت الجرعة، IOB، ومعدل امتصاص الوجبة مع الفريق المعالج. لا تُجرِ تقريبًا تلقائيًا.";
+    const icr = 500 / tdd;
+    const isf = (kind === "regular" ? 1500 : 1800) / tdd;
+    show(tddOutput, tdd.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " وحدة");
+    show(icrOutput, "1 وحدة لكل " + icr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
+    show(isfOutput, isf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " mg/dL لكل وحدة");
+    show(message, "تقدير تعليمي أولي فقط. لا تغيّر جرعاتك بناءً عليه؛ يجب أن يراجع الطبيب النتيجة ويضبطها حسب قراءات السكر واستجابة المريض. قد تختلف نسبة ICR بين الوجبات.");
     message.dataset.state = "notice";
   }
 
@@ -949,10 +930,10 @@
     $("portalToolsPanel")?.addEventListener("click", handlePatientToolsClick);
     $("portalToolsPanel")?.addEventListener("change", handleToolQuantity);
     $("portalToolsPanel")?.addEventListener("input", event => {
-      if (event.target.closest(".portal-insulin-fields")) calculateInsulinEstimate();
+      if (event.target.matches("#portalInsulinTdd")) calculateInsulinEstimate();
     });
     $("portalToolsPanel")?.addEventListener("change", event => {
-      if (event.target.matches("#portalInsulinMeal, #portalInsulinUnit")) calculateInsulinEstimate();
+      if (event.target.matches("#portalInsulinRegimen, #portalInsulinKind")) calculateInsulinEstimate();
     });
     $("portalCarbSearch")?.addEventListener("input", event => renderFoodSearchResults(event.target.value));
     $("portalCarbPicker")?.addEventListener("keydown", event => { if (event.key === "Escape") closeFoodPicker(); });
