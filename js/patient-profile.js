@@ -496,6 +496,45 @@
     });
   }
 
+  async function setPatientPlanPublication(plan, shouldPublish, button) {
+    if (!plan?.id || !button) return;
+    button.disabled = true;
+    const originalText = button.textContent;
+    button.textContent = shouldPublish ? 'جاري النشر...' : 'جاري الإخفاء...';
+    try {
+      const rpc = shouldPublish
+        ? 'publish_patient_nutrition_plan'
+        : 'revoke_patient_nutrition_plan';
+      const { error } = await supabase.rpc(rpc, { p_plan_id: plan.id });
+      if (error) throw error;
+      await loadNutritionPlans();
+      if (window.Swal?.fire) {
+        await window.Swal.fire({
+          icon: 'success',
+          title: shouldPublish ? 'تم نشر الخطة' : 'تم إخفاء الخطة',
+          text: shouldPublish
+            ? 'أصبحت الخطة متاحة للمريض في بوابته.'
+            : 'لم تعد الخطة ظاهرة للمريض.',
+          confirmButtonText: 'حسنًا'
+        });
+      }
+    } catch (error) {
+      console.error('Patient plan publication update failed:', error);
+      if (window.Swal?.fire) {
+        await window.Swal.fire({
+          icon: 'error',
+          title: 'تعذر تحديث حالة النشر',
+          text: error.message || 'حاول مرة أخرى.',
+          confirmButtonText: 'حسنًا'
+        });
+      } else {
+        window.alert(error.message || 'تعذر تحديث حالة النشر.');
+      }
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  }
+
   async function loadNutritionPlans({ autoOpenLatest = false } = {}) {
     const loading = $('visitsLoading');
     const empty = $('visitsEmpty');
@@ -525,6 +564,17 @@
       empty.hidden = false;
       return [];
     }
+
+    const { data: publicationRows, error: publicationError } = await supabase
+      .from('patient_plan_publications')
+      .select('plan_id,revoked_at')
+      .in('plan_id', data.map(plan => plan.id));
+    if (publicationError) {
+      console.error('Load patient plan publication states failed:', publicationError);
+    }
+    const publicationByPlan = new Map(
+      (publicationRows || []).map(publication => [String(publication.plan_id), publication])
+    );
 
     const planNumberById = new Map(
       [...data]
@@ -567,7 +617,26 @@
       deleteButton.innerHTML = '<i class="fa-solid fa-trash" aria-hidden="true"></i>';
       deleteButton.addEventListener('click', () => void deleteNutritionPlan(plan));
 
-      row.append(openButton, deleteButton);
+      const publication = publicationByPlan.get(String(plan.id));
+      const isPublished = Boolean(publication && !publication.revoked_at);
+      const publicationButton = document.createElement('button');
+      publicationButton.type = 'button';
+      publicationButton.className = 'followup-day-publish' + (isPublished ? ' is-published' : '');
+      publicationButton.textContent = isPublished ? 'إخفاء عن المريض' : 'نشر للمريض';
+      publicationButton.title = publicationError
+        ? 'تعذر التحقق من حالة النشر'
+        : isPublished
+          ? 'إيقاف ظهور هذه الخطة للمريض'
+          : 'إتاحة هذه الخطة للمريض في بوابته';
+      publicationButton.disabled = Boolean(publicationError);
+      publicationButton.setAttribute('aria-label', publicationButton.title);
+      publicationButton.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        void setPatientPlanPublication(plan, !isPublished, publicationButton);
+      });
+
+      row.append(openButton, publicationButton, deleteButton);
       list.appendChild(row);
     });
 
