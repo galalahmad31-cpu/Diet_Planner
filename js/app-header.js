@@ -25,15 +25,22 @@
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
     ["patient-portal.html#portalProfileArea", "الملف الشخصي", "fa-user"]
   ];
+  // Professional navigation is the single source of truth for all professional pages.
+  // Keep the requested order; the shared six-column grid wraps naturally into rows of six.
   const professionalPages = [
     ["app.html", "الرئيسية", "fa-house"],
     ["patient.html", "قائمة المرضى", "fa-user-group"],
     ["food.html", "مكتبة الأغذية", "fa-apple-whole"],
-    ["diet.html", "الخطط الغذائية", "fa-layer-group"],
+    ["diet.html", "مكتبة الدايت", "fa-layer-group"],
+    ["products.html", "المنتجات الغذائية", "fa-box-open"],
+    ["recipe.html", "الوصفات الصحية", "fa-bowl-food"],
+    ["article.html", "المقالات", "fa-newspaper"],
     ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"],
     ["finance.html", "اشتراكات المرضى", "fa-wallet"],
-    ["professional-directory-manage.html", "ملفي المهني", "fa-id-card"],
-    ["notifications.html", "الإشعارات", "fa-bell"]
+    ["notifications.html", "الإشعارات", "fa-bell"],
+    ["professional-directory-manage.html#requests", "التواصل مع المرضى", "fa-comments"],
+    ["profile.html", "الصفحة الشخصية", "fa-user"],
+    ["professional-directory-manage.html", "الملف المهني", "fa-id-card"]
   ];
   const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
   const titles = {
