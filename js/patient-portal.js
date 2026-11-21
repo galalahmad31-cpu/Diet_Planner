@@ -101,6 +101,15 @@
     const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel"];
     if (!allowed.includes(panelId)) return;
     if (!state.hasActiveCareTeam && panelId !== "portalCommunicationPanel") return;
+
+    // Keep the selected panel's ancestors visible. Tabs live outside portalContent,
+    // so a hidden parent would otherwise leave an active tab with a completely blank body.
+    const healthArea = $("portalHealthArea");
+    const content = $("portalContent");
+    if (healthArea) healthArea.hidden = false;
+    if (content) content.hidden = false;
+    if ($("portalHome")) $("portalHome").hidden = true;
+
     document.querySelectorAll("[data-health-tab]").forEach(tab => {
       const active = tab.dataset.healthTab === panelId;
       tab.classList.toggle("is-active", active);
