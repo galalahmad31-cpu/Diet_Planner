@@ -54,8 +54,50 @@
     <div id="bookModalBody" class="books-modal-body"></div>
   </section>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/auth-access.js?v=20261121-books-return-v1"></script>
-<script src="js/books.js?v=20261121-books-v3"></script>
+<script>
+(() => {
+  "use strict";
+  const grid = document.getElementById("booksGrid");
+  const empty = document.getElementById("booksEmpty");
+  const showLoadError = (message) => {
+    grid.replaceChildren();
+    empty.hidden = false;
+    empty.textContent = message;
+  };
+  const loadLocalScript = (src, onload) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = onload;
+    script.onerror = () => showLoadError("تعذر تحميل مكونات المكتبة. حدّث الصفحة أو حاول لاحقًا.");
+    document.body.appendChild(script);
+  };
+  const sdkSources = [
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+    "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"
+  ];
+  const loadSdk = (index) => {
+    if (window.supabase?.createClient) {
+      loadLocalScript("js/auth-access.js?v=20261121-books-return-v2", () => {
+        if (!window.DietPlannerAccess?.supabaseClient) {
+          showLoadError("تعذر تهيئة الاتصال بالمكتبة. حدّث الصفحة أو حاول لاحقًا.");
+          return;
+        }
+        loadLocalScript("js/books.js?v=20261121-books-v4");
+      });
+      return;
+    }
+    if (index >= sdkSources.length) {
+      showLoadError("تعذر الاتصال بخدمة المكتبة. تحقق من اتصال الإنترنت وحاول مرة أخرى.");
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = sdkSources[index];
+    script.onload = () => window.supabase?.createClient ? loadSdk(sdkSources.length) : loadSdk(index + 1);
+    script.onerror = () => loadSdk(index + 1);
+    document.head.appendChild(script);
+  };
+  loadSdk(0);
+})();
+</script>
 </body>
 </html>
