@@ -124,11 +124,13 @@
 .measurement-number,.measurement-numeric-value{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
 .measurement-numeric-value{display:inline-block;text-align:right}
 
-/* Patient nutrition tools: one isolated component set, reusing platform tokens. */
+/* Patient nutrition tools: full-width two-tab workspace and accessible food picker modal. */
 .portal-tools-area{width:100%;max-width:100%;min-width:0;padding:clamp(14px,2vw,24px);margin:0 auto}
-.portal-tools-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:10px 14px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface);color:var(--dp-text);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
-.portal-tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
-.portal-tool-card{min-width:0;padding:clamp(13px,2vw,20px);border:1px solid var(--dp-border);border-radius:16px;background:var(--dp-surface);color:var(--dp-text);box-shadow:var(--dp-shadow-sm,0 2px 10px rgba(0,0,0,.04))}
+.portal-tools-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 14px;padding:6px;border:1px solid var(--dp-border);border-radius:14px;background:var(--dp-surface-2)}
+.portal-tools-tabs button{display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;min-height:46px;padding:10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--dp-text-2);font:800 12px/1.5 var(--dp-font);cursor:pointer}
+.portal-tools-tabs button.is-active{background:var(--dp-primary);color:var(--dp-on-primary);box-shadow:0 3px 10px var(--dp-shadow)}
+.portal-tools-tab-panel[hidden]{display:none!important}
+.portal-tool-card{width:100%;min-width:0;padding:clamp(14px,2vw,22px);border:1px solid var(--dp-border);border-radius:16px;background:var(--dp-surface);color:var(--dp-text);box-shadow:var(--dp-shadow-sm,0 2px 10px rgba(0,0,0,.04))}
 .portal-tool-heading{display:flex;align-items:center;gap:11px;margin-bottom:15px}
 .portal-tool-heading h3{margin:0;color:var(--dp-text);font-size:15px;font-weight:900}
 .portal-tool-heading p{margin:4px 0 0;color:var(--dp-muted);font-size:11px;line-height:1.7}
@@ -137,31 +139,27 @@
 .portal-tool-total{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:13px;border-radius:12px;background:var(--dp-surface-2)}
 .portal-tool-total span{font-size:11px;color:var(--dp-muted);font-weight:800}
 .portal-tool-total strong{font-size:20px;color:var(--dp-primary);font-weight:900;font-variant-numeric:tabular-nums}
-.portal-carb-meals{display:grid;gap:10px}
-.portal-carb-meal{padding:12px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-bg)}
+.portal-carb-meals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.portal-carb-meal{min-width:0;padding:13px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-bg)}
 .portal-carb-meal-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .portal-carb-meal-heading h4{margin:0 0 4px;font-size:13px;font-weight:900;color:var(--dp-text)}
 .portal-carb-meal-heading small{font-size:10px;color:var(--dp-muted)}
 .portal-carb-meal-heading small strong{color:var(--dp-primary)}
 .portal-tool-add{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:0;border-radius:9px;background:var(--dp-primary);color:#fff;font:inherit;font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer}
 .portal-carb-items{display:grid;gap:7px;margin-top:10px}
-.portal-carb-item{display:grid;grid-template-columns:minmax(0,1fr) 105px 30px;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--dp-border)}
+.portal-carb-item{display:grid;grid-template-columns:minmax(0,1fr) 100px 30px;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--dp-border)}
 .portal-carb-item-copy{min-width:0;display:grid;gap:3px}
 .portal-carb-item-copy strong{font-size:11px;overflow-wrap:anywhere}
 .portal-carb-item-copy small{font-size:9px;color:var(--dp-muted)}
+.portal-carb-household-inline{line-height:1.6}
 .portal-carb-grams{display:grid;gap:3px;font-size:9px;color:var(--dp-muted)}
-.portal-carb-grams input,.portal-tool-card input,.portal-tool-card select{width:100%;min-width:0;min-height:38px;padding:8px 10px;border:1px solid var(--dp-border);border-radius:9px;background:var(--dp-bg);color:var(--dp-text);font:inherit;font-size:12px}
+.portal-carb-grams input,.portal-tool-card input,.portal-tool-card select,.portal-food-modal input{box-sizing:border-box;width:100%;min-width:0;min-height:40px;padding:8px 10px;border:1px solid var(--dp-border);border-radius:9px;background:var(--dp-bg);color:var(--dp-text);font:inherit;font-size:12px}
 .portal-tool-icon-button{width:30px;height:30px;border:0;border-radius:8px;background:var(--dp-surface-2);color:var(--dp-danger,#b64b4b);cursor:pointer}
-.portal-food-picker{margin-top:12px;padding:12px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-surface-2)}
-.portal-food-picker label,.portal-tool-card>label{display:block;margin:0 0 6px;font-size:10px;font-weight:800;color:var(--dp-text)}
-.portal-food-search-results{display:grid;gap:5px;max-height:240px;overflow:auto;margin-top:8px}
-.portal-food-search-item{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;padding:9px 10px;border:1px solid var(--dp-border);border-radius:9px;background:var(--dp-surface);color:var(--dp-text);text-align:right;cursor:pointer}
-.portal-food-search-item strong{font-size:11px}
-.portal-food-search-item small{font-size:9px;color:var(--dp-muted)}
+.portal-tool-card>label,.portal-food-modal>label,.portal-selected-food>label{display:block;margin:12px 0 6px;font-size:11px;font-weight:800;color:var(--dp-text)}
 .portal-tool-footnote,.portal-tool-hint{margin:10px 0 0;color:var(--dp-muted);font-size:10px;line-height:1.8}
 .portal-tool-card select{margin-bottom:12px}
-.portal-renal-results{display:grid;gap:7px;max-height:440px;overflow:auto}
-.portal-renal-food{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-bg)}
+.portal-renal-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:520px;overflow:auto}
+.portal-renal-food{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:11px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-bg)}
 .portal-renal-food>div{display:grid;gap:4px;min-width:0}
 .portal-renal-food>div strong{font-size:11px;overflow-wrap:anywhere}
 .portal-renal-food>div small{font-size:9px;color:var(--dp-muted)}
@@ -169,5 +167,30 @@
 .portal-renal-food>span small{font-size:9px;color:var(--dp-muted)}
 .portal-renal-food>span strong{font-size:12px;color:var(--dp-primary);font-weight:900}
 .portal-tool-loading{padding:14px;color:var(--dp-muted);font-size:11px}
-@media(max-width:760px){.portal-tools-grid{grid-template-columns:minmax(0,1fr)}.portal-tools-area{padding:12px 0}.portal-tool-card{padding:13px}}
-@media(max-width:420px){.portal-carb-item{grid-template-columns:minmax(0,1fr) 88px 28px;gap:5px}.portal-carb-meal{padding:9px}.portal-carb-meal-heading h4{font-size:12px}.portal-tool-add{padding:8px;font-size:9px}}
+.portal-modal-open{overflow:hidden}
+.portal-modal-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:16px;background:rgba(12,28,31,.56);backdrop-filter:blur(3px)}
+.portal-modal-backdrop[hidden]{display:none!important}
+.portal-food-modal{width:min(560px,100%);max-height:min(86dvh,760px);overflow:auto;padding:18px;border:1px solid var(--dp-border);border-radius:18px;background:var(--dp-surface);color:var(--dp-text);box-shadow:0 22px 70px rgba(0,0,0,.24)}
+.portal-food-modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.portal-food-modal-header h3{margin:3px 0;font-size:17px;font-weight:900}
+.portal-food-modal-header p{margin:0;color:var(--dp-muted);font-size:10px}
+.portal-modal-close{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:0;border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text);font-size:16px;cursor:pointer}
+.portal-food-search-results{display:grid;gap:6px;max-height:220px;overflow:auto;margin-top:8px;padding:1px}
+.portal-food-search-item{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;padding:10px 11px;border:1px solid var(--dp-border);border-radius:9px;background:var(--dp-bg);color:var(--dp-text);text-align:right;cursor:pointer}
+.portal-food-search-item:hover{border-color:var(--dp-primary);background:var(--dp-surface-2)}
+.portal-food-search-item strong{font-size:11px}
+.portal-food-search-item small{font-size:9px;color:var(--dp-muted)}
+.portal-selected-food{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.45fr);gap:10px;align-items:end;margin-top:14px;padding:12px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-surface-2)}
+.portal-selected-food[hidden]{display:none!important}
+.portal-selected-food-name{display:grid;gap:4px;min-width:0}
+.portal-selected-food-name span,.portal-household-measure span{font-size:9px;color:var(--dp-muted);font-weight:800}
+.portal-selected-food-name strong{font-size:12px;overflow-wrap:anywhere}
+.portal-selected-food>label{margin:0}
+.portal-household-measure{grid-column:1/-1;display:grid;gap:4px;padding:9px 10px;border-radius:9px;background:var(--dp-surface)}
+.portal-household-measure strong{font-size:11px;color:var(--dp-primary);line-height:1.7}
+.portal-selected-food>.portal-tool-hint{grid-column:1/-1;margin:0}
+.portal-food-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.portal-food-modal-actions .portal-primary-button,.portal-food-modal-actions .portal-secondary-button{min-height:40px;padding:9px 16px;font:inherit;font-size:11px;font-weight:900;cursor:pointer}
+.portal-food-modal-actions .portal-primary-button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:760px){.portal-tools-area{padding:12px 0}.portal-carb-meals{grid-template-columns:minmax(0,1fr)}.portal-renal-results{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.portal-tools-tabs button{min-height:44px;padding:8px 5px;font-size:10px;gap:5px}.portal-tool-card{padding:12px}.portal-carb-meal{padding:10px}.portal-carb-item{grid-template-columns:minmax(0,1fr) 88px 28px;gap:5px}.portal-food-modal{padding:14px}.portal-selected-food{grid-template-columns:minmax(0,1fr) 110px;gap:8px}}
