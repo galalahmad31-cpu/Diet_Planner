@@ -17,13 +17,11 @@
   <link rel="stylesheet" href="css/app-header.css?v=20261121-patient-header-v2">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261121-patient-ia-v2">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
-  <link rel="stylesheet" href="css/patient-appointments.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
   <script src="js/app-header.js?v=20261121-patient-ia-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
-  <script src="js/patient-appointments.js?v=20261121-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261121-shared-weight-logs" defer></script>
+  <script src="js/patient-portal.js?v=20261121-subscription-followup" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
   <div data-dp-patient-header></div>
@@ -60,7 +58,7 @@
       <nav class="portal-health-tabs" role="tablist" aria-label="أقسام الملف الصحي">
         <button type="button" role="tab" aria-selected="true" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel" class="is-active">الخطة الغذائية</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalAppointmentsPanel" data-health-tab="portalAppointmentsPanel">المواعيد</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalAppointmentsPanel" data-health-tab="portalAppointmentsPanel">الاشتراك والمتابعة</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalCommunicationPanel" data-health-tab="portalCommunicationPanel">التواصل مع المختص</button>
       </nav>
 
@@ -132,13 +130,28 @@
         <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
       </section>
 
-      <div id="portalAppointmentsPanel" class="portal-health-tab-panel" role="tabpanel" hidden></div><section class="portal-section" aria-labelledby="portalAppointmentsTitle">
-        <div class="portal-section-heading">
-          <div><span class="portal-section-kicker">APPOINTMENTS</span><h2 id="portalAppointmentsTitle">حجز ومتابعة المواعيد</h2><p>أرسل طلب موعد مع أحد المختصين المرتبطين بملفك.</p></div>
-          <span class="portal-section-icon"><i class="fa-regular fa-calendar-check"></i></span>
-        </div>
-        <div id="patientPortalAppointments" data-patient-appointments data-patient-role="patient"></div>
-      </section></div>
+      <div id="portalAppointmentsPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
+        <section class="portal-section" aria-labelledby="portalAppointmentsTitle">
+          <div class="portal-section-heading">
+            <div><span class="portal-section-kicker">SUBSCRIPTION & FOLLOW-UP</span><h2 id="portalAppointmentsTitle">الاشتراك والمتابعة</h2><p>تواريخ اشتراكك وموعد المتابعة الذي حدده المختص المسؤول عن ملفك.</p></div>
+            <span class="portal-section-icon"><i class="fa-regular fa-calendar-check"></i></span>
+          </div>
+          <div id="portalFollowUpLoading" class="portal-muted-state">جاري تحميل بيانات الاشتراك والمتابعة...</div>
+          <div id="portalFollowUpError" class="portal-empty-state" role="alert" hidden></div>
+          <div id="portalFollowUpEmpty" class="portal-empty-state" hidden>لا توجد بيانات اشتراك مسجلة حاليًا. تواصل مع المختص المرتبط بملفك.</div>
+          <div id="portalFollowUpContent" hidden>
+            <div class="portal-followup-grid">
+              <article><span>بداية الاشتراك</span><strong id="portalSubscriptionStart">—</strong></article>
+              <article><span>نهاية الاشتراك</span><strong id="portalSubscriptionEnd">—</strong></article>
+              <article class="is-next"><span>موعد المتابعة القادمة</span><strong id="portalNextFollowUp">—</strong><small id="portalFollowUpHint">يحدده المختص المسؤول عن ملفك</small></article>
+            </div>
+            <div class="portal-followup-contact">
+              <div><strong>هل تحتاج إلى التواصل مع مختصك؟</strong><p>استخدم الرسائل للتواصل ومناقشة المتابعة أو الاستفسارات المتعلقة بخطتك.</p></div>
+              <button type="button" class="portal-primary-button" data-open-patient-messages><i class="fa-solid fa-comments"></i> التواصل مع المختص</button>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <div id="portalMeasurementsPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalMeasurementsTitle">
         <div class="portal-section-heading">

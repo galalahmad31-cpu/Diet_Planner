@@ -273,6 +273,50 @@
     } finally { state.busy = false; button.disabled = false; }
   }
 
+
+  async function loadSubscriptionFollowUp() {
+    const loading = $("portalFollowUpLoading");
+    const errorBox = $("portalFollowUpError");
+    const empty = $("portalFollowUpEmpty");
+    const content = $("portalFollowUpContent");
+    if (loading) loading.hidden = false;
+    if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
+    if (empty) empty.hidden = true;
+    if (content) content.hidden = true;
+    try {
+      // A narrow RPC returns only the three dates; it does not expose finance amounts.
+      const { data, error } = await supabase.rpc("get_patient_subscription_follow_up");
+      if (error) throw error;
+      const record = Array.isArray(data) ? data[0] : data;
+      if (!record) {
+        if (empty) empty.hidden = false;
+        return;
+      }
+      $("portalSubscriptionStart").textContent = formatDate(record.subscription_start_date);
+      $("portalSubscriptionEnd").textContent = formatDate(record.subscription_end_date);
+      $("portalNextFollowUp").textContent = formatDate(record.next_follow_up_date);
+      const hint = $("portalFollowUpHint");
+      if (hint) {
+        if (!record.next_follow_up_date) hint.textContent = "لم يحدد المختص موعد المتابعة القادمة بعد";
+        else {
+          const today = localToday();
+          hint.textContent = record.next_follow_up_date < today
+            ? "موعد المتابعة المحدد قد مضى؛ تواصل مع مختصك لتحديثه"
+            : "يحدده المختص المسؤول عن ملفك";
+        }
+      }
+      if (content) content.hidden = false;
+    } catch (error) {
+      console.error("Patient subscription/follow-up load failed:", error);
+      if (errorBox) {
+        errorBox.textContent = error.message || "تعذر تحميل بيانات الاشتراك والمتابعة.";
+        errorBox.hidden = false;
+      }
+    } finally {
+      if (loading) loading.hidden = true;
+    }
+  }
+
   async function loadPlans() {
     const loading = $("portalPlansLoading");
     const empty = $("portalPlansEmpty");
@@ -455,16 +499,13 @@
     }
     state.patientId = account.patient_id;
     await loadPatient();
-    await Promise.all([loadMeasurements(), loadPlans(), loadProfessionalRequests()]);
+    await Promise.all([loadMeasurements(), loadPlans(), loadProfessionalRequests(), loadSubscriptionFollowUp()]);
     showOnly("portalContent");
     void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
       patientId: state.patientId,
       role: "patient"
     });
-    void window.DietPlannerPatientAppointments?.mount($("patientPortalAppointments"), {
-      patientId: state.patientId,
-      role: "patient"
-    });
+
   }
 
   async function handleInviteSubmit(event) {
@@ -544,6 +585,10 @@
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
+    document.querySelector("[data-open-patient-messages]")?.addEventListener("click", () => {
+      activateHealthTab("portalCommunicationPanel");
+      $("patientPortalMessages")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     loadSelfProfile().catch(error => {
       console.error("Patient profile load failed:", error);

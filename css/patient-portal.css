@@ -63,3 +63,15 @@
 .portal-measurements-table td{vertical-align:middle}
 .portal-measurement-form button:disabled{opacity:.55;cursor:wait}
 @media(max-width:600px){.portal-measurement-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.portal-measurement-summary article{min-height:72px;padding:8px 6px}.portal-measurement-summary span{font-size:8px}.portal-measurement-summary strong{font-size:13px}.portal-measurement-summary small{font-size:7px}.portal-form-footer{align-items:stretch;flex-direction:column}.portal-measurement-actions{width:100%}.portal-measurement-actions button{flex:1}}
+
+/* Subscription and follow-up dates: shared source patient_finances. */
+.portal-followup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.portal-followup-grid article{display:flex;flex-direction:column;justify-content:center;gap:7px;min-height:112px;padding:16px;border:1px solid var(--portal-line);border-radius:14px;background:var(--portal-bg);min-width:0}
+.portal-followup-grid article span{font-size:10px;color:var(--portal-muted);font-weight:800}
+.portal-followup-grid article strong{font-size:17px;color:var(--portal-ink);font-weight:900;overflow-wrap:anywhere}
+.portal-followup-grid article small{font-size:9px;color:var(--portal-muted);line-height:1.7}
+.portal-followup-grid article.is-next{border-color:var(--dp-primary);background:var(--dp-surface-2)}
+.portal-followup-contact{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-top:14px;padding:16px;border:1px solid var(--portal-line);border-radius:14px;background:var(--portal-card)}
+.portal-followup-contact strong{font-size:12px;color:var(--portal-ink)}
+.portal-followup-contact p{font-size:10px;color:var(--portal-muted);margin:4px 0 0;line-height:1.8}
+@media(max-width:650px){.portal-followup-grid{grid-template-columns:1fr;gap:8px}.portal-followup-grid article{min-height:82px}.portal-followup-contact{align-items:stretch;flex-direction:column}.portal-followup-contact .portal-primary-button{width:100%}}
