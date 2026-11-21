@@ -33,11 +33,6 @@
     });
   }
 
-  function returnHome() {
-    $("portalHealthArea").hidden = true;
-    $("portalHome").hidden = false;
-  }
-
   function fail(message) {
     $("portalErrorText").textContent = message;
     showOnly("portalError");
@@ -421,7 +416,6 @@
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
     $("portalHome")?.querySelector("[data-portal-open-health]")?.addEventListener("click", openHealthArea);
-    $("portalBackHome")?.addEventListener("click", returnHome);
     if (new URLSearchParams(window.location.search).has("invite")) openHealthArea();
   }
 
