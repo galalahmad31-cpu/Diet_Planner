@@ -32,7 +32,6 @@ create policy patient_plan_publications_select_linked_patient_or_owner
     )
   );
 
-revoke all on function public.is_linked_patient_for_plan(uuid) from public, anon, authenticated;
-drop function public.is_linked_patient_for_plan(uuid);
+drop function if exists public.is_linked_patient_for_plan(uuid);
 
 commit;
