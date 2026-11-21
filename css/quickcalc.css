@@ -235,42 +235,68 @@
 .qc-note strong{color:var(--dp-text)}
 .qc-note p{margin-top:5px}
 
-/* GIR — compact clinical layout: weight, IV and enteral side by side. */
+/* GIR — fixed 2×2 clinical layout: Weight | IV, Enteral | Result. */
 #qc-gir-content:not(.hidden){
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  align-items:start;
+  grid-template-areas:
+    "weight iv"
+    "enteral result";
+  align-items:stretch;
   gap:12px!important;
 }
-#qc-gir-content:not(.hidden) > *{min-width:0;margin-block-start:0!important}
+#qc-gir-content:not(.hidden) > *{
+  min-width:0;
+  min-height:0;
+  margin:0!important;
+  grid-column:auto!important;
+}
 #qc-gir-content:not(.hidden) > .qc-weight-panel{
-  grid-column:1/-1;
-  display:grid;
-  grid-template-columns:minmax(130px,190px) minmax(0,320px);
-  align-items:center;
-  justify-content:start;
-  gap:12px 18px;
-  padding:10px 14px;
+  grid-area:weight;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:10px;
+  padding:14px!important;
 }
-#qc-gir-content .qc-weight-panel label{margin:0;line-height:1.4}
-#qc-gir-content .qc-weight-panel input{min-height:38px}
+#qc-gir-content .qc-weight-panel label{
+  margin:0!important;
+  line-height:1.4;
+}
+#qc-gir-content .qc-weight-panel input{
+  min-height:40px;
+}
+#qc-gir-content:not(.hidden) > .qc-panel:nth-child(2){grid-area:iv}
+#qc-gir-content:not(.hidden) > .qc-panel:nth-child(3){grid-area:enteral}
 #qc-gir-content:not(.hidden) > .qc-result{
-  grid-column:1/-1;
-  padding:13px 18px;
+  grid-area:result;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:10px!important;
+  padding:14px!important;
 }
-#qc-gir-content .qc-result h4{margin-bottom:3px;font-size:.92rem}
-#qc-gir-content .qc-result .qc-result-value{font-size:1.8rem;line-height:1.35}
-#qc-gir-content .qc-result > div:last-child{padding-top:8px}
+#qc-gir-content .qc-panel{padding:12px!important}
+#qc-gir-content .qc-panel h4{margin:0 0 9px;font-size:.9rem}
+#qc-gir-content .qc-result h4{margin:0;font-size:.9rem}
+#qc-gir-content .qc-result .qc-result-value{font-size:1.8rem;line-height:1.3}
+#qc-gir-content .qc-result > div:last-child{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px 16px;
+  padding-top:8px;
+}
 
-/* Dynamic IV lines: the remove column exists only when its button exists. */
+/* Dynamic IV lines remain compact and expand only for an actual remove button. */
 #iv-lines-container{display:grid;gap:8px}
 .iv-line-row{
   display:grid!important;
   grid-template-columns:repeat(3,minmax(0,1fr)) auto!important;
   align-items:end!important;
-  gap:8px!important;
+  gap:7px!important;
   min-width:0;
-  padding:10px!important;
+  padding:9px!important;
   border:1px solid var(--dp-border)!important;
   border-radius:11px!important;
   background:var(--dp-surface-2)!important;
@@ -280,30 +306,32 @@
 .iv-line-row label{
   min-height:2.2em;
   margin-bottom:4px!important;
-  font-size:.66rem!important;
+  font-size:.64rem!important;
   line-height:1.3!important;
 }
 .iv-line-row input,.iv-line-row select{
   min-width:0!important;
   min-height:38px!important;
-  padding:6px!important;
-  font-size:.8rem!important;
+  padding:5px!important;
+  font-size:.76rem!important;
 }
 .qc-iv-remove-slot:empty{display:none!important}
 .qc-iv-remove-slot{align-items:end;justify-content:center}
 .qc-iv-remove-slot button{
-  min-width:30px;
+  min-width:29px;
   min-height:36px;
   border:1px solid var(--dp-danger)!important;
   border-radius:9px!important;
   background:color-mix(in srgb,var(--dp-danger) 12%,var(--dp-surface))!important;
   color:var(--dp-danger)!important;
 }
+
+/* Enteral inputs form a balanced 2×2 group inside the lower-left card. */
 .qc-enteral-fields{
   display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
   align-items:end;
-  gap:9px!important;
+  gap:10px!important;
 }
 .qc-enteral-fields > div{min-width:0}
 .qc-enteral-fields label{
@@ -312,9 +340,7 @@
   font-size:.68rem;
   line-height:1.35;
 }
-#qc-gir-content .qc-panel{padding:12px}
-#qc-gir-content .qc-panel h4{margin-bottom:8px;font-size:.9rem}
-
+#qc-gir-content #qc-custom-carb-box{grid-column:1/-1}
 
 /* Dextrose — compact field grid and prominent preparation result. */
 #qc-dextrose-content:not(.hidden){
@@ -425,12 +451,12 @@
   #qc-dextrose-content:not(.hidden),
   #qc-formula-conc-content:not(.hidden),
   #qc-bmf-content:not(.hidden){grid-template-columns:minmax(0,1fr)}
-  #qc-gir-content:not(.hidden){grid-template-columns:minmax(0,1fr);gap:10px!important}
-  #qc-gir-content:not(.hidden) > .qc-weight-panel{
-    grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);
-    gap:8px 10px;
+  #qc-gir-content:not(.hidden){
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"weight" "iv" "enteral" "result";
+    gap:10px!important;
   }
-  #qc-gir-content:not(.hidden) > .qc-result{grid-column:1}
+  #qc-gir-content:not(.hidden) > .qc-weight-panel{gap:8px}
   .qc-dex-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px 9px!important}
   .qc-enteral-fields{gap:8px!important}
   .qc-enteral-fields label{font-size:.66rem;min-height:3em}
