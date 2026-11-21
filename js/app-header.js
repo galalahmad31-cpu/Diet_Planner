@@ -84,6 +84,17 @@
       }
       track.append(link);
     });
+    const professionalLink = document.createElement("a");
+    professionalLink.className = "dp-app-header__link";
+    professionalLink.href = appBasePath + "professional-directory-manage.html";
+    professionalLink.dataset.pageHref = "professional-directory-manage.html";
+    professionalLink.innerHTML = '<i class="fa-solid fa-id-card" aria-hidden="true"></i><span>ملفي المهني</span>';
+    professionalLink.hidden = true;
+    if (path === "professional-directory-manage.html") {
+      professionalLink.classList.add("is-active");
+      professionalLink.setAttribute("aria-current", "page");
+    }
+    track.append(professionalLink);
     const toggle = header.querySelector(".dp-app-header__toggle");
     const nav = header.querySelector(".dp-app-header__nav");
     toggle.addEventListener("click", () => {
@@ -103,16 +114,25 @@
   }
 
 
-  function renderAccount(user) {
+  async function renderAccount(user) {
     const logout = document.getElementById("logoutBtn");
     const login = document.getElementById("loginCta");
     const register = document.getElementById("registerCta");
+    const professionalLink = document.querySelector('.dp-app-header__link[data-page-href="professional-directory-manage.html"]');
     const context = document.querySelector(".dp-app-header__context");
     const signedIn = Boolean(user?.id);
     logout?.classList.toggle("hidden", !signedIn);
     login?.classList.toggle("hidden", signedIn);
     register?.classList.toggle("hidden", signedIn);
     if (context) context.hidden = signedIn;
+    if (professionalLink) {
+      let accountType = null;
+      if (signedIn) {
+        try { accountType = await window.DietPlannerAccess?.getUserAccountType(user.id); }
+        catch (error) { console.error("Professional navigation access check failed:", error); }
+      }
+      professionalLink.hidden = accountType !== "professional";
+    }
   }
 
   function bindAccountActions() {
