@@ -265,16 +265,22 @@
   }
 
   async function loadMeasurements() {
+    const loading = $("portalMeasurementsLoading");
     const errorBox = $("portalMeasurementsError");
+    if (loading) loading.hidden = false;
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
-    const { data, error } = await supabase.from("weight_logs")
+    try {
+      const { data, error } = await supabase.from("weight_logs")
       .select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by")
       .eq("patient_id", state.patientId)
       .order("measurement_date", { ascending: true })
       .order("created_at", { ascending: true });
-    if (error) throw error;
-    state.logs = data || [];
-    renderMeasurements();
+      if (error) throw error;
+      state.logs = data || [];
+      renderMeasurements();
+    } finally {
+      if (loading) loading.hidden = true;
+    }
   }
 
   function resetMeasurementForm() {
