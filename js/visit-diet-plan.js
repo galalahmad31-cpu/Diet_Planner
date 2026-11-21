@@ -748,6 +748,7 @@ function newCloudUuid(){
 
 function serializePlanDay(day){
  return {
+  id:isPersistedDayId(day.id)?String(day.id):null,
   title:day.title||'',
   notes:day.notes||'',
   meals:(day.meals||[]).map(meal=>({
