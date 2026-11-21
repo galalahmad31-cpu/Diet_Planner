@@ -47,15 +47,12 @@
           <label for="patientMessageRecipient">المختص</label>
           <select id="patientMessageRecipient" data-message-recipient></select>
         </div>
-        <section class="patient-messages-quick-actions" data-message-quick-actions hidden aria-label="تأكيدات الاتفاق والدفع">
+        <section class="patient-messages-quick-actions" data-message-quick-actions hidden aria-label="مراحل الاتفاق والدفع">
           <div class="patient-messages-quick-actions-heading">
-            <strong>تأكيدات الاتفاق والدفع</strong>
-            <small>تُسجل كتأكيدات مؤرخة، ولا تتحقق المنصة من وصول التحويل.</small>
+            <strong data-message-stage>حالة الاتفاق</strong>
+            <small data-message-stage-note></small>
           </div>
-          <div class="patient-messages-quick-actions-buttons">
-            <button type="button" data-message-confirm="agreement">تأكيد الاتفاق</button>
-            <button type="button" data-message-confirm="payment">${role === "patient" ? "تأكيد إرسال المبلغ" : "تأكيد استلام المبلغ"}</button>
-          </div>
+          <div class="patient-messages-quick-actions-buttons" data-message-confirmation-buttons></div>
         </section>
         <div class="patient-messages-list" data-message-list aria-live="polite">
           <div class="patient-messages-empty">جاري تحميل المحادثة...</div>
@@ -85,66 +82,89 @@
     const recipientSelect = root.querySelector("[data-message-recipient]");
     const quickActions = root.querySelector("[data-message-quick-actions]");
     let recipientId = null;
+    let requestId = options.requestId || null;
+    let requestState = null;
     let busy = false;
     let loading = false;
     let counterpartLabel = role === "patient" ? "المختص" : "المريض";
 
     try {
       if (role === "patient") {
+        const { data: requests, error: requestError } = await supabase
+          .from("professional_connection_requests")
+          .select("id,professional_id,status,created_at")
+          .eq("patient_id", patientId)
+          .eq("requested_by", user.id)
+          .in("status", ["accepted", "active"])
+          .order("created_at", { ascending: false });
+        if (requestError) throw requestError;
+
+        const contactsById = new Map((requests || []).map(item => [item.professional_id, {
+          id: item.professional_id, requestId: item.id, status: item.status
+        }]));
         const { data: team, error: teamError } = await supabase
           .from("patient_care_team")
           .select("professional_id,relationship_role")
           .eq("patient_id", patientId)
-          .eq("status", "active")
-          .order("relationship_role", { ascending: true });
+          .eq("status", "active");
         if (teamError) throw teamError;
-        const professionalIds = [...new Set((team || [])
-          .sort((a, b) => (a.relationship_role === "primary" ? 0 : 1) - (b.relationship_role === "primary" ? 0 : 1))
-          .map(item => item.professional_id))];
-        if (!professionalIds.length) {
-          list.innerHTML = '<div class="patient-messages-empty">لم يتم ربط مختص نشط بهذا الملف حتى الآن.</div>';
+        (team || []).forEach(item => {
+          if (!contactsById.has(item.professional_id)) {
+            contactsById.set(item.professional_id, { id: item.professional_id, requestId: null, status: "active" });
+          }
+        });
+
+        const contactRows = [...contactsById.values()];
+        if (!contactRows.length) {
+          list.innerHTML = '<div class="patient-messages-empty">لا توجد محادثات مقبولة حتى الآن. يمكنك إرسال طلب محادثة من دليل المختصين.</div>';
           form.hidden = true;
           recipientWrap.hidden = true;
           return;
         }
+
         const { data: profiles, error: profileError } = await supabase
-          .from("profiles")
-          .select("id,full_name,profession")
-          .in("id", professionalIds);
+          .from("profiles").select("id,full_name,profession").in("id", contactRows.map(item => item.id));
         if (profileError) throw profileError;
         const profileById = new Map((profiles || []).map(profile => [profile.id, profile]));
-        const contacts = professionalIds.map(id => ({
-          id,
-          name: profileById.get(id)?.full_name || "المختص",
-          profession: profileById.get(id)?.profession || "",
-          role: team.find(item => item.professional_id === id)?.relationship_role || "collaborator"
+        const contacts = contactRows.map(item => ({
+          ...item,
+          name: profileById.get(item.id)?.full_name || "المختص",
+          profession: profileById.get(item.id)?.profession || ""
         }));
         recipientSelect.innerHTML = contacts.map(contact =>
-          `<option value="${escapeHtml(contact.id)}">${escapeHtml(contact.name)}${contact.profession ? " · " + escapeHtml(contact.profession) : ""}${contact.role === "primary" ? " (المختص الأساسي)" : ""}</option>`
+          `<option value="${escapeHtml(contact.id)}">${escapeHtml(contact.name)}${contact.profession ? " · " + escapeHtml(contact.profession) : ""}</option>`
         ).join("");
         recipientId = contacts[0].id;
-        recipientWrap.hidden = contacts.length < 2;
+        requestId = contacts[0].requestId;
         counterpartLabel = contacts.length === 1 ? contacts[0].name : "المختص";
+        recipientWrap.hidden = contacts.length < 2;
         recipientSelect.addEventListener("change", () => {
-          recipientId = recipientSelect.value;
-          counterpartLabel = contacts.find(contact => contact.id === recipientId)?.name || "المختص";
-          void loadMessages();
+          const selected = contacts.find(contact => contact.id === recipientSelect.value);
+          recipientId = selected?.id || null;
+          requestId = selected?.requestId || null;
+          counterpartLabel = selected?.name || "المختص";
+          void loadRequestState().then(loadMessages);
         });
       } else {
         const { data: account, error: accountError } = await supabase
-          .from("patient_accounts")
-          .select("user_id")
-          .eq("patient_id", patientId)
-          .eq("status", "active")
-          .maybeSingle();
+          .from("patient_accounts").select("user_id")
+          .eq("patient_id", patientId).eq("status", "active").maybeSingle();
         if (accountError) throw accountError;
         if (!account?.user_id) {
-          list.innerHTML = '<div class="patient-messages-empty">لم يربط المريض حسابه بعد. أرسل دعوة الربط أولًا.</div>';
+          list.innerHTML = '<div class="patient-messages-empty">لم يربط المريض حسابه بعد.</div>';
           form.hidden = true;
           return;
         }
         recipientId = account.user_id;
         counterpartLabel = "المريض";
+        if (!requestId) {
+          const { data: request, error: requestError } = await supabase
+            .from("professional_connection_requests").select("id")
+            .eq("patient_id", patientId).eq("professional_id", user.id)
+            .in("status", ["accepted", "active"]).maybeSingle();
+          if (requestError) throw requestError;
+          requestId = request?.id || null;
+        }
       }
     } catch (error) {
       console.error("Patient messaging setup failed:", error);
@@ -154,7 +174,65 @@
       return;
     }
 
-    quickActions.hidden = false;
+    async function loadRequestState() {
+      requestState = null;
+      if (!requestId) { quickActions.hidden = true; return; }
+      const { data, error } = await supabase.from("professional_connection_requests")
+        .select("id,status,patient_agreement_at,professional_agreement_at,payment_sent_at,payment_received_at")
+        .eq("id", requestId).maybeSingle();
+      if (error) throw error;
+      requestState = data || null;
+      renderQuickActions();
+    }
+
+    function renderQuickActions() {
+      const stage = root.querySelector("[data-message-stage]");
+      const note = root.querySelector("[data-message-stage-note]");
+      const buttons = root.querySelector("[data-message-confirmation-buttons]");
+      if (!requestState || !["accepted", "active"].includes(requestState.status)) {
+        quickActions.hidden = true;
+        return;
+      }
+      quickActions.hidden = false;
+      buttons.replaceChildren();
+      const isPatient = role === "patient";
+      const patientAgreed = Boolean(requestState.patient_agreement_at);
+      const professionalAgreed = Boolean(requestState.professional_agreement_at);
+      const makeButton = (step, label) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.messageConfirm = step;
+        button.textContent = label;
+        buttons.appendChild(button);
+      };
+
+      if (requestState.status === "active" || requestState.payment_received_at) {
+        stage.textContent = "المتابعة نشطة";
+        note.textContent = "تم تأكيد استلام المبلغ وبدء المتابعة.";
+      } else if (!patientAgreed || !professionalAgreed) {
+        stage.textContent = "المرحلة 1 من 3 · تأكيد الاتفاق";
+        const ownConfirmed = isPatient ? patientAgreed : professionalAgreed;
+        const otherConfirmed = isPatient ? professionalAgreed : patientAgreed;
+        if (!ownConfirmed) makeButton("agreement", "أؤكد الاتفاق");
+        note.textContent = ownConfirmed
+          ? "تم تأكيد موافقتك. ننتظر تأكيد الطرف الآخر."
+          : otherConfirmed
+            ? "الطرف الآخر أكد الاتفاق. راجع تفاصيل الخدمة والسعر والمدة ثم أكد موافقتك."
+            : "بعد الاتفاق على الخدمة والسعر والمدة، يؤكد كل طرف موافقته.";
+      } else if (!requestState.payment_sent_at) {
+        stage.textContent = "المرحلة 2 من 3 · تأكيد الدفع";
+        if (isPatient) makeButton("payment_sent", "تأكيد إرسال المبلغ");
+        note.textContent = isPatient
+          ? "أرسل المبلغ بالطريقة التي اتفقتما عليها، ثم أكد الإرسال."
+          : "تم تأكيد الاتفاق من الطرفين. ننتظر تأكيد المريض إرسال المبلغ.";
+      } else {
+        stage.textContent = "المرحلة 3 من 3 · تأكيد الاستلام";
+        if (!isPatient) makeButton("payment_received", "تأكيد استلام المبلغ");
+        note.textContent = isPatient
+          ? "تم تسجيل تأكيد الإرسال. ننتظر تأكيد المختص استلام المبلغ."
+          : "لا تؤكد الاستلام إلا بعد التحقق بنفسك من وصول المبلغ.";
+      }
+    }
 
     async function loadMessages() {
       if (loading) return;
@@ -236,29 +314,41 @@
       void sendMessage(input.value.trim(), { clearInput: true });
     });
 
-    root.querySelectorAll("[data-message-confirm]").forEach(button => {
-      button.addEventListener("click", () => {
-        const action = button.dataset.messageConfirm;
-        const isAgreement = action === "agreement";
-        const body = isAgreement
-          ? "تأكيد الاتفاق\nأؤكد موافقتي على تفاصيل الخدمة والسعر والمدة التي اتفقنا عليها في هذه المحادثة."
-          : role === "patient"
-            ? "تأكيد إرسال المبلغ\nأؤكد أنني أرسلت المبلغ المتفق عليه للمختص."
-            : "تأكيد استلام المبلغ\nأؤكد أنني استلمت المبلغ المتفق عليه من المريض.";
-        const prompt = isAgreement
-          ? "هل تؤكد موافقتك على تفاصيل الخدمة والسعر والمدة التي اتفقتما عليها؟"
-          : role === "patient"
-            ? "هل تؤكد أنك أرسلت المبلغ بالفعل؟"
-            : "هل تؤكد أنك استلمت المبلغ بالفعل؟";
-
-        if (!window.confirm(prompt)) return;
-        void sendMessage(body, {
-          successMessage: isAgreement ? "تم إرسال تأكيد الاتفاق." : role === "patient" ? "تم إرسال تأكيد إرسال المبلغ." : "تم إرسال تأكيد استلام المبلغ."
+    quickActions.addEventListener("click", async event => {
+      const button = event.target.closest("[data-message-confirm]");
+      if (!button || !requestId || busy) return;
+      const step = button.dataset.messageConfirm;
+      const prompts = {
+        agreement: "هل تؤكد موافقتك على الخدمة والسعر والمدة الموضحة في المحادثة؟",
+        payment_sent: "هل تؤكد أنك أرسلت المبلغ بالفعل؟",
+        payment_received: "هل تحققت من وصول المبلغ وتؤكد استلامه بالفعل؟"
+      };
+      if (!window.confirm(prompts[step] || "هل تريد تأكيد هذه الخطوة؟")) return;
+      busy = true;
+      sendButton.disabled = true;
+      button.disabled = true;
+      setStatus(root, "جاري تسجيل التأكيد...");
+      try {
+        const { error } = await supabase.rpc("confirm_professional_connection_step", {
+          p_request_id: requestId, p_step: step
         });
-      });
+        if (error) throw error;
+        setStatus(root, "تم تسجيل التأكيد بنجاح.", "success");
+        await loadRequestState();
+        await loadMessages();
+        if (requestState?.status === "active") window.location.reload();
+      } catch (error) {
+        console.error("Connection confirmation failed:", error);
+        setStatus(root, error.message || "تعذر تسجيل التأكيد.", "error");
+        await loadRequestState();
+      } finally {
+        busy = false;
+        sendButton.disabled = false;
+      }
     });
 
     refreshButton.addEventListener("click", () => void loadMessages());
+    await loadRequestState();
     await loadMessages();
   }
 
