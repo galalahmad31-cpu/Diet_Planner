@@ -193,7 +193,7 @@
   const measurementState = { logs: [], loaded: false, loading: false };
 
   function updateMeasurementWriteAccess() {
-    const button = $('addMeasurementRowBtn');
+    const button = $('weightTableContainer')?.querySelector('[data-add-measurement]');
     const status = $('measurementAccessStatus');
     if (!button) return;
     const allowed = canWrite();
@@ -313,32 +313,7 @@
   }
 
   function createMeasurementEditor(log = null) {
-    const now = new Date();
-    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    const row = document.createElement('tr');
-    row.className = 'measurement-entry-row';
-    row.dataset.measurementEditor = 'true';
-    if (log?.id) row.dataset.measurementEditorId = String(log.id);
-    row.innerHTML = '<td><input data-field="date" type="date" aria-label="تاريخ القياس"></td>' +
-      '<td><input data-field="weight" type="number" min="0.1" step="0.1" placeholder="إلزامي" aria-label="الوزن بالكيلوجرام" required></td>' +
-      '<td><input data-field="bodyFat" type="number" min="0" max="100" step="0.1" placeholder="—" aria-label="نسبة الدهون"></td>' +
-      '<td><input data-field="muscle" type="number" min="0" max="100" step="0.1" placeholder="—" aria-label="نسبة العضلات"></td>' +
-      '<td><input data-field="water" type="number" min="0" max="100" step="0.1" placeholder="—" aria-label="نسبة الماء"></td>' +
-      '<td><input data-field="waist" type="number" min="0.1" step="0.1" placeholder="—" aria-label="محيط الوسط"></td>' +
-      '<td><input data-field="hip" type="number" min="0.1" step="0.1" placeholder="—" aria-label="محيط الأرداف"></td>' +
-      '<td><select data-field="adherence" aria-label="الالتزام الغذائي"><option value="">لم يحدد</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></td>' +
-      '<td><textarea data-field="notes" rows="2" placeholder="ملاحظات المريض ومشكلاته مع النظام الغذائي" aria-label="ملاحظات المريض"></textarea></td>' +
-      '<td class="measurement-entry-actions"><button type="button" class="measurement-save-button" data-measurement-save>حفظ</button><button type="button" class="measurement-cancel-button" data-measurement-cancel>إلغاء</button></td>';
-    const values = {
-      date: log?.date || localDate, weight: log?.weight ?? '', bodyFat: log?.bodyFat ?? '',
-      muscle: log?.muscle ?? '', water: log?.water ?? '', waist: log?.waist ?? '',
-      hip: log?.hip ?? '', adherence: log?.adherence || '', notes: log?.notes || ''
-    };
-    Object.entries(values).forEach(([field, value]) => {
-      const input = row.querySelector('[data-field="' + field + '"]');
-      if (input) input.value = String(value);
-    });
-    return row;
+    return window.DietPlannerWeightLogs.createEditorRow(log);
   }
 
   function openMeasurementEntry() {
@@ -1466,13 +1441,14 @@
       if (!button) return;
       openPlanWorkspace(button.dataset.openPlan, button.dataset.planType);
     });
-    $('addMeasurementRowBtn')?.addEventListener('click', openMeasurementEntry);
     $('weightTableContainer')?.addEventListener('click', (event) => {
+      const add = event.target.closest('[data-add-measurement]');
       const save = event.target.closest('[data-measurement-save]');
       const cancel = event.target.closest('[data-measurement-cancel]');
       const edit = event.target.closest('[data-measurement-edit]');
       const remove = event.target.closest('[data-measurement-delete]');
-      if (save) void saveMeasurementEntry(save.closest('[data-measurement-editor]'));
+      if (add) openMeasurementEntry();
+      else if (save) void saveMeasurementEntry(save.closest('[data-measurement-editor]'));
       else if (cancel) renderMeasurements();
       else if (edit) editMeasurementEntry(Number(edit.dataset.measurementEdit));
       else if (remove) void deleteMeasurement(Number(remove.dataset.measurementDelete));
