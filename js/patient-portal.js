@@ -225,7 +225,10 @@
         .in("id", publishedPlanIds);
       if (plansError) throw plansError;
 
-      const publicationOrder = new Map((publications || []).map(row => [row.plan_id, row.published_at]));
+      const publicationOrder = new Map();
+      (publications || []).forEach(row => {
+        if (row.plan_id && !publicationOrder.has(row.plan_id)) publicationOrder.set(row.plan_id, row.published_at);
+      });
       const orderedPlans = (plans || []).sort((a, b) =>
         new Date(publicationOrder.get(b.id) || b.updated_at || b.created_at) -
         new Date(publicationOrder.get(a.id) || a.updated_at || a.created_at)
@@ -295,15 +298,12 @@
         // not use the day/meal/item structure. Patients only need the
         // professional's written instructions, never exchange counts.
         if (!planDays.length) {
-          return `<article class="portal-plan-card portal-plan-card-notes">
+          return `<article class="portal-plan-card">
             <div class="portal-plan-head">
               <div><strong>${escapeHtml(plan.plan_name || "الخطة الغذائية")}</strong><small>${planDate}</small></div>
               <span class="portal-plan-status">منشورة</span>
             </div>
-            <section class="portal-plan-instructions">
-              <h4>ملاحظات وتعليمات المختص</h4>
-              <p>${plan.notes ? escapeHtml(plan.notes).replace(/\n/g, "<br>") : "لم يضف المختص ملاحظات لهذه الخطة."}</p>
-            </section>
+            <p class="portal-plan-note"><strong>ملاحظات المختص:</strong><br>${plan.notes ? escapeHtml(plan.notes).replace(/\n/g, "<br>") : "لم يضف المختص ملاحظات لهذه الخطة."}</p>
           </article>`;
         }
 
