@@ -116,9 +116,15 @@
   catch(error){console.error(error);toast(error.message||"تعذر تحديث حالة الطلب.")}
  }
  async function openProof(path,button){
+  const popup=window.open("about:blank","_blank");
+  if(popup)popup.opener=null;
   button.disabled=true;
-  try{const {data,error}=await sb.storage.from("book-payment-proofs").createSignedUrl(path,300);if(error)throw error;window.open(data.signedUrl,"_blank","noopener,noreferrer")}
-  catch(error){console.error(error);toast("تعذر فتح إيصال التحويل.")}
+  try{
+   const {data,error}=await sb.storage.from("book-payment-proofs").createSignedUrl(path,300);
+   if(error)throw error;
+   if(popup)popup.location.replace(data.signedUrl);
+   else window.location.assign(data.signedUrl);
+  }catch(error){popup?.close();console.error(error);toast("تعذر فتح إيصال التحويل.")}
   finally{button.disabled=false}
  }
  async function init(){
