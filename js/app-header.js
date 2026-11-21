@@ -10,6 +10,7 @@
   let notificationChannel = null;
   let notificationUserId = null;
   let publicAuthSubscription = null;
+  let publicAuthRevision = 0;
 
   if (new URLSearchParams(location.search).get("embed") === "1") return;
   if (document.documentElement.classList.contains("visit-embedded") ||
@@ -136,10 +137,16 @@
     document.body.classList.add("dp-has-app-header");
     const access = window.DietPlannerAccess;
     access?.getCurrentUser?.().then(user => user ? syncNotificationBadge(user) : clearNotificationBadge());
-    access?.supabaseClient?.auth?.onAuthStateChange((_event, session) => {
-      if (session?.user) syncNotificationBadge(session.user);
-      else clearNotificationBadge();
-    });
+    const patientAuth = access?.supabaseClient?.auth;
+    if (patientAuth) {
+      patientAuth.onAuthStateChange((_event, session) => {
+        queueMicrotask(() => {
+          if (!header.isConnected) return;
+          if (session?.user) void syncNotificationBadge(session.user);
+          else void clearNotificationBadge();
+        });
+      });
+    }
   }
 
   const pages = [
@@ -354,7 +361,10 @@
       if (error) console.error("Header session lookup failed:", error);
       renderAccount(data?.session?.user || null);
     });
-    supabase.auth.onAuthStateChange((_event, session) => renderAccount(session?.user || null));
+    supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user || null;
+      queueMicrotask(() => void renderAccount(user));
+    });
   }
 
   const publicPages = [
@@ -365,6 +375,7 @@
     ["jobs.html", "الوظائف", "fa-briefcase"],
     ["quickcalc.html", "الحاسبة", "fa-calculator"]
   ];
+  const publicPagePaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
 
   function buildPublicHeader(title) {
     const header = document.createElement("header");
@@ -397,7 +408,7 @@
       link.dataset.publicPage = href;
       link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
       link.querySelector("span").textContent = label;
-      const active = path === href || (path === "article-view.html" && href === "article.html");
+      const active = path === href || (path === "article-view.html" && href === "article.html") || (path === "job.html" && href === "jobs.html");
       if (active) {
         link.classList.add("is-active");
         link.setAttribute("aria-current", "page");
@@ -410,8 +421,8 @@
     return header;
   }
 
-  async function renderPublicAccount(user, header) {
-    if (!header.isConnected) return;
+  async function renderPublicAccount(user, header, revision) {
+    if (!header.isConnected || revision !== publicAuthRevision) return;
     const login = header.querySelector("#dpPublicLogin");
     const register = header.querySelector("#dpPublicRegister");
     const account = header.querySelector("#dpPublicAccount");
@@ -425,6 +436,7 @@
 
     try {
       const status = await window.DietPlannerAccess?.getAccessStatus?.();
+      if (!header.isConnected || revision !== publicAuthRevision) return;
       if (!status || status.accessVerificationFailed || (!status.accountType && !status.isAdmin)) {
         account.href = appBasePath + "login.html";
         account.textContent = "استكمال الحساب";
@@ -475,15 +487,29 @@
     });
     const supabase = window.DietPlannerAccess?.supabaseClient;
     if (!supabase?.auth) {
-      renderPublicAccount(null, header);
+      publicAuthRevision += 1;
+      void renderPublicAccount(null, header, publicAuthRevision);
       return;
     }
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (error) console.error("Public header session lookup failed:", error);
-      renderPublicAccount(data?.session?.user || null, header);
+
+    const scheduleRender = user => {
+      const revision = ++publicAuthRevision;
+      queueMicrotask(() => {
+        if (header.isConnected) void renderPublicAccount(user, header, revision);
+      });
+    };
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Defer Supabase profile lookups until after the auth callback releases its internal lock.
+      scheduleRender(session?.user || null);
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => renderPublicAccount(session?.user || null, header));
     publicAuthSubscription = data?.subscription || null;
+
+    const initialRevision = publicAuthRevision;
+    supabase.auth.getSession().then(({ data: sessionData, error }) => {
+      if (error) console.error("Public header session lookup failed:", error);
+      if (publicAuthRevision === initialRevision) scheduleRender(sessionData?.session?.user || null);
+    });
   }
 
   function mount() {
@@ -493,10 +519,12 @@
       return;
     }
     const placeholder = document.querySelector("[data-dp-app-header]");
-    if (placeholder?.dataset.dpHeaderVariant === "public") {
-      const title = (placeholder.dataset.pageTitle || "").trim();
+    const isPublicPage = placeholder?.dataset.dpHeaderVariant === "public" || publicPagePaths.has(path);
+    if (isPublicPage) {
+      const title = (placeholder?.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim()).trim();
       const publicHeader = buildPublicHeader(title);
-      placeholder.replaceWith(publicHeader);
+      if (placeholder) placeholder.replaceWith(publicHeader);
+      else document.body.insertBefore(publicHeader, document.querySelector("main") || document.body.firstChild);
       const actions = document.querySelector("[data-dp-page-actions]");
       if (actions) {
         const slot = publicHeader.querySelector(".dp-public-header__page-actions");
@@ -505,6 +533,7 @@
         actions.remove();
       }
       bindPublicAccountActions(publicHeader);
+      document.body.classList.remove("dp-has-app-header");
       document.body.classList.add("dp-has-public-header");
       return;
     }
