@@ -43,7 +43,6 @@
   };
   let notificationChannel = null;
   let notificationUserId = null;
-  let authSubscription = null;
   let renderRevision = 0;
 
   if (new URLSearchParams(location.search).get("embed") === "1" ||
@@ -240,7 +239,7 @@
   function findPageActions() {
     const explicit = document.querySelector("[data-dp-page-actions]");
     if (explicit) return explicit;
-    return document.querySelector(".dp-public-header__page-actions, .dp-patient-header__page-actions");
+    return document.querySelector(".dp-public-header__page-actions, .dp-patient-header__page-actions, .dp-app-header__context");
   }
 
   function mountHeader(role, user, revision) {
@@ -271,11 +270,6 @@
 
   async function initialize() {
     if (!document.body) return;
-    const placeholder = document.querySelector("[data-dp-app-header], [data-dp-patient-header]");
-    const publicRoute = isPublicRoute();
-    if (!placeholder && !document.querySelector(".dp-app-header") && !publicRoute && !isPatientRoute()) {
-      // Pages without a header placeholder still receive the central header.
-    }
     const supabase = access()?.supabaseClient;
     if (!supabase?.auth) {
       await renderForSession(null);
@@ -284,10 +278,9 @@
     const { data, error } = await supabase.auth.getSession();
     if (error) console.error("Header session lookup failed:", error);
     await renderForSession(data?.session?.user || null);
-    const { data: authData } = supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((_event, session) => {
       queueMicrotask(() => void renderForSession(session?.user || null));
     });
-    authSubscription = authData?.subscription || null;
   }
 
   if (document.readyState === "loading") {
