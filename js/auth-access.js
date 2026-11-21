@@ -611,6 +611,11 @@
     document.querySelectorAll(".auth-form").forEach(form => { form.style.display = "none"; });
     document.querySelectorAll("[data-auth-tab]").forEach(tab => tab.classList.remove("active"));
     panel.hidden = false;
+    const requestedAccountType = new URLSearchParams(window.location.search).get("account_type");
+    if (["patient", "professional"].includes(requestedAccountType)) {
+      const preferred = panel.querySelector(`input[name="onboardingAccountType"][value="${requestedAccountType}"]`);
+      if (preferred) preferred.checked = true;
+    }
     document.getElementById("authMessage")?.style.setProperty("display", "none");
   }
 
@@ -733,6 +738,11 @@
 
     if (window.location.hash === "#register") {
       document.querySelector('[data-auth-tab="registerForm"]')?.click();
+      const requestedAccountType = new URLSearchParams(window.location.search).get("account_type");
+      if (["patient", "professional"].includes(requestedAccountType)) {
+        const preferred = document.querySelector(`input[name="registerAccountType"][value="${requestedAccountType}"]`);
+        if (preferred) preferred.checked = true;
+      }
     }
 
     const isAuthCallback =

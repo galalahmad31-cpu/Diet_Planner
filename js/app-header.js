@@ -351,9 +351,127 @@
     });
     supabase.auth.onAuthStateChange((_event, session) => renderAccount(session?.user || null));
   }
+
+  const publicPages = [
+    ["index.html", "الرئيسية", "fa-house"],
+    ["article.html", "المقالات", "fa-newspaper"],
+    ["about.html", "عن المنصة", "fa-circle-info"],
+    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"],
+    ["jobs.html", "الوظائف", "fa-briefcase"],
+    ["quickcalc.html", "الحاسبة", "fa-calculator"]
+  ];
+
+  function buildPublicHeader(title) {
+    const header = document.createElement("header");
+    header.className = "dp-app-header dp-public-header no-print";
+    header.setAttribute("dir", "rtl");
+    header.innerHTML = `
+      <div class="dp-public-header__top">
+        <a class="dp-app-header__brand" href="${appBasePath}index.html" aria-label="Diet Planner - الرئيسية">
+          <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
+          <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>منصة التغذية العلاجية</small></span>
+        </a>
+        <div class="dp-public-header__account">
+          <a class="dp-public-header__auth-link" id="dpPublicLogin" href="${appBasePath}login.html">تسجيل الدخول</a>
+          <a class="dp-public-header__auth-link is-primary" id="dpPublicRegister" href="${appBasePath}login.html#register">إنشاء حساب</a>
+          <a class="dp-public-header__account-link" id="dpPublicAccount" href="${appBasePath}login.html" hidden>حسابي</a>
+          <button type="button" id="dpPublicLogout" class="dp-public-header__logout" hidden><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>خروج</span></button>
+          <button type="button" id="dpPublicThemeToggle" class="dp-public-header__theme" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <nav class="dp-public-header__nav" aria-label="روابط الموقع">
+        <div class="dp-public-header__links"></div>
+        <span class="dp-public-header__page-title"></span>
+      </nav>
+      <div class="dp-public-header__page-actions" hidden></div>`;
+    const links = header.querySelector(".dp-public-header__links");
+    publicPages.forEach(([href, label, icon]) => {
+      const link = document.createElement("a");
+      link.className = "dp-public-header__link";
+      link.href = appBasePath + href;
+      link.dataset.publicPage = href;
+      link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
+      link.querySelector("span").textContent = label;
+      const active = path === href || (path === "article-view.html" && href === "article.html");
+      if (active) {
+        link.classList.add("is-active");
+        link.setAttribute("aria-current", "page");
+      }
+      links.append(link);
+    });
+    const titleNode = header.querySelector(".dp-public-header__page-title");
+    if (title && path !== "index.html") titleNode.textContent = title;
+    else titleNode.remove();
+    return header;
+  }
+
+  async function renderPublicAccount(user, header) {
+    const login = header.querySelector("#dpPublicLogin");
+    const register = header.querySelector("#dpPublicRegister");
+    const account = header.querySelector("#dpPublicAccount");
+    const logout = header.querySelector("#dpPublicLogout");
+    const signedIn = Boolean(user?.id);
+    login.hidden = signedIn;
+    register.hidden = signedIn;
+    account.hidden = !signedIn;
+    logout.hidden = !signedIn;
+    if (!signedIn) return;
+    let href = appBasePath + "login.html";
+    let label = "استكمال الحساب";
+    try {
+      const status = await window.DietPlannerAccess?.getAccessStatus?.();
+      if (status?.isAdmin) { href = appBasePath + "app.html"; label = "لوحة الإدارة"; }
+      else if (status?.accountType === "patient") { href = appBasePath + "patient-portal.html"; label = "بوابة المريض"; }
+      else if (status?.accountType === "professional") {
+        href = appBasePath + (status.hasActiveSubscription ? "app.html" : "profile.html");
+        label = status.hasActiveSubscription ? "مساحة المختص" : "استكمال الملف والاشتراك";
+      }
+    } catch (error) {
+      console.error("Public header account lookup failed:", error);
+    }
+    account.href = href;
+    account.textContent = label;
+  }
+
+  function bindPublicAccountActions(header) {
+    header.querySelector("#dpPublicThemeToggle")?.addEventListener("click", () => window.DietPlannerTheme?.toggle?.());
+    const logout = header.querySelector("#dpPublicLogout");
+    logout?.addEventListener("click", async () => {
+      if (logout.disabled) return;
+      logout.disabled = true;
+      try { await window.DietPlannerAccess?.logout(); }
+      catch (error) { console.error("Public header logout failed:", error); logout.disabled = false; }
+    });
+    const supabase = window.DietPlannerAccess?.supabaseClient;
+    if (!supabase?.auth) {
+      renderPublicAccount(null, header);
+      return;
+    }
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) console.error("Public header session lookup failed:", error);
+      renderPublicAccount(data?.session?.user || null, header);
+    });
+    supabase.auth.onAuthStateChange((_event, session) => renderPublicAccount(session?.user || null, header));
+  }
+
   function mount() {
     if (!document.body || document.querySelector(".dp-app-header")) return;
     const placeholder = document.querySelector("[data-dp-app-header]");
+    if (placeholder?.dataset.dpHeaderVariant === "public") {
+      const title = (placeholder.dataset.pageTitle || "").trim();
+      const publicHeader = buildPublicHeader(title);
+      placeholder.replaceWith(publicHeader);
+      const actions = document.querySelector("[data-dp-page-actions]");
+      if (actions) {
+        const slot = publicHeader.querySelector(".dp-public-header__page-actions");
+        slot.append(...actions.childNodes);
+        slot.hidden = !slot.childNodes.length;
+        actions.remove();
+      }
+      bindPublicAccountActions(publicHeader);
+      document.body.classList.add("dp-has-public-header");
+      return;
+    }
     const header = buildHeader();
     const context = header.querySelector(".dp-app-header__context");
     if (placeholder) {

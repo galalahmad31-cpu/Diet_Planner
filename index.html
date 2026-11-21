@@ -19,24 +19,15 @@
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
-  <link rel="stylesheet" href="css/landing.css?v=20261121-public-home-v2">
+  <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/app-header.css?v=20261121-public-header-v1">
+  <link rel="stylesheet" href="css/landing.css?v=20261121-public-home-v3">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
+  <script src="js/app-header.js?v=20261121-public-header-v1" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dp-landing-page">
-  <header class="dp-landing-header">
-    <a class="dp-landing-brand" href="index.html" aria-label="Diet Planner الرئيسية">
-      <span class="dp-landing-logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
-      <span><strong>Diet Planner</strong><small>منصة التغذية العلاجية</small></span>
-    </a>
-    <nav class="dp-landing-header-nav" aria-label="التنقل الرئيسي">
-      <a href="#public-services">الخدمات العامة</a>
-    </nav>
-    <div class="dp-landing-header-actions">
-      <a class="dp-landing-login-link" href="login.html">تسجيل الدخول</a>
-      <button class="dp-landing-theme" id="landingThemeToggle" type="button" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
-    </div>
-  </header>
+  <div data-dp-app-header data-dp-header-variant="public" data-page-title="الرئيسية"></div>
 
   <main class="dp-landing-main">
     <section class="dp-landing-hero" aria-labelledby="landingTitle">
@@ -65,7 +56,7 @@
           <h2>مساحة المريض</h2>
           <p>اكتشف المختصين، وتابع خطتك الغذائية وقياساتك، واطّلع على تقدمك الصحي.</p>
         </div>
-        <a class="dp-landing-role-action" id="landingPatientAction" href="patient-portal.html" hidden>دخول بوابة المريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+        <a class="dp-landing-role-action" id="landingPatientAction" href="login.html?account_type=patient#register">إنشاء حساب كمريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
       </article>
 
       <article class="dp-landing-role-card dp-landing-professional" id="landingProfessionalCard">
@@ -77,16 +68,11 @@
           <h2>مساحة المختص</h2>
           <p>أدر ملفات المرضى، وأنشئ الخطط الغذائية، ونظّم خدماتك ومتابعاتك المهنية.</p>
         </div>
-        <a class="dp-landing-role-action" id="landingProfessionalAction" href="app.html" hidden>دخول مساحة المختص <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+        <a class="dp-landing-role-action" id="landingProfessionalAction" href="login.html?account_type=professional#register">إنشاء حساب كمختص <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
       </article>
     </section>
 
-    <div class="dp-landing-guest-action" id="landingGuestAction">
-      <a href="login.html#register">إنشاء حساب جديد <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
-      <span>اختر نوع الحساب في صفحة التسجيل للبدء</span>
-    </div>
-
-    <p class="dp-landing-account-status" id="landingAccountStatus" role="status" aria-live="polite" hidden></p>
+<p class="dp-landing-account-status" id="landingAccountStatus" role="status" aria-live="polite" hidden></p>
 
     <section class="dp-landing-services" id="public-services" aria-labelledby="landingServicesTitle">
       <div class="dp-landing-section-heading">
