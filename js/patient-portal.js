@@ -346,5 +346,28 @@
     if (new URLSearchParams(window.location.search).has("invite")) openHealthArea();
   }
 
+  window.DietPlannerPatientPortal = Object.freeze({
+    async navigateToSection(id) {
+      if (id === "portalHome") {
+        returnHome();
+        document.getElementById("portalHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      if (!state.patientId) {
+        openHealthArea();
+        return;
+      }
+      if ($("portalHealthArea")?.hidden) {
+        $("portalHome").hidden = true;
+        $("portalHealthArea").hidden = false;
+      }
+      if (!$("portalContent") || $("portalContent").hidden) {
+        try { await loadPortal(); }
+        catch (error) { fail(error.message || "تعذر تحميل الملف الصحي."); return; }
+      }
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
   document.addEventListener("DOMContentLoaded", init, { once: true });
 })();
