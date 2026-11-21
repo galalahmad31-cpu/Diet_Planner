@@ -14,20 +14,8 @@
   if (document.documentElement.classList.contains("visit-embedded") ||
       document.documentElement.classList.contains("nsp-embedded")) return;
 
-  if (path === "patient-portal.html" || path === "professional-directory.html") {
+  function mountPatientHeader({ publicPage = false } = {}) {
     const isDirectoryPage = path === "professional-directory.html";
-    const patientPages = [
-      [isDirectoryPage ? "patient-portal.html#portalHome" : "#portalHome", "الرئيسية", "fa-house"],
-      [isDirectoryPage ? "patient-portal.html#portalContent" : "#portalContent", "الملف الصحي", "fa-heart-pulse"],
-      ["professional-directory.html", "دليل المتخصصين", "fa-user-doctor"],
-      ["notifications.html", "الإشعارات", "fa-bell"],
-      [isDirectoryPage ? "patient-portal.html#portalDietBuilder" : "#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
-      [isDirectoryPage ? "patient-portal.html#portalEducation" : "#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
-      [isDirectoryPage ? "patient-portal.html#portalTools" : "#portalTools", "أدوات التغذية", "fa-calculator"],
-      [isDirectoryPage ? "patient-portal.html#portalProfileArea" : "#portalProfileArea", "الملف الشخصي", "fa-user"]
-    ];
-
-    function mountPatientHeader() {
       if (!document.body || document.querySelector(".dp-app-header")) return;
       const header = document.createElement("header");
       header.className = "dp-app-header dp-patient-header no-print";
@@ -51,7 +39,8 @@
             </button>
           </div>
           <div class="dp-app-header__track" id="dp-patient-header-track"></div>
-        </nav>`;
+        </nav>
+        <div class="dp-app-header__context dp-patient-header__page-actions" hidden></div>`;
       const track = header.querySelector(".dp-app-header__track");
       const nav = header.querySelector(".dp-patient-header__nav");
       const toggle = header.querySelector(".dp-app-header__toggle");
@@ -120,8 +109,16 @@
       header.querySelector("#portalThemeToggle").addEventListener("click", () => {
         window.DietPlannerTheme?.toggle?.();
       });
-      const placeholder = document.querySelector("[data-dp-patient-header]");
+      const placeholder = document.querySelector("[data-dp-patient-header], [data-dp-app-header]");
+      const publicHeader = document.querySelector(".dp-public-header");
+      const pageActions = publicHeader?.querySelector(".dp-public-header__page-actions");
+      if (pageActions?.childNodes.length) {
+        const slot = header.querySelector(".dp-patient-header__page-actions");
+        slot.append(...pageActions.childNodes);
+        slot.hidden = !slot.childNodes.length;
+      }
       if (placeholder) placeholder.replaceWith(header);
+      else if (publicHeader) publicHeader.replaceWith(header);
       else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
       document.body.classList.add("dp-has-app-header");
       const access = window.DietPlannerAccess;
@@ -131,11 +128,6 @@
         else clearNotificationBadge();
       });
     }
-
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountPatientHeader, { once: true });
-    else mountPatientHeader();
-    return;
-  }
 
   const pages = [
     ["app.html", "الرئيسية", "fa-house"],
@@ -416,21 +408,43 @@
     account.hidden = !signedIn;
     logout.hidden = !signedIn;
     if (!signedIn) return;
-    let href = appBasePath + "login.html";
-    let label = "استكمال الحساب";
+
     try {
       const status = await window.DietPlannerAccess?.getAccessStatus?.();
-      if (status?.isAdmin) { href = appBasePath + "app.html"; label = "لوحة الإدارة"; }
-      else if (status?.accountType === "patient") { href = appBasePath + "patient-portal.html"; label = "بوابة المريض"; }
-      else if (status?.accountType === "professional") {
-        href = appBasePath + (status.hasActiveSubscription ? "app.html" : "profile.html");
-        label = status.hasActiveSubscription ? "مساحة المختص" : "استكمال الملف والاشتراك";
+      if (!status || status.accessVerificationFailed || !status.accountType) {
+        account.href = appBasePath + "login.html";
+        account.textContent = "استكمال الحساب";
+        return;
       }
+      if (status.accountType === "patient") {
+        mountPatientHeader({ publicPage: true });
+        return;
+      }
+      if (status.accountType === "professional" || status.isAdmin) {
+        const roleHeader = buildHeader();
+        const placeholder = document.querySelector("[data-dp-app-header]");
+        const title = (placeholder?.dataset.pageTitle || "").trim();
+        const titleNode = roleHeader.querySelector(".dp-app-header__page-title");
+        const activeHref = roleHeader.querySelector(".dp-app-header__link.is-active")?.dataset.pageHref;
+        if (title && activeHref !== path) titleNode.textContent = title;
+        else titleNode.remove();
+        const pageActions = header.querySelector(".dp-public-header__page-actions");
+        if (pageActions?.childNodes.length) {
+          const context = roleHeader.querySelector(".dp-app-header__context");
+          context.append(...pageActions.childNodes);
+          context.hidden = !context.childNodes.length;
+        }
+        header.replaceWith(roleHeader);
+        document.body.classList.remove("dp-has-public-header");
+        document.body.classList.add("dp-has-app-header");
+        bindAccountActions();
+        return;
+      }
+      account.href = appBasePath + "login.html";
+      account.textContent = "استكمال الحساب";
     } catch (error) {
       console.error("Public header account lookup failed:", error);
     }
-    account.href = href;
-    account.textContent = label;
   }
 
   function bindPublicAccountActions(header) {
@@ -456,6 +470,10 @@
 
   function mount() {
     if (!document.body || document.querySelector(".dp-app-header")) return;
+    if (path === "patient-portal.html" || path === "professional-directory.html") {
+      mountPatientHeader();
+      return;
+    }
     const placeholder = document.querySelector("[data-dp-app-header]");
     if (placeholder?.dataset.dpHeaderVariant === "public") {
       const title = (placeholder.dataset.pageTitle || "").trim();
