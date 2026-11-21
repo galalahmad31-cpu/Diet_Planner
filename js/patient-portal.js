@@ -522,7 +522,7 @@
   const FOOD_SEARCH_LIMIT = 30;
 
   function normalizeFoodSearch(value) {
-    return String(value || "").toLocaleLowerCase("ar").normalize("NFKD").replace(/[\\u064B-\\u065F\\u0670]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").trim();
+    return String(value || "").toLocaleLowerCase("ar").normalize("NFKD").replace(/[\u064B-\u065F\u0670]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").trim();
   }
 
   async function ensurePatientFoods() {
@@ -601,7 +601,7 @@
     const matches = findFoods(query);
     root.innerHTML = matches.length ? matches.map(food => {
       const value = food[nutrient];
-      const display = value === null || value === undefined || value === "" ? "غير مسجل" : optionalNumber(value, " مجم");
+      const display = value === null || value === undefined || value === "" ? "غير مسجل" : optionalNumber(value, nutrient === "protein" ? " جم" : " مجم");
       return `<article class="portal-renal-food"><div><strong>${escapeHtml(food.name_ar || food.name_en || "غذاء")}</strong><small>${escapeHtml(food.household || "—")}</small></div><span><small>${labels[nutrient]} / 100 جم</small><strong>${display}</strong></span></article>`;
     }).join("") : '<p class="portal-tool-hint">لا توجد نتائج مطابقة.</p>';
   }
