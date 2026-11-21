@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false };
+  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -464,13 +464,13 @@
     const root = $(rootId);
     if (!root) return;
     const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
-    if (error) { root.textContent = "تعذر تحميل طلبات المتابعة."; return; }
-    if (!data?.length) { root.textContent = "لم ترسل طلبات متابعة حتى الآن."; return; }
-    const status = { pending: "قيد الانتظار", accepted: "تم قبول الطلب", declined: "لم يتم قبول الطلب", cancelled: "ملغي" };
+    if (error) { root.textContent = "تعذر تحميل طلبات المحادثة."; return; }
+    if (!data?.length) { root.textContent = "لم ترسل طلبات محادثة حتى الآن."; return; }
+    const status = { pending: "طلب المحادثة قيد الانتظار", accepted: "المحادثة مفتوحة · بانتظار الاتفاق والدفع", active: "المتابعة نشطة", declined: "لم يتم قبول الطلب", cancelled: "ملغي" };
     root.className = "portal-plans-list";
     root.innerHTML = data.map(item => `<article class="portal-plan-card"><div class="portal-plan-head"><div><strong>${escapeHtml(item.professional_name || "مختص")}</strong><small>${escapeHtml(item.professional_title || "")}</small></div><span class="portal-plan-status">${escapeHtml(status[item.status] || item.status)}</span></div>${item.status === "pending" ? `<button type="button" class="portal-primary-button" data-cancel-professional-request="${escapeHtml(item.request_id)}">إلغاء الطلب</button>` : ""}</article>`).join("");
     root.querySelectorAll("[data-cancel-professional-request]").forEach(button => button.addEventListener("click", async () => {
-      if (!confirm("هل تريد إلغاء طلب المتابعة؟")) return;
+      if (!confirm("هل تريد إلغاء طلب المحادثة؟")) return;
       button.disabled = true;
       const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", { p_request_id: button.dataset.cancelProfessionalRequest });
       if (cancelError) { button.disabled = false; root.dataset.error = cancelError.message; return; }
@@ -498,15 +498,39 @@
       showOnly("portalUnlinked");
       return;
     }
+
     state.patientId = account.patient_id;
+    const { data: careLinks, error: careError } = await supabase
+      .from("patient_care_team")
+      .select("id")
+      .eq("patient_id", state.patientId)
+      .eq("status", "active")
+      .limit(1);
+    if (careError) throw careError;
+    state.hasActiveCareTeam = Boolean(careLinks?.length);
+
     await loadPatient();
-    await Promise.all([loadMeasurements(), loadPlans(), loadProfessionalRequests(), loadSubscriptionFollowUp()]);
+    if (state.hasActiveCareTeam) {
+      document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
+      await Promise.all([loadMeasurements(), loadPlans(), loadProfessionalRequests(), loadSubscriptionFollowUp()]);
+      activateHealthTab("portalPlansPanel");
+    } else {
+      document.querySelectorAll("[data-health-tab]").forEach(tab => {
+        tab.hidden = tab.dataset.healthTab !== "portalCommunicationPanel";
+      });
+      ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel"].forEach(id => {
+        const panel = $(id);
+        if (panel) panel.hidden = true;
+      });
+      await loadProfessionalRequests();
+      activateHealthTab("portalCommunicationPanel");
+    }
+
     showOnly("portalContent");
     void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
       patientId: state.patientId,
       role: "patient"
     });
-
   }
 
   async function handleInviteSubmit(event) {
