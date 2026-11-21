@@ -345,15 +345,30 @@
       return true;
     }
 
-    const accountType = await getUserAccountType(userId);
+    let accountType = await getUserAccountType(userId);
     if (!accountType) {
       showAuthMessage("تعذر التحقق من نوع الحساب حاليًا. حاول مرة أخرى.");
       return false;
     }
 
     if (accountType === "pending") {
-      showAccountTypeSelection();
-      return false;
+      const requestedType = getGoogleSignupIntent();
+      if (requestedType) {
+        const { error } = await supabaseClient.rpc("complete_account_type_selection", {
+          p_account_type: requestedType
+        });
+        if (error) {
+          console.error("Google signup account type could not be saved:", error);
+          showAccountTypeSelection();
+          return false;
+        }
+        clearGoogleSignupIntent();
+        clearAccessCache();
+        accountType = requestedType;
+      } else {
+        showAccountTypeSelection();
+        return false;
+      }
     }
 
     if (accountType === "patient") {
@@ -641,6 +656,7 @@
         p_account_type: accountType
       });
       if (error) throw error;
+      clearGoogleSignupIntent();
       clearAccessCache();
       const user = await getCurrentUser();
       await checkUserAccess({ user });
@@ -653,39 +669,79 @@
     }
   }
 
-  async function loginWithGoogle() {
-    const button =
-      document.getElementById("googleLoginButton");
+  const GOOGLE_SIGNUP_INTENT_KEY = "dp_google_signup_account_type";
 
-    if (button) {
-      button.disabled = true;
-      button.innerHTML =
-        '<i class="fa-brands fa-google"></i><span>جاري فتح Google...</span>';
+  function getGoogleSignupIntent() {
+    try {
+      const value = window.sessionStorage.getItem(GOOGLE_SIGNUP_INTENT_KEY);
+      return ["professional", "patient"].includes(value) ? value : null;
+    } catch (error) {
+      console.warn("Google signup intent is unavailable:", error);
+      return null;
+    }
+  }
+
+  function clearGoogleSignupIntent() {
+    try {
+      window.sessionStorage.removeItem(GOOGLE_SIGNUP_INTENT_KEY);
+    } catch (error) {
+      console.warn("Google signup intent could not be cleared:", error);
+    }
+  }
+
+  async function startGoogleOAuth(button, accountType = null) {
+    if (accountType && !["professional", "patient"].includes(accountType)) {
+      showAuthMessage("اختر نوع الحساب أولًا.");
+      return;
     }
 
     try {
-      const { error } =
-        await supabaseClient.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo:
-              "https://galalahmad31-cpu.github.io/Diet_Planner/login.html"
-          }
-        });
+      if (accountType) {
+        window.sessionStorage.setItem(GOOGLE_SIGNUP_INTENT_KEY, accountType);
+      } else {
+        clearGoogleSignupIntent();
+      }
+    } catch (error) {
+      console.warn("Google signup intent could not be stored:", error);
+    }
+
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = '<i class="fa-brands fa-google" aria-hidden="true"></i><span>جاري فتح Google...</span>';
+    }
+
+    try {
+      const redirectTo = new URL(window.location.href);
+      redirectTo.hash = "";
+      redirectTo.search = "";
+
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: redirectTo.toString() }
+      });
 
       if (error) throw error;
     } catch (error) {
-      showAuthMessage(
-        error?.message ||
-        "تعذر تسجيل الدخول باستخدام Google."
-      );
-
+      if (accountType) clearGoogleSignupIntent();
+      showAuthMessage(error?.message || "تعذر المتابعة باستخدام Google.");
       if (button) {
         button.disabled = false;
-        button.innerHTML =
-          '<i class="fa-brands fa-google"></i><span>المتابعة باستخدام Google</span>';
+        button.innerHTML = '<i class="fa-brands fa-google" aria-hidden="true"></i><span>المتابعة باستخدام Google</span>';
       }
     }
+  }
+
+  async function loginWithGoogle() {
+    return startGoogleOAuth(document.getElementById("googleLoginButton"));
+  }
+
+  async function registerWithGoogle() {
+    const accountType = document.querySelector('input[name="registerAccountType"]:checked')?.value;
+    if (!["professional", "patient"].includes(accountType)) {
+      showAuthMessage("اختر نوع الحساب أولًا قبل المتابعة باستخدام Google.");
+      return;
+    }
+    return startGoogleOAuth(document.getElementById("googleSignupButton"), accountType);
   }
 
   async function logoutUser() {
@@ -738,6 +794,9 @@
     document
       .getElementById("googleLoginButton")
       ?.addEventListener("click", loginWithGoogle);
+    document
+      .getElementById("googleSignupButton")
+      ?.addEventListener("click", registerWithGoogle);
     document
       .getElementById("completeAccountTypeButton")
       ?.addEventListener("click", completeAccountTypeSelection);
