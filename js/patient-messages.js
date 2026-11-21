@@ -175,28 +175,8 @@
             .eq("patient_id", patientId).eq("status", "active").maybeSingle();
           if (accountError) throw accountError;
           if (!account?.user_id) {
-            const drawer = root.closest(".patient-conversation-drawer");
-            drawer?.classList.add("is-unlinked");
-            root.innerHTML = `
-              <section class="patient-messages-unlinked" role="status">
-                <span class="patient-messages-unlinked-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span>
-                <h3>حساب المريض غير مربوط</h3>
-                <p>اربط حساب المريض أولًا لتتمكن من بدء محادثة خاصة ومتابعة الرسائل هنا.</p>
-                <div class="patient-messages-unlinked-actions">
-                  <button type="button" data-create-patient-link>إنشاء رابط الربط</button>
-                  <button type="button" data-retry-patient-link>تحقق من الربط</button>
-                </div>
-              </section>`;
-            root.querySelector("[data-create-patient-link]")?.addEventListener("click", () => {
-              document.getElementById("createPatientPortalInvite")?.click();
-            });
-            root.querySelector("[data-retry-patient-link]")?.addEventListener("click", async event => {
-              const button = event.currentTarget;
-              button.disabled = true;
-              button.textContent = "جاري التحقق...";
-              delete root.dataset.messagesMounted;
-              await mount(root, options);
-            });
+            root.closest(".patient-conversation-drawer")?.classList.add("is-unlinked");
+            root.innerHTML = '<div class="patient-messages-unlinked" role="status">لم يتم ربط حساب المريض بعد.</div>';
             return;
           }
           root.closest(".patient-conversation-drawer")?.classList.remove("is-unlinked");
