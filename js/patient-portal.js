@@ -753,6 +753,7 @@
   }
 
   function calculateInsulinEstimate() {
+    const diabetesType = $("portalDiabetesType")?.value || "type1";
     const regimen = $("portalInsulinRegimen")?.value || "basal_bolus";
     const kind = $("portalInsulinKind")?.value || "rapid";
     const tddInput = $("portalInsulinTdd")?.value ?? "";
@@ -781,7 +782,7 @@
     show(tddOutput, tdd.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " وحدة");
     show(icrOutput, "1 وحدة لكل " + icr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
     show(isfOutput, isf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " mg/dL لكل وحدة");
-    show(message, "تقدير تعليمي أولي فقط. لا تغيّر جرعاتك بناءً عليه؛ يجب أن يراجع الطبيب النتيجة ويضبطها حسب قراءات السكر واستجابة المريض. قد تختلف نسبة ICR بين الوجبات.");
+    show(message, `تقدير تعليمي أولي لمريض السكري ${diabetesType === "type1" ? "النوع الأول" : "النوع الثاني"} الذي يستخدم نظام القاعدي مع إنسولين الوجبات. لا تغيّر جرعاتك بناءً عليه؛ يجب أن يراجع الطبيب النتيجة ويضبطها حسب قراءات السكر واستجابة المريض. قد تختلف نسبة ICR بين الوجبات.`);
     message.dataset.state = "notice";
   }
 
@@ -933,7 +934,7 @@
       if (event.target.matches("#portalInsulinTdd")) calculateInsulinEstimate();
     });
     $("portalToolsPanel")?.addEventListener("change", event => {
-      if (event.target.matches("#portalInsulinRegimen, #portalInsulinKind")) calculateInsulinEstimate();
+      if (event.target.matches("#portalDiabetesType, #portalInsulinRegimen, #portalInsulinKind")) calculateInsulinEstimate();
     });
     $("portalCarbSearch")?.addEventListener("input", event => renderFoodSearchResults(event.target.value));
     $("portalCarbPicker")?.addEventListener("keydown", event => { if (event.key === "Escape") closeFoodPicker(); });
