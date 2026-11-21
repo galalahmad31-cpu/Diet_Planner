@@ -196,7 +196,7 @@
     }).join("");
   }
 
-  async function loadPortal() {
+  async function loadProfessionalRequests() {\n    const root = $("patientProfessionalRequests");\n    if (!root) return;\n    const { data, error } = await supabase.rpc("list_my_professional_connection_requests");\n    if (error) { root.textContent = "تعذر تحميل طلبات المتابعة."; return; }\n    if (!data?.length) { root.textContent = "لم ترسل طلبات متابعة حتى الآن."; return; }\n    const status = { pending: "قيد الانتظار", accepted: "تم قبول الطلب", declined: "لم يتم قبول الطلب", cancelled: "ملغي" };\n    root.className = "portal-plans-list";\n    root.innerHTML = data.map(item => `<article class="portal-plan-card"><div class="portal-plan-head"><div><strong>${escapeHtml(item.professional_name || "مختص")}</strong><small>${escapeHtml(item.professional_title || "")}</small></div><span class="portal-plan-status">${escapeHtml(status[item.status] || item.status)}</span></div></article>`).join("");\n  }\n\n  async function loadPortal() {
     showOnly("portalLoading");
     const account = await getPatientAccount();
     if (!account?.patient_id) {
@@ -217,7 +217,7 @@
     }
     state.patientId = account.patient_id;
     await loadPatient();
-    await Promise.all([loadMeasurements(), loadPlans()]);
+    await Promise.all([loadMeasurements(), loadPlans(), loadProfessionalRequests()]);
     showOnly("portalContent");
     void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
       patientId: state.patientId,
