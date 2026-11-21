@@ -508,6 +508,27 @@
 
   }
 
+  async function createSelfPatientRecord() {
+    const button = $("portalCreateSelfRecord");
+    if (!button || button.disabled) return;
+    button.disabled = true;
+    setMessage("portalSelfRecordMessage", "جاري إنشاء ملفك الصحي الأساسي...");
+    try {
+      const { error } = await supabase.rpc("ensure_patient_self_record");
+      if (error) throw error;
+      setMessage("portalSelfRecordMessage", "تم إنشاء ملفك الصحي بنجاح.", "success");
+      await loadPortal();
+    } catch (error) {
+      console.error("Patient self-record creation failed:", error);
+      const messages = {
+        patient_account_required: "هذه الخدمة متاحة لحسابات المرضى فقط.",
+        patient_account_revoked: "حالة ملفك الصحي تحتاج مراجعة إدارة المنصة."
+      };
+      setMessage("portalSelfRecordMessage", messages[error.message] || "تعذر إنشاء الملف الصحي. حاول مرة أخرى.", "error");
+      button.disabled = false;
+    }
+  }
+
   async function handleInviteSubmit(event) {
     event.preventDefault();
     const input = $("portalInviteToken");
@@ -584,6 +605,7 @@
     $("portalLogout")?.addEventListener("click", () => access.logout());
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
+    $("portalCreateSelfRecord")?.addEventListener("click", createSelfPatientRecord);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
     document.querySelector("[data-open-patient-messages]")?.addEventListener("click", () => {
       activateHealthTab("portalCommunicationPanel");
