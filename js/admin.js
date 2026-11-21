@@ -23,6 +23,7 @@ function closeModal(){ $('modalBg').style.display='none' }
 function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modalBg').style.display='flex'}
 function askConfirm(title,text,action){$('confirmTitle').textContent=title;$('confirmText').innerHTML=text;$('confirmBg').style.display='flex';confirmAction=action}
 function closeConfirm(){ $('confirmBg').style.display='none';confirmAction=null }
+window.DietPlannerConfirm=Object.freeze({ask(title,message,action){if(typeof action!=='function')return;askConfirm(title,esc(message),action)}});
 
 async function requireAdmin(){
  if(!sb||!access){location.replace('index.html');return false}
