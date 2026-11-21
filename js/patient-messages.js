@@ -87,7 +87,9 @@
           .eq("status", "active")
           .order("relationship_role", { ascending: true });
         if (teamError) throw teamError;
-        const professionalIds = [...new Set((team || []).map(item => item.professional_id))];
+        const professionalIds = [...new Set((team || [])
+          .sort((a, b) => (a.relationship_role === "primary" ? 0 : 1) - (b.relationship_role === "primary" ? 0 : 1))
+          .map(item => item.professional_id))];
         if (!professionalIds.length) {
           list.innerHTML = '<div class="patient-messages-empty">لم يتم ربط مختص نشط بهذا الملف حتى الآن.</div>';
           form.hidden = true;
@@ -155,13 +157,11 @@
           .from("patient_messages")
           .select("id,sender_id,recipient_id,body,created_at,read_at")
           .eq("patient_id", patientId)
+          .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
           .order("created_at", { ascending: false })
           .limit(200);
         if (error) throw error;
-        const messages = (data || []).filter(message =>
-          (message.sender_id === user.id && message.recipient_id === recipientId)
-          || (message.sender_id === recipientId && message.recipient_id === user.id)
-        ).reverse();
+        const messages = (data || []).reverse();
         if (!messages.length) {
           list.innerHTML = '<div class="patient-messages-empty">لا توجد رسائل بعد. يمكنك بدء المحادثة برسالة قصيرة.</div>';
           return;
