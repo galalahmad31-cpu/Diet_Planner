@@ -310,9 +310,9 @@
     const numeric = field => read(field)==="" ? null : Number(read(field));
     const record = {patient_id:state.patientId,weight:numeric("weight"),measurement_date:read("date"),body_fat_percent:numeric("bodyFat"),muscle_percent:numeric("muscle"),water_percent:numeric("water"),waist_cm:numeric("waist"),hip_cm:numeric("hip"),diet_adherence:read("adherence")||null,notes:read("notes")||null};
     const validPercent = value => value===null || (Number.isFinite(value)&&value>=0&&value<=100);
-    if(!record.measurement_date||!Number.isFinite(record.weight)||record.weight<=0){setMessage("portalMeasurementsError","أدخل تاريخ القياس والوزن بصورة صحيحة.","error");row.querySelector("[data-field=weight]")?.focus();return;}
-    if(![record.body_fat_percent,record.muscle_percent,record.water_percent].every(validPercent)){setMessage("portalMeasurementsError","النسب المئوية يجب أن تكون بين 0 و100%.","error");return;}
-    if([record.waist_cm,record.hip_cm].some(value=>value!==null&&(!Number.isFinite(value)||value<=0))){setMessage("portalMeasurementsError","محيطات الجسم يجب أن تكون أكبر من صفر.","error");return;}
+    if(!record.measurement_date||!Number.isFinite(record.weight)||record.weight<=0){setMessage("portalMeasurementMessage","أدخل تاريخ القياس والوزن بصورة صحيحة.","error");row.querySelector("[data-field=weight]")?.focus();return;}
+    if(![record.body_fat_percent,record.muscle_percent,record.water_percent].every(validPercent)){setMessage("portalMeasurementMessage","النسب المئوية يجب أن تكون بين 0 و100%.","error");return;}
+    if([record.waist_cm,record.hip_cm].some(value=>value!==null&&(!Number.isFinite(value)||value<=0))){setMessage("portalMeasurementMessage","محيطات الجسم يجب أن تكون أكبر من صفر.","error");return;}
     const editingId=row.dataset.measurementEditorId||"";
     row.dataset.saving="true";
     const save=row.querySelector("[data-measurement-save]");
@@ -326,12 +326,12 @@
       if(index>=0)state.logs[index]=data;else state.logs.push(data);
       state.logs.sort((x,y)=>String(x.measurement_date).localeCompare(String(y.measurement_date))||String(x.created_at||"").localeCompare(String(y.created_at||"")));
       renderMeasurements();
-      setMessage("portalMeasurementsError",editingId?"تم تحديث القياس بنجاح.":"تم حفظ القياس بنجاح.","success");
+      setMessage("portalMeasurementMessage",editingId?"تم تحديث القياس بنجاح.":"تم حفظ القياس بنجاح.","success");
     } catch(error) {
       console.error("Patient measurement save failed:",error);
       row.dataset.saving="false";
       if(save){save.disabled=false;save.textContent="حفظ";}
-      setMessage("portalMeasurementsError",error.message||"تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.","error");
+      setMessage("portalMeasurementMessage",error.message||"تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.","error");
     } finally { state.busy=false; }
   }
 
