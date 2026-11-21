@@ -23,7 +23,7 @@
 - Finance/weight: `finance.html` → `js/finance.js`; the repository's standalone weight page uses the Arabic-named `weightم.html`, `css/weightم.css`, and `js/weightم.js`.
 - Nutrition support: the standalone `nutritionsupport.html` page is retained temporarily but is no longer exposed in shared navigation; patient-linked nutrition support remains in `nutritionsupport-patient.html` → `js/nutritionsupport-patient.js`.
 - Subscriptions: plans and subscription actions are presented inside `profile.html` using `js/profile.js` and `js/subscription-plans.js`.
-- Public healthcare jobs: `jobs.html` → `js/jobs.js` (public listing and filters); `/jobs/:id` is server-rendered by `api/job.js` with `JobPosting` structured data. `job_posts` is a dedicated table, separate from `announcements`; `js/admin-jobs.js` manages it from the admin tab. `api/sitemap.js` includes only published, unexpired job detail URLs.
+- Public healthcare jobs: `jobs.html` → `js/jobs.js` (public listing and filters); `job.html?id=...` → `js/job-details.js` (static detail page compatible with GitHub Pages and Vercel). On Vercel, the legacy `/jobs/:id` route remains server-rendered by `api/job.js` with `JobPosting` structured data. `job_posts` is a dedicated table, separate from `announcements`; `js/admin-jobs.js` manages it from the admin tab. `api/sitemap.js` includes only published, unexpired job detail URLs.
 - Other modules include profile, articles, feedback, notifications, about, and password recovery/update pages.
 
 ## Subscription/security flow
