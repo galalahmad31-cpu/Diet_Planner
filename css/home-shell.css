@@ -1,0 +1,21 @@
+/* Shared visual shell for the three Diet Planner home pages.
+   Page-specific content and navigation remain owned by their page modules. */
+.dp-home-container{width:100%;max-width:1120px;margin-inline:auto}
+.dp-home-hero{
+  min-height:245px;
+  padding:clamp(22px,3vw,34px);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  background:linear-gradient(115deg,#075B4D 0%,#087F6B 58%,#15977B 100%);
+  color:#fff;
+  box-shadow:0 12px 30px rgba(8,76,64,.14);
+  overflow:hidden;
+}
+.dp-home-hero h1{color:#fff}
+.dp-home-hero p{color:rgba(255,255,255,.88)}
+@media(max-width:640px){
+  .dp-home-hero{min-height:0;padding:21px 18px;border-radius:19px}
+}
+@media(prefers-reduced-motion:reduce){
+  .dp-home-hero{scroll-behavior:auto}
+}
