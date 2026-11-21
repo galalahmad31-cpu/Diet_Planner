@@ -41,6 +41,7 @@
     ["professional-directory-manage.html#requests", "التواصل مع المرضى", "fa-comments"],
     ["profile.html", "الصفحة الشخصية", "fa-user"],
     ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
+    ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
     ["about.html", "عن المنصة", "fa-circle-info"]
   ];
   const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
