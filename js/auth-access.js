@@ -306,18 +306,9 @@
       return true;
     }
 
-    const active = await hasActiveSubscription(userId);
-
-    if (active === null) {
-      showAuthMessage("تعذر التحقق من الاشتراك حاليًا. لم يتم منح الوصول. حاول مرة أخرى.");
-      return false;
-    }
-
-    if (active === true) {
-      window.location.replace("app.html");
-      return true;
-    }
-
+    // Patient identity is independent of the professional workspace subscription.
+    // Resolve the patient's own account first so an RPC outage in subscription
+    // checks cannot block access to the patient portal.
     const { data: patientAccount, error: patientAccountError } = await supabaseClient
       .from("patient_accounts")
       .select("patient_id")
@@ -331,9 +322,21 @@
       return false;
     }
 
+    const active = await hasActiveSubscription(userId);
+
+    if (active === true) {
+      window.location.replace("app.html");
+      return true;
+    }
+
     if (patientAccount?.patient_id) {
       window.location.replace("patient-portal.html");
       return true;
+    }
+
+    if (active === null) {
+      showAuthMessage("تعذر التحقق من الاشتراك حاليًا. لم يتم منح الوصول. حاول مرة أخرى.");
+      return false;
     }
 
     window.location.replace("profile.html");
