@@ -14,7 +14,7 @@ function render(job){
  const location=[city,job.workplace_type==="remote"?"عن بُعد":""].filter(Boolean).join(" · "),published=job.published_at||job.created_at;
  document.title=title+" | وظائف طبية وصحية - Diet Planner";
  const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=(title+" لدى "+company+". "+String(job.description||"").replace(/\s+/g," ")).slice(0,155);
- const canonical=new URL("job.html",window.location.href);canonical.searchParams.set("id",job.id);const canonicalTag=document.querySelector('link[rel="canonical"]');if(canonicalTag)canonicalTag.href=canonical.href;
+ const canonicalTag=document.querySelector('link[rel="canonical"]');if(canonicalTag)canonicalTag.href="https://nutrition-3.vercel.app/jobs/"+encodeURIComponent(job.id);
  $("jobTitle").textContent=title;$("jobCompany").textContent=company;
  $("jobMeta").innerHTML=[
  '<span><i class="fa-solid fa-stethoscope"></i>'+escapeHtml(SPECIALTIES[job.specialty]||"تخصص صحي")+'</span>',
