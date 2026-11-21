@@ -149,7 +149,7 @@
           .select("id,professional_id,status,created_at")
           .eq("patient_id", patientId)
           .eq("requested_by", user.id)
-          .in("status", ["accepted", "active"])
+          .in("status", ["accepted", "active", "ended"])
           .order("created_at", { ascending: false });
         if (requestError) throw requestError;
 
