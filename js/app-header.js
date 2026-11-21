@@ -7,6 +7,8 @@
 
   const path = decodeURIComponent(location.pathname.split("/").pop() || "index.html");
   const appBasePath = location.hostname === "galalahmad31-cpu.github.io" ? "/Diet_Planner/" : "/";
+  let notificationChannel = null;
+  let notificationUserId = null;
 
   if (new URLSearchParams(location.search).get("embed") === "1") return;
   if (document.documentElement.classList.contains("visit-embedded") ||
@@ -18,6 +20,7 @@
       [isDirectoryPage ? "patient-portal.html#portalHome" : "#portalHome", "الرئيسية", "fa-house"],
       [isDirectoryPage ? "patient-portal.html#portalContent" : "#portalContent", "الملف الصحي", "fa-heart-pulse"],
       ["professional-directory.html", "دليل المتخصصين", "fa-user-doctor"],
+      ["notifications.html", "الإشعارات", "fa-bell"],
       [isDirectoryPage ? "patient-portal.html#portalDietBuilder" : "#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
       [isDirectoryPage ? "patient-portal.html#portalEducation" : "#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
       [isDirectoryPage ? "patient-portal.html#portalTools" : "#portalTools", "أدوات التغذية", "fa-calculator"],
@@ -219,6 +222,65 @@
   }
 
 
+  async function syncNotificationBadge(user) {
+    const link = document.getElementById("dpNotificationLink");
+    const badge = document.getElementById("dpNotificationBadge");
+    const supabase = window.DietPlannerAccess?.supabaseClient;
+    if (!link || !badge || !supabase || !user?.id) {
+      if (link) link.hidden = true;
+      if (badge) badge.hidden = true;
+      return;
+    }
+
+    link.hidden = false;
+    const refresh = async () => {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", user.id)
+        .is("read_at", null);
+      if (error) {
+        console.error("Notification badge lookup failed:", error);
+        return;
+      }
+      const unread = Number(count || 0);
+      badge.textContent = unread > 99 ? "99+" : String(unread);
+      badge.hidden = unread === 0;
+      link.setAttribute("aria-label", unread ? `الإشعارات، ${unread} غير مقروء` : "الإشعارات");
+    };
+
+    if (notificationUserId !== user.id) {
+      if (notificationChannel) {
+        await supabase.removeChannel(notificationChannel);
+        notificationChannel = null;
+      }
+      notificationUserId = user.id;
+      notificationChannel = supabase
+        .channel(`dp-header-notifications-${user.id}`)
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${user.id}`
+        }, refresh)
+        .subscribe();
+    }
+    await refresh();
+  }
+
+  async function clearNotificationBadge() {
+    const link = document.getElementById("dpNotificationLink");
+    const badge = document.getElementById("dpNotificationBadge");
+    const supabase = window.DietPlannerAccess?.supabaseClient;
+    if (link) link.hidden = true;
+    if (badge) badge.hidden = true;
+    if (notificationChannel && supabase) {
+      await supabase.removeChannel(notificationChannel);
+    }
+    notificationChannel = null;
+    notificationUserId = null;
+  }
+
   async function renderAccount(user) {
     const logout = document.getElementById("logoutBtn");
     const login = document.getElementById("loginCta");
@@ -238,6 +300,8 @@
       }
       professionalLink.style.display = accountType === "professional" ? "" : "none";
     }
+    if (signedIn) await syncNotificationBadge(user);
+    else await clearNotificationBadge();
   }
 
   function bindAccountActions() {
