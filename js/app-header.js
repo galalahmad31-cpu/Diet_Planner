@@ -183,20 +183,24 @@
   }
 
   async function syncNotificationBadge(user) {
-    const link = document.getElementById("dpNotificationLink");
-    const badge = document.getElementById("dpNotificationBadge");
     const supabase = access()?.supabaseClient;
-    if (!link || !badge || !supabase || !user?.id) {
+    if (!supabase || !user?.id) {
+      const link = document.getElementById("dpNotificationLink");
+      const badge = document.getElementById("dpNotificationBadge");
       if (link) link.hidden = true;
       if (badge) badge.hidden = true;
       return;
     }
-    link.hidden = false;
+    const currentLink = document.getElementById("dpNotificationLink");
+    if (currentLink) currentLink.hidden = false;
     const refresh = async () => {
       const { count, error } = await supabase.from("notifications")
         .select("id", { count: "exact", head: true })
         .eq("recipient_id", user.id).is("read_at", null);
       if (error) { console.error("Notification badge lookup failed:", error); return; }
+      const link = document.getElementById("dpNotificationLink");
+      const badge = document.getElementById("dpNotificationBadge");
+      if (!link || !badge) return;
       const unread = Number(count || 0);
       badge.textContent = unread > 99 ? "99+" : String(unread);
       badge.hidden = unread === 0;
