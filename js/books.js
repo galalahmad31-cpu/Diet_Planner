@@ -107,7 +107,7 @@
       area.innerHTML = '<div class="book-status pending"><i class="fa-solid fa-clock"></i> تم إرسال طلبك بنجاح، وهو الآن قيد المراجعة. سيظهر رابط الكتاب بعد تأكيد الدفع.</div>';
     } catch (error) {
       console.error("Book order submission failed:",error);
-      button.disabled = false;
+      button.disabled = false; button.textContent = originalText;
       alert(error.message || "تعذر إرسال الطلب. حاول مرة أخرى.");
     }
   }
