@@ -105,6 +105,7 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 #section-tpn .bg-blue-50,#section-tpn .bg-blue-100{background:var(--tpn-soft)!important;border-color:var(--tpn-line)!important}
 #section-tpn .border-blue-200,#section-tpn .border-blue-300{border-color:var(--tpn-line)!important}
 #section-tpn .text-blue-700,#section-tpn .text-blue-800,#section-tpn .text-blue-900{color:var(--tpn-dark)!important}
+#section-tpn .bg-blue-600{background:#4F46E5!important}
 #section-tpn .bg-blue-900{background:var(--tpn-dark)!important}
 
 /* Tables: EN teal, TPN indigo */
