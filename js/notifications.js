@@ -9,10 +9,14 @@ const state = {
   notifications: {
     today: [],
     tomorrow: [],
-    subscriptions: []
+    subscriptions: [],
+    requests: []
   },
   activeTab: 'today'
 };
+let currentUser = null;
+let currentAccountType = null;
+let notificationChannel = null;
 
 const TAB_INFO = {
   today: {
@@ -32,6 +36,12 @@ const TAB_INFO = {
     subtitle: 'الاشتراكات التي يقترب موعد انتهائها.',
     emptyTitle: 'لا توجد تنبيهات اشتراكات',
     emptyText: 'لا توجد اشتراكات تنتهي خلال يومين أو أسبوع.'
+  },
+  requests: {
+    title: 'طلبات المحادثة والرسائل',
+    subtitle: 'آخر التحديثات المتعلقة بطلبات المحادثة والاتفاق والرسائل.',
+    emptyTitle: 'لا توجد تنبيهات جديدة',
+    emptyText: 'ستظهر هنا طلبات المحادثة والرسائل وتحديثات المتابعة.'
   }
 };
 
@@ -244,6 +254,35 @@ function render() {
   $('notifications').innerHTML = '';
   $('empty').classList.toggle('hidden', list.length > 0);
 
+  if (state.activeTab === 'requests') {
+    list.forEach((notification) => {
+      const element = document.createElement('article');
+      const unread = !notification.read_at;
+      const date = notification.created_at
+        ? new Date(notification.created_at).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })
+        : '';
+      element.className = 'card glass rounded-3xl p-4 sm:p-5 notification-card notification-event-card';
+      element.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="notification-event-icon"><i class="fa-solid ${notification.icon}"></i></div>
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="font-extrabold notification-patient-name">${esc(notification.title)}</h3>
+              ${unread ? '<span class="notification-unread-label">جديد</span>' : ''}
+            </div>
+            <p class="mt-1 text-sm leading-6 notification-copy">${esc(notification.body)}</p>
+            <div class="mt-2 text-xs notification-date">${esc(date)}</div>
+            <button type="button" class="notification-open-button" data-notification-open="${esc(notification.id)}" data-request-id="${esc(notification.request_id)}">
+              ${currentAccountType === 'professional' ? 'فتح الطلب أو المحادثة' : 'فتح بوابة المريض'}
+              <i class="fa-solid fa-arrow-left mr-1"></i>
+            </button>
+          </div>
+        </div>`;
+      $('notifications').appendChild(element);
+    });
+    return;
+  }
+
   list.forEach((notification) => {
     const element = document.createElement('div');
 
@@ -315,40 +354,103 @@ function showError(error) {
 }
 
 async function loadNotifications() {
-  const user = await window.DietPlannerAccess?.getCurrentUser();
-
+  const user = currentUser || await window.DietPlannerAccess?.getCurrentUser();
   if (!user) {
     location.replace('index.html');
     return;
   }
+  currentUser = user;
+  currentAccountType = await window.DietPlannerAccess?.getUserAccountType(user.id);
 
-  const { data, error } = await supabase
-    .from('patient_finances')
-    .select(`
-      patient_id,
-      subscription_end_date,
-      next_follow_up_date,
-      subscription_start_date,
-      subscription_months,
-      patients(name)
-    `)
-    .eq('user_id', user.id);
+  let financeRows = [];
+  if (currentAccountType !== 'patient') {
+    const { data, error } = await supabase
+      .from('patient_finances')
+      .select(`
+        patient_id,
+        subscription_end_date,
+        next_follow_up_date,
+        subscription_start_date,
+        subscription_months,
+        patients(name)
+      `)
+      .eq('user_id', user.id);
+    if (error) throw error;
+    financeRows = data || [];
+  }
 
-  if (error) throw error;
+  const { data: events, error: eventError } = await supabase
+    .from('notifications')
+    .select('id,event_type,title,body,created_at,read_at,request_id')
+    .eq('recipient_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (eventError) throw eventError;
 
-  state.notifications = buildNotifications(data);
+  state.notifications = {
+    ...buildNotifications(financeRows),
+    requests: (events || []).map(event => ({
+      ...event,
+      icon: event.event_type === 'connection_request_received' ? 'fa-user-plus'
+        : event.event_type === 'message_received' ? 'fa-comment-dots'
+        : event.event_type === 'followup_activated' ? 'fa-circle-check'
+        : 'fa-bell'
+    }))
+  };
 
   $('todayCount').textContent = state.notifications.today.length;
   $('tomorrowCount').textContent = state.notifications.tomorrow.length;
   $('subscriptionCount').textContent = state.notifications.subscriptions.length;
+  $('requestsCount').textContent = state.notifications.requests.filter(item => !item.read_at).length;
 
   updateTabButtons();
   render();
-
   $('loading').style.display = 'none';
 }
 
-document.addEventListener('click', (event) => {
+function subscribeToNotifications() {
+  if (!currentUser?.id || notificationChannel) return;
+  notificationChannel = supabase
+    .channel(`dp-notifications-page-${currentUser.id}`)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'notifications',
+      filter: `recipient_id=eq.${currentUser.id}`
+    }, () => {
+      loadNotifications().catch(showError);
+    })
+    .subscribe();
+}
+
+document.addEventListener('click', async (event) => {
+  const openButton = event.target.closest('[data-notification-open]');
+  if (openButton) {
+    if (openButton.disabled) return;
+    openButton.disabled = true;
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read_at: new Date().toISOString() })
+      .eq('id', openButton.dataset.notificationOpen)
+      .eq('recipient_id', currentUser.id)
+      .is('read_at', null);
+    if (error) {
+      console.error('Unable to mark notification as read:', error);
+      openButton.disabled = false;
+      return;
+    }
+    const requestId = openButton.dataset.requestId;
+    if (currentAccountType === 'professional') {
+      const target = requestId
+        ? `professional-directory-manage.html?request=${encodeURIComponent(requestId)}#requests`
+        : 'professional-directory-manage.html';
+      location.href = target;
+    } else {
+      location.href = 'patient-portal.html';
+    }
+    return;
+  }
+
   const button = event.target.closest('[data-tab]');
   if (!button) return;
 
@@ -363,6 +465,7 @@ document.addEventListener('click', (event) => {
 (async () => {
   try {
     await loadNotifications();
+    subscribeToNotifications();
   } catch (error) {
     showError(error);
   } finally {
