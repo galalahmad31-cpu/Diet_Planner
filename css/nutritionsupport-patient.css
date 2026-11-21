@@ -97,20 +97,15 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 #section-en .bg-purple-50{background:var(--en-pale)!important;border-color:var(--en-line)!important}
 #section-en .bg-blue-50{background:#f2faf9!important;border-color:#d8ece8!important}
 #section-en .border-blue-100,#section-en .border-blue-200{border-color:#d8ece8!important}
-#section-en .bg-indigo-50{background:#f5faf9!important}
-#section-en .border-indigo-100,#section-en .border-indigo-200{border-color:#dcebe8!important}
-#section-en .text-purple-700,#section-en .text-purple-800,#section-en .text-purple-900,#section-en .text-blue-700,#section-en .text-blue-800,#section-en .text-blue-900{color:var(--en-dark)!important}
-#section-en .border-purple-600{border-right-color:var(--en)!important}
-#section-en .text-emerald-700{color:#137b6f!important}
+#section-en .border-indigo-200{border-color:#dcebe8!important}
+#section-en .text-purple-700,#section-en .text-purple-900,#section-en .text-blue-700,#section-en .text-blue-800,#section-en .text-blue-900{color:var(--en-dark)!important}
 
 /* TPN: indigo family */
 #section-tpn .bg-gray-50{background:var(--tpn-pale)!important;border-color:var(--tpn-line)!important}
 #section-tpn .bg-blue-50,#section-tpn .bg-blue-100{background:var(--tpn-soft)!important;border-color:var(--tpn-line)!important}
 #section-tpn .border-blue-200,#section-tpn .border-blue-300{border-color:var(--tpn-line)!important}
 #section-tpn .text-blue-700,#section-tpn .text-blue-800,#section-tpn .text-blue-900{color:var(--tpn-dark)!important}
-#section-tpn .bg-blue-600{background:#4F46E5!important}
-#section-tpn .bg-blue-800,#section-tpn .bg-blue-900{background:var(--tpn-dark)!important}
-#section-tpn .text-emerald-700{color:#4338CA!important}
+#section-tpn .bg-blue-900{background:var(--tpn-dark)!important}
 
 /* Tables: EN teal, TPN indigo */
 .table-custom{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:12px;font-size:.82rem;background:#fff}
@@ -134,8 +129,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 .patient-info-row{direction:ltr!important;text-align:left!important}.ltr-input{direction:ltr!important;text-align:left!important}.weight-input-ltr{direction:ltr!important;text-align:left!important;unicode-bidi:bidi-override}.ltr-block{direction:ltr;text-align:left}
 
 /* Existing hidden patient header / print behavior */
-#patient-collapse-btn{font-size:.72rem;line-height:1.2;padding:4px 9px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#475569;cursor:pointer}
-#patient-collapse-btn:hover{background:#f1f5f9;color:var(--en-dark)}
 #glu-input-mode{font-size:.82rem;padding:6px 8px}
 #glu-remaining-info{font-size:.72rem;line-height:1.35;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:7px 8px;text-align:center}
 .glucose-method-cell,.glucose-method-result,.glucose-other-row{min-width:0}.glucose-other-row{grid-column:span 2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}.glucose-method-result{display:flex;flex-direction:column;justify-content:flex-start}
@@ -354,7 +347,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 /* Embedded mode: compact document flow; host iframe height follows the rendered root. */
 html.nsp-embedded{display:flow-root;width:100%;max-width:100%;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#f5f8f8!important}
 html.nsp-embedded body{display:flow-root;width:100%;max-width:100%;min-width:0;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#f5f8f8!important}
-html.nsp-embedded .nsp-page-header{display:none!important}
 html.nsp-embedded .container-main{display:flow-root;width:100%!important;max-width:none!important;min-width:0!important;min-height:0!important;height:auto!important;margin:0!important;padding:0 0 1px!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
 html.nsp-embedded .detail-patient-area{padding:0 14px!important;margin:0!important}
 html.nsp-embedded .support-days{margin:7px 10px 0!important;padding:8px 10px!important}
