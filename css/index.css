@@ -140,3 +140,18 @@ body{min-height:100svh;display:flex;flex-direction:column;align-items:center;jus
   .msg.email-verification .verification-text{font-size:12px;line-height:1.8}
   .msg.email-verification .verification-spam-note{font-size:11.5px;padding:8px 9px}
 }
+
+
+/* Account type selection — shared by registration and OAuth onboarding */
+.account-type-field{margin:18px 0}
+.account-type-label{display:block;font-size:13px;font-weight:800;margin-bottom:9px}
+.account-type-option{display:flex;align-items:center;gap:10px;padding:12px;margin:8px 0;border:1px solid #d8dee8;border-radius:12px;background:#fff;cursor:pointer;text-align:right}
+.account-type-option:has(input:checked){border-color:#178f84;background:#f0faf8;box-shadow:0 0 0 2px rgba(23,143,132,.08)}
+.account-type-option input{width:17px;height:17px;accent-color:#178f84;flex:0 0 auto}
+.account-type-option span{display:grid;grid-template-columns:22px 1fr;align-items:center;gap:2px 8px}
+.account-type-option i{grid-row:span 2;color:#178f84}
+.account-type-option strong{font-size:13px}
+.account-type-option small{font-size:11px;color:#64748b}
+.account-type-onboarding{margin:18px 0}
+.account-type-onboarding h2{font-size:18px;text-align:center;margin:0 0 6px}
+.account-type-onboarding>p{text-align:center;color:#64748b;font-size:12px;margin:0 0 16px}
