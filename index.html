@@ -27,8 +27,11 @@
   <header class="dp-landing-header">
     <a class="dp-landing-brand" href="index.html" aria-label="Diet Planner الرئيسية">
       <span class="dp-landing-logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
-      <span><strong>Diet Planner</strong><small>التغذية العلاجية في مكان واحد</small></span>
+      <span><strong>Diet Planner</strong><small>منصة التغذية العلاجية</small></span>
     </a>
+    <nav class="dp-landing-header-nav" aria-label="التنقل الرئيسي">
+      <a href="#public-services">الخدمات العامة</a>
+    </nav>
     <div class="dp-landing-header-actions">
       <a class="dp-landing-login-link" href="login.html">تسجيل الدخول</a>
       <button class="dp-landing-theme" id="landingThemeToggle" type="button" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
@@ -38,10 +41,10 @@
   <main class="dp-landing-main">
     <section class="dp-landing-hero" aria-labelledby="landingTitle">
       <div class="dp-landing-intro">
-        <span class="dp-landing-eyebrow"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> منصة متكاملة للتغذية العلاجية</span>
+        <span class="dp-landing-eyebrow"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> مساحة واحدة للمريض والمختص</span>
         <h1 id="landingTitle">التغذية العلاجية،<br><span>بشكل أكثر تنظيمًا</span></h1>
-        <p>مساحة تجمع المريض والمختص؛ من اكتشاف الخدمات والتواصل، إلى الخطط الغذائية والمتابعة الصحية.</p>
-        <div class="dp-landing-trust"><span><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> خصوصية لكل حساب</span><span><i class="fa-solid fa-people-arrows-left-right" aria-hidden="true"></i> تواصل ومتابعة</span></div>
+        <p>منصة تجمع المريض ومتخصص التغذية العلاجية؛ لاكتشاف الخدمات، وتنظيم الخطط، ومتابعة التقدم الصحي في مكان واحد.</p>
+        <div class="dp-landing-trust"><span><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> حسابات ومساحات منفصلة</span><span><i class="fa-solid fa-people-arrows-left-right" aria-hidden="true"></i> تواصل ومتابعة منظمة</span></div>
       </div>
       <div class="dp-landing-orbit" aria-hidden="true">
         <span class="dp-landing-orbit-ring"></span>
@@ -52,75 +55,82 @@
       </div>
     </section>
 
-    <section class="dp-landing-roles" aria-label="اختر طريقة استخدام المنصة">
+    <section class="dp-landing-roles" aria-label="مساحات الاستخدام">
       <article class="dp-landing-role-card dp-landing-patient" id="landingPatientCard">
-        <div class="dp-landing-role-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
-        <div class="dp-landing-role-copy">
+        <div class="dp-landing-role-top">
+          <span class="dp-landing-role-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
           <span class="dp-landing-role-kicker">PATIENT SPACE</span>
-          <h2>أنا مريض</h2>
-          <p>اكتشف المختصين، وتابع خطتك الغذائية وقياساتك، وتواصل مع مختصك من مكان واحد.</p>
         </div>
-        <a class="dp-landing-role-action" id="landingPatientAction" href="login.html?next=patient-portal.html">دخول بوابة المريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
-        <a class="dp-landing-create-link" href="login.html#register">إنشاء حساب مريض</a>
+        <div class="dp-landing-role-copy">
+          <h2>مساحة المريض</h2>
+          <p>اكتشف المختصين، وتابع خطتك الغذائية وقياساتك، واطّلع على تقدمك الصحي.</p>
+        </div>
+        <a class="dp-landing-role-action" id="landingPatientAction" href="login.html#register">ابدأ كمريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
       </article>
 
       <article class="dp-landing-role-card dp-landing-professional" id="landingProfessionalCard">
-        <div class="dp-landing-role-icon"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i></div>
-        <div class="dp-landing-role-copy">
+        <div class="dp-landing-role-top">
+          <span class="dp-landing-role-icon"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i></span>
           <span class="dp-landing-role-kicker">PROFESSIONAL SPACE</span>
-          <h2>أنا مختص تغذية</h2>
-          <p>أدر ملفات المرضى، وأنشئ الخطط الغذائية، ونظّم المتابعة والخدمات المهنية.</p>
         </div>
-        <a class="dp-landing-role-action" id="landingProfessionalAction" href="login.html">دخول مساحة المختص <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
-        <a class="dp-landing-create-link" href="login.html#register">إنشاء حساب مختص</a>
+        <div class="dp-landing-role-copy">
+          <h2>مساحة المختص</h2>
+          <p>أدر ملفات المرضى، وأنشئ الخطط الغذائية، ونظّم خدماتك ومتابعاتك المهنية.</p>
+        </div>
+        <a class="dp-landing-role-action" id="landingProfessionalAction" href="login.html#register">ابدأ كمختص <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
       </article>
     </section>
 
     <p class="dp-landing-account-status" id="landingAccountStatus" role="status" aria-live="polite" hidden></p>
 
-    <section class="dp-landing-services" aria-labelledby="landingServicesTitle">
+    <section class="dp-landing-services" id="public-services" aria-labelledby="landingServicesTitle">
       <div class="dp-landing-section-heading">
-        <span>ماذا تقدم المنصة؟</span>
-        <h2 id="landingServicesTitle">كل ما تحتاجه في مساحة واحدة</h2>
+        <span>خدمات متاحة للجميع</span>
+        <h2 id="landingServicesTitle">استكشف خدمات Diet Planner</h2>
+        <p>يمكنك تصفح هذه الخدمات دون الدخول إلى مساحة المريض أو المختص.</p>
       </div>
       <div class="dp-landing-service-grid">
-        <a class="dp-landing-service" href="professional-directory.html">
-          <span><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span>
-          <strong>دليل المختصين</strong>
-          <small>استكشف الملفات المهنية والخدمات المتاحة</small>
+        <a class="dp-landing-service" href="article.html">
+          <span><i class="fa-solid fa-newspaper" aria-hidden="true"></i></span>
+          <strong>المقالات العلمية</strong>
+          <small>محتوى علمي في التغذية العلاجية والإكلينيكية</small>
+          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
         </a>
-        <div class="dp-landing-service">
-          <span><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></span>
-          <strong>الخطط الغذائية</strong>
-          <small>خطط منظمة قابلة للمتابعة والمراجعة</small>
-        </div>
-        <div class="dp-landing-service">
-          <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
-          <strong>المتابعة الصحية</strong>
-          <small>تسجيل القياسات ومتابعة التقدم</small>
-        </div>
-        <div class="dp-landing-service">
-          <span><i class="fa-solid fa-comments" aria-hidden="true"></i></span>
-          <strong>التواصل</strong>
-          <small>قناة تواصل بين المريض والمختص</small>
-        </div>
+        <a class="dp-landing-service" href="about.html">
+          <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
+          <strong>عن التطبيق</strong>
+          <small>تعرّف على المنصة وأدواتها وطريقة استخدامها</small>
+          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
+        </a>
+        <a class="dp-landing-service" href="feedback.html">
+          <span><i class="fa-solid fa-comment-dots" aria-hidden="true"></i></span>
+          <strong>شاركنا رأيك</strong>
+          <small>أرسل ملاحظاتك واقتراحاتك لتطوير المنصة</small>
+          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
+        </a>
+        <a class="dp-landing-service" href="jobs.html">
+          <span><i class="fa-solid fa-briefcase" aria-hidden="true"></i></span>
+          <strong>الوظائف الطبية</strong>
+          <small>تصفح فرص العمل في المجالات الطبية والصحية</small>
+          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
+        </a>
+        <a class="dp-landing-service" href="quickcalc.html">
+          <span><i class="fa-solid fa-calculator" aria-hidden="true"></i></span>
+          <strong>الحاسبة السريعة</strong>
+          <small>أدوات حساب غذائية وسريرية سريعة</small>
+          <i class="fa-solid fa-arrow-left dp-landing-service-arrow" aria-hidden="true"></i>
+        </a>
       </div>
-    </section>
-
-    <section class="dp-landing-about">
-      <div><span>DIET PLANNER</span><h2>تنظيم أفضل للرعاية الغذائية</h2><p>منصة رقمية تربط أدوات المختص باحتياجات المريض، مع فصل واضح بين مساحة كل مستخدم.</p></div>
-      <a href="about.html">تعرّف على المنصة <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
     </section>
   </main>
 
   <footer class="dp-landing-footer">
     <strong>Diet Planner</strong>
-    <span>التغذية العلاجية والمتابعة الغذائية</span>
-    <nav aria-label="روابط إضافية"><a href="about.html">عن المنصة</a><a href="privacy.html">سياسة الخصوصية</a><a href="feedback.html">شاركنا رأيك</a></nav>
+    <nav aria-label="روابط قانونية"><a href="privacy.html">سياسة الخصوصية</a></nav>
     <small>Developed by Dr. Ahmed Galal</small>
   </footer>
 
-  <script src="js/auth-access.js?v=20261121-public-home-v1"></script>
-  <script src="js/landing.js?v=20261121-public-home-v1"></script>
+  <script src="js/auth-access.js?v=20261121-account-type-v2"></script>
+  <script src="js/landing.js?v=20261121-public-home-v2"></script>
 </body>
 </html>
