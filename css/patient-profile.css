@@ -870,7 +870,7 @@ body.patient-conversation-open{overflow:hidden}
  .patient-profile-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .patient-profile-actions>button{width:100%;min-width:0}
  .patient-conversation-overlay{align-items:flex-end;justify-content:center;padding:0;background:rgba(9,25,29,.48)}
- .patient-conversation-drawer{width:100%;height:min(86dvh,780px);height:min(86vh,780px);height:min(86dvh,780px);max-height:92dvh;border:0;border-top:1px solid var(--dp-border);border-radius:22px 22px 0 0;box-shadow:0 -12px 42px rgba(0,0,0,.2);animation:patientConversationSlideUp .24s ease-out}
+ .patient-conversation-drawer{width:100%;height:min(86vh,780px);height:min(86dvh,780px);max-height:92dvh;border:0;border-top:1px solid var(--dp-border);border-radius:22px 22px 0 0;box-shadow:0 -12px 42px rgba(0,0,0,.2);animation:patientConversationSlideUp .24s ease-out}
  .patient-conversation-header{padding:12px 15px}
  .patient-conversation-header:before{content:"";position:absolute;top:6px;left:50%;width:38px;height:4px;border-radius:99px;background:var(--dp-border);transform:translateX(-50%)}
  .patient-conversation-header{position:relative;padding-top:20px}
