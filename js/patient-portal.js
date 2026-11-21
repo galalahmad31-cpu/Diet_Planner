@@ -130,7 +130,7 @@
         const message = error?.message || "تعذر تحميل هذا القسم.";
         const targets = {
           portalPlansPanel: "portalPlansLoading",
-          portalMeasurementsPanel: "portalMeasurementsTable",
+          portalMeasurementsPanel: "portalMeasurementsError",
           portalAppointmentsPanel: "portalFollowUpError",
           portalCommunicationPanel: "patientProfessionalRequests"
         };
@@ -138,6 +138,14 @@
         if (target) {
           target.textContent = message;
           target.hidden = false;
+          if (panelId === "portalMeasurementsPanel" && !target.querySelector("button")) {
+            const retry = document.createElement("button");
+            retry.type = "button";
+            retry.id = "portalMeasurementsRetry";
+            retry.className = "portal-primary-button";
+            retry.textContent = "إعادة تحميل القياسات";
+            target.append(" ", retry);
+          }
         }
       } finally {
         state.loadingPanels.delete(panelId);
@@ -253,6 +261,8 @@
   }
 
   async function loadMeasurements() {
+    const errorBox = $("portalMeasurementsError");
+    if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
     const { data, error } = await supabase.from("weight_logs")
       .select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by")
       .eq("patient_id", state.patientId)
@@ -269,6 +279,7 @@
     $("portalMeasurementDate").value = localToday();
     $("portalSaveMeasurement").innerHTML = '<i class="fa-solid fa-plus"></i> حفظ القياس';
     $("portalCancelMeasurementEdit").hidden = true;
+    $("portalMeasurementForm").hidden = true;
   }
 
   function editPatientMeasurement(id) {
@@ -282,6 +293,7 @@
     };
     Object.entries(values).forEach(([id, value]) => { $(id).value = value ?? ""; });
     $("portalEditingMeasurementId").value = log.id;
+    $("portalMeasurementForm").hidden = false;
     $("portalSaveMeasurement").textContent = "حفظ التعديلات";
     $("portalCancelMeasurementEdit").hidden = false;
     $("portalMeasurementForm").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -622,7 +634,17 @@
       });
     }
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
+    $("portalAddMeasurement")?.addEventListener("click", () => {
+      resetMeasurementForm();
+      $("portalMeasurementForm").hidden = false;
+      $("portalMeasurementForm").scrollIntoView({ behavior: "smooth", block: "center" });
+      $("portalWeight")?.focus({ preventScroll: true });
+    });
     $("portalCancelMeasurementEdit")?.addEventListener("click", resetMeasurementForm);
+    $("portalMeasurementsRetry")?.addEventListener("click", () => {
+      state.loadedPanels.delete("portalMeasurementsPanel");
+      void ensureHealthPanelLoaded("portalMeasurementsPanel");
+    });
     $("portalMeasurementsTable")?.addEventListener("click", event => {
       const edit = event.target.closest("[data-edit-measurement]");
       const remove = event.target.closest("[data-delete-measurement]");
