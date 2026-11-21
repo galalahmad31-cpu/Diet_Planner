@@ -1,126 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-
 <head>
-
-    <script>
-        /* Dashboard UI is public; database access is protected by RLS. */
-    </script>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <title>Diet Planner | برنامج تصميم الأنظمة الغذائية لأخصائي التغذية</title>
-<meta name="description" content="Diet Planner منصة لأخصائي التغذية لتصميم الأنظمة الغذائية، حساب السعرات والماكروز، إدارة المرضى، مكتبة الأغذية والدايت والدعم الغذائي.">
-<meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:type" content="website"><meta property="og:title" content="Diet Planner | برنامج تصميم الأنظمة الغذائية"><meta property="og:description" content="برنامج لأخصائي التغذية لتصميم الدايت وحساب السعرات وإدارة المرضى."><meta property="og:url" content="https://nutrition-3.vercel.app/">
-<link rel="canonical" href="https://nutrition-3.vercel.app/">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    >
-
-    <link rel="stylesheet" href="css/tailwind.css?v=20260923-1">
-    <link rel="stylesheet" href="css/app.css?v=20261120-about-cta-v1">
-    <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
-    <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
-<link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
-<link rel="stylesheet" href="css/dark-theme.css?v=20261120-home-layout-v1">
-
-    <script src="js/theme.js?v=20261120-central-v11" defer></script>
-
-    <meta name="google-site-verification" content="EygLE_fG_MWWuOzfIpkKM7DwAEhtpUpZCOUxHI92rF4" />
-  
-  <link rel="stylesheet" href="css/app-header.css?v=20261121-central-notifications-v1">
-  <script src="js/app-header.js?v=20261121-central-notifications-v1" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#087F6B">
+  <title>Diet Planner | منصة التغذية العلاجية</title>
+  <meta name="description" content="Diet Planner منصة تجمع المرضى ومتخصصي التغذية العلاجية لإدارة الخطط الغذائية والمتابعة الصحية والتواصل في مكان واحد.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Diet Planner | منصة التغذية العلاجية">
+  <meta property="og:description" content="مساحة واحدة للمرضى ومتخصصي التغذية العلاجية.">
+  <meta property="og:url" content="https://nutrition-3.vercel.app/">
+  <link rel="canonical" href="https://nutrition-3.vercel.app/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
+  <link rel="stylesheet" href="css/landing.css?v=20261121-public-home-v1">
+  <script src="js/theme.js?v=20261120-central-v11" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
-<body class="min-h-screen">
-
-    <div id="loadingScreen" class="loading">
-        <div class="flex flex-col items-center gap-3">
-            <div class="spinner"></div>
-
-            <div class="text-sm font-semibold text-slate-500">
-                جاري تحميل التطبيق...
-            </div>
-        </div>
+<body class="dp-landing-page">
+  <header class="dp-landing-header">
+    <a class="dp-landing-brand" href="index.html" aria-label="Diet Planner الرئيسية">
+      <span class="dp-landing-logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
+      <span><strong>Diet Planner</strong><small>التغذية العلاجية في مكان واحد</small></span>
+    </a>
+    <div class="dp-landing-header-actions">
+      <a class="dp-landing-login-link" href="login.html">تسجيل الدخول</a>
+      <button class="dp-landing-theme" id="landingThemeToggle" type="button" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
     </div>
+  </header>
 
-    <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
+  <main class="dp-landing-main">
+    <section class="dp-landing-hero" aria-labelledby="landingTitle">
+      <div class="dp-landing-intro">
+        <span class="dp-landing-eyebrow"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> منصة متكاملة للتغذية العلاجية</span>
+        <h1 id="landingTitle">التغذية العلاجية،<br><span>بشكل أكثر تنظيمًا</span></h1>
+        <p>مساحة تجمع المريض والمختص؛ من اكتشاف الخدمات والتواصل، إلى الخطط الغذائية والمتابعة الصحية.</p>
+        <div class="dp-landing-trust"><span><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> خصوصية لكل حساب</span><span><i class="fa-solid fa-people-arrows-left-right" aria-hidden="true"></i> تواصل ومتابعة</span></div>
+      </div>
+      <div class="dp-landing-orbit" aria-hidden="true">
+        <span class="dp-landing-orbit-ring"></span>
+        <span class="dp-landing-orbit-leaf"><i class="fa-solid fa-leaf"></i></span>
+        <span class="dp-landing-orbit-dot dp-landing-orbit-dot-one"><i class="fa-solid fa-user"></i></span>
+        <span class="dp-landing-orbit-dot dp-landing-orbit-dot-two"><i class="fa-solid fa-user-doctor"></i></span>
+        <span class="dp-landing-orbit-dot dp-landing-orbit-dot-three"><i class="fa-solid fa-heart-pulse"></i></span>
+      </div>
+    </section>
 
-        <div class="mx-auto max-w-6xl">
-
-            <div data-dp-app-header data-page-title="الرئيسية"></div>
-            <section class="dp-dashboard-welcome mt-5" aria-labelledby="dashboardWelcomeTitle">
-                <div class="dp-dashboard-welcome-card">
-                    <div class="dp-dashboard-welcome-copy">
-                        <span class="dp-dashboard-eyebrow">لوحة التحكم الرئيسية</span>
-                        <h1 id="dashboardWelcomeTitle">أهلاً بك في Diet Planner</h1>
-                        <p>مساحة عملك لإدارة ملفات المرضى، والاحتياجات الغذائية، والخطط والمتابعة في مكان واحد.</p>
-                        <a class="dp-dashboard-about-link" href="professional-directory.html" aria-label="استكشاف دليل المختصين"><span class="dp-dashboard-about-link-icon"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i></span><span class="dp-dashboard-about-link-copy"><strong>دليل المختصين</strong><small>استكشف الملفات المهنية المعتمدة واطلب المتابعة مع مختص</small></span><i class="fa-solid fa-arrow-left dp-dashboard-about-link-arrow" aria-hidden="true"></i></a>
-                        <a class="dp-dashboard-about-link" href="about.html" aria-label="التعرف على تطبيق Diet Planner ومميزاته">
-                            <span class="dp-dashboard-about-link-icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
-                            <span class="dp-dashboard-about-link-copy">
-                                <strong>تعرّف على التطبيق</strong>
-                                <small>اكتشف مميزات Diet Planner وكيف يساعدك في تنظيم عملك الغذائي</small>
-                            </span>
-                            <i class="fa-solid fa-arrow-left dp-dashboard-about-link-arrow" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                    <a id="adminCard" href="admin.html" class="dp-dashboard-admin-link" hidden>
-                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                        <span>لوحة الإدارة</span>
-                    </a>
-                </div>
-            </section>
-
-            
-
-            <section class="dashboard-notifications-section mt-5" aria-labelledby="dashboardNotificationsTitle">
-                <div class="dashboard-notifications-header">
-                    <div>
-                        <h3 id="dashboardNotificationsTitle" class="text-base font-extrabold text-slate-800">مركز الإشعارات</h3>
-                        <p class="mt-1 text-[11px] text-slate-500">أسماء المرضى والمهام المطلوبة مرتبة حسب تاريخ الاستحقاق</p>
-                    </div>
-                    <a href="notifications.html" class="dashboard-all-notifications">كل الإشعارات <i class="fa-solid fa-arrow-left"></i></a>
-                </div>
-                <div class="dashboard-notifications-content" id="dashboardNotificationsContent" aria-live="polite">
-                    <div class="dashboard-notifications-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>جارٍ تحميل الإشعارات...</span></div>
-                </div>
-            </section>
-
-            
-<footer class="py-8 text-center">
-
-                <div class="text-sm font-semibold text-slate-500">
-                    Developed by <span class="text-brand-600">Dr. Ahmed Galal</span>
-                </div>
-
-                <div class="mt-1 text-xs text-slate-400">
-                    Diet Planner • Clinical Nutrition
-                </div>
-
-            </footer>
-
+    <section class="dp-landing-roles" aria-label="اختر طريقة استخدام المنصة">
+      <article class="dp-landing-role-card dp-landing-patient" id="landingPatientCard">
+        <div class="dp-landing-role-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+        <div class="dp-landing-role-copy">
+          <span class="dp-landing-role-kicker">PATIENT SPACE</span>
+          <h2>أنا مريض</h2>
+          <p>اكتشف المختصين، وتابع خطتك الغذائية وقياساتك، وتواصل مع مختصك من مكان واحد.</p>
         </div>
+        <a class="dp-landing-role-action" id="landingPatientAction" href="login.html?next=patient-portal.html">دخول بوابة المريض <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+        <a class="dp-landing-create-link" href="login.html#register">إنشاء حساب مريض</a>
+      </article>
 
-    </main>
+      <article class="dp-landing-role-card dp-landing-professional" id="landingProfessionalCard">
+        <div class="dp-landing-role-icon"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i></div>
+        <div class="dp-landing-role-copy">
+          <span class="dp-landing-role-kicker">PROFESSIONAL SPACE</span>
+          <h2>أنا مختص تغذية</h2>
+          <p>أدر ملفات المرضى، وأنشئ الخطط الغذائية، ونظّم المتابعة والخدمات المهنية.</p>
+        </div>
+        <a class="dp-landing-role-action" id="landingProfessionalAction" href="login.html">دخول مساحة المختص <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+        <a class="dp-landing-create-link" href="login.html#register">إنشاء حساب مختص</a>
+      </article>
+    </section>
 
-    <script src="js/auth-access.js?v=20261116-auth-v1"></script>
-    <script src="js/app-dashboard.js?v=20261120-home-layout-v1"></script>
+    <p class="dp-landing-account-status" id="landingAccountStatus" role="status" aria-live="polite" hidden></p>
 
+    <section class="dp-landing-services" aria-labelledby="landingServicesTitle">
+      <div class="dp-landing-section-heading">
+        <span>ماذا تقدم المنصة؟</span>
+        <h2 id="landingServicesTitle">كل ما تحتاجه في مساحة واحدة</h2>
+      </div>
+      <div class="dp-landing-service-grid">
+        <a class="dp-landing-service" href="professional-directory.html">
+          <span><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span>
+          <strong>دليل المختصين</strong>
+          <small>استكشف الملفات المهنية والخدمات المتاحة</small>
+        </a>
+        <div class="dp-landing-service">
+          <span><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></span>
+          <strong>الخطط الغذائية</strong>
+          <small>خطط منظمة قابلة للمتابعة والمراجعة</small>
+        </div>
+        <div class="dp-landing-service">
+          <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+          <strong>المتابعة الصحية</strong>
+          <small>تسجيل القياسات ومتابعة التقدم</small>
+        </div>
+        <div class="dp-landing-service">
+          <span><i class="fa-solid fa-comments" aria-hidden="true"></i></span>
+          <strong>التواصل</strong>
+          <small>قناة تواصل بين المريض والمختص</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="dp-landing-about">
+      <div><span>DIET PLANNER</span><h2>تنظيم أفضل للرعاية الغذائية</h2><p>منصة رقمية تربط أدوات المختص باحتياجات المريض، مع فصل واضح بين مساحة كل مستخدم.</p></div>
+      <a href="about.html">تعرّف على المنصة <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+    </section>
+  </main>
+
+  <footer class="dp-landing-footer">
+    <strong>Diet Planner</strong>
+    <span>التغذية العلاجية والمتابعة الغذائية</span>
+    <nav aria-label="روابط إضافية"><a href="about.html">عن المنصة</a><a href="privacy.html">سياسة الخصوصية</a><a href="feedback.html">شاركنا رأيك</a></nav>
+    <small>Developed by Dr. Ahmed Galal</small>
+  </footer>
+
+  <script src="js/auth-access.js?v=20261121-public-home-v1"></script>
+  <script src="js/landing.js?v=20261121-public-home-v1"></script>
 </body>
-
 </html>
