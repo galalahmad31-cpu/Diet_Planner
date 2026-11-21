@@ -20,14 +20,6 @@
     }
     meta.content = value;
   };
-  const updateToggle = () => {
-    const button = document.getElementById("dp-theme-toggle");
-    if (!button) return;
-    const dark = root.dataset.theme === "dark";
-    button.textContent = dark ? "☀️" : "🌙";
-    button.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
-    button.title = dark ? "Light mode" : "Dark mode";
-  };
   const syncEmbeddedFrames = (theme) => {
     if (window.parent !== window) return;
     document.querySelectorAll("iframe").forEach((frame) => {
@@ -46,7 +38,6 @@
     root.style.colorScheme = next;
     setMeta("color-scheme", next);
     setMeta("theme-color", next === "dark" ? "#101B19" : "#F1F5F4");
-    updateToggle();
     syncEmbeddedFrames(next);
   };
   // Embedded same-origin pages follow the parent theme even when opened before
@@ -59,29 +50,6 @@
     try { localStorage.setItem(STORAGE_KEY, theme); } catch (_) {}
     apply(theme);
   };
-  const createToggle = () => {
-    // Pages may opt out of the floating switch while still using this
-    // centralized theme manager and its cross-page synchronization.
-    if (!document.body) return;
-    // Embedded modules inherit the host page's theme and must never
-    // create a second floating switch inside the iframe.
-    if (document.body.dataset.dpThemeToggle === "off" ||
-        root.classList.contains("nsp-embedded") ||
-        window.parent !== window) {
-      document.getElementById("dp-theme-toggle")?.remove();
-      return;
-    }
-    let button = document.getElementById("dp-theme-toggle");
-    if (button) { updateToggle(); return; }
-    button = document.createElement("button");
-    button.type = "button";
-    button.id = "dp-theme-toggle";
-    button.className = "dp-theme-toggle";
-    button.addEventListener("click", () => save(root.dataset.theme === "dark" ? "light" : "dark"));
-    document.body.appendChild(button);
-    updateToggle();
-  };
-
   // Every page receives exactly one copy of each central stylesheet.
   // Versioning here prevents stale page-level URLs from retaining an old theme.
   const ensureCentralStylesheets = () => {
@@ -127,7 +95,6 @@
   };
   const initialize = () => {
     ensureCentralStylesheets();
-    createToggle();
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initialize, { once: true });
