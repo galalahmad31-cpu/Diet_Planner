@@ -12,6 +12,95 @@
   if (document.documentElement.classList.contains("visit-embedded") ||
       document.documentElement.classList.contains("nsp-embedded")) return;
 
+  if (path === "patient-portal.html") {
+    const patientPages = [
+      ["#portalHome", "الرئيسية", "fa-house"],
+      ["#portalContent", "ملفي الصحي", "fa-folder-heart"],
+      ["#portalPlansTitle", "خطتي الغذائية", "fa-bowl-food"],
+      ["#portalAppointmentsTitle", "مواعيدي", "fa-calendar-check"],
+      ["#portalMessagesTitle", "رسائلي", "fa-comments"],
+      ["#portalMeasurementsTitle", "قياساتي", "fa-chart-line"],
+      ["professional-directory.html", "دليل المختصين", "fa-user-doctor"]
+    ];
+
+    function mountPatientHeader() {
+      if (!document.body || document.querySelector(".dp-app-header")) return;
+      const header = document.createElement("header");
+      header.className = "dp-app-header dp-patient-header no-print";
+      header.setAttribute("dir", "rtl");
+      header.innerHTML = `
+        <div class="dp-app-header__brand-row">
+          <a class="dp-app-header__brand" href="${appBasePath}patient-portal.html" aria-label="Diet Planner - بوابة المريض">
+            <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
+            <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>بوابة المريض</small></span>
+          </a>
+          <div class="dp-patient-header__actions">
+            <button type="button" id="portalThemeToggle" class="dp-patient-header__action" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
+            <button id="logoutBtn" type="button" class="dp-app-header__logout" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
+          </div>
+        </div>
+        <nav class="dp-app-header__nav is-expanded dp-patient-header__nav" aria-label="التنقل في بوابة المريض">
+          <div class="dp-app-header__nav-top"><span class="dp-patient-header__nav-label">التنقل بين صفحات بوابة المريض</span></div>
+          <div class="dp-app-header__track"></div>
+        </nav>`;
+      const track = header.querySelector(".dp-app-header__track");
+      patientPages.forEach(([href, label, icon]) => {
+        const link = document.createElement("a");
+        link.className = "dp-app-header__link";
+        link.href = href.startsWith("#") ? href : appBasePath + href;
+        link.dataset.patientTarget = href;
+        link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
+        link.querySelector("span").textContent = label;
+        if (href === "#portalHome") {
+          link.classList.add("is-active");
+          link.setAttribute("aria-current", "page");
+        }
+        track.append(link);
+      });
+      track.addEventListener("click", event => {
+        const link = event.target.closest("[data-patient-target]");
+        if (!link) return;
+        const target = link.dataset.patientTarget;
+        if (target.startsWith("#")) {
+          event.preventDefault();
+          window.DietPlannerPatientPortal?.navigateToSection(target.slice(1));
+          track.querySelectorAll(".dp-app-header__link").forEach(item => {
+            const active = item === link;
+            item.classList.toggle("is-active", active);
+            if (active) item.setAttribute("aria-current", "page");
+            else item.removeAttribute("aria-current");
+          });
+        }
+      });
+
+      const logout = header.querySelector("#logoutBtn");
+      logout.addEventListener("click", async () => {
+        if (logout.disabled) return;
+        logout.disabled = true;
+        try { await window.DietPlannerAccess?.logout(); }
+        catch (error) { console.error("Patient header logout failed:", error); logout.disabled = false; }
+      });
+      header.querySelector("#portalThemeToggle").addEventListener("click", () => {
+        window.DietPlannerTheme?.toggle?.();
+      });
+      const placeholder = document.querySelector("[data-dp-patient-header]");
+      if (placeholder) placeholder.replaceWith(header);
+      else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
+      document.body.classList.add("dp-has-app-header");
+      const supabase = window.DietPlannerAccess?.supabaseClient;
+      if (supabase?.auth) {
+        supabase.auth.getSession().then(({data,error}) => {
+          if (error) console.error("Patient header session lookup failed:", error);
+          if (!data?.session?.user) window.location.replace(appBasePath + "login.html?next=patient-portal.html");
+        });
+      }
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountPatientHeader, { once: true });
+    else mountPatientHeader();
+    return;
+  }
+
   const pages = [
     ["app.html", "الرئيسية", "fa-house"],
     ["patient.html", "قائمة المرضى", "fa-user-group"],

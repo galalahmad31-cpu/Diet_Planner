@@ -131,3 +131,33 @@
 }
 @media(prefers-reduced-motion:reduce){.dp-app-header__link{transition:none}}
 @media print{.dp-app-header{display:none!important}}
+
+
+/* Patient header variant: shared central header structure and visual tokens. */
+.dp-patient-header .dp-app-header__brand-row{margin-bottom:13px}
+.dp-patient-header__actions{position:relative;z-index:1;display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.dp-patient-header__action{display:inline-grid;place-items:center;width:38px;height:36px;border:1px solid rgba(255,255,255,.22);border-radius:11px;background:rgba(255,255,255,.12);color:#fff;font:inherit;cursor:pointer}
+.dp-patient-header__action:hover{background:rgba(255,255,255,.2)}
+.dp-patient-header__nav{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.dp-patient-header__nav-label{display:inline-flex;align-items:center;min-height:36px;padding:7px 13px;border:1px solid rgba(255,255,255,.16);border-radius:11px;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:900}
+.dp-patient-header__nav .dp-app-header__track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.dp-patient-header__nav .dp-app-header__link{min-height:42px}
+@media(min-width:1024px){.dp-patient-header__nav .dp-app-header__track{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:640px){
+ .dp-patient-header .dp-app-header__brand-row{align-items:flex-start}
+ .dp-patient-header__actions{gap:6px}
+ .dp-patient-header__action{width:34px;height:32px}
+ .dp-patient-header .dp-app-header__page-meta{display:none}
+ .dp-patient-header__nav .dp-app-header__track{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .dp-patient-header__nav .dp-app-header__link{min-height:38px;padding:7px 6px;font-size:10px}
+ .dp-patient-header__nav-label{font-size:10px;min-height:34px}
+}
+
+.dp-patient-header__actions .dp-app-header__logout{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;
+ padding:7px 12px;border:1px solid rgba(255,255,255,.85);border-radius:11px;
+ background:#fff;color:#15594d;font-family:var(--dp-font,Cairo,sans-serif);
+ font-size:11px;font-weight:900;line-height:1.35;white-space:nowrap;cursor:pointer;
+}
+.dp-patient-header__actions .dp-app-header__logout:hover{background:#edf8f3}
+@media(max-width:640px){.dp-patient-header__actions .dp-app-header__logout{min-height:32px;padding:6px 8px;font-size:10px}.dp-patient-header__actions .dp-app-header__logout span{display:inline}}

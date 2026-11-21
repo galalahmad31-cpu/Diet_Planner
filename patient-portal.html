@@ -14,26 +14,19 @@
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-dashboard-v1">
+  <link rel="stylesheet" href="css/app-header.css?v=20261121-patient-header-v1">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-patient-header-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-v1">
   <link rel="stylesheet" href="css/patient-appointments.css?v=20261121-v1">
   <script src="js/theme.js?v=20261120-central-v11" defer></script>
+  <script src="js/app-header.js?v=20261121-patient-header-v1" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
   <script src="js/patient-appointments.js?v=20261121-v1" defer></script>
   <script src="js/patient-portal.js?v=20261121-dashboard-v1" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
-  <header class="portal-header">
-    <a class="portal-brand" href="patient-portal.html" aria-label="Diet Planner">
-      <span class="portal-brand-mark"><i class="fa-solid fa-leaf"></i></span>
-      <span><strong>Diet Planner</strong><small>بوابة المريض</small></span>
-    </a>
-    <div class="portal-header-actions"><a href="professional-directory.html" class="portal-logout">استكشف المختصين</a>
-      <button type="button" id="portalThemeToggle" class="portal-icon-button" aria-label="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke"></i></button>
-      <button type="button" id="portalLogout" class="portal-logout"><i class="fa-solid fa-right-from-bracket"></i><span>تسجيل الخروج</span></button>
-    </div>
-  </header>
+  <div data-dp-patient-header></div>
 
   <main class="portal-main">
     <section id="portalHome" class="portal-home">
