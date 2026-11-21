@@ -220,11 +220,24 @@
   }
   async function deleteJob(id) {
     const job = rows.find((item) => item.id === id);
-    if (!job || !window.confirm("هل تريد حذف الوظيفة نهائيًا؟")) return;
-    const { error } = await client.from(PAGE).delete().eq("id", id);
-    if (error) return toast(error.message || "تعذر حذف الوظيفة.");
-    toast("تم حذف الوظيفة.");
-    await loadJobs();
+    const confirmation = window.DietPlannerConfirm;
+    if (!job || !confirmation || typeof confirmation.ask !== "function") {
+      if (job) toast("تعذر فتح نافذة التأكيد. أعد تحميل الصفحة.");
+      return;
+    }
+    confirmation.ask(
+      "حذف الوظيفة",
+      `هل تريد حذف وظيفة «${job.title}» نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.`,
+      async () => {
+        const { error } = await client.from(PAGE).delete().eq("id", id);
+        if (error) {
+          toast(error.message || "تعذر حذف الوظيفة.");
+          return;
+        }
+        toast("تم حذف الوظيفة.");
+        await loadJobs();
+      }
+    );
   }
 
   async function init() {
