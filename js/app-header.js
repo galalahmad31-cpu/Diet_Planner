@@ -16,7 +16,7 @@
 
   function mountPatientHeader({ publicPage = false } = {}) {
     const isDirectoryPage = path === "professional-directory.html";
-      if (!document.body || document.querySelector(".dp-app-header")) return;
+      if (!document.body || document.querySelector(".dp-app-header:not(.dp-public-header)")) return;
       const header = document.createElement("header");
       header.className = "dp-app-header dp-patient-header no-print";
       header.setAttribute("dir", "rtl");
@@ -68,8 +68,9 @@
           badge.textContent = "0";
           link.append(badge);
         }
-        if ((!isDirectoryPage && href === "#portalHome") ||
-            (isDirectoryPage && href === "professional-directory.html")) {
+        if ((!isDirectoryPage && !publicPage && href === "#portalHome") ||
+            (isDirectoryPage && href === "professional-directory.html") ||
+            (publicPage && href === "patient-portal.html#portalHome")) {
           link.classList.add("is-active");
           link.setAttribute("aria-current", "page");
         }
@@ -398,6 +399,7 @@
   }
 
   async function renderPublicAccount(user, header) {
+    if (!header.isConnected) return;
     const login = header.querySelector("#dpPublicLogin");
     const register = header.querySelector("#dpPublicRegister");
     const account = header.querySelector("#dpPublicAccount");
