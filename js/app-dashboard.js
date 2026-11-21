@@ -79,30 +79,9 @@
   }
 
   function renderAdminCard(isAdmin) {
-    const card = elements.adminCard;
-    if (!card) return;
-
-    // Fail closed: hide the card unless the verified role is exactly admin.
-    const canViewAdminCard = isAdmin === true;
-
-    if (!canViewAdminCard) {
-      card.hidden = true;
-      card.setAttribute("aria-hidden", "true");
-      card.setAttribute("tabindex", "-1");
-      card.style.setProperty("display", "none", "important");
-      return;
-    }
-
-    // Reveal only after getAccessStatus() confirms role === "admin".
-    // The card is initially hidden by three independent mechanisms:
-    // the hidden attribute, Tailwind's .hidden class, and inline display:none!important.
-    // Clear all three so the admin card is visible on phones as well as desktop.
-    card.hidden = false;
-    card.classList.remove("hidden");
-    card.removeAttribute("hidden");
-    card.removeAttribute("aria-hidden");
-    card.removeAttribute("tabindex");
-    card.style.removeProperty("display");
+    // The professional dashboard is shared; only this action is admin-specific.
+    // CSS explicitly honors [hidden], so visibility has one source of truth.
+    if (elements.adminCard) elements.adminCard.hidden = isAdmin !== true;
   }
 
   // ---------------------------------------------------------
