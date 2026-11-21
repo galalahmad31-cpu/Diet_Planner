@@ -234,7 +234,7 @@
     window.DietPlannerWeightLogs?.render({
       tbody: $("portalMeasurementsRows"),
       logs: state.logs.map(log => ({
-        id: log.id, date: log.measurement_date, weight: log.weight,
+        id: log.id, created_by: log.created_by, date: log.measurement_date, weight: log.weight,
         bodyFat: log.body_fat_percent, muscle: log.muscle_percent,
         water: log.water_percent, waist: log.waist_cm, hip: log.hip_cm,
         adherence: log.diet_adherence, notes: log.notes
