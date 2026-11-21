@@ -130,7 +130,7 @@
         const message = error?.message || "تعذر تحميل هذا القسم.";
         const targets = {
           portalPlansPanel: "portalPlansLoading",
-          portalMeasurementsPanel: "portalMeasurementsRows",
+          portalMeasurementsPanel: "portalMeasurementsTable",
           portalAppointmentsPanel: "portalFollowUpError",
           portalCommunicationPanel: "patientProfessionalRequests"
         };
