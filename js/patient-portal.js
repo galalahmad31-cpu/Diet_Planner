@@ -614,16 +614,22 @@
             return `<span>${config.labels[key]}: <strong>${optionalNumber(result.total, " مجم")}${result.missing ? "*" : ""}</strong></span>`;
           }).join(" · ");
       const items = meal.items.length ? meal.items.map(item => {
-        const nutrientLine = tool === "carb"
-          ? `${optionalNumber(getFoodNutrient(item.food, "carb", item.grams), " جم كربوهيدرات")}`
-          : config.nutrients.map(key => `${config.labels[key]} ${getFoodNutrient(item.food, key, item.grams) === null ? "غير مسجل" : optionalNumber(getFoodNutrient(item.food, key, item.grams), " مجم")}`).join(" · ");
         const quantityAttr = tool === "carb" ? "data-carb-grams" : "data-renal-grams";
         const removeAttr = tool === "carb" ? "data-remove-carb-item" : "data-remove-renal-item";
-        return `<div class="portal-carb-item" data-tool-item="${escapeHtml(item.id)}">
-          <div class="portal-carb-item-copy"><strong>${escapeHtml(item.food.name_ar || item.food.name_en || "غذاء")}</strong><small>${optionalNumber(item.grams, " جم")} · ${nutrientLine}</small><small class="portal-carb-household-inline">${escapeHtml(item.food.household || "لا يوجد مقياس منزلي مسجل")}</small></div>
-          <label class="portal-carb-grams"><span>الكمية (جم)</span><input type="number" min="0.1" max="10000" step="1" value="${escapeHtml(item.grams)}" ${quantityAttr}="${escapeHtml(item.id)}" inputmode="decimal"></label>
-          <button type="button" class="portal-tool-icon-button" ${removeAttr}="${escapeHtml(item.id)}" aria-label="حذف الصنف"><i class="fa-solid fa-trash"></i></button>
-        </div>`;
+        const foodName = escapeHtml(item.food.name_ar || item.food.name_en || "غذاء");
+        const household = escapeHtml(item.food.household || "غير مسجل");
+        if (tool === "renal") {
+          return "<div class=\"portal-carb-item portal-renal-item\" data-tool-item=\"" + escapeHtml(item.id) + "\">" +
+            "<strong class=\"portal-renal-item-name\">" + foodName + "</strong>" +
+            "<label class=\"portal-carb-grams\"><span>الكمية (جم)</span><input type=\"number\" min=\"0.1\" max=\"10000\" step=\"1\" value=\"" + escapeHtml(item.grams) + "\" " + quantityAttr + "=\"" + escapeHtml(item.id) + "\" inputmode=\"decimal\" aria-label=\"كمية " + foodName + " بالجرام\"></label>" +
+            "<div class=\"portal-renal-item-household\"><span>المقياس المنزلي</span><strong>" + household + "</strong></div>" +
+            "<button type=\"button\" class=\"portal-tool-icon-button\" " + removeAttr + "=\"" + escapeHtml(item.id) + "\" aria-label=\"حذف " + foodName + "\"><i class=\"fa-solid fa-trash\"></i></button></div>";
+        }
+        const nutrientLine = optionalNumber(getFoodNutrient(item.food, "carb", item.grams), " جم كربوهيدرات");
+        return "<div class=\"portal-carb-item\" data-tool-item=\"" + escapeHtml(item.id) + "\">" +
+          "<div class=\"portal-carb-item-copy\"><strong>" + foodName + "</strong><small>" + optionalNumber(item.grams, " جم") + " · " + nutrientLine + "</small><small class=\"portal-carb-household-inline\">" + household + "</small></div>" +
+          "<label class=\"portal-carb-grams\"><span>الكمية (جم)</span><input type=\"number\" min=\"0.1\" max=\"10000\" step=\"1\" value=\"" + escapeHtml(item.grams) + "\" " + quantityAttr + "=\"" + escapeHtml(item.id) + "\" inputmode=\"decimal\"></label>" +
+          "<button type=\"button\" class=\"portal-tool-icon-button\" " + removeAttr + "=\"" + escapeHtml(item.id) + "\" aria-label=\"حذف الصنف\"><i class=\"fa-solid fa-trash\"></i></button></div>";
       }).join("") : '<p class="portal-tool-hint">لم تضف أصنافًا لهذه الوجبة بعد.</p>';
       const addAttr = tool === "carb" ? "data-add-carb-food" : "data-add-renal-food";
       return `<section class="portal-carb-meal" data-tool-meal="${meal.id}">
