@@ -377,14 +377,8 @@
 #qc-formula-conc-content > .fc-volume-panel{grid-area:volume}
 #qc-formula-conc-content > .fc-result-group{
   grid-area:result;
-  display:flex;
-  flex-direction:column;
-  justify-content:stretch;
-  gap:12px;
-  min-width:0;
-}
-#qc-formula-conc-content > .fc-result-group{
   align-self:start;
+  min-width:0;
 }
 #qc-formula-conc-content .fc-result-group > .qc-result{
   display:flex;
