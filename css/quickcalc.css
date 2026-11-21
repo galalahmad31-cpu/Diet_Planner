@@ -357,16 +357,45 @@
 .qc-dex-fields > div{min-width:0}
 .qc-dex-fields label{min-height:2.8em}
 
-/* Formula — normal and required preparations side by side. */
+/* Formula concentration — balanced two-column layout. */
 #qc-formula-conc-content:not(.hidden){
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-areas:
+    "normal required"
+    "volume result";
+  align-items:stretch;
   gap:14px!important;
 }
-#qc-formula-conc-content:not(.hidden) > .qc-result,
-#qc-formula-conc-content:not(.hidden) > .qc-note{
-  grid-column:1/-1;
+#qc-formula-conc-content:not(.hidden) > *{
+  min-width:0;
+  min-height:0;
+  margin:0!important;
 }
+#qc-formula-conc-content > .fc-normal-panel{grid-area:normal}
+#qc-formula-conc-content > .fc-required-panel{grid-area:required}
+#qc-formula-conc-content > .fc-volume-panel{grid-area:volume}
+#qc-formula-conc-content > .fc-result-group{
+  grid-area:result;
+  display:flex;
+  flex-direction:column;
+  justify-content:stretch;
+  gap:12px;
+  min-width:0;
+}
+#qc-formula-conc-content .fc-result-group > .qc-result{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:10px!important;
+  padding:16px!important;
+}
+#qc-formula-conc-content .fc-result-group > .qc-note{
+  flex:0 0 auto;
+  padding:12px 14px;
+}
+#qc-formula-conc-content .fc-result-group .qc-note p{margin-top:4px}
 #qc-formula-conc-content .fc-compact-grid,
 #qc-formula-conc-content .fc-normal-density-grid,
 #qc-formula-conc-content .fc-required-fields,
@@ -391,14 +420,16 @@
 }
 #qc-formula-conc-content .fc-volume-fields .text-xs{
   display:flex;
-  align-items:center;
+  flex-direction:column;
+  justify-content:center;
   min-height:42px;
   border:1px solid var(--dp-border);
   border-radius:10px;
   background:var(--dp-surface-2);
   color:var(--dp-text-2);
+  font-size:.76rem;
+  line-height:1.6;
 }
-
 /* Breastmilk fortification — reference, inputs, result and safety note. */
 #qc-bmf-content:not(.hidden){
   display:grid!important;
@@ -449,8 +480,12 @@
   .qc-panel{padding:13px}
   .qc-result{padding:15px}
   #qc-dextrose-content:not(.hidden),
-  #qc-formula-conc-content:not(.hidden),
   #qc-bmf-content:not(.hidden){grid-template-columns:minmax(0,1fr)}
+  #qc-formula-conc-content:not(.hidden){
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"normal" "required" "volume" "result";
+    gap:10px!important;
+  }
   #qc-gir-content:not(.hidden){
     grid-template-columns:minmax(0,1fr);
     grid-template-areas:"weight" "iv" "enteral" "result";
