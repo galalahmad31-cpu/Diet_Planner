@@ -223,6 +223,10 @@
       patientId: state.patientId,
       role: "patient"
     });
+    void window.DietPlannerPatientAppointments?.mount($("patientPortalAppointments"), {
+      patientId: state.patientId,
+      role: "patient"
+    });
   }
 
   async function handleInviteSubmit(event) {
