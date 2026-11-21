@@ -267,8 +267,11 @@
   async function loadMeasurements() {
     const loading = $("portalMeasurementsLoading");
     const errorBox = $("portalMeasurementsError");
-    if (loading) loading.hidden = false;
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
+
+    // Render the shared table immediately; database latency must not leave this panel blank.
+    renderMeasurements();
+    if (loading) loading.hidden = false;
     try {
       const { data, error } = await supabase.from("weight_logs")
       .select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by")
