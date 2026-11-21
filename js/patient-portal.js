@@ -231,28 +231,21 @@
 
   function renderMeasurements() {
     renderMeasurementSummary();
-    const tbody = $("portalMeasurementsRows");
-    if (!tbody) return;
-    if (!state.logs.length) {
-      tbody.innerHTML = '<tr><td colspan="10">لا توجد قياسات مسجلة لهذا المريض.</td></tr>';
-      return;
-    }
-    const adherence = { excellent: "ممتاز", good: "جيد", fair: "متوسط", poor: "ضعيف" };
-    tbody.innerHTML = state.logs.map(log => {
-      const canManage = log.created_by === state.user?.id;
-      return `<tr>
-        <td>${escapeHtml(formatDate(log.measurement_date))}</td>
-        <td><strong>${escapeHtml(optionalNumber(log.weight, " كجم"))}</strong></td>
-        <td>${escapeHtml(optionalNumber(log.body_fat_percent, "%"))}</td>
-        <td>${escapeHtml(optionalNumber(log.muscle_percent, "%"))}</td>
-        <td>${escapeHtml(optionalNumber(log.water_percent, "%"))}</td>
-        <td>${escapeHtml(optionalNumber(log.waist_cm, " سم"))}</td>
-        <td>${escapeHtml(optionalNumber(log.hip_cm, " سم"))}</td>
-        <td>${escapeHtml(adherence[log.diet_adherence] || "—")}</td>
-        <td class="portal-measurement-notes">${escapeHtml(log.notes || "—")}</td>
-        <td>${canManage ? `<div class="portal-measurement-row-actions"><button type="button" data-edit-measurement="${escapeHtml(log.id)}">تعديل</button><button type="button" data-delete-measurement="${escapeHtml(log.id)}">حذف</button></div>` : '<span class="portal-measurement-readonly">سجل المختص</span>'}</td>
-      </tr>`;
-    }).join("");
+    window.DietPlannerWeightLogs?.render({
+      tbody: $("portalMeasurementsRows"),
+      logs: state.logs.map(log => ({
+        id: log.id, date: log.measurement_date, weight: log.weight,
+        bodyFat: log.body_fat_percent, muscle: log.muscle_percent,
+        water: log.water_percent, waist: log.waist_cm, hip: log.hip_cm,
+        adherence: log.diet_adherence, notes: log.notes
+      })),
+      actionCell: log => log.created_by === state.user?.id
+        ? `<div class="measurement-row-actions">
+            <button type="button" class="measurement-edit-button" data-edit-measurement="${escapeHtml(log.id)}">تعديل</button>
+            <button type="button" class="measurement-delete-button" data-delete-measurement="${escapeHtml(log.id)}">حذف</button>
+          </div>`
+        : '<span class="portal-measurement-readonly">سجل المختص</span>'
+    });
   }
 
   async function loadMeasurements() {
