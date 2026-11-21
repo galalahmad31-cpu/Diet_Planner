@@ -146,25 +146,39 @@
           void loadRequestState().then(loadMessages);
         });
       } else {
-        const { data: account, error: accountError } = await supabase
-          .from("patient_accounts").select("user_id")
-          .eq("patient_id", patientId).eq("status", "active").maybeSingle();
-        if (accountError) throw accountError;
-        if (!account?.user_id) {
-          list.innerHTML = '<div class="patient-messages-empty">لم يربط المريض حسابه بعد.</div>';
-          form.hidden = true;
-          return;
-        }
-        recipientId = account.user_id;
-        counterpartLabel = "المريض";
-        if (!requestId) {
-          const { data: request, error: requestError } = await supabase
-            .from("professional_connection_requests").select("id")
+        let request = null;
+        if (requestId) {
+          const { data, error: requestError } = await supabase
+            .from("professional_connection_requests").select("id,requested_by")
+            .eq("id", requestId).maybeSingle();
+          if (requestError) throw requestError;
+          request = data;
+        } else {
+          const { data, error: requestError } = await supabase
+            .from("professional_connection_requests").select("id,requested_by")
             .eq("patient_id", patientId).eq("professional_id", user.id)
             .in("status", ["accepted", "active"]).maybeSingle();
           if (requestError) throw requestError;
+          request = data;
           requestId = request?.id || null;
         }
+
+        if (request?.requested_by) {
+          recipientId = request.requested_by;
+        } else {
+          // Legacy care-team conversations predate connection requests.
+          const { data: account, error: accountError } = await supabase
+            .from("patient_accounts").select("user_id")
+            .eq("patient_id", patientId).eq("status", "active").maybeSingle();
+          if (accountError) throw accountError;
+          if (!account?.user_id) {
+            list.innerHTML = '<div class="patient-messages-empty">لم يربط المريض حسابه بعد.</div>';
+            form.hidden = true;
+            return;
+          }
+          recipientId = account.user_id;
+        }
+        counterpartLabel = "المريض";
       }
     } catch (error) {
       console.error("Patient messaging setup failed:", error);
