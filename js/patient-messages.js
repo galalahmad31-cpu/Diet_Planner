@@ -131,10 +131,7 @@
           return;
         }
         recipientId = account.user_id;
-        const { data: patient, error: patientError } = await supabase
-          .from("patients").select("name").eq("id", patientId).maybeSingle();
-        if (patientError) throw patientError;
-        counterpartLabel = patient?.name || "المريض";
+        counterpartLabel = "المريض";
       }
     } catch (error) {
       console.error("Patient messaging setup failed:", error);
@@ -157,14 +154,15 @@
           .from("patient_messages")
           .select("id,sender_id,recipient_id,body,created_at,read_at")
           .eq("patient_id", patientId)
-          .order("created_at", { ascending: true })
+          .order("created_at", { ascending: false })
           .limit(200);
         if (error) throw error;
-        if (!data?.length) {
+        const messages = (data || []).reverse();
+        if (!messages.length) {
           list.innerHTML = '<div class="patient-messages-empty">لا توجد رسائل بعد. يمكنك بدء المحادثة برسالة قصيرة.</div>';
           return;
         }
-        list.innerHTML = data.map(message => {
+        list.innerHTML = messages.map(message => {
           const mine = message.sender_id === user.id;
           return `<article class="patient-message-bubble ${mine ? "is-mine" : "is-theirs"}">
             <div class="patient-message-body">${escapeHtml(message.body)}</div>
@@ -172,7 +170,7 @@
           </article>`;
         }).join("");
         list.scrollTop = list.scrollHeight;
-        root.querySelector("[data-message-counter]").textContent = `${data.length.toLocaleString("ar-EG")} رسالة في المحادثة`;
+        root.querySelector("[data-message-counter]").textContent = `${messages.length.toLocaleString("ar-EG")} رسالة في المحادثة`;
       } catch (error) {
         console.error("Patient messages load failed:", error);
         list.innerHTML = '<div class="patient-messages-empty is-error">تعذر تحميل الرسائل. اضغط تحديث للمحاولة مرة أخرى.</div>';
