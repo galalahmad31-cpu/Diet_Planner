@@ -145,21 +145,30 @@
           <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>أضف قياساتك لمتابعة التغير مع الوقت.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
         </div>
+        <div class="portal-measurement-summary" aria-label="ملخص تغيرات الوزن ومؤشر كتلة الجسم">
+          <article><span>التغير من أول قياس</span><strong id="portalWeightChangeOverall">—</strong><small id="portalWeightChangeOverallNote">لا توجد بيانات كافية</small></article>
+          <article><span>التغير بين آخر وزنين</span><strong id="portalWeightChangeRecent">—</strong><small id="portalWeightChangeRecentNote">يلزم تسجيل قياسين</small></article>
+          <article><span>مؤشر كتلة الجسم (BMI)</span><strong id="portalLatestBmi">—</strong><small id="portalLatestBmiNote">يعتمد على آخر وزن والطول المسجل</small></article>
+        </div>
         <form id="portalMeasurementForm" class="portal-measurement-form">
+          <input id="portalEditingMeasurementId" type="hidden">
           <div class="portal-form-grid">
-            <div><label for="portalWeight">الوزن (كجم) *</label><input id="portalWeight" type="number" min="1" max="500" step="0.1" required></div>
+            <div><label for="portalWeight">الوزن (كجم) *</label><input id="portalWeight" type="number" min="0.1" max="500" step="0.1" required></div>
             <div><label for="portalMeasurementDate">تاريخ القياس *</label><input id="portalMeasurementDate" type="date" required></div>
-            <div><label for="portalWaist">محيط الخصر (سم)</label><input id="portalWaist" type="number" min="1" max="300" step="0.1"></div>
-            <div><label for="portalHip">محيط الأرداف (سم)</label><input id="portalHip" type="number" min="1" max="300" step="0.1"></div>
-            <div><label for="portalBodyFat">نسبة الدهون (%)</label><input id="portalBodyFat" type="number" min="1" max="75" step="0.1"></div>
-            <div class="portal-form-wide"><label for="portalMeasurementNotes">ملاحظات (اختياري)</label><input id="portalMeasurementNotes" type="text" maxlength="500" placeholder="مثال: القياس صباحًا قبل الإفطار"></div>
+            <div><label for="portalBodyFat">نسبة الدهون (%)</label><input id="portalBodyFat" type="number" min="0" max="100" step="0.1"></div>
+            <div><label for="portalMuscle">نسبة العضلات (%)</label><input id="portalMuscle" type="number" min="0" max="100" step="0.1"></div>
+            <div><label for="portalWater">نسبة الماء (%)</label><input id="portalWater" type="number" min="0" max="100" step="0.1"></div>
+            <div><label for="portalWaist">محيط الوسط (سم)</label><input id="portalWaist" type="number" min="0.1" max="300" step="0.1"></div>
+            <div><label for="portalHip">محيط الأرداف (سم)</label><input id="portalHip" type="number" min="0.1" max="300" step="0.1"></div>
+            <div><label for="portalAdherence">الالتزام الغذائي</label><select id="portalAdherence"><option value="">لم يحدد</option><option value="excellent">ممتاز</option><option value="good">جيد</option><option value="fair">متوسط</option><option value="poor">ضعيف</option></select></div>
+            <div class="portal-form-wide"><label for="portalMeasurementNotes">ملاحظات المريض</label><textarea id="portalMeasurementNotes" rows="2" maxlength="2000" placeholder="ملاحظاتك حول القياس أو الالتزام الغذائي"></textarea></div>
           </div>
-          <div class="portal-form-footer"><p id="portalMeasurementMessage" class="portal-inline-message" role="status"></p><button type="submit" class="portal-primary-button"><i class="fa-solid fa-plus"></i> حفظ القياس</button></div>
+          <div class="portal-form-footer"><p id="portalMeasurementMessage" class="portal-inline-message" role="status"></p><div class="portal-measurement-actions"><button type="button" id="portalCancelMeasurementEdit" class="portal-secondary-button" hidden>إلغاء التعديل</button><button type="submit" id="portalSaveMeasurement" class="portal-primary-button"><i class="fa-solid fa-plus"></i> حفظ القياس</button></div></div>
         </form>
         <div class="portal-table-wrap">
           <table class="portal-measurements-table">
-            <thead><tr><th>التاريخ</th><th>الوزن</th><th>الخصر</th><th>الأرداف</th><th>دهون الجسم</th></tr></thead>
-            <tbody id="portalMeasurementsRows"><tr><td colspan="5">جاري تحميل القياسات...</td></tr></tbody>
+            <thead><tr><th>التاريخ</th><th>الوزن (كجم)</th><th>نسبة الدهون</th><th>نسبة العضلات</th><th>نسبة الماء</th><th>محيط الوسط</th><th>محيط الأرداف</th><th>الالتزام</th><th>ملاحظات المريض</th><th>إجراء</th></tr></thead>
+            <tbody id="portalMeasurementsRows"><tr><td colspan="10">جاري تحميل القياسات...</td></tr></tbody>
           </table>
         </div>
       </section></div>
