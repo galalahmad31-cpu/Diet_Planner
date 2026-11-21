@@ -236,7 +236,7 @@
       throw new Error("تعذر تحميل مكوّن جدول القياسات. حدّث الصفحة وحاول مرة أخرى.");
     }
     tableRenderer.render({
-      tbody: $("portalMeasurementsRows"),
+      container: $("portalMeasurementsTable"),
       logs: state.logs.map(log => ({
         id: log.id, created_by: log.created_by, date: log.measurement_date, weight: log.weight,
         bodyFat: log.body_fat_percent, muscle: log.muscle_percent,
@@ -623,7 +623,7 @@
     }
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
     $("portalCancelMeasurementEdit")?.addEventListener("click", resetMeasurementForm);
-    $("portalMeasurementsRows")?.addEventListener("click", event => {
+    $("portalMeasurementsTable")?.addEventListener("click", event => {
       const edit = event.target.closest("[data-edit-measurement]");
       const remove = event.target.closest("[data-delete-measurement]");
       if (edit) editPatientMeasurement(edit.dataset.editMeasurement);
