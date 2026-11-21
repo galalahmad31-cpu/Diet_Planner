@@ -136,9 +136,5 @@ document.addEventListener("DOMContentLoaded",()=>{
  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("directoryModal").hidden)closeModal();});
  $("directorySendRequest").addEventListener("click",submitRequest);
  loadProfiles();
- const access=window.DietPlannerAccess;
- Promise.resolve().then(()=>access?.getCurrentUser()).then(user=>user?access?.getUserAccountType(user.id):null)
- .then(type=>{$("directoryProfessionalProfile").hidden=type!=="professional";})
- .catch(()=>{$("directoryProfessionalProfile").hidden=true;});
 });
 })();
