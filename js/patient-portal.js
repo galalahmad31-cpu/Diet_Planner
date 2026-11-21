@@ -349,115 +349,74 @@
     const loading = $("portalPlansLoading");
     const empty = $("portalPlansEmpty");
     const list = $("portalPlansList");
+    if (!loading || !empty || !list || !state.patientId) return;
+
     loading.hidden = false;
     empty.hidden = true;
     list.replaceChildren();
 
     try {
-      const { data: publications, error: publicationError } = await supabase
-        .from("patient_plan_publications")
-        .select("plan_id,published_at")
-        .is("revoked_at", null)
-        .order("published_at", { ascending: false });
-      if (publicationError) throw publicationError;
-
-      const publishedPlanIds = [...new Set((publications || []).map(row => row.plan_id).filter(Boolean))];
-      if (!publishedPlanIds.length) {
-        empty.hidden = false;
-        return;
-      }
-
-      const { data: plans, error: plansError } = await supabase
+      // One relational request replaces the previous publication -> plans ->
+      // days -> meals -> items -> food-name request chain.
+      const { data: plans, error } = await supabase
         .from("nutrition_plans")
-        .select("id,patient_id,plan_name,start_date,notes,created_at,updated_at")
+        .select(`
+          id,patient_id,plan_name,start_date,notes,created_at,updated_at,
+          publication:patient_plan_publications!inner(published_at,revoked_at),
+          days:plan_days(
+            id,plan_id,day_number,day_name,notes,
+            meals:plan_meals(
+              id,day_id,meal_name,meal_order,frequency,
+              items:plan_items(
+                id,meal_id,food_id,item_name,quantity_g,household_measure,frequency,notes,
+                food:foods(name_ar)
+              )
+            )
+          )
+        `)
         .eq("patient_id", state.patientId)
-        .in("id", publishedPlanIds);
-      if (plansError) throw plansError;
+        .is("patient_plan_publications.revoked_at", null);
 
-      const publicationOrder = new Map();
-      (publications || []).forEach(row => {
-        if (row.plan_id && !publicationOrder.has(row.plan_id)) publicationOrder.set(row.plan_id, row.published_at);
+      if (error) throw error;
+
+      const orderedPlans = (plans || []).slice().sort((a, b) => {
+        const publicationDate = plan => {
+          const publication = Array.isArray(plan.publication)
+            ? plan.publication[0]
+            : plan.publication;
+          return publication?.published_at || plan.updated_at || plan.created_at || "";
+        };
+        return new Date(publicationDate(b)).getTime() - new Date(publicationDate(a)).getTime();
       });
-      const orderedPlans = (plans || []).sort((a, b) =>
-        new Date(publicationOrder.get(b.id) || b.updated_at || b.created_at) -
-        new Date(publicationOrder.get(a.id) || a.updated_at || a.created_at)
-      );
 
       if (!orderedPlans.length) {
         empty.hidden = false;
         return;
       }
 
-      const planIds = orderedPlans.map(plan => plan.id);
-      const { data: days, error: daysError } = await supabase
-        .from("plan_days")
-        .select("id,plan_id,day_number,day_name,notes")
-        .in("plan_id", planIds)
-        .order("day_number", { ascending: true });
-      if (daysError) throw daysError;
-
-      const dayIds = (days || []).map(day => day.id);
-      let meals = [];
-      if (dayIds.length) {
-        const result = await supabase.from("plan_meals")
-          .select("id,day_id,meal_name,meal_order,frequency")
-          .in("day_id", dayIds)
-          .order("meal_order", { ascending: true });
-        if (result.error) throw result.error;
-        meals = result.data || [];
-      }
-
-      const mealIds = meals.map(meal => meal.id);
-      let items = [];
-      if (mealIds.length) {
-        const result = await supabase.from("plan_items")
-          .select("id,meal_id,food_id,item_name,quantity_g,household_measure,frequency,notes")
-          .in("meal_id", mealIds);
-        if (result.error) throw result.error;
-        items = result.data || [];
-      }
-
-      const missingFoodIds = [...new Set(items.filter(item => !item.item_name && item.food_id).map(item => item.food_id))];
-      let foodNames = new Map();
-      if (missingFoodIds.length) {
-        const result = await supabase.from("foods").select("id,name_ar").in("id", missingFoodIds);
-        if (result.error) throw result.error;
-        foodNames = new Map((result.data || []).map(food => [food.id, food.name_ar]));
-      }
-
-      const mealsByDay = new Map();
-      meals.forEach(meal => {
-        if (!mealsByDay.has(meal.day_id)) mealsByDay.set(meal.day_id, []);
-        mealsByDay.get(meal.day_id).push(meal);
-      });
-      const itemsByMeal = new Map();
-      items.forEach(item => {
-        if (!itemsByMeal.has(item.meal_id)) itemsByMeal.set(item.meal_id, []);
-        itemsByMeal.get(item.meal_id).push(item);
-      });
-      const daysByPlan = new Map();
-      (days || []).forEach(day => {
-        if (!daysByPlan.has(day.plan_id)) daysByPlan.set(day.plan_id, []);
-        daysByPlan.get(day.plan_id).push(day);
-      });
-
-      list.innerHTML = orderedPlans.map((plan, planIndex) => {
-        const planDays = daysByPlan.get(plan.id) || [];
+      list.innerHTML = orderedPlans.map(plan => {
+        const planDays = Array.isArray(plan.days) ? plan.days.slice().sort(
+          (a, b) => Number(a.day_number || 0) - Number(b.day_number || 0)
+        ) : [];
         const planDate = plan.start_date
           ? "تاريخ البداية: " + escapeHtml(formatDate(plan.start_date))
           : "تمت مشاركتها معك";
+
         const dayMarkup = planDays.map(day => {
-          const dayMeals = mealsByDay.get(day.id) || [];
+          const dayMeals = Array.isArray(day.meals) ? day.meals.slice().sort(
+            (a, b) => Number(a.meal_order || 0) - Number(b.meal_order || 0)
+          ) : [];
           const mealsMarkup = dayMeals.map(meal => {
-            const mealItems = itemsByMeal.get(meal.id) || [];
+            const mealItems = Array.isArray(meal.items) ? meal.items : [];
             const foodMarkup = mealItems.length ? mealItems.map(item => {
-              const itemName = item.item_name || foodNames.get(item.food_id) || "صنف غذائي";
+              const itemName = item.item_name || item.food?.name_ar || "صنف غذائي";
               return `<div class="portal-food-row">
                 <span class="portal-food-name">${escapeHtml(itemName)}${item.notes ? '<small>' + escapeHtml(item.notes) + '</small>' : ''}</span>
                 <span class="portal-food-quantity">${escapeHtml(optionalNumber(item.quantity_g, " جم"))}</span>
                 <span class="portal-food-household">${escapeHtml(item.household_measure || "—")}</span>
               </div>`;
             }).join("") : '<p class="portal-plan-empty-meal">لا توجد أصناف مسجلة لهذه الوجبة.</p>';
+
             return `<section class="portal-meal">
               <h4 class="portal-meal-title">${escapeHtml(meal.meal_name || "وجبة")}${meal.frequency ? '<small>' + escapeHtml(meal.frequency) + '</small>' : ''}</h4>
               <div class="portal-food-table" role="table" aria-label="أصناف ${escapeHtml(meal.meal_name || "الوجبة")}">
@@ -466,6 +425,7 @@
               </div>
             </section>`;
           }).join("");
+
           return `<section class="portal-plan-day">
             <h3>${escapeHtml(day.day_name || ("اليوم " + day.day_number))}</h3>
             ${day.notes ? '<p class="portal-plan-day-note">' + escapeHtml(day.notes) + '</p>' : ""}
@@ -479,6 +439,7 @@
         const content = planDays.length
           ? dayMarkup
           : '<p class="portal-plan-empty-meal">لا توجد أيام مسجلة في هذه الخطة.</p>';
+
         return `<details class="portal-plan-card">
           <summary class="portal-plan-summary">
             <span class="portal-plan-summary-copy">
@@ -498,7 +459,12 @@
       }).join("");
     } catch (error) {
       list.replaceChildren();
-      throw error;
+      console.error("Patient nutrition plans load failed:", error);
+      const errorMessage = document.createElement("p");
+      errorMessage.className = "portal-empty-state";
+      errorMessage.setAttribute("role", "alert");
+      errorMessage.textContent = error.message || "تعذر تحميل الخطط الغذائية. حاول مرة أخرى.";
+      list.append(errorMessage);
     } finally {
       loading.hidden = true;
     }
