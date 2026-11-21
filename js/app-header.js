@@ -16,6 +16,16 @@
 
   function mountPatientHeader({ publicPage = false } = {}) {
     const isDirectoryPage = path === "professional-directory.html";
+    const patientPages = [
+      [(isDirectoryPage || publicPage) ? "patient-portal.html#portalHome" : "#portalHome", "الرئيسية", "fa-house"],
+      [(isDirectoryPage || publicPage) ? "patient-portal.html#portalContent" : "#portalContent", "الملف الصحي", "fa-heart-pulse"],
+      ["professional-directory.html", "دليل المتخصصين", "fa-user-doctor"],
+      ["notifications.html", "الإشعارات", "fa-bell"],
+      [(isDirectoryPage || publicPage) ? "patient-portal.html#portalDietBuilder" : "#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
+      [(isDirectoryPage || publicPage) ? "patient-portal.html#portalEducation" : "#portalEducation", "المكتبة والتثقيف", "fa-book-open"],
+      [(isDirectoryPage || publicPage) ? "patient-portal.html#portalTools" : "#portalTools", "أدوات التغذية", "fa-calculator"],
+      [(isDirectoryPage || publicPage) ? "patient-portal.html#portalProfileArea" : "#portalProfileArea", "الملف الشخصي", "fa-user"]
+    ];
       if (!document.body || document.querySelector(".dp-app-header:not(.dp-public-header)")) return;
       const header = document.createElement("header");
       header.className = "dp-app-header dp-patient-header no-print";
