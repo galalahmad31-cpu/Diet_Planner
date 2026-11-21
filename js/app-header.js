@@ -68,6 +68,17 @@
         link.dataset.patientTarget = href;
         link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
         link.querySelector("span").textContent = label;
+        if (href === "notifications.html") {
+          link.id = "dpNotificationLink";
+          link.classList.add("dp-app-header__notification-nav-link");
+          link.setAttribute("aria-label", "الإشعارات");
+          const badge = document.createElement("span");
+          badge.id = "dpNotificationBadge";
+          badge.className = "dp-app-header__notification-badge";
+          badge.hidden = true;
+          badge.textContent = "0";
+          link.append(badge);
+        }
         if ((!isDirectoryPage && href === "#portalHome") ||
             (isDirectoryPage && href === "professional-directory.html")) {
           link.classList.add("is-active");
@@ -113,6 +124,12 @@
       if (placeholder) placeholder.replaceWith(header);
       else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
       document.body.classList.add("dp-has-app-header");
+      const access = window.DietPlannerAccess;
+      access?.getCurrentUser?.().then(user => user ? syncNotificationBadge(user) : clearNotificationBadge());
+      access?.supabaseClient?.auth?.onAuthStateChange((_event, session) => {
+        if (session?.user) syncNotificationBadge(session.user);
+        else clearNotificationBadge();
+      });
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountPatientHeader, { once: true });
