@@ -295,30 +295,44 @@
     }
   }
 
-  function resetMeasurementForm() {
-    $("portalMeasurementForm")?.reset();
-    $("portalEditingMeasurementId").value = "";
-    $("portalMeasurementDate").value = localToday();
-    $("portalSaveMeasurement").innerHTML = '<i class="fa-solid fa-plus"></i> حفظ القياس';
-    $("portalCancelMeasurementEdit").hidden = true;
-    $("portalMeasurementForm").hidden = true;
+  function openPatientMeasurement(log = null) {
+    const body = $("portalMeasurementsRows");
+    if (!body || body.querySelector("[data-measurement-editor]")) return;
+    const editor = window.DietPlannerWeightLogs.createEditorRow(log ? {id:log.id,date:log.measurement_date,weight:log.weight,bodyFat:log.body_fat_percent,muscle:log.muscle_percent,water:log.water_percent,waist:log.waist_cm,hip:log.hip_cm,adherence:log.diet_adherence,notes:log.notes} : null);
+    body.prepend(editor);
+    editor.querySelector("[data-field=weight]")?.focus();
+    editor.scrollIntoView({behavior:"smooth",block:"center"});
   }
 
-  function editPatientMeasurement(id) {
-    const log = state.logs.find(item => String(item.id) === String(id));
-    if (!log || log.created_by !== state.user?.id) return;
-    const values = {
-      portalWeight: log.weight, portalMeasurementDate: log.measurement_date,
-      portalBodyFat: log.body_fat_percent, portalMuscle: log.muscle_percent,
-      portalWater: log.water_percent, portalWaist: log.waist_cm, portalHip: log.hip_cm,
-      portalAdherence: log.diet_adherence, portalMeasurementNotes: log.notes
-    };
-    Object.entries(values).forEach(([id, value]) => { $(id).value = value ?? ""; });
-    $("portalEditingMeasurementId").value = log.id;
-    $("portalMeasurementForm").hidden = false;
-    $("portalSaveMeasurement").textContent = "حفظ التعديلات";
-    $("portalCancelMeasurementEdit").hidden = false;
-    $("portalMeasurementForm").scrollIntoView({ behavior: "smooth", block: "center" });
+  async function savePatientMeasurement(row) {
+    if (!row || state.busy || row.dataset.saving === "true") return;
+    const read = field => row.querySelector('[data-field="'+field+'"]')?.value?.trim() ?? "";
+    const numeric = field => read(field)==="" ? null : Number(read(field));
+    const record = {patient_id:state.patientId,weight:numeric("weight"),measurement_date:read("date"),body_fat_percent:numeric("bodyFat"),muscle_percent:numeric("muscle"),water_percent:numeric("water"),waist_cm:numeric("waist"),hip_cm:numeric("hip"),diet_adherence:read("adherence")||null,notes:read("notes")||null};
+    const validPercent = value => value===null || (Number.isFinite(value)&&value>=0&&value<=100);
+    if(!record.measurement_date||!Number.isFinite(record.weight)||record.weight<=0){setMessage("portalMeasurementsError","أدخل تاريخ القياس والوزن بصورة صحيحة.","error");row.querySelector("[data-field=weight]")?.focus();return;}
+    if(![record.body_fat_percent,record.muscle_percent,record.water_percent].every(validPercent)){setMessage("portalMeasurementsError","النسب المئوية يجب أن تكون بين 0 و100%.","error");return;}
+    if([record.waist_cm,record.hip_cm].some(value=>value!==null&&(!Number.isFinite(value)||value<=0))){setMessage("portalMeasurementsError","محيطات الجسم يجب أن تكون أكبر من صفر.","error");return;}
+    const editingId=row.dataset.measurementEditorId||"";
+    row.dataset.saving="true";
+    const save=row.querySelector("[data-measurement-save]");
+    if(save){save.disabled=true;save.textContent="جارٍ الحفظ";}
+    state.busy=true;
+    try {
+      const query=editingId ? supabase.from("weight_logs").update(record).eq("id",editingId).eq("patient_id",state.patientId).eq("created_by",state.user.id) : supabase.from("weight_logs").insert(record);
+      const {data,error}=await query.select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by").single();
+      if(error)throw error;
+      const index=state.logs.findIndex(item=>String(item.id)===String(editingId));
+      if(index>=0)state.logs[index]=data;else state.logs.push(data);
+      state.logs.sort((x,y)=>String(x.measurement_date).localeCompare(String(y.measurement_date))||String(x.created_at||"").localeCompare(String(y.created_at||"")));
+      renderMeasurements();
+      setMessage("portalMeasurementsError",editingId?"تم تحديث القياس بنجاح.":"تم حفظ القياس بنجاح.","success");
+    } catch(error) {
+      console.error("Patient measurement save failed:",error);
+      row.dataset.saving="false";
+      if(save){save.disabled=false;save.textContent="حفظ";}
+      setMessage("portalMeasurementsError",error.message||"تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.","error");
+    } finally { state.busy=false; }
   }
 
   async function deletePatientMeasurement(id, button) {
@@ -577,48 +591,6 @@
     }
   }
 
-  async function handleMeasurementSubmit(event) {
-    event.preventDefault();
-    if (state.busy || !state.patientId) return;
-    const read = id => $(id).value.trim();
-    const number = id => read(id) === "" ? null : Number(read(id));
-    const record = {
-      patient_id: state.patientId, weight: number("portalWeight"),
-      measurement_date: read("portalMeasurementDate"),
-      body_fat_percent: number("portalBodyFat"), muscle_percent: number("portalMuscle"),
-      water_percent: number("portalWater"), waist_cm: number("portalWaist"),
-      hip_cm: number("portalHip"), diet_adherence: read("portalAdherence") || null,
-      notes: read("portalMeasurementNotes") || null
-    };
-    const percentValid = value => value === null || (Number.isFinite(value) && value >= 0 && value <= 100);
-    if (!record.measurement_date || !Number.isFinite(record.weight) || record.weight <= 0) {
-      setMessage("portalMeasurementMessage", "أدخل تاريخ القياس والوزن بصورة صحيحة.", "error"); return;
-    }
-    if (![record.body_fat_percent,record.muscle_percent,record.water_percent].every(percentValid)) {
-      setMessage("portalMeasurementMessage", "النسب المئوية يجب أن تكون بين 0 و100%.", "error"); return;
-    }
-    if ([record.waist_cm,record.hip_cm].some(value => value !== null && (!Number.isFinite(value) || value <= 0))) {
-      setMessage("portalMeasurementMessage", "محيطات الجسم يجب أن تكون أكبر من صفر.", "error"); return;
-    }
-    const editingId = $("portalEditingMeasurementId").value;
-    const button = $("portalSaveMeasurement");
-    state.busy = true; button.disabled = true;
-    setMessage("portalMeasurementMessage", editingId ? "جاري تحديث القياس..." : "جاري حفظ القياس...");
-    try {
-      const query = editingId
-        ? supabase.from("weight_logs").update(record).eq("id", editingId).eq("patient_id", state.patientId).eq("created_by", state.user.id)
-        : supabase.from("weight_logs").insert(record);
-      const { error } = await query;
-      if (error) throw error;
-      resetMeasurementForm();
-      await loadMeasurements();
-      setMessage("portalMeasurementMessage", editingId ? "تم تحديث القياس بنجاح." : "تم حفظ القياس بنجاح.", "success");
-    } catch (error) {
-      console.error("Patient measurement save failed:", error);
-      setMessage("portalMeasurementMessage", error.message || "تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.", "error");
-    } finally { state.busy = false; button.disabled = false; }
-  }
-
   async function init() {
     if (!supabase || !access?.getCurrentUser) {
       fail("تعذر تهيئة الاتصال الآمن. أعد تحميل الصفحة.");
@@ -655,21 +627,25 @@
         setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
       });
     }
-    $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
-    $("portalAddMeasurement")?.addEventListener("click", () => {
-      resetMeasurementForm();
-      $("portalMeasurementForm").hidden = false;
-      $("portalMeasurementForm").scrollIntoView({ behavior: "smooth", block: "center" });
-      $("portalWeight")?.focus({ preventScroll: true });
-    });
-    $("portalCancelMeasurementEdit")?.addEventListener("click", resetMeasurementForm);
     $("portalMeasurementsTable")?.addEventListener("click", event => {
+      const add = event.target.closest("[data-add-measurement]");
+      const save = event.target.closest("[data-measurement-save]");
+      const cancel = event.target.closest("[data-measurement-cancel]");
       const edit = event.target.closest("[data-edit-measurement]");
       const remove = event.target.closest("[data-delete-measurement]");
-      if (edit) editPatientMeasurement(edit.dataset.editMeasurement);
-      else if (remove) void deletePatientMeasurement(remove.dataset.deleteMeasurement, remove);
+      if (add) openPatientMeasurement();
+      else if (save) void savePatientMeasurement(save.closest("[data-measurement-editor]"));
+      else if (cancel) renderMeasurements();
+      else if (edit) {
+        const log = state.logs.find(item => String(item.id) === String(edit.dataset.editMeasurement));
+        if (log?.created_by === state.user?.id) {
+          const current = edit.closest("tr");
+          const editor = window.DietPlannerWeightLogs.createEditorRow({id:log.id,date:log.measurement_date,weight:log.weight,bodyFat:log.body_fat_percent,muscle:log.muscle_percent,water:log.water_percent,waist:log.waist_cm,hip:log.hip_cm,adherence:log.diet_adherence,notes:log.notes});
+          current?.replaceWith(editor);
+          editor.querySelector("[data-field=weight]")?.focus();
+        }
+      } else if (remove) void deletePatientMeasurement(remove.dataset.deleteMeasurement, remove);
     });
-    $("portalMeasurementDate").value = localToday();
     $("portalThemeToggle")?.addEventListener("click", () => {
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
