@@ -194,7 +194,6 @@
 
   function updateMeasurementWriteAccess() {
     const status = $('measurementAccessStatus');
-    const allowed = canWrite();
     if (status) {
       status.textContent = state.isAdmin
         ? 'وضع المدير: يمكنك إضافة القياسات وإدارتها.'
