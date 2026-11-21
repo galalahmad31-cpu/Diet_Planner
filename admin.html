@@ -6,7 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="css/admin.css?v=20261120-doctors-table-v1">
-<link rel="stylesheet" href="css/admin-jobs.css?v=20261121-jobs-v1">
+<link rel="stylesheet" href="css/admin-jobs.css?v=20261121-jobs-v1">\n<link rel="stylesheet" href="css/admin-books.css?v=20261121-books-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -19,7 +19,7 @@
  <div data-dp-app-header data-page-title="لوحة الإدارة"></div>
 <main class="container" id="adminContent" style="display:none">
 <div class="title"><h1>إدارة الاشتراكات</h1><p>إدارة الطلبات والخطط والأطباء من مكان واحد</p></div>
-<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button><button class="tab" data-tab="jobs"><i class="fa-solid fa-briefcase"></i> إدارة الوظائف</button><button class="tab" data-tab="privacy"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="requests"><i class="fa-solid fa-inbox"></i> طلبات الاشتراك</button><button class="tab" data-tab="plans"><i class="fa-solid fa-layer-group"></i> إدارة الخطط</button><button class="tab" data-tab="doctors"><i class="fa-solid fa-user-doctor"></i> الأطباء والاشتراكات</button><button class="tab" data-tab="announcements"><i class="fa-solid fa-bullhorn"></i> الإعلانات والتحديثات</button><button class="tab" data-tab="jobs"><i class="fa-solid fa-briefcase"></i> إدارة الوظائف</button><button class="tab" data-tab="books"><i class="fa-solid fa-book-open"></i> مكتبة الكتب</button><button class="tab" data-tab="privacy"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</button></nav>
 <section id="tab-requests">
 <div class="toolbar requests-toolbar"><div class="stats"><button type="button" class="stat stat-filter selected" data-request-filter="all" aria-pressed="true">كل الطلبات <b id="totalCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="pending" aria-pressed="false">قيد المراجعة <b id="pendingCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="paid" aria-pressed="false">مفعّلة <b id="paidCount">0</b></button><button type="button" class="stat stat-filter" data-request-filter="canceled" aria-pressed="false">ملغاة <b id="canceledCount">0</b></button></div><input id="requestSearch" class="search" type="search" placeholder="ابحث بالاسم أو البريد أو الخطة..." aria-label="البحث في طلبات الاشتراك"><button class="btn btn-outline" id="refreshBtn"><i class="fa-solid fa-rotate"></i> تحديث</button></div>
 <div class="card"><div id="requestState" class="state">جاري التحميل...</div><div class="wrap" id="requestWrap" style="display:none"><table><thead><tr><th>الطبيب</th><th>الخطة</th><th>السعر</th><th>تاريخ الطلب</th><th>البداية / النهاية</th><th>الحالة</th><th>إثبات الدفع</th><th>إجراءات</th></tr></thead><tbody id="requestsBody"></tbody></table></div></div>
@@ -94,7 +94,53 @@
   </section>
  </div>
 </section>
-<section id="tab-privacy" style="display:none">
+<section id="tab-books" style="display:none">
+ <div class="books-admin-layout">
+  <section class="books-admin-panel">
+   <div class="books-admin-panel-head"><div><h2>إعدادات الدفع</h2><p>بيانات التحويل التي تظهر للمستخدم عند شراء كتاب.</p></div><button id="booksSettingsSave" class="btn btn-primary" type="button"><i class="fa-solid fa-floppy-disk"></i> حفظ</button></div>
+   <div class="books-admin-settings-grid">
+    <label><span>طريقة التحويل</span><input id="booksPaymentMethod" maxlength="120" placeholder="محفظة إلكترونية / تحويل بنكي"></label>
+    <label><span>بيانات التحويل</span><textarea id="booksPaymentDetails" rows="2" maxlength="1200" placeholder="رقم المحفظة أو الحساب واسم المستفيد"></textarea></label>
+    <label class="full"><span>تعليمات إضافية للمشتري</span><textarea id="booksPaymentInstructions" rows="2" maxlength="1200" placeholder="اكتب تعليمات التحويل وإرسال الإيصال..."></textarea></label>
+   </div>
+  </section>
+  <section class="books-admin-panel">
+   <div class="books-admin-panel-head"><div><h2>إدارة الكتب</h2><p>أضف الغلاف والوصف والمميزات والسعر ورابط التسليم الخاص.</p></div><button id="booksNewBtn" class="btn btn-primary" type="button"><i class="fa-solid fa-plus"></i> إضافة كتاب</button></div>
+   <div id="booksAdminState" class="books-admin-state">جاري تحميل الكتب...</div>
+   <div id="booksAdminList" class="books-admin-list" hidden></div>
+  </section>
+  <section class="books-admin-panel">
+   <div class="books-admin-panel-head"><div><h2>طلبات شراء الكتب</h2><p>راجع إيصال التحويل ثم أكد الطلب أو ارفضه.</p></div><button id="booksOrdersRefresh" class="btn btn-outline" type="button"><i class="fa-solid fa-rotate"></i> تحديث</button></div>
+   <div class="books-admin-filters"><button type="button" class="active" data-book-order-filter="all">الكل</button><button type="button" data-book-order-filter="pending">قيد المراجعة</button><button type="button" data-book-order-filter="approved">مؤكدة</button><button type="button" data-book-order-filter="rejected">مرفوضة</button></div>
+   <div id="booksOrdersState" class="books-admin-state">جاري تحميل الطلبات...</div>
+   <div id="booksOrdersList" class="books-admin-orders" hidden></div>
+  </section>
+ </div>
+ <div id="booksAdminModal" class="books-admin-overlay" hidden>
+  <section class="books-admin-dialog" role="dialog" aria-modal="true" aria-labelledby="booksAdminDialogTitle">
+   <header><div><span>إدارة المحتوى</span><h2 id="booksAdminDialogTitle">إضافة كتاب</h2></div><button id="booksAdminClose" type="button" aria-label="إغلاق">×</button></header>
+   <form id="booksAdminForm">
+    <input id="booksAdminId" type="hidden">
+    <div class="books-admin-form-grid">
+     <label><span>اسم الكتاب *</span><input id="booksAdminTitle" required minlength="2" maxlength="180"></label>
+     <label><span>المؤلف</span><input id="booksAdminAuthor" maxlength="160"></label>
+     <label><span>التصنيف</span><input id="booksAdminCategory" maxlength="100" placeholder="التغذية العلاجية، الكلى..."></label>
+     <label><span>السعر بالجنيه *</span><input id="booksAdminPrice" type="number" min="0" step="0.01" value="0" required></label>
+     <label class="books-admin-check"><input id="booksAdminFree" type="checkbox"><span>كتاب مجاني</span></label>
+     <label><span>حالة النشر</span><select id="booksAdminStatus"><option value="draft">مسودة</option><option value="published">منشور</option><option value="archived">مؤرشف</option></select></label>
+     <label class="full"><span>وصف الكتاب ومميزاته العامة</span><textarea id="booksAdminDescription" rows="3" maxlength="5000"></textarea></label>
+     <label class="full"><span>مميزات الكتاب (كل ميزة في سطر)</span><textarea id="booksAdminFeatures" rows="3" placeholder="محتوى علمي منظم&#10;مراجع حديثة&#10;تطبيقات عملية"></textarea></label>
+     <label class="full"><span>غلاف الكتاب (JPG / PNG / WEBP، حتى 5MB)</span><input id="booksAdminCover" type="file" accept="image/jpeg,image/png,image/webp"></label>
+     <label class="full"><span>رابط الكتاب على Telegram *</span><input id="booksAdminTelegram" type="url" placeholder="https://t.me/+..." required></label>
+     <label><span>ترتيب العرض</span><input id="booksAdminSort" type="number" min="0" max="100000" value="0"></label>
+    </div>
+    <div class="books-admin-form-actions"><button class="btn btn-primary" id="booksAdminSave" type="submit">حفظ الكتاب</button><button class="btn btn-outline" id="booksAdminCancel" type="button">إلغاء</button></div>
+   </form>
+  </section>
+ </div>
+ <div id="booksAdminToast" class="books-admin-toast" role="status" aria-live="polite"></div>
+</section>
+\n<section id="tab-privacy" style="display:none">
  <div class="toolbar">
   <div class="stats"><div class="stat">محتوى سياسة الخصوصية</div></div>
   <button class="btn btn-outline" id="refreshPrivacyPolicyBtn" type="button"><i class="fa-solid fa-rotate"></i> تحديث</button>
@@ -120,6 +166,6 @@
 <div class="modal-bg" id="confirmBg"><div class="modal small"><div class="modal-head"><h2 id="confirmTitle">تأكيد العملية</h2><button class="close" id="confirmClose"><i class="fa-solid fa-xmark"></i></button></div><div id="confirmText" class="confirm-text"></div><div class="modal-foot"><button class="btn btn-danger" id="confirmYes">تأكيد</button><button class="btn btn-outline" id="confirmNo">إلغاء</button></div></div></div>
 <div class="modal-bg" id="proofBg"><div class="modal"><div class="modal-head"><h2>إثبات الدفع</h2><button class="close" id="proofClose"><i class="fa-solid fa-xmark"></i></button></div><div id="proofBody"></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261121-admin-subscription-assignment-v2"></script><script src="js/admin-jobs.js?v=20261121-job-confirm-v2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script><script src="js/admin.js?v=20261121-admin-subscription-assignment-v2"></script><script src="js/admin-jobs.js?v=20261121-job-confirm-v2"></script><script src="js/admin-books.js?v=20261121-books-v1"></script>
   
 </body></html>
