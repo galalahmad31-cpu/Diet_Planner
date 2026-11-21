@@ -39,10 +39,47 @@
         <button type="button" class="portal-service-card portal-service-featured" data-portal-open-health><span class="portal-service-icon"><i class="fa-solid fa-folder-heart"></i></span><span class="portal-service-copy"><strong>ملفي الصحي</strong><small>بياناتي الصحية، القياسات، الخطط والمتابعة مع المختص.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></button>
         <a class="portal-service-card" href="professional-directory.html"><span class="portal-service-icon"><i class="fa-solid fa-user-doctor"></i></span><span class="portal-service-copy"><strong>استكشف المختصين</strong><small>ابحث عن مختص تغذية واطلب المتابعة معه.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></a>
         <article class="portal-service-card portal-service-upcoming" id="portalDietBuilder"><span class="portal-service-icon"><i class="fa-solid fa-bowl-food"></i></span><span class="portal-service-copy"><strong>صمم نظامك الغذائي</strong><small>أنشئ نظامك الغذائي وتابع التزامك بنفسك.</small><em>قريبًا</em></span></article>
-        <article class="portal-service-card portal-service-upcoming" id="portalTools"><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدوات التغذية</strong><small>حساب الاحتياجات ومتابعة الوزن والتقدم.</small><em>قريبًا</em></span></article>
+        <button type="button" class="portal-service-card" id="portalTools" data-open-patient-tools><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدوات التغذية</strong><small>احسب الكربوهيدرات وتعرّف على القيم الغذائية للأطعمة.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></button>
         <article class="portal-service-card portal-service-upcoming" id="portalEducation"><span class="portal-service-icon"><i class="fa-solid fa-book-open"></i></span><span class="portal-service-copy"><strong>المكتبة والتثقيف</strong><small>محتوى علمي وإرشادات غذائية مبسطة.</small><em>قريبًا</em></span></article>
       </section>
       <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استخدام الخدمات العامة دون الارتباط بمختص. أرسل طلب محادثة من دليل المختصين؛ وبعد قبول المختص يمكنكما الاتفاق على الخدمة والسعر والمدة. تبدأ المتابعة ويُتاح الملف الصحي للمختص بعد تأكيد استلام المبلغ، أو يمكنك ربط ملف موجود عبر رمز الدعوة.</p>
+    </section>
+    <section id="portalToolsPanel" class="portal-tools-area" hidden aria-labelledby="portalToolsTitle">
+      <div class="portal-section-heading">
+        <div><span class="portal-section-kicker">NUTRITION TOOLS</span><h2 id="portalToolsTitle">أدوات التغذية</h2><p>اختر الأداة التي تحتاجها. الحسابات تتم على جهازك ولا تُحفظ في حسابك.</p></div>
+        <span class="portal-section-icon"><i class="fa-solid fa-calculator"></i></span>
+      </div>
+      <button type="button" class="portal-tools-back" data-tools-back><i class="fa-solid fa-arrow-right"></i> العودة للرئيسية</button>
+      <div class="portal-tools-grid">
+        <section class="portal-tool-card" aria-labelledby="carbToolTitle">
+          <div class="portal-tool-heading"><span class="portal-tool-icon"><i class="fa-solid fa-wheat-awn"></i></span><div><h3 id="carbToolTitle">حساب الكربوهيدرات</h3><p>أضف الطعام وحدد كميته بالجرام لحساب الكربوهيدرات.</p></div></div>
+          <div class="portal-tool-total"><span>إجمالي كربوهيدرات اليوم</span><strong id="portalCarbDayTotal">0 جم</strong></div>
+          <div id="portalCarbMeals" class="portal-carb-meals">
+            <div class="portal-tool-loading">جاري تجهيز الحاسبة...</div>
+          </div>
+          <div id="portalCarbPicker" class="portal-food-picker" hidden>
+            <label for="portalCarbSearch">ابحث عن الطعام</label>
+            <input id="portalCarbSearch" type="search" autocomplete="off" placeholder="مثال: أرز، خبز، تفاح">
+            <div id="portalCarbSearchResults" class="portal-food-search-results" aria-live="polite"></div>
+          </div>
+          <p class="portal-tool-footnote">الحساب يعتمد على قيمة الكربوهيدرات المسجلة لكل 100 جم في مكتبة الأغذية. أدخل الوزن الفعلي للطعام.</p>
+        </section>
+        <section class="portal-tool-card" aria-labelledby="renalToolTitle">
+          <div class="portal-tool-heading"><span class="portal-tool-icon portal-tool-icon-blue"><i class="fa-solid fa-heart-pulse"></i></span><div><h3 id="renalToolTitle">دليل أغذية مرضى الكلى</h3><p>ابحث عن غذاء واعرض قيم عناصره الغذائية.</p></div></div>
+          <label for="portalRenalSearch">ابحث عن الغذاء</label>
+          <input id="portalRenalSearch" type="search" autocomplete="off" placeholder="اكتب اسم الغذاء">
+          <label for="portalRenalNutrient">العنصر الغذائي</label>
+          <select id="portalRenalNutrient">
+            <option value="potassium">البوتاسيوم</option>
+            <option value="phosphorus">الفوسفور</option>
+            <option value="sodium">الصوديوم</option>
+            <option value="protein">البروتين</option>
+          </select>
+          <div id="portalRenalResults" class="portal-renal-results" aria-live="polite"><p class="portal-tool-hint">ابدأ بكتابة اسم الغذاء لعرض بياناته.</p></div>
+          <p class="portal-tool-footnote">القيم المعروضة لكل 100 جم من الغذاء. لا تعني هذه البيانات أن الغذاء مناسب أو غير مناسب لكل مرضى الكلى؛ فالاختيار يعتمد على الحالة والتحاليل وخطة العلاج.</p>
+        </section>
+      </div>
+      <p id="portalToolsStatus" class="portal-inline-message" role="status"></p>
     </section>
     <section id="portalProfileArea" class="portal-profile-area" hidden>
       <div class="portal-section-heading"><div><span class="portal-section-kicker">PERSONAL PROFILE</span><h2>الملف الشخصي</h2><p>إدارة بيانات حسابك ووسائل التواصل.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-pen"></i></span></div>
