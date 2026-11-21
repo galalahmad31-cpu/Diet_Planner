@@ -260,8 +260,10 @@
       logs: measurementState.logs,
       addDisabled: !canWrite(),
       actionCell: (_log, index) => `
-        <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
-        <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>`
+        <div class="measurement-row-actions">
+          <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
+          <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>
+        </div>`
     });
   }
 
