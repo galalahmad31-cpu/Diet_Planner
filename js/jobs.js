@@ -72,7 +72,7 @@
         <p class="job-card-description">${escapeHtml(job.description)}</p>
         <div class="job-card-bottom">
           <span class="job-date">${job.published_at ? "نُشرت " + escapeHtml(formatDate(job.published_at)) : ""}</span>
-          <a class="job-details-link" href="job.html?id=${encodeURIComponent(job.id)}">التفاصيل والتقديم <i class="fa-solid fa-arrow-left"></i></a>
+          <a class="job-details-link" href="https://nutrition-3.vercel.app/jobs/${encodeURIComponent(job.id)}">التفاصيل والتقديم <i class="fa-solid fa-arrow-left"></i></a>
         </div>
       </article>`;
     }).join("");
