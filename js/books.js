@@ -136,9 +136,13 @@
         access?.getCurrentUser?.() || Promise.resolve(null)
       ]);
       if (booksResult.error) throw booksResult.error;
-      if (settingsResult.error) throw settingsResult.error;
       state.books = booksResult.data || [];
-      state.settings = settingsResult.data || {};
+      if (settingsResult.error) {
+        console.warn("Book store settings unavailable; catalog remains available:", settingsResult.error);
+        state.settings = {};
+      } else {
+        state.settings = settingsResult.data || {};
+      }
       state.user = user;
       const categories = [...new Set(state.books.map(book => book.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
       $("booksCategory").innerHTML = '<option value="">كل التصنيفات</option>' + categories.map(category => '<option value="' + esc(category) + '">' + esc(category) + '</option>').join("");
