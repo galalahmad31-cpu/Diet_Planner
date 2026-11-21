@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false };
+  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, loadedPanels: new Set(), loadingPanels: new Map() };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -108,6 +108,44 @@
       tab.setAttribute("aria-selected", String(active));
     });
     allowed.forEach(id => { const panel = $(id); if (panel) panel.hidden = id !== panelId; });
+    void ensureHealthPanelLoaded(panelId);
+  }
+
+  async function ensureHealthPanelLoaded(panelId) {
+    if (state.loadedPanels.has(panelId)) return;
+    if (state.loadingPanels.has(panelId)) return state.loadingPanels.get(panelId);
+    const loaders = {
+      portalPlansPanel: loadPlans,
+      portalMeasurementsPanel: loadMeasurements,
+      portalAppointmentsPanel: loadSubscriptionFollowUp,
+      portalCommunicationPanel: loadProfessionalRequests
+    };
+    const loader = loaders[panelId];
+    if (!loader) return;
+    const task = (async () => {
+      try {
+        await loader();
+        state.loadedPanels.add(panelId);
+      } catch (error) {
+        console.error("Patient portal panel load failed:", panelId, error);
+        const message = error?.message || "تعذر تحميل هذا القسم.";
+        const targets = {
+          portalPlansPanel: "portalPlansLoading",
+          portalMeasurementsPanel: "portalMeasurementsRows",
+          portalAppointmentsPanel: "portalFollowUpError",
+          portalCommunicationPanel: "patientProfessionalRequests"
+        };
+        const target = $(targets[panelId]);
+        if (target) {
+          target.textContent = message;
+          target.hidden = false;
+        }
+      } finally {
+        state.loadingPanels.delete(panelId);
+      }
+    })();
+    state.loadingPanels.set(panelId, task);
+    return task;
   }
 
   function showPortalDestination(id) {
@@ -500,7 +538,13 @@
       return;
     }
 
-    state.patientId = account.patient_id;
+    const nextPatientId = account.patient_id;
+    if (state.patientId !== nextPatientId) {
+      state.loadedPanels.clear();
+      state.loadingPanels.clear();
+      state.logs = [];
+    }
+    state.patientId = nextPatientId;
     const { data: careLinks, error: careError } = await supabase
       .from("patient_care_team")
       .select("id")
@@ -513,7 +557,7 @@
     await loadPatient();
     if (state.hasActiveCareTeam) {
       document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
-      await Promise.all([loadMeasurements(), loadPlans(), loadProfessionalRequests(), loadSubscriptionFollowUp()]);
+      showOnly("portalContent");
       activateHealthTab("portalPlansPanel");
     } else {
       document.querySelectorAll("[data-health-tab]").forEach(tab => {
@@ -523,11 +567,10 @@
         const panel = $(id);
         if (panel) panel.hidden = true;
       });
-      await loadProfessionalRequests();
+      showOnly("portalContent");
       activateHealthTab("portalCommunicationPanel");
     }
 
-    showOnly("portalContent");
     void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
       patientId: state.patientId,
       role: "patient"
