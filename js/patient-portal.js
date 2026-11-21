@@ -586,9 +586,12 @@
   function renderCarbSearchResults(query) {
     const root = $("portalCarbSearchResults");
     if (!root) return;
-    if (!query.trim()) { root.innerHTML = '<p class="portal-tool-hint">اكتب اسم الصنف للبحث في المكتبة.</p>'; return; }
-    const matches = findFoods(query);
-    root.innerHTML = matches.length ? matches.map(foodSearchMarkup).join("") : '<p class="portal-tool-hint">لا توجد نتائج مطابقة.</p>';
+    const matches = query.trim()
+      ? findFoods(query)
+      : (state.foods || []).slice(0, FOOD_SEARCH_LIMIT);
+    root.innerHTML = matches.length
+      ? matches.map(foodSearchMarkup).join("")
+      : '<p class="portal-tool-hint">لا توجد أصناف متاحة للعرض.</p>';
   }
 
   function renderRenalFoods() {
@@ -625,7 +628,7 @@
     if (!picker || !meal) return;
     $("portalCarbMealLabel").textContent = "إضافة صنف إلى " + meal.name;
     $("portalCarbSearch").value = "";
-    $("portalCarbSearchResults").innerHTML = '<p class="portal-tool-hint">اكتب اسم الصنف للبحث في مكتبة الأغذية.</p>';
+    renderCarbSearchResults("");
     $("portalCarbSelectedFood").hidden = true;
     $("portalCarbConfirm").disabled = true;
     $("portalCarbGrams").value = "100";
