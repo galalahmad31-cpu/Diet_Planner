@@ -55,12 +55,12 @@ function offersPayload(){
 async function save(){
  const profile=profilePayload();
  if(!profile.specialties.length||!profile.service_modes.length){setStatus("أضف تخصصًا واحدًا على الأقل وحدد طريقة تقديم خدمة.");return false;}
+ let pricing;
+ try{pricing=offersPayload();}catch(error){$("professionalOffersStatus").textContent=error.message;return false;}
  const {data:existing,error:readError}=await db.from("professional_directory_profiles").select("user_id").eq("user_id",user.id).maybeSingle();
  if(readError){setStatus("تعذر التحقق من الملف: "+readError.message);return false;}
  const result=existing?await db.from("professional_directory_profiles").update(profile).eq("user_id",user.id):await db.from("professional_directory_profiles").insert(profile);
  if(result.error){setStatus("تعذر حفظ البيانات المهنية: "+result.error.message);return false;}
- let pricing;
- try{pricing=offersPayload();}catch(error){$("professionalOffersStatus").textContent=error.message;return false;}
  const {data:count,error}=await db.rpc("save_professional_directory_offers",{p_offers:pricing});
  if(error){$("professionalOffersStatus").textContent="تم حفظ الملف المهني، لكن تعذر حفظ الأسعار: "+error.message;return false;}
  $("professionalOffersStatus").textContent="تم حفظ "+count+" خدمة/عرض.";
