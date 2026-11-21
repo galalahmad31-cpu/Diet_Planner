@@ -71,6 +71,7 @@
     const submit = root.querySelector("[data-appointment-submit]");
     const providerSelect = root.querySelector("[data-appointment-provider]");
     let busy = false;
+    let localMin = "";
 
     if (role === "patient") {
       try {
@@ -103,7 +104,7 @@
 
       const dateInput = root.querySelector("[data-appointment-date]");
       const now = new Date(Date.now() + 15 * 60000);
-      const localMin = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+      localMin = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0,16);
       dateInput.min = localMin;
     }
 
@@ -155,7 +156,7 @@
         if (busy) return;
         const dateValue = root.querySelector("[data-appointment-date]").value;
         const date = new Date(dateValue);
-        if (!dateValue || Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) {
+        if (!dateValue || Number.isNaN(date.getTime()) || date.getTime() <= Date.now() + 15 * 60000) {
           setStatus(root, "اختر تاريخًا ووقتًا مستقبليين.", "error");
           return;
         }
