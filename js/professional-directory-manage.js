@@ -6,10 +6,12 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const val=id=>$(id).value.trim();
 const setStatus=t=>$("professionalProfileStatus").textContent=t;
 function setEditorLocked(locked){
+ const offersLocked=["pending_review","suspended"].includes(profileStatus);
  $("professionalProfileForm").querySelectorAll("input,textarea,button[type=submit]").forEach(el=>el.disabled=locked);
  $("submitForReview").disabled=locked;
- $("addProfessionalOffer").disabled=locked;
- $("professionalOffersList").querySelectorAll("input,textarea,button").forEach(el=>el.disabled=locked);
+ $("addProfessionalOffer").disabled=offersLocked;
+ $("saveProfessionalOffers").disabled=offersLocked;
+ $("professionalOffersList").querySelectorAll("input,textarea,button").forEach(el=>el.disabled=offersLocked);
 }
 function renderOfferRows(){
  const root=$("professionalOffersList");
@@ -52,19 +54,23 @@ function offersPayload(){
  }
  return payload;
 }
+async function saveOffers(){
+ let pricing;
+ try{pricing=offersPayload();}catch(error){$("professionalOffersStatus").textContent=error.message;return false;}
+ const {data:count,error}=await db.rpc("save_professional_directory_offers",{p_offers:pricing});
+ if(error){$("professionalOffersStatus").textContent="تعذر حفظ الخدمات والأسعار: "+error.message;return false;}
+ $("professionalOffersStatus").textContent="تم حفظ "+count+" خدمة/عرض بنجاح.";
+ return true;
+}
 async function save(){
  const profile=profilePayload();
  if(!profile.specialties.length||!profile.service_modes.length){setStatus("أضف تخصصًا واحدًا على الأقل وحدد طريقة تقديم خدمة.");return false;}
- let pricing;
- try{pricing=offersPayload();}catch(error){$("professionalOffersStatus").textContent=error.message;return false;}
  const {data:existing,error:readError}=await db.from("professional_directory_profiles").select("user_id").eq("user_id",user.id).maybeSingle();
  if(readError){setStatus("تعذر التحقق من الملف: "+readError.message);return false;}
  const result=existing?await db.from("professional_directory_profiles").update(profile).eq("user_id",user.id):await db.from("professional_directory_profiles").insert(profile);
  if(result.error){setStatus("تعذر حفظ البيانات المهنية: "+result.error.message);return false;}
- const {data:count,error}=await db.rpc("save_professional_directory_offers",{p_offers:pricing});
- if(error){$("professionalOffersStatus").textContent="تم حفظ الملف المهني، لكن تعذر حفظ الأسعار: "+error.message;return false;}
- $("professionalOffersStatus").textContent="تم حفظ "+count+" خدمة/عرض.";
- setStatus("تم حفظ الملف المهني والخدمات والأسعار. لن تظهر للعامة قبل اعتماد الملف.");
+ if(!await saveOffers())return false;
+ setStatus("تم حفظ الملف المهني والخدمات والأسعار.");
  return true;
 }
 async function loadRequests(){
@@ -96,6 +102,7 @@ async function load(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
  $("addProfessionalOffer").addEventListener("click",addOffer);
+ $("saveProfessionalOffers").addEventListener("click",saveOffers);
  $("professionalProfileForm").addEventListener("submit",async e=>{e.preventDefault();if(await save()){}});
  $("submitForReview").addEventListener("click",async()=>{
   if(!await save())return;
