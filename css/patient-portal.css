@@ -76,10 +76,3 @@
 .portal-followup-contact p{font-size:10px;color:var(--portal-muted);margin:4px 0 0;line-height:1.8}
 @media(max-width:650px){.portal-followup-grid{grid-template-columns:1fr;gap:8px}.portal-followup-grid article{min-height:82px}.portal-followup-contact{align-items:stretch;flex-direction:column}.portal-followup-contact .portal-primary-button{width:100%}}
 
-/* Patient self-onboarding: create a minimal health record or accept an existing invitation. */
-.portal-self-record-option{display:grid;gap:8px;max-width:460px;margin:20px auto 14px;padding:17px;border:1px solid var(--portal-line);border-radius:14px;background:var(--portal-bg);text-align:right}
-.portal-self-record-option strong{font-size:13px;color:var(--portal-ink)}
-.portal-self-record-option>span{font-size:11px;line-height:1.8;color:var(--portal-muted)}
-.portal-self-record-option .portal-primary-button{width:100%;min-height:42px}
-.portal-invite-divider{display:flex;align-items:center;gap:12px;max-width:460px;margin:16px auto;color:var(--portal-muted);font-size:10px}
-.portal-invite-divider:before,.portal-invite-divider:after{content:"";height:1px;flex:1;background:var(--portal-line)}
