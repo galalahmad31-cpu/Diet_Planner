@@ -1334,8 +1334,7 @@
       measurements: { tab: 'measurementsTab', panel: 'measurementsPanel' },
       energy: { tab: 'energyTab', panel: 'patientEnergyPanel' },
       plans: { tab: 'plansTab', panel: 'plansPanel' },
-      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' },
-      messages: { tab: 'patientMessagesTab', panel: 'patientMessagesPanel' }
+      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' }
     };
     if (moduleName !== null && !modules[moduleName]) return;
 
@@ -1363,12 +1362,6 @@
       void loadNutritionPlans({ autoOpenLatest: true });
     }
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
-    if (moduleName === 'messages') {
-      void window.DietPlannerPatientMessages?.mount($('patientProfileMessages'), {
-        patientId: state.patient?.id || patientId,
-        role: 'professional'
-      });
-    }
   }
 
   function loadNutritionSupportFrame() {
@@ -1431,8 +1424,46 @@
     activatePatientModule(null);
   }
 
+  function bindPatientConversationDrawer() {
+    const drawer = $('patientConversationDrawer');
+    const openButton = $('openPatientConversation');
+    const closeButton = $('closePatientConversation');
+    const name = $('patientConversationPatientName');
+    const messagesRoot = $('patientProfileMessages');
+    if (!drawer || !openButton || !closeButton || !messagesRoot) return;
+
+    const close = () => {
+      drawer.hidden = true;
+      document.body.classList.remove('patient-conversation-open');
+      openButton.setAttribute('aria-expanded', 'false');
+      openButton.focus();
+    };
+    const open = () => {
+      const patientName = state.patient?.name || $('patientName')?.textContent || 'المريض';
+      if (name) name.textContent = patientName;
+      drawer.hidden = false;
+      document.body.classList.add('patient-conversation-open');
+      openButton.setAttribute('aria-expanded', 'true');
+      closeButton.focus();
+      void window.DietPlannerPatientMessages?.mount(messagesRoot, {
+        patientId: state.patient?.id || patientId,
+        role: 'professional'
+      });
+    };
+
+    openButton.addEventListener('click', open);
+    closeButton.addEventListener('click', close);
+    drawer.addEventListener('click', event => {
+      if (event.target === drawer) close();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !drawer.hidden) close();
+    });
+  }
+
   function bindEvents() {
     bindPatientModuleTabs();
+    bindPatientConversationDrawer();
     bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
