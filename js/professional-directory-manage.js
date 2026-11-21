@@ -129,6 +129,18 @@ function setPageView(){
  $("professionalCommunicationView").hidden=!communication;
  document.title=communication?"التواصل مع المرضى | Diet Planner":"ملفي المهني | Diet Planner";
  if(location.hash==="#requests")history.replaceState(null,"",location.pathname+location.search+"#communication");
+ const track=document.querySelector(".dp-app-header__track");
+ if(track){
+  track.querySelectorAll(".dp-app-header__link").forEach(link=>{
+   const href=link.dataset.headerHref||"";
+   const active=communication
+    ?href==="professional-directory-manage.html#communication"||href==="professional-directory-manage.html#requests"
+    :href==="professional-directory-manage.html";
+   link.classList.toggle("is-active",active);
+   if(active)link.setAttribute("aria-current","page");
+   else link.removeAttribute("aria-current");
+  });
+ }
  return communication;
 }
 async function load(){
