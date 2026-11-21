@@ -299,7 +299,7 @@ language sql
 stable
 security definer
 set search_path = public, pg_temp
-as $
+as $$
   select auth.uid() is not null and exists (
     select 1
     from public.nutrition_plans np
@@ -308,7 +308,7 @@ as $
       and pa.user_id = auth.uid()
       and pa.status = 'active'
   );
-$;
+$$;
 
 revoke all on function public.is_linked_patient_for_plan(uuid) from public, anon;
 grant execute on function public.is_linked_patient_for_plan(uuid) to authenticated;
@@ -325,7 +325,7 @@ create policy patient_plan_publications_select_linked_patient_or_owner
 create or replace function public.publish_patient_nutrition_plan(p_plan_id uuid)
 returns void language plpgsql security definer
 set search_path = public, pg_temp
-as $
+as $$
 declare v_uid uuid := auth.uid();
 begin
   if v_uid is null then
@@ -347,12 +347,12 @@ begin
     set published_by = excluded.published_by,
         published_at = now(), revoked_at = null;
 end;
-$;
+$$;
 
 create or replace function public.revoke_patient_nutrition_plan(p_plan_id uuid)
 returns void language plpgsql security definer
 set search_path = public, pg_temp
-as $
+as $$
 declare v_uid uuid := auth.uid();
 begin
   if v_uid is null then
@@ -370,7 +370,7 @@ begin
       using errcode = '42501';
   end if;
 end;
-$;
+$$;
 
 revoke all on function public.publish_patient_nutrition_plan(uuid) from public, anon;
 revoke all on function public.revoke_patient_nutrition_plan(uuid) from public, anon;
