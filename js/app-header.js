@@ -26,120 +26,120 @@
       [(isDirectoryPage || publicPage) ? "patient-portal.html#portalTools" : "#portalTools", "أدوات التغذية", "fa-calculator"],
       [(isDirectoryPage || publicPage) ? "patient-portal.html#portalProfileArea" : "#portalProfileArea", "الملف الشخصي", "fa-user"]
     ];
-      if (!document.body || document.querySelector(".dp-app-header:not(.dp-public-header)")) return;
-      const header = document.createElement("header");
-      header.className = "dp-app-header dp-patient-header no-print";
-      header.setAttribute("dir", "rtl");
-      header.innerHTML = `
-        <div class="dp-app-header__brand-row">
-          <a class="dp-app-header__brand" href="${appBasePath}patient-portal.html" aria-label="Diet Planner - بوابة المريض">
-            <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
-            <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>بوابة المريض</small></span>
-          </a>
-          <div class="dp-patient-header__actions">
-            <button type="button" id="portalThemeToggle" class="dp-patient-header__action" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
-            <button id="logoutBtn" type="button" class="dp-app-header__logout" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
-          </div>
+    if (!document.body || document.querySelector(".dp-app-header:not(.dp-public-header)")) return;
+    const header = document.createElement("header");
+    header.className = "dp-app-header dp-patient-header no-print";
+    header.setAttribute("dir", "rtl");
+    header.innerHTML = `
+      <div class="dp-app-header__brand-row">
+        <a class="dp-app-header__brand" href="${appBasePath}patient-portal.html" aria-label="Diet Planner - بوابة المريض">
+          <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
+          <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>بوابة المريض</small></span>
+        </a>
+        <div class="dp-patient-header__actions">
+          <button type="button" id="portalThemeToggle" class="dp-patient-header__action" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
+          <button id="logoutBtn" type="button" class="dp-app-header__logout" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
         </div>
-        <nav class="dp-app-header__nav is-collapsed dp-patient-header__nav" aria-label="التنقل في بوابة المريض">
-          <div class="dp-app-header__nav-top">
-            <button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-patient-header-track">
-              <span>التنقل بين صفحات بوابة المريض</span>
-              <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-          </div>
-          <div class="dp-app-header__track" id="dp-patient-header-track"></div>
-        </nav>
-        <div class="dp-app-header__context dp-patient-header__page-actions" hidden></div>`;
-      const track = header.querySelector(".dp-app-header__track");
-      const nav = header.querySelector(".dp-patient-header__nav");
-      const toggle = header.querySelector(".dp-app-header__toggle");
-      toggle.addEventListener("click", () => {
-        const expanded = toggle.getAttribute("aria-expanded") === "true";
-        toggle.setAttribute("aria-expanded", String(!expanded));
-        nav.classList.toggle("is-expanded", !expanded);
-        nav.classList.toggle("is-collapsed", expanded);
-      });
-      patientPages.forEach(([href, label, icon]) => {
-        const link = document.createElement("a");
-        link.className = "dp-app-header__link";
-        link.href = href.startsWith("#") ? href : appBasePath + href;
-        link.dataset.patientTarget = href;
-        link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
-        link.querySelector("span").textContent = label;
-        if (href === "notifications.html") {
-          link.id = "dpNotificationLink";
-          link.classList.add("dp-app-header__notification-nav-link");
-          link.setAttribute("aria-label", "الإشعارات");
-          const badge = document.createElement("span");
-          badge.id = "dpNotificationBadge";
-          badge.className = "dp-app-header__notification-badge";
-          badge.hidden = true;
-          badge.textContent = "0";
-          link.append(badge);
-        }
-        if ((!isDirectoryPage && !publicPage && href === "#portalHome") ||
-            (isDirectoryPage && href === "professional-directory.html") ||
-            (publicPage && href === "patient-portal.html#portalHome")) {
-          link.classList.add("is-active");
-          link.setAttribute("aria-current", "page");
-        }
-        track.append(link);
-      });
-      track.addEventListener("click", event => {
-        const link = event.target.closest("[data-patient-target]");
-        if (!link) return;
-        const target = link.dataset.patientTarget;
-        if (!target.startsWith("#")) {
-          toggle.setAttribute("aria-expanded", "false");
-          nav.classList.remove("is-expanded");
-          nav.classList.add("is-collapsed");
-        }
-        if (target.startsWith("#")) {
-          event.preventDefault();
-          window.DietPlannerPatientPortal?.navigateToSection(target.slice(1));
-          toggle.setAttribute("aria-expanded", "false");
-          nav.classList.remove("is-expanded");
-          nav.classList.add("is-collapsed");
-          track.querySelectorAll(".dp-app-header__link").forEach(item => {
-            const active = item === link;
-            item.classList.toggle("is-active", active);
-            if (active) item.setAttribute("aria-current", "page");
-            else item.removeAttribute("aria-current");
-          });
-        }
-      });
-
-      const logout = header.querySelector("#logoutBtn");
-      logout.addEventListener("click", async () => {
-        if (logout.disabled) return;
-        logout.disabled = true;
-        try { await window.DietPlannerAccess?.logout(); }
-        catch (error) { console.error("Patient header logout failed:", error); logout.disabled = false; }
-      });
-      header.querySelector("#portalThemeToggle").addEventListener("click", () => {
-        window.DietPlannerTheme?.toggle?.();
-      });
-      const placeholder = document.querySelector("[data-dp-patient-header], [data-dp-app-header]");
-      const publicHeader = document.querySelector(".dp-public-header");
-      const pageActions = publicHeader?.querySelector(".dp-public-header__page-actions");
-      if (pageActions?.childNodes.length) {
-        const slot = header.querySelector(".dp-patient-header__page-actions");
-        slot.append(...pageActions.childNodes);
-        slot.hidden = !slot.childNodes.length;
+      </div>
+      <nav class="dp-app-header__nav is-collapsed dp-patient-header__nav" aria-label="التنقل في بوابة المريض">
+        <div class="dp-app-header__nav-top">
+          <button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-patient-header-track">
+            <span>التنقل بين صفحات بوابة المريض</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="dp-app-header__track" id="dp-patient-header-track"></div>
+      </nav>
+      <div class="dp-app-header__context dp-patient-header__page-actions" hidden></div>`;
+    const track = header.querySelector(".dp-app-header__track");
+    const nav = header.querySelector(".dp-patient-header__nav");
+    const toggle = header.querySelector(".dp-app-header__toggle");
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      nav.classList.toggle("is-expanded", !expanded);
+      nav.classList.toggle("is-collapsed", expanded);
+    });
+    patientPages.forEach(([href, label, icon]) => {
+      const link = document.createElement("a");
+      link.className = "dp-app-header__link";
+      link.href = href.startsWith("#") ? href : appBasePath + href;
+      link.dataset.patientTarget = href;
+      link.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span></span>`;
+      link.querySelector("span").textContent = label;
+      if (href === "notifications.html") {
+        link.id = "dpNotificationLink";
+        link.classList.add("dp-app-header__notification-nav-link");
+        link.setAttribute("aria-label", "الإشعارات");
+        const badge = document.createElement("span");
+        badge.id = "dpNotificationBadge";
+        badge.className = "dp-app-header__notification-badge";
+        badge.hidden = true;
+        badge.textContent = "0";
+        link.append(badge);
       }
-      if (placeholder) placeholder.replaceWith(header);
-      else if (publicHeader) publicHeader.replaceWith(header);
-      else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
-      document.body.classList.remove("dp-has-public-header");
-      document.body.classList.add("dp-has-app-header");
-      const access = window.DietPlannerAccess;
-      access?.getCurrentUser?.().then(user => user ? syncNotificationBadge(user) : clearNotificationBadge());
-      access?.supabaseClient?.auth?.onAuthStateChange((_event, session) => {
-        if (session?.user) syncNotificationBadge(session.user);
-        else clearNotificationBadge();
-      });
+      if ((!isDirectoryPage && !publicPage && href === "#portalHome") ||
+          (isDirectoryPage && href === "professional-directory.html") ||
+          (publicPage && href === "patient-portal.html#portalHome")) {
+        link.classList.add("is-active");
+        link.setAttribute("aria-current", "page");
+      }
+      track.append(link);
+    });
+    track.addEventListener("click", event => {
+      const link = event.target.closest("[data-patient-target]");
+      if (!link) return;
+      const target = link.dataset.patientTarget;
+      if (!target.startsWith("#")) {
+        toggle.setAttribute("aria-expanded", "false");
+        nav.classList.remove("is-expanded");
+        nav.classList.add("is-collapsed");
+      }
+      if (target.startsWith("#")) {
+        event.preventDefault();
+        window.DietPlannerPatientPortal?.navigateToSection(target.slice(1));
+        toggle.setAttribute("aria-expanded", "false");
+        nav.classList.remove("is-expanded");
+        nav.classList.add("is-collapsed");
+        track.querySelectorAll(".dp-app-header__link").forEach(item => {
+          const active = item === link;
+          item.classList.toggle("is-active", active);
+          if (active) item.setAttribute("aria-current", "page");
+          else item.removeAttribute("aria-current");
+        });
+      }
+    });
+
+    const logout = header.querySelector("#logoutBtn");
+    logout.addEventListener("click", async () => {
+      if (logout.disabled) return;
+      logout.disabled = true;
+      try { await window.DietPlannerAccess?.logout(); }
+      catch (error) { console.error("Patient header logout failed:", error); logout.disabled = false; }
+    });
+    header.querySelector("#portalThemeToggle").addEventListener("click", () => {
+      window.DietPlannerTheme?.toggle?.();
+    });
+    const placeholder = document.querySelector("[data-dp-patient-header], [data-dp-app-header]");
+    const publicHeader = document.querySelector(".dp-public-header");
+    const pageActions = publicHeader?.querySelector(".dp-public-header__page-actions");
+    if (pageActions?.childNodes.length) {
+      const slot = header.querySelector(".dp-patient-header__page-actions");
+      slot.append(...pageActions.childNodes);
+      slot.hidden = !slot.childNodes.length;
     }
+    if (placeholder) placeholder.replaceWith(header);
+    else if (publicHeader) publicHeader.replaceWith(header);
+    else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
+    document.body.classList.remove("dp-has-public-header");
+    document.body.classList.add("dp-has-app-header");
+    const access = window.DietPlannerAccess;
+    access?.getCurrentUser?.().then(user => user ? syncNotificationBadge(user) : clearNotificationBadge());
+    access?.supabaseClient?.auth?.onAuthStateChange((_event, session) => {
+      if (session?.user) syncNotificationBadge(session.user);
+      else clearNotificationBadge();
+    });
+  }
 
   const pages = [
     ["app.html", "الرئيسية", "fa-house"],
