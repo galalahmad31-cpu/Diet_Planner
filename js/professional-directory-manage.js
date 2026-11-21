@@ -73,40 +73,48 @@ async function save(){
  setStatus("تم حفظ الملف المهني والخدمات والأسعار.");
  return true;
 }
-async function loadRequests(){
- const {data,error}=await db.rpc("list_professional_connection_requests"),root=$("professionalConnectionRequests");
- if(error){root.textContent="تعذر تحميل طلبات المحادثة.";return;}
- if(!data?.length){root.textContent="لا توجد طلبات محادثة حتى الآن.";return;}
- const status={pending:"طلب محادثة جديد",accepted:"محادثة مفتوحة · بانتظار الاتفاق والدفع",active:"المتابعة نشطة",declined:"مرفوض",cancelled:"ملغي"};
- root.innerHTML=data.map(r=>{
-  const chat=r.status==="accepted"&&r.patient_id
-   ? '<div class="professional-request-chat" data-request-chat data-request-id="'+esc(r.request_id)+'" data-patient-id="'+esc(r.patient_id)+'"></div>'
-   : "";
-  const activeLink=r.status==="active"&&r.patient_id
-   ? '<a class="directory-secondary-button" href="patient-profile.html?id='+encodeURIComponent(r.patient_id)+'">فتح ملف المريض</a>'
-   : "";
-  const actions=r.status==="pending"
-   ? '<div class="directory-card-actions"><button type="button" class="directory-primary-button" data-answer="accepted" data-id="'+esc(r.request_id)+'">قبول المحادثة</button><button type="button" class="directory-secondary-button" data-answer="declined" data-id="'+esc(r.request_id)+'">رفض الطلب</button></div>'
-   : "";
-  return '<article class="directory-card" id="connection-request-'+esc(r.request_id)+'"><strong>'+esc(r.patient_name||"مريض")+'</strong><p>'+esc(r.message||"لم يرسل المريض رسالة.")+'</p><span class="directory-chip">'+esc(status[r.status]||r.status)+'</span>'+actions+chat+activeLink+'</article>';
+function renderIncomingRequests(requests){
+ const root=$("professionalConnectionRequests");
+ const incoming=requests.filter(item=>item.status==="pending");
+ if(!incoming.length){root.innerHTML='<div class="directory-empty-state">لا توجد طلبات محادثة واردة حاليًا.</div>';return;}
+ root.innerHTML=incoming.map(r=>'<article class="directory-card" id="connection-request-'+esc(r.request_id)+'"><div class="directory-card-heading"><strong>'+esc(r.patient_name||"مريض")+'</strong><span class="directory-chip">طلب جديد</span></div><p>'+esc(r.message||"لم يرسل المريض رسالة.")+'</p><div class="directory-card-actions"><button type="button" class="directory-primary-button" data-answer="accepted" data-id="'+esc(r.request_id)+'">قبول المحادثة</button><button type="button" class="directory-secondary-button" data-answer="declined" data-id="'+esc(r.request_id)+'">رفض الطلب</button></div></article>').join("");
+}
+function renderConversationHistory(requests){
+ const root=$("professionalConversationHistory");
+ const conversations=requests.filter(item=>["accepted","active"].includes(item.status));
+ if(!conversations.length){root.innerHTML='<div class="directory-empty-state">لا توجد محادثات مقبولة حتى الآن. ستظهر المحادثات هنا بعد قبول طلب جديد.</div>';return;}
+ root.innerHTML=conversations.map(r=>{
+  const active=r.status==="active";
+  const chat='<div class="professional-request-chat" data-request-chat data-request-id="'+esc(r.request_id)+'" data-patient-id="'+esc(r.patient_id)+'"></div>';
+  const activeLink=active?'<a class="directory-secondary-button" href="patient-profile.html?id='+encodeURIComponent(r.patient_id)+'">فتح ملف المريض</a>':"";
+  return '<article class="directory-card professional-conversation-card" id="connection-request-'+esc(r.request_id)+'"><div class="directory-card-heading"><strong>'+esc(r.patient_name||"مريض")+'</strong><span class="directory-chip">'+(active?"المتابعة نشطة":"محادثة مفتوحة · بانتظار الاتفاق والدفع")+'</span></div><p>'+esc(r.message||"بدأت المحادثة دون رسالة افتتاحية.")+'</p>'+activeLink+chat+'</article>';
  }).join("");
- root.querySelectorAll("[data-answer]").forEach(btn=>btn.addEventListener("click",async()=>{
-  btn.disabled=true;
-  const {error:answerError}=await db.rpc("respond_professional_connection_request",{p_request_id:btn.dataset.id,p_decision:btn.dataset.answer});
-  if(answerError){$("professionalProfileStatus").textContent="تعذر تنفيذ الطلب: "+answerError.message;btn.disabled=false;return;}
-  await loadRequests();
- }));
  root.querySelectorAll("[data-request-chat]").forEach(node=>{
   void window.DietPlannerPatientMessages?.mount(node,{
    patientId:node.dataset.patientId,requestId:node.dataset.requestId,role:"professional"
   });
  });
+}
+async function loadRequests(){
+ const incomingRoot=$("professionalConnectionRequests");
+ const historyRoot=$("professionalConversationHistory");
+ const {data,error}=await db.rpc("list_professional_connection_requests");
+ if(error){
+  incomingRoot.textContent="تعذر تحميل طلبات المحادثة.";
+  historyRoot.textContent="تعذر تحميل سجل المحادثات.";
+  console.error("Professional communication data load failed:",error);
+  return;
+ }
+ const requests=data||[];
+ renderIncomingRequests(requests);
+ renderConversationHistory(requests);
  const requestedId=new URLSearchParams(location.search).get("request");
  if(requestedId){
   const target=document.getElementById("connection-request-"+requestedId);
   if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
  }
 }
+
 async function load(){
  user=await window.DietPlannerAccess?.getCurrentUser();if(!user){location.href="login.html";return;}
  const {data,error}=await db.from("professional_directory_profiles").select("*").eq("user_id",user.id).maybeSingle();
