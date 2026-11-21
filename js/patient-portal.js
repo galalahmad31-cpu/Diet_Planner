@@ -596,7 +596,7 @@
         acc.missing += part.missing;
         return acc;
       }, { total: 0, missing: 0 });
-      return `<div class="portal-renal-total"><span>${TOOL_CONFIG.renal.labels[key]}</span><strong>${optionalNumber(totals.total, " مجم")}${totals.missing ? "*" : ""}</strong></div>`;
+      return `<div class="portal-renal-total"><span>${TOOL_CONFIG.renal.labels[key]}</span><strong>${optionalNumber(result.total, " مجم")}${result.missing ? "*" : ""}</strong></div>`;
     }).join("");
     root.innerHTML = totals;
   }
