@@ -121,6 +121,7 @@
       if (placeholder) placeholder.replaceWith(header);
       else if (publicHeader) publicHeader.replaceWith(header);
       else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
+      document.body.classList.remove("dp-has-public-header");
       document.body.classList.add("dp-has-app-header");
       const access = window.DietPlannerAccess;
       access?.getCurrentUser?.().then(user => user ? syncNotificationBadge(user) : clearNotificationBadge());
@@ -424,8 +425,7 @@
       }
       if (status.accountType === "professional" || status.isAdmin) {
         const roleHeader = buildHeader();
-        const placeholder = document.querySelector("[data-dp-app-header]");
-        const title = (placeholder?.dataset.pageTitle || "").trim();
+        const title = (header.querySelector(".dp-public-header__page-title")?.textContent || "").trim();
         const titleNode = roleHeader.querySelector(".dp-app-header__page-title");
         const activeHref = roleHeader.querySelector(".dp-app-header__link.is-active")?.dataset.pageHref;
         if (title && activeHref !== path) titleNode.textContent = title;
