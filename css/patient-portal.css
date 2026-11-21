@@ -23,7 +23,7 @@
 .portal-service-arrow{margin-right:auto;color:var(--portal-accent);font-size:13px}.portal-service-upcoming{cursor:default}
 .portal-home-note{display:flex;align-items:center;gap:9px;margin:0;padding:13px 16px;border-radius:13px;background:var(--portal-bg);color:var(--portal-muted);font-size:11px;line-height:1.8}
 .portal-home-note i{color:var(--portal-accent)}.portal-health-area{display:grid;gap:14px}
-.portal-back-button{justify-self:start;border:1px solid var(--portal-line);border-radius:10px;padding:9px 13px;background:var(--portal-card);color:var(--portal-ink);font:800 11px "Cairo",sans-serif;cursor:pointer}
+
 
 
 @media(max-width:640px){.portal-services{grid-template-columns:1fr;gap:10px}.portal-service-card{min-height:94px;padding:14px;border-radius:15px}.portal-service-icon{width:43px;height:43px;flex-basis:43px}.portal-service-copy strong{font-size:13px}.portal-service-copy small{font-size:10px}.portal-home{gap:12px}.portal-health-area{gap:10px}}
