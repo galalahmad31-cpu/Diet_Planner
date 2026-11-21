@@ -354,8 +354,11 @@
         return;
       }
       if (!state.patientId) {
-        openHealthArea();
-        return;
+        $("portalHome").hidden = true;
+        $("portalHealthArea").hidden = false;
+        try { await loadPortal(); }
+        catch (error) { fail(error.message || "تعذر تحميل الملف الصحي."); return; }
+        if ($("portalContent")?.hidden) return;
       }
       if ($("portalHealthArea")?.hidden) {
         $("portalHome").hidden = true;
