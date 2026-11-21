@@ -87,13 +87,6 @@
       if (placeholder) placeholder.replaceWith(header);
       else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
       document.body.classList.add("dp-has-app-header");
-      const supabase = window.DietPlannerAccess?.supabaseClient;
-      if (supabase?.auth) {
-        supabase.auth.getSession().then(({data,error}) => {
-          if (error) console.error("Patient header session lookup failed:", error);
-          if (!data?.session?.user) window.location.replace(appBasePath + "login.html?next=patient-portal.html");
-        });
-      }
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountPatientHeader, { once: true });
