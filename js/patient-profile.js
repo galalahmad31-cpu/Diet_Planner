@@ -1335,8 +1335,7 @@
       energy: { tab: 'energyTab', panel: 'patientEnergyPanel' },
       plans: { tab: 'plansTab', panel: 'plansPanel' },
       'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' },
-      messages: { tab: 'patientMessagesTab', panel: 'patientMessagesPanel' },
-      appointments: { tab: 'patientAppointmentsTab', panel: 'patientAppointmentsPanel' }
+      messages: { tab: 'patientMessagesTab', panel: 'patientMessagesPanel' }
     };
     if (moduleName !== null && !modules[moduleName]) return;
 
@@ -1366,12 +1365,6 @@
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
     if (moduleName === 'messages') {
       void window.DietPlannerPatientMessages?.mount($('patientProfileMessages'), {
-        patientId: state.patient?.id || patientId,
-        role: 'professional'
-      });
-    }
-    if (moduleName === 'appointments') {
-      void window.DietPlannerPatientAppointments?.mount($('patientProfileAppointments'), {
         patientId: state.patient?.id || patientId,
         role: 'professional'
       });
