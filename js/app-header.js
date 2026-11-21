@@ -9,6 +9,7 @@
   const appBasePath = location.hostname === "galalahmad31-cpu.github.io" ? "/Diet_Planner/" : "/";
   let notificationChannel = null;
   let notificationUserId = null;
+  let publicAuthSubscription = null;
 
   if (new URLSearchParams(location.search).get("embed") === "1") return;
   if (document.documentElement.classList.contains("visit-embedded") ||
@@ -430,6 +431,8 @@
         return;
       }
       if (status.accountType === "patient") {
+        publicAuthSubscription?.unsubscribe?.();
+        publicAuthSubscription = null;
         mountPatientHeader({ publicPage: true });
         return;
       }
@@ -446,6 +449,8 @@
           context.append(...pageActions.childNodes);
           context.hidden = !context.childNodes.length;
         }
+        publicAuthSubscription?.unsubscribe?.();
+        publicAuthSubscription = null;
         header.replaceWith(roleHeader);
         document.body.classList.remove("dp-has-public-header");
         document.body.classList.add("dp-has-app-header");
@@ -477,7 +482,8 @@
       if (error) console.error("Public header session lookup failed:", error);
       renderPublicAccount(data?.session?.user || null, header);
     });
-    supabase.auth.onAuthStateChange((_event, session) => renderPublicAccount(session?.user || null, header));
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => renderPublicAccount(session?.user || null, header));
+    publicAuthSubscription = data?.subscription || null;
   }
 
   function mount() {
