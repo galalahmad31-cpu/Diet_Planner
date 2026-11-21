@@ -209,14 +209,6 @@
     }
   }
 
-  function measurementDateLabel(value) {
-    if (!value) return '—';
-    const date = new Date(`${value}T00:00:00`);
-    return Number.isNaN(date.getTime())
-      ? escapeHtml(value)
-      : date.toLocaleDateString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-
   function formatMeasurementDelta(value) {
     if (!Number.isFinite(value)) return { value: '—', note: 'لا توجد بيانات كافية', trend: 'neutral' };
     const rounded = Math.round(Math.abs(value) * 10) / 10;
@@ -264,29 +256,13 @@
 
   function renderMeasurements() {
     updateMeasurementSummary();
-    const body = $('weightTableBody');
-    if (!body) return;
-    if (!measurementState.logs.length) {
-      body.innerHTML = '<tr><td colspan="10" class="measurements-state">لا توجد قياسات مسجلة لهذا المريض.</td></tr>';
-      return;
-    }
-    const labels = { excellent: 'ممتاز', good: 'جيد', fair: 'متوسط', poor: 'ضعيف' };
-    body.innerHTML = measurementState.logs.map((log, index) => `
-      <tr>
-        <td data-label="التاريخ">${measurementDateLabel(log.date)}</td>
-        <td data-label="الوزن (كجم)" class="measurement-weight">${Number(log.weight).toFixed(1)}</td>
-        <td data-label="نسبة الدهون">${log.bodyFat == null ? '—' : Number(log.bodyFat).toFixed(1)+'%'}</td>
-        <td data-label="نسبة العضلات">${log.muscle == null ? '—' : Number(log.muscle).toFixed(1)+'%'}</td>
-        <td data-label="نسبة الماء">${log.water == null ? '—' : Number(log.water).toFixed(1)+'%'}</td>
-        <td data-label="محيط الوسط (سم)">${log.waist == null ? '—' : Number(log.waist).toFixed(1)}</td>
-        <td data-label="محيط الأرداف (سم)">${log.hip == null ? '—' : Number(log.hip).toFixed(1)}</td>
-        <td data-label="الالتزام">${escapeHtml(labels[log.adherence] || '—')}</td>
-        <td data-label="ملاحظات المريض" class="measurement-notes-cell">${escapeHtml(log.notes || '—')}</td>
-        <td data-label="إجراء" class="no-print measurement-row-actions">
-          <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
-          <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>
-        </td>
-      </tr>`).join('');
+    window.DietPlannerWeightLogs?.render({
+      tbody: $("weightTableBody"),
+      logs: measurementState.logs,
+      actionCell: (_log, index) => `
+        <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
+        <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>`
+    });
   }
 
   async function loadMeasurements() {
