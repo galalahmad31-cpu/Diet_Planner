@@ -459,12 +459,7 @@
       }).join("");
     } catch (error) {
       list.replaceChildren();
-      console.error("Patient nutrition plans load failed:", error);
-      const errorMessage = document.createElement("p");
-      errorMessage.className = "portal-empty-state";
-      errorMessage.setAttribute("role", "alert");
-      errorMessage.textContent = error.message || "تعذر تحميل الخطط الغذائية. حاول مرة أخرى.";
-      list.append(errorMessage);
+      throw error;
     } finally {
       loading.hidden = true;
     }
