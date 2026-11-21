@@ -145,3 +145,21 @@ body.auth-page{
   .field input:not([type=radio]){min-height:47px}
   .btn,.google-btn{min-height:46px}
 }
+
+/* Authentication page follows the platform-wide dark theme tokens. */
+html[data-theme="dark"] body.auth-page{background:radial-gradient(ellipse at 12% 10%,rgba(32,168,138,.12),transparent 34%),var(--dp-surface-2,#172622);color:var(--dp-text,#f1f7f4)}
+html[data-theme="dark"] .auth-layout{background:var(--dp-surface,#20332e);border-color:var(--dp-border,#354a43);box-shadow:0 24px 70px rgba(0,0,0,.28)}
+html[data-theme="dark"] .card.auth-card{background:var(--dp-surface,#20332e)}
+html[data-theme="dark"] .auth-card-header h2{color:var(--dp-text,#f1f7f4)}
+html[data-theme="dark"] .auth-intro,html[data-theme="dark"] .auth-eyebrow{color:var(--dp-text-2,#c1d0ca)}
+html[data-theme="dark"] .tabs{background:var(--dp-surface-2,#172622);border-color:var(--dp-border,#354a43)}
+html[data-theme="dark"] .tabs button{color:var(--dp-text-2,#c1d0ca)}
+html[data-theme="dark"] .tabs button.active{background:var(--dp-surface-3,#293d37);color:#8ce0ca;box-shadow:none}
+html[data-theme="dark"] .field label,html[data-theme="dark"] .account-type-label{color:var(--dp-text,#f1f7f4)}
+html[data-theme="dark"] .field input:not([type=radio]){background:var(--dp-surface-2,#172622);border-color:var(--dp-border,#354a43);color:var(--dp-text,#f1f7f4)}
+html[data-theme="dark"] .google-btn,html[data-theme="dark"] .account-type-option{background:var(--dp-surface-2,#172622);border-color:var(--dp-border,#354a43);color:var(--dp-text,#f1f7f4)}
+html[data-theme="dark"] .account-type-option:has(input:checked){background:var(--dp-surface-3,#293d37);border-color:var(--dp-primary,#20a88a)}
+html[data-theme="dark"] .account-type-option small,html[data-theme="dark"] .field-hint,html[data-theme="dark"] .auth-bottom-note{color:var(--dp-muted,#91a69c)}
+html[data-theme="dark"] .auth-footer{border-color:var(--dp-border,#354a43)}
+html[data-theme="dark"] .divider:before,html[data-theme="dark"] .divider:after{background:var(--dp-border,#354a43)}
+html[data-theme="dark"] .msg.email-verification{background:var(--dp-surface-2,#172622);border-color:var(--dp-border,#354a43);color:var(--dp-text,#f1f7f4)}
