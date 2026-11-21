@@ -668,7 +668,7 @@
 
     dietPlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-diet-plan.js?v=20261120-direct-patient-plan-v5';
+      script.src = 'js/visit-diet-plan.js?v=20261121-single-save-v1';
       script.async = true;
       script.onload = () => {
         if (typeof window.dietPlan?.openPlan !== 'function') {
