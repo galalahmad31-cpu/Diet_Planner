@@ -34,7 +34,7 @@ function renderProfiles(){
    +field("طرق المتابعة",modes.join("، "),"fa-video")
    +specialtyField(p)+'</div><p class="directory-card-bio">'+esc(p.bio||"لم يضف المختص نبذة تعريفية بعد.")+'</p>'
    +'<section class="directory-card-offers"><h3>الخدمات والأسعار</h3>'+renderOffers(p.user_id,true)+'</section>'
-   +'<div class="directory-card-actions"><button type="button" class="directory-secondary-button" data-view-profile="'+esc(p.user_id)+'">عرض الملف</button><button type="button" class="directory-primary-button" data-request-profile="'+esc(p.user_id)+'" '+(state.requestSent.has(p.user_id)?"disabled":"")+'>'+(state.requestSent.has(p.user_id)?"تم إرسال الطلب":"طلب متابعة")+'</button></div></article>';
+   +'<div class="directory-card-actions"><button type="button" class="directory-secondary-button" data-view-profile="'+esc(p.user_id)+'">عرض الملف</button><button type="button" class="directory-primary-button" data-request-profile="'+esc(p.user_id)+'" '+(state.requestSent.has(p.user_id)?"disabled":"")+'>'+(state.requestSent.has(p.user_id)?"تم إرسال الطلب":"طلب محادثة")+'</button></div></article>';
  }).join("");
  $("directoryStatus").textContent=list.length?"عدد النتائج المحمّلة: "+list.length:"لا توجد ملفات مهنية مطابقة لمعايير البحث.";
 }
@@ -74,7 +74,7 @@ function openProfile(profileId){
  $("directoryModalOffers").innerHTML=renderOffers(profileId);
  $("directoryModalBio").textContent=p.bio||"لم يضف المختص نبذة تعريفية بعد.";
  $("directoryRequestMessage").value="";$("directoryModalStatus").textContent="";$("directoryModalStatus").className="directory-modal-status";
- const send=$("directorySendRequest");send.disabled=state.requestSent.has(profileId);send.textContent=send.disabled?"تم إرسال الطلب":"إرسال طلب المتابعة";
+ const send=$("directorySendRequest");send.disabled=state.requestSent.has(profileId);send.textContent=send.disabled?"تم إرسال الطلب":"إرسال طلب المحادثة";
  $("directoryModal").hidden=false;document.body.classList.add("directory-modal-open");$("directoryModalClose").focus();
 }
 function closeModal(){$("directoryModal").hidden=true;document.body.classList.remove("directory-modal-open");state.selectedProfile=null;}
@@ -83,11 +83,11 @@ async function submitRequest(){
  const user=await window.DietPlannerAccess?.getCurrentUser();if(!user){window.location.href="login.html?next="+encodeURIComponent("patient-portal.html");return;}
  const send=$("directorySendRequest"),message=$("directoryRequestMessage").value.trim();
  if(message.length>1000){$("directoryModalStatus").textContent="الرسالة يجب ألا تتجاوز 1000 حرف.";return;}
- send.disabled=true;$("directoryModalStatus").textContent="جاري إرسال طلب المتابعة...";
+ send.disabled=true;$("directoryModalStatus").textContent="جاري إرسال طلب المحادثة...";
  try{
   const accountType=await window.DietPlannerAccess?.getUserAccountType(user.id);if(accountType!=="patient")throw new Error("patient_account_required");
   const {error}=await db.rpc("request_professional_connection",{p_professional_id:p.user_id,p_message:message||null});if(error)throw error;
-  state.requestSent.add(p.user_id);$("directoryModalStatus").textContent="تم إرسال طلبك بنجاح. يمكنك متابعة حالته أو إلغاءه من بوابة المريض ما دام قيد الانتظار.";
+  state.requestSent.add(p.user_id);$("directoryModalStatus").textContent="تم إرسال طلب المحادثة. يمكنك إلغاءه من بوابة المريض ما دام قيد الانتظار.";
   $("directoryModalStatus").className="directory-modal-status is-success";send.textContent="تم إرسال الطلب";send.disabled=true;renderProfiles();
  }catch(error){
   console.error("[Professional Directory] Request failed:",error);
