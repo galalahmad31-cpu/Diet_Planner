@@ -125,7 +125,6 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 
 /* Common clinical callouts */
 .highlight-box{background:var(--en-soft);border:1px solid var(--en-line);border-radius:10px;padding:15px;position:relative}
-.monitoring-section{margin-top:2rem;padding:1.5rem;background:#f3f8f5;border:1px solid #dbece4;border-radius:.75rem}
 .component-select{background:#f1f5f9;font-weight:700;font-size:.8rem;border:0;cursor:pointer}
 .patient-info-row{direction:ltr!important;text-align:left!important}.ltr-input{direction:ltr!important;text-align:left!important}.weight-input-ltr{direction:ltr!important;text-align:left!important;unicode-bidi:bidi-override}.ltr-block{direction:ltr;text-align:left}
 
@@ -362,3 +361,50 @@ html.nsp-embedded .delete-confirm-overlay.show{display:none!important}
 /* In the patient-profile iframe, the patient name is already shown by the host page. */
 html.nsp-embedded .detail-top{display:none!important}
 
+
+/* Monitoring workspace — page-scoped styles loaded after shared theme styles. */
+.nsp-monitoring{display:grid;gap:14px;width:100%;min-width:0;margin:18px 0 4px;padding:16px;border:1px solid var(--dp-border,#dce5e2);border-radius:16px;background:var(--dp-bg,#f1f5f4);color:var(--dp-text,#263238)}
+.nsp-monitoring-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:2px 2px 12px;border-bottom:1px solid var(--dp-border,#dce5e2)}
+.nsp-monitoring-heading{min-width:0}
+.nsp-monitoring-kicker{display:block;margin-bottom:4px;color:var(--dp-primary,#087f6b);font-size:9px;font-weight:900;letter-spacing:1.1px}
+.nsp-monitoring-heading h2{margin:0;color:var(--dp-text,#263238);font:900 19px/1.45 var(--dp-font,'Cairo',sans-serif)}
+.nsp-monitoring-heading p{margin:4px 0 0;color:var(--dp-muted,#52636a);font:500 10px/1.7 var(--dp-font,'Cairo',sans-serif)}
+.nsp-monitoring-status{display:inline-flex;flex:0 0 auto;align-items:center;gap:7px;padding:8px 11px;border:1px solid var(--dp-border,#dce5e2);border-radius:999px;background:var(--dp-surface,#fff);color:var(--dp-text-2,#52636a);font:800 10px var(--dp-font,'Cairo',sans-serif);white-space:nowrap}
+.nsp-monitoring-status i{color:var(--dp-primary,#087f6b)}
+.nsp-monitoring-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.nsp-monitoring-card{display:flex;min-width:0;flex-direction:column;gap:12px;padding:14px;border:1px solid var(--dp-border,#dce5e2);border-radius:13px;background:var(--dp-surface,#fff);box-shadow:0 2px 8px var(--dp-shadow,rgba(23,77,67,.05))}
+.nsp-monitoring-card-heading{display:flex;align-items:center;gap:10px;min-width:0}
+.nsp-monitoring-card-heading>div{min-width:0}
+.nsp-monitoring-card-heading label{display:block;margin:0;color:var(--dp-text,#263238);font:900 12px/1.5 var(--dp-font,'Cairo',sans-serif)}
+.nsp-monitoring-card-heading p{margin:3px 0 0;color:var(--dp-muted,#52636a);font:500 9px/1.55 var(--dp-font,'Cairo',sans-serif)}
+.nsp-monitoring-icon{display:grid;width:36px;height:36px;flex:0 0 36px;place-items:center;border-radius:10px;font-size:14px}
+.nsp-monitoring-icon-labs{background:#e7f2fb;color:#3977a7}
+.nsp-monitoring-icon-clinical{background:#e6f5ef;color:#16845b}
+.nsp-monitoring-icon-plan{background:#fff3df;color:#a8751d}
+.nsp-monitoring-card textarea{display:block;width:100%;min-width:0;min-height:112px;height:112px;resize:vertical;box-sizing:border-box;padding:11px 12px;border:1px solid var(--dp-input-border,#cbd9d5);border-radius:10px;background:var(--dp-input,#fff);color:var(--dp-text,#263238);font:500 11px/1.8 var(--dp-font,'Cairo',sans-serif);text-align:start;direction:auto;box-shadow:none}
+.nsp-monitoring-card textarea::placeholder{color:var(--dp-muted,#87958f);opacity:.85}
+.nsp-monitoring-card textarea:focus{border-color:var(--dp-primary,#087f6b);outline:0;box-shadow:0 0 0 3px rgba(8,127,107,.12)}
+.nsp-monitoring-plan{grid-column:1/-1}
+.nsp-monitoring-plan textarea{min-height:88px;height:88px}
+html[data-theme="dark"] .nsp-monitoring-icon-labs{background:#203b50;color:#9bcdf0}
+html[data-theme="dark"] .nsp-monitoring-icon-clinical{background:#1e4035;color:#8bd5b1}
+html[data-theme="dark"] .nsp-monitoring-icon-plan{background:#493a21;color:#f1ca7e}
+@media(max-width:640px){
+.nsp-monitoring{gap:11px;margin-top:12px;padding:11px;border-radius:13px}
+.nsp-monitoring-header{align-items:flex-start;flex-direction:column;gap:8px;padding-bottom:10px}
+.nsp-monitoring-heading h2{font-size:17px}
+.nsp-monitoring-status{padding:6px 9px;font-size:9px}
+.nsp-monitoring-grid{grid-template-columns:minmax(0,1fr);gap:9px}
+.nsp-monitoring-card{gap:9px;padding:11px;border-radius:11px}
+.nsp-monitoring-card textarea{min-height:100px;height:100px;font-size:11px}
+.nsp-monitoring-plan{grid-column:auto}
+.nsp-monitoring-plan textarea{min-height:84px;height:84px}
+}
+@media print{
+.nsp-monitoring{display:block;margin:10px 0;padding:0;border:0;background:#fff}
+.nsp-monitoring-header{margin-bottom:8px}
+.nsp-monitoring-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nsp-monitoring-card{break-inside:avoid;padding:8px;border:1px solid #d5d5d5;box-shadow:none}
+.nsp-monitoring-card textarea{min-height:55px;height:auto;border:1px solid #ddd;background:#fff;color:#111}
+.nsp-monitoring-plan{grid-column:1/-1}
+}
