@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-food-modal-readable-v4">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261121-food-measure-row-v5">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
@@ -88,9 +88,13 @@
           <div id="portalCarbSearchResults" class="portal-food-search-results" aria-live="polite"><p class="portal-tool-hint">اكتب اسم الصنف لعرض النتائج.</p></div>
           <div id="portalCarbSelectedFood" class="portal-selected-food" hidden>
             <div class="portal-selected-food-name"><span>الصنف المختار</span><strong id="portalCarbSelectedName"></strong></div>
-            <label for="portalCarbGrams">الكمية بالجرام</label>
-            <input id="portalCarbGrams" type="number" min="0.1" max="10000" step="1" value="100" inputmode="decimal">
-            <div class="portal-household-measure"><span>المقياس المنزلي المسجل في مكتبة الأغذية</span><strong id="portalCarbHousehold">—</strong></div>
+            <div class="portal-food-measure-row">
+              <div class="portal-food-grams-field">
+                <label for="portalCarbGrams">الكمية بالجرام</label>
+                <input id="portalCarbGrams" type="number" min="0.1" max="10000" step="1" value="100" inputmode="decimal">
+              </div>
+              <div class="portal-household-measure"><span>المقياس المنزلي المسجل في مكتبة الأغذية</span><strong id="portalCarbHousehold">—</strong></div>
+            </div>
             <small class="portal-tool-hint">المقياس المنزلي يُعرض كما هو مسجل للصنف؛ لا يتم تحويله إلى كمية مكافئة بالجرام لعدم وجود وزن مرجعي منفصل في بيانات المكتبة.</small>
           </div>
           <div class="portal-food-modal-actions">
