@@ -183,3 +183,35 @@
 .dp-patient-header__nav .dp-app-header__notification-badge{top:2px;inset-inline-start:5px;border-color:#087765}
 
 .dp-app-header__notification-nav-link[hidden]{display:none!important}
+
+/* Public variant of the shared header: same component, visitor-friendly navigation. */
+.dp-public-header{padding:12px 18px 10px}
+.dp-public-header__top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.dp-public-header__account{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.dp-public-header__auth-link,.dp-public-header__account-link,.dp-public-header__logout,.dp-public-header__theme{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:7px 12px;border:1px solid rgba(255,255,255,.24);border-radius:10px;background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:11px;font-weight:800;text-decoration:none;white-space:nowrap;cursor:pointer}
+.dp-public-header__auth-link.is-primary,.dp-public-header__account-link{background:#fff;border-color:#fff;color:#15594d}
+.dp-public-header__theme{width:37px;padding:0}
+.dp-public-header__nav{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.16)}
+.dp-public-header__links{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+.dp-public-header__link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:7px 10px;border:1px solid transparent;border-radius:9px;color:#e9f7f2;font-size:10px;font-weight:800;text-decoration:none;white-space:nowrap}
+.dp-public-header__link:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
+.dp-public-header__link.is-active{background:#fff;color:#15594d}
+.dp-public-header__link i{font-size:11px}
+.dp-public-header__page-title{flex:0 0 auto;color:rgba(255,255,255,.84);font-size:10px;font-weight:700}
+.dp-public-header__page-actions{position:relative;z-index:1;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.14)}
+.dp-public-header__page-actions[hidden],.dp-public-header [hidden]{display:none!important}
+@media(max-width:680px){
+ .dp-public-header{padding:11px 11px 9px}
+ .dp-public-header__top{gap:8px}
+ .dp-public-header .dp-app-header__logo{width:39px;height:39px;flex-basis:39px}
+ .dp-public-header .dp-app-header__brand-copy strong{font-size:16px}
+ .dp-public-header .dp-app-header__brand-copy small{font-size:9px}
+ .dp-public-header__account{gap:5px}
+ .dp-public-header__auth-link,.dp-public-header__account-link,.dp-public-header__logout{min-height:33px;padding:6px 8px;font-size:9px}
+ .dp-public-header__theme{width:33px;min-height:33px}
+ .dp-public-header__nav{display:block;margin-top:9px;padding-top:8px}
+ .dp-public-header__links{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-bottom:2px}
+ .dp-public-header__links::-webkit-scrollbar{display:none}
+ .dp-public-header__link{flex:0 0 auto;min-height:32px;padding:6px 8px;font-size:9px}
+ .dp-public-header__page-title{display:none}
+}
