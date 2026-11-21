@@ -10,7 +10,6 @@ function setEditorLocked(locked){
  $("professionalProfileForm").querySelectorAll("input,textarea,button[type=submit]").forEach(el=>el.disabled=locked);
  $("submitForReview").disabled=locked;
  $("addProfessionalOffer").disabled=offersLocked;
- $("saveProfessionalOffers").disabled=offersLocked;
  $("professionalOffersList").querySelectorAll("input,textarea,button").forEach(el=>el.disabled=offersLocked);
 }
 function renderOfferRows(){
