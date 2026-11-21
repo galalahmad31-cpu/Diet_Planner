@@ -115,6 +115,15 @@ async function loadRequests(){
  }
 }
 
+function setPageView(){
+ const communication=location.hash==="#communication"||location.hash==="#requests";
+ $("professionalProfileHero").hidden=communication;
+ $("professionalProfileEditor").hidden=communication;
+ $("professionalCommunicationView").hidden=!communication;
+ document.title=communication?"التواصل مع المرضى | Diet Planner":"ملفي المهني | Diet Planner";
+ if(location.hash==="#requests")history.replaceState(null,"",location.pathname+location.search+"#communication");
+ return communication;
+}
 async function load(){
  user=await window.DietPlannerAccess?.getCurrentUser();if(!user){location.href="login.html";return;}
  const {data,error}=await db.from("professional_directory_profiles").select("*").eq("user_id",user.id).maybeSingle();
@@ -128,9 +137,10 @@ async function load(){
   setStatus("حالة الملف: "+({draft:"مسودة",pending_review:"قيد المراجعة — لا يمكن التعديل حتى انتهاء المراجعة",published:"منشور ومعتمد — أوقف الظهور أولًا قبل التعديل",rejected:"يحتاج إلى تعديل",suspended:"موقوف — تواصل مع إدارة المنصة"}[profileStatus]||profileStatus)+(data.moderation_note?" — ملاحظة: "+data.moderation_note:""));
   $("withdrawDirectoryProfile").hidden=!["pending_review","published"].includes(profileStatus);
  }else{profileStatus="draft";setStatus("لم تنشئ ملفًا مهنيًا بعد. الظهور اختياري.");}
- await loadOffers();setEditorLocked(["pending_review","published","suspended"].includes(profileStatus));await loadRequests();
+ await loadOffers();setEditorLocked(["pending_review","published","suspended"].includes(profileStatus));if(setPageView())await loadRequests();
 }
 document.addEventListener("DOMContentLoaded",()=>{
+ window.addEventListener("hashchange",()=>{if(setPageView())void loadRequests();else setPageView();});
  $("addProfessionalOffer").addEventListener("click",addOffer);
  $("saveProfessionalOffers").addEventListener("click",saveOffers);
  $("professionalProfileForm").addEventListener("submit",async e=>{e.preventDefault();if(await save()){}});
