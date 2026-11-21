@@ -165,33 +165,112 @@
     $("portalDiagnosis").textContent = data.diagnosis || "غير مسجل";
   }
 
+  function measurementDelta(value) {
+    if (!Number.isFinite(value)) return { value: "—", note: "لا توجد بيانات كافية", trend: "neutral" };
+    if (Math.abs(value) < 0.05) return { value: "0.0 كجم", note: "لا يوجد تغير", trend: "neutral" };
+    const amount = Math.abs(value).toFixed(1);
+    return value > 0
+      ? { value: "+" + amount + " كجم", note: "زيادة في الوزن", trend: "up" }
+      : { value: "−" + amount + " كجم", note: "انخفاض في الوزن", trend: "down" };
+  }
+
+  function renderMeasurementSummary() {
+    const logs = state.logs;
+    const valid = logs.filter(log => Number.isFinite(Number(log.weight)) && Number(log.weight) > 0);
+    const first = valid[0], latest = valid[valid.length - 1], previous = valid[valid.length - 2];
+    const overall = first && latest ? measurementDelta(Number(latest.weight) - Number(first.weight)) : null;
+    const recent = previous && latest ? measurementDelta(Number(latest.weight) - Number(previous.weight)) : null;
+    const set = (id, value, note, trend) => {
+      const node = $(id); if (!node) return;
+      node.textContent = value || "—";
+      node.dataset.trend = trend || "neutral";
+      const noteNode = $(id + "Note"); if (noteNode) noteNode.textContent = note || "";
+    };
+    set("portalWeightChangeOverall", overall?.value, overall ? (valid.length > 1 ? overall.note : "هذا هو القياس المسجل الأول") : "لا توجد قياسات مسجلة", overall?.trend);
+    set("portalWeightChangeRecent", recent?.value, recent?.note || "يلزم تسجيل قياسين على الأقل", recent?.trend);
+    const heightCm = Number(state.patient?.height);
+    const bmi = latest && heightCm > 0 ? Number(latest.weight) / Math.pow(heightCm / 100, 2) : NaN;
+    set("portalLatestBmi", Number.isFinite(bmi) ? bmi.toFixed(1) : "—",
+      Number.isFinite(bmi) ? "بناءً على آخر وزن والطول المسجل" : "يلزم تسجيل الطول والوزن لحساب BMI");
+  }
+
+  function renderMeasurements() {
+    renderMeasurementSummary();
+    const tbody = $("portalMeasurementsRows");
+    if (!tbody) return;
+    if (!state.logs.length) {
+      tbody.innerHTML = '<tr><td colspan="10">لا توجد قياسات مسجلة لهذا المريض.</td></tr>';
+      return;
+    }
+    const adherence = { excellent: "ممتاز", good: "جيد", fair: "متوسط", poor: "ضعيف" };
+    tbody.innerHTML = state.logs.map(log => {
+      const canManage = log.created_by === state.user?.id;
+      return `<tr>
+        <td>${escapeHtml(formatDate(log.measurement_date))}</td>
+        <td><strong>${escapeHtml(optionalNumber(log.weight, " كجم"))}</strong></td>
+        <td>${escapeHtml(optionalNumber(log.body_fat_percent, "%"))}</td>
+        <td>${escapeHtml(optionalNumber(log.muscle_percent, "%"))}</td>
+        <td>${escapeHtml(optionalNumber(log.water_percent, "%"))}</td>
+        <td>${escapeHtml(optionalNumber(log.waist_cm, " سم"))}</td>
+        <td>${escapeHtml(optionalNumber(log.hip_cm, " سم"))}</td>
+        <td>${escapeHtml(adherence[log.diet_adherence] || "—")}</td>
+        <td class="portal-measurement-notes">${escapeHtml(log.notes || "—")}</td>
+        <td>${canManage ? `<div class="portal-measurement-row-actions"><button type="button" data-edit-measurement="${escapeHtml(log.id)}">تعديل</button><button type="button" data-delete-measurement="${escapeHtml(log.id)}">حذف</button></div>` : '<span class="portal-measurement-readonly">سجل المختص</span>'}</td>
+      </tr>`;
+    }).join("");
+  }
+
   async function loadMeasurements() {
-    const { data, error } = await supabase
-      .from("weight_logs")
-      .select("id,weight,measurement_date,waist_cm,hip_cm,body_fat_percent,notes")
+    const { data, error } = await supabase.from("weight_logs")
+      .select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by")
       .eq("patient_id", state.patientId)
-      .order("measurement_date", { ascending: false })
-      .order("created_at", { ascending: false });
+      .order("measurement_date", { ascending: true })
+      .order("created_at", { ascending: true });
     if (error) throw error;
     state.logs = data || [];
     renderMeasurements();
   }
 
-  function renderMeasurements() {
-    const tbody = $("portalMeasurementsRows");
-    if (!tbody) return;
-    if (!state.logs.length) {
-      tbody.innerHTML = '<tr><td colspan="5">لم تسجل قياسات بعد. أضف أول قياس من النموذج أعلاه.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = state.logs.map(log => `
-      <tr>
-        <td>${escapeHtml(formatDate(log.measurement_date))}</td>
-        <td><strong>${escapeHtml(optionalNumber(log.weight, " كجم"))}</strong></td>
-        <td>${escapeHtml(optionalNumber(log.waist_cm, " سم"))}</td>
-        <td>${escapeHtml(optionalNumber(log.hip_cm, " سم"))}</td>
-        <td>${escapeHtml(optionalNumber(log.body_fat_percent, "%"))}</td>
-      </tr>`).join("");
+  function resetMeasurementForm() {
+    $("portalMeasurementForm")?.reset();
+    $("portalEditingMeasurementId").value = "";
+    $("portalMeasurementDate").value = localToday();
+    $("portalSaveMeasurement").innerHTML = '<i class="fa-solid fa-plus"></i> حفظ القياس';
+    $("portalCancelMeasurementEdit").hidden = true;
+  }
+
+  function editPatientMeasurement(id) {
+    const log = state.logs.find(item => String(item.id) === String(id));
+    if (!log || log.created_by !== state.user?.id) return;
+    const values = {
+      portalWeight: log.weight, portalMeasurementDate: log.measurement_date,
+      portalBodyFat: log.body_fat_percent, portalMuscle: log.muscle_percent,
+      portalWater: log.water_percent, portalWaist: log.waist_cm, portalHip: log.hip_cm,
+      portalAdherence: log.diet_adherence, portalMeasurementNotes: log.notes
+    };
+    Object.entries(values).forEach(([id, value]) => { $(id).value = value ?? ""; });
+    $("portalEditingMeasurementId").value = log.id;
+    $("portalSaveMeasurement").textContent = "حفظ التعديلات";
+    $("portalCancelMeasurementEdit").hidden = false;
+    $("portalMeasurementForm").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  async function deletePatientMeasurement(id, button) {
+    const log = state.logs.find(item => String(item.id) === String(id));
+    if (!log || log.created_by !== state.user?.id || state.busy) return;
+    if (!window.confirm("هل تريد حذف القياس الذي سجلته؟ لا يمكن التراجع عن الحذف.")) return;
+    state.busy = true; button.disabled = true;
+    try {
+      const { error } = await supabase.from("weight_logs").delete()
+        .eq("id", log.id).eq("patient_id", state.patientId).eq("created_by", state.user.id);
+      if (error) throw error;
+      state.logs = state.logs.filter(item => item.id !== log.id);
+      renderMeasurements();
+      setMessage("portalMeasurementMessage", "تم حذف القياس.", "success");
+    } catch (error) {
+      console.error("Patient measurement delete failed:", error);
+      setMessage("portalMeasurementMessage", error.message || "تعذر حذف القياس.", "error");
+    } finally { state.busy = false; button.disabled = false; }
   }
 
   async function loadPlans() {
@@ -410,42 +489,43 @@
   async function handleMeasurementSubmit(event) {
     event.preventDefault();
     if (state.busy || !state.patientId) return;
-    const weight = Number($("portalWeight").value);
-    const date = $("portalMeasurementDate").value;
-    const waist = $("portalWaist").value;
-    const hip = $("portalHip").value;
-    const bodyFat = $("portalBodyFat").value;
-    if (!Number.isFinite(weight) || weight <= 0 || !date) {
-      setMessage("portalMeasurementMessage", "أدخل وزنًا صحيحًا وتاريخ القياس.", "error");
-      return;
-    }
-    const button = $("portalMeasurementForm").querySelector('button[type="submit"]');
-    state.busy = true;
-    button.disabled = true;
-    setMessage("portalMeasurementMessage", "جاري حفظ القياس...");
+    const read = id => $(id).value.trim();
+    const number = id => read(id) === "" ? null : Number(read(id));
     const record = {
-      patient_id: state.patientId,
-      weight,
-      measurement_date: date,
-      waist_cm: waist ? Number(waist) : null,
-      hip_cm: hip ? Number(hip) : null,
-      body_fat_percent: bodyFat ? Number(bodyFat) : null,
-      notes: $("portalMeasurementNotes").value.trim() || null
+      patient_id: state.patientId, weight: number("portalWeight"),
+      measurement_date: read("portalMeasurementDate"),
+      body_fat_percent: number("portalBodyFat"), muscle_percent: number("portalMuscle"),
+      water_percent: number("portalWater"), waist_cm: number("portalWaist"),
+      hip_cm: number("portalHip"), diet_adherence: read("portalAdherence") || null,
+      notes: read("portalMeasurementNotes") || null
     };
-    try {
-      const { error } = await supabase.from("weight_logs").insert(record);
-      if (error) throw error;
-      $("portalMeasurementForm").reset();
-      $("portalMeasurementDate").value = localToday();
-      await loadMeasurements();
-      setMessage("portalMeasurementMessage", "تم حفظ القياس بنجاح.", "success");
-    } catch (error) {
-      console.error("Patient measurement insert failed:", error);
-      setMessage("portalMeasurementMessage", error.message || "تعذر حفظ القياس.", "error");
-    } finally {
-      state.busy = false;
-      button.disabled = false;
+    const percentValid = value => value === null || (Number.isFinite(value) && value >= 0 && value <= 100);
+    if (!record.measurement_date || !Number.isFinite(record.weight) || record.weight <= 0) {
+      setMessage("portalMeasurementMessage", "أدخل تاريخ القياس والوزن بصورة صحيحة.", "error"); return;
     }
+    if (![record.body_fat_percent,record.muscle_percent,record.water_percent].every(percentValid)) {
+      setMessage("portalMeasurementMessage", "النسب المئوية يجب أن تكون بين 0 و100%.", "error"); return;
+    }
+    if ([record.waist_cm,record.hip_cm].some(value => value !== null && (!Number.isFinite(value) || value <= 0))) {
+      setMessage("portalMeasurementMessage", "محيطات الجسم يجب أن تكون أكبر من صفر.", "error"); return;
+    }
+    const editingId = $("portalEditingMeasurementId").value;
+    const button = $("portalSaveMeasurement");
+    state.busy = true; button.disabled = true;
+    setMessage("portalMeasurementMessage", editingId ? "جاري تحديث القياس..." : "جاري حفظ القياس...");
+    try {
+      const query = editingId
+        ? supabase.from("weight_logs").update(record).eq("id", editingId).eq("patient_id", state.patientId).eq("created_by", state.user.id)
+        : supabase.from("weight_logs").insert(record);
+      const { error } = await query;
+      if (error) throw error;
+      resetMeasurementForm();
+      await loadMeasurements();
+      setMessage("portalMeasurementMessage", editingId ? "تم تحديث القياس بنجاح." : "تم حفظ القياس بنجاح.", "success");
+    } catch (error) {
+      console.error("Patient measurement save failed:", error);
+      setMessage("portalMeasurementMessage", error.message || "تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.", "error");
+    } finally { state.busy = false; button.disabled = false; }
   }
 
   async function init() {
@@ -470,6 +550,13 @@
       setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
     });
     $("portalMeasurementForm")?.addEventListener("submit", handleMeasurementSubmit);
+    $("portalCancelMeasurementEdit")?.addEventListener("click", resetMeasurementForm);
+    $("portalMeasurementsRows")?.addEventListener("click", event => {
+      const edit = event.target.closest("[data-edit-measurement]");
+      const remove = event.target.closest("[data-delete-measurement]");
+      if (edit) editPatientMeasurement(edit.dataset.editMeasurement);
+      else if (remove) void deletePatientMeasurement(remove.dataset.deleteMeasurement, remove);
+    });
     $("portalMeasurementDate").value = localToday();
     $("portalThemeToggle")?.addEventListener("click", () => {
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
