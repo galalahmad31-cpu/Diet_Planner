@@ -21,7 +21,7 @@
   <script src="js/app-header.js?v=20261121-patient-ia-v2" defer></script>
   <script src="js/auth-access.js?v=20261121-patient-routing-v1"></script>
   <script src="js/patient-messages.js?v=20261121-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261121-subscription-followup" defer></script>
+  <script src="js/patient-portal.js?v=20261121-self-patient-onboarding" defer></script>
 </head>
 <body class="patient-portal-page" data-dp-theme-toggle="off">
   <div data-dp-patient-header></div>
@@ -77,7 +77,14 @@
     <section id="portalUnlinked" class="portal-state-card" hidden>
       <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
       <h1>اربط حسابك بملفك الصحي</h1>
-      <p>أدخل رمز الدعوة الذي أرسله إليك المختص لربط حسابك بملفك الموجود بالفعل. لا تنشئ ملفًا جديدًا.</p>
+      <p>يمكنك إنشاء ملف صحي أساسي بنفسك لاستكشاف المختصين وإرسال طلب متابعة، أو ربط ملف موجود باستخدام رمز الدعوة الذي أرسله إليك المختص.</p>
+      <section class="portal-self-record-option">
+        <strong>ليس لديك ملف صحي بعد؟</strong>
+        <span>أنشئ ملفك الأساسي باستخدام اسمك وبيانات حسابك. لن تُضاف أي بيانات طبية تلقائيًا.</span>
+        <button type="button" id="portalCreateSelfRecord" class="portal-primary-button">إنشاء ملفي الصحي</button>
+        <p id="portalSelfRecordMessage" class="portal-inline-message" role="status"></p>
+      </section>
+      <div class="portal-invite-divider"><span>أو لديك رمز دعوة بالفعل</span></div>
       <form id="portalInviteForm" class="portal-invite-form">
         <label for="portalInviteToken">رمز الدعوة</label>
         <input id="portalInviteToken" type="text" inputmode="text" autocomplete="off" placeholder="الصق رمز الدعوة هنا" required>
