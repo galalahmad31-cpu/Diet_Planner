@@ -474,7 +474,7 @@
       button.disabled = true;
       const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", { p_request_id: button.dataset.cancelProfessionalRequest });
       if (cancelError) { button.disabled = false; root.dataset.error = cancelError.message; return; }
-      await loadProfessionalRequests();
+      await loadProfessionalRequests(rootId);
     }));
   }
 
