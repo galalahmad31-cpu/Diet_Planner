@@ -275,4 +275,197 @@ comment on function public.create_patient_invitation(uuid) is
 comment on function public.accept_patient_invitation(uuid) is
   'Atomically links the authenticated patient account to the existing patient record and records the primary professional relationship.';
 
+
+-- Explicit publication boundary: patients can read only plans the professional
+-- has intentionally published. Drafts remain private to the professional.
+create table public.patient_plan_publications (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid not null unique references public.nutrition_plans(id) on delete cascade,
+  published_by uuid not null references auth.users(id) on delete restrict,
+  published_at timestamptz not null default now(),
+  revoked_at timestamptz,
+  created_at timestamptz not null default now(),
+  constraint patient_plan_publications_state_check
+    check (revoked_at is null or revoked_at >= published_at)
+);
+
+alter table public.patient_plan_publications enable row level security;
+revoke all on public.patient_plan_publications from anon, authenticated;
+grant select on public.patient_plan_publications to authenticated;
+
+create policy patient_plan_publications_select_linked_patient_or_owner
+  on public.patient_plan_publications for select to authenticated
+  using (
+    revoked_at is null and (
+      published_by = (select auth.uid())
+      or exists (
+        select 1 from public.nutrition_plans np
+        join public.patient_accounts pa on pa.patient_id = np.patient_id
+        where np.id = patient_plan_publications.plan_id
+          and pa.user_id = (select auth.uid()) and pa.status = 'active'
+      )
+    )
+  );
+
+create or replace function public.publish_patient_nutrition_plan(p_plan_id uuid)
+returns void language plpgsql security definer
+set search_path = public, pg_temp
+as $
+declare v_uid uuid := auth.uid();
+begin
+  if v_uid is null then
+    raise exception 'Authentication required' using errcode = '28000';
+  end if;
+  if not exists (
+    select 1 from public.nutrition_plans np
+    join public.patients p on p.id = np.patient_id
+    where np.id = p_plan_id and p.user_id = v_uid
+  ) and not public.is_admin() then
+    raise exception 'Plan is not owned by caller' using errcode = '42501';
+  end if;
+  if not public.is_admin() and not public.has_active_subscription(v_uid) then
+    raise exception 'Active professional subscription required' using errcode = '42501';
+  end if;
+  insert into public.patient_plan_publications (plan_id, published_by)
+  values (p_plan_id, v_uid)
+  on conflict (plan_id) do update
+    set published_by = excluded.published_by,
+        published_at = now(), revoked_at = null;
+end;
+$;
+
+create or replace function public.revoke_patient_nutrition_plan(p_plan_id uuid)
+returns void language plpgsql security definer
+set search_path = public, pg_temp
+as $
+declare v_uid uuid := auth.uid();
+begin
+  if v_uid is null then
+    raise exception 'Authentication required' using errcode = '28000';
+  end if;
+  update public.patient_plan_publications pp
+  set revoked_at = now()
+  from public.nutrition_plans np
+  join public.patients p on p.id = np.patient_id
+  where pp.plan_id = np.id and np.id = p_plan_id
+    and (p.user_id = v_uid or public.is_admin())
+    and pp.revoked_at is null;
+  if not found then
+    raise exception 'Published plan not found or caller not authorized'
+      using errcode = '42501';
+  end if;
+end;
+$;
+
+revoke all on function public.publish_patient_nutrition_plan(uuid) from public, anon;
+revoke all on function public.revoke_patient_nutrition_plan(uuid) from public, anon;
+grant execute on function public.publish_patient_nutrition_plan(uuid) to authenticated;
+grant execute on function public.revoke_patient_nutrition_plan(uuid) to authenticated;
+
+create policy nutrition_plans_select_published_patient on public.nutrition_plans
+  for select to authenticated using (
+    exists (
+      select 1 from public.patient_plan_publications pp
+      join public.patient_accounts pa on pa.patient_id = nutrition_plans.patient_id
+      where pp.plan_id = nutrition_plans.id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+create policy plan_days_select_published_patient on public.plan_days
+  for select to authenticated using (
+    exists (
+      select 1 from public.nutrition_plans np
+      join public.patient_plan_publications pp on pp.plan_id = np.id
+      join public.patient_accounts pa on pa.patient_id = np.patient_id
+      where np.id = plan_days.plan_id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+create policy plan_meals_select_published_patient on public.plan_meals
+  for select to authenticated using (
+    exists (
+      select 1 from public.plan_days pd
+      join public.nutrition_plans np on np.id = pd.plan_id
+      join public.patient_plan_publications pp on pp.plan_id = np.id
+      join public.patient_accounts pa on pa.patient_id = np.patient_id
+      where pd.id = plan_meals.day_id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+create policy plan_items_select_published_patient on public.plan_items
+  for select to authenticated using (
+    exists (
+      select 1 from public.plan_meals pm
+      join public.plan_days pd on pd.id = pm.day_id
+      join public.nutrition_plans np on np.id = pd.plan_id
+      join public.patient_plan_publications pp on pp.plan_id = np.id
+      join public.patient_accounts pa on pa.patient_id = np.patient_id
+      where pm.id = plan_items.meal_id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+
+-- Preserve professional subscription gating while allowing a linked patient
+-- to read only a currently published plan and its child rows.
+drop policy if exists subscription_required_for_workspace_reads on public.nutrition_plans;
+create policy subscription_required_for_workspace_reads on public.nutrition_plans
+  as restrictive for select to authenticated using (
+    (select public.is_admin())
+    or (select public.has_active_subscription((select auth.uid())))
+    or exists (
+      select 1 from public.patient_plan_publications pp
+      join public.patient_accounts pa on pa.patient_id = nutrition_plans.patient_id
+      where pp.plan_id = nutrition_plans.id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+
+drop policy if exists subscription_required_for_workspace_reads on public.plan_days;
+create policy subscription_required_for_workspace_reads on public.plan_days
+  as restrictive for select to authenticated using (
+    (select public.is_admin())
+    or (select public.has_active_subscription((select auth.uid())))
+    or exists (
+      select 1 from public.nutrition_plans np
+      join public.patient_plan_publications pp on pp.plan_id = np.id
+      join public.patient_accounts pa on pa.patient_id = np.patient_id
+      where np.id = plan_days.plan_id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+
+drop policy if exists subscription_required_for_workspace_reads on public.plan_meals;
+create policy subscription_required_for_workspace_reads on public.plan_meals
+  as restrictive for select to authenticated using (
+    (select public.is_admin())
+    or (select public.has_active_subscription((select auth.uid())))
+    or exists (
+      select 1 from public.plan_days pd
+      join public.nutrition_plans np on np.id = pd.plan_id
+      join public.patient_plan_publications pp on pp.plan_id = np.id
+      join public.patient_accounts pa on pa.patient_id = np.patient_id
+      where pd.id = plan_meals.day_id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+
+drop policy if exists subscription_required_for_workspace_reads on public.plan_items;
+create policy subscription_required_for_workspace_reads on public.plan_items
+  as restrictive for select to authenticated using (
+    (select public.is_admin())
+    or (select public.has_active_subscription((select auth.uid())))
+    or exists (
+      select 1 from public.plan_meals pm
+      join public.plan_days pd on pd.id = pm.day_id
+      join public.nutrition_plans np on np.id = pd.plan_id
+      join public.patient_plan_publications pp on pp.plan_id = np.id
+      join public.patient_accounts pa on pa.patient_id = np.patient_id
+      where pm.id = plan_items.meal_id and pp.revoked_at is null
+        and pa.user_id = (select auth.uid()) and pa.status = 'active'
+    )
+  );
+
+comment on table public.patient_plan_publications is
+  'Explicit publish/revoke boundary for patient-visible nutrition plans; drafts are not visible to patients.';
+
 commit;
