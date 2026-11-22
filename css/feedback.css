@@ -281,17 +281,9 @@ body{
 }
 #feedbackList>article [data-delete-feedback]{border-color:var(--dp-danger);color:var(--dp-danger)}
 #feedbackEmpty{padding:1.5rem;border:1px dashed var(--dp-border);border-radius:1rem;background:var(--dp-surface-2);text-align:center;color:var(--dp-text-2)}
-#feedbackDeleteModal{
   position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;
   background:rgba(15,23,42,.55);backdrop-filter:blur(2px)
 }
-#feedbackDeleteModal>div{width:100%;max-width:24rem;padding:1.5rem;border:1px solid var(--dp-border);border-radius:1.5rem;background:var(--dp-surface);color:var(--dp-text);box-shadow:0 20px 50px rgba(0,0,0,.22)}
-#feedbackDeleteModal h2{margin:0;font-size:1.1rem;font-weight:900;color:var(--dp-text)}
-#feedbackDeleteModal p{margin-top:.5rem;color:var(--dp-text-2);font-size:.875rem;line-height:1.8}
-#feedbackDeleteModal>div>div:last-child{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.5rem}
-#feedbackDeleteModal button{min-height:44px;border-radius:.75rem;font:inherit;font-size:.875rem;font-weight:800;cursor:pointer}
-#cancelDeleteBtn{border:1px solid var(--dp-border);background:var(--dp-surface-2);color:var(--dp-text-2)}
-#confirmDeleteBtn{border:1px solid var(--dp-danger);background:var(--dp-danger);color:#fff}
 #loadingScreen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--dp-bg)}
 #loadingScreen .spinner{width:30px;height:30px;border:3px solid var(--dp-border);border-top-color:var(--dp-accent);border-radius:50%;animation:feedback-spin .8s linear infinite}
 #loadingScreen .flex{display:flex;flex-direction:column;align-items:center;gap:.75rem}
@@ -317,8 +309,6 @@ body{
 #feedbackList>article .text-slate-300{color:var(--dp-muted)}
 #feedbackList>article>p{margin-top:1rem;color:var(--dp-text-2);font-size:.875rem;line-height:1.9;white-space:pre-wrap}
 #feedbackList>article>div:last-child{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--dp-border)}
-#feedbackDeleteModal>div>div:first-child{display:flex;align-items:flex-start;gap:1rem}
-#feedbackDeleteModal>div>div:first-child>div:first-child{display:flex;flex:0 0 48px;align-items:center;justify-content:center;width:48px;height:48px;border-radius:1rem;background:color-mix(in srgb,var(--dp-danger) 12%,var(--dp-surface));color:var(--dp-danger)}
 
 
 @media(max-width:1100px){
