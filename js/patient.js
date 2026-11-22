@@ -11,7 +11,6 @@
     hasMorePatients: false,
     isLoadingPatients: false,
     statusFilter: 'all',
-    pendingDeleteId: null,
     statusTimer: null,
     user: null,
     isAdmin: false,
@@ -458,12 +457,10 @@
       variant: "danger"
     });
     if (!confirmed) return;
-    state.pendingDeleteId = id;
-    await deletePatient();
+    await deletePatient(id);
   }
 
-  async function deletePatient() {
-    const id = state.pendingDeleteId;
+  async function deletePatient(id) {
     if (!id) return;
 
     if (!state.user) {
