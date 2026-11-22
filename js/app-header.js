@@ -43,7 +43,7 @@
     ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"],
     ["finance.html", "اشتراكات المرضى", "fa-wallet"],
     ["notifications.html", "الإشعارات", "fa-bell"],
-    ["professional-directory-manage.html#communication", "التواصل مع المرضى", "fa-comments"],
+    ["professional-communication.html", "التواصل مع المرضى", "fa-comments"],
     ["profile.html", "الصفحة الشخصية", "fa-user"],
     ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
@@ -87,7 +87,6 @@
       return role === "professional" && path === target && (location.hash === "#" + fragment || (fragment === "communication" && location.hash === "#requests"));
     }
     if (path === target) {
-      if (role === "professional" && target === "professional-directory-manage.html") return !location.hash || location.hash === "#profile";
       return true;
     }
     if (role === "professional" &&
@@ -189,10 +188,7 @@
         });
       }
     });
-    window.addEventListener("hashchange", () => {
-      if (role !== "professional" || path !== "professional-directory-manage.html") return;
       track.querySelectorAll(".dp-app-header__link").forEach(node => {
-        const active = activeFor(node.dataset.headerHref, role);
         node.classList.toggle("is-active", active);
         if (active) node.setAttribute("aria-current", "page");
         else node.removeAttribute("aria-current");

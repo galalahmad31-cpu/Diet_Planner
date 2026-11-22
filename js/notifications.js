@@ -443,8 +443,8 @@ document.addEventListener('click', async (event) => {
     const requestId = openButton.dataset.requestId;
     if (currentAccountType === 'professional') {
       const target = requestId
-        ? `professional-directory-manage.html?request=${encodeURIComponent(requestId)}#requests`
-        : 'professional-directory-manage.html';
+        ? `professional-communication.html?request=${encodeURIComponent(requestId)}`
+        : 'professional-communication.html';
       location.href = target;
     } else {
       location.href = 'patient-portal.html';
