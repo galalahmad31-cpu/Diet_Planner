@@ -1431,7 +1431,8 @@
       measurements: { tab: 'measurementsTab', panel: 'measurementsPanel' },
       energy: { tab: 'energyTab', panel: 'patientEnergyPanel' },
       plans: { tab: 'plansTab', panel: 'plansPanel' },
-      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' }
+      'nutrition-support': { tab: 'nutritionSupportTab', panel: 'nutritionSupportPanel' },
+      'patient-care': { tab: 'patientCareTab', panel: 'patientCarePanel' }
     };
     if (moduleName !== null && !modules[moduleName]) return;
 
@@ -1473,10 +1474,7 @@
 
   function bindPatientModuleTabs() {
     document.querySelectorAll('[data-module]').forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const nextModule = tab.classList.contains('is-active') ? null : tab.dataset.module;
-        activatePatientModule(nextModule);
-      });
+      tab.addEventListener('click', () => activatePatientModule(tab.dataset.module));
     });
     window.addEventListener('message', (event) => {
       if (event.origin !== window.location.origin) return;
