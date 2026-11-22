@@ -2,8 +2,9 @@
 'use strict';
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
-const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all'};
-let confirmAction=null;
+const PAGE_SIZE=20;
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0};
+let confirmAction=null,requestSearchTimer=null,doctorSearchTimer=null;
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
@@ -34,41 +35,91 @@ async function requireAdmin(){
 }
 
 async function loadAll(){
- const [p,s,prof,pat]=await Promise.all([
-  sb.from('subscription_plans').select('*').order('created_at',{ascending:true}),
-  sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot').order('created_at',{ascending:false}),
-  sb.from('profiles').select('id,full_name,email,phone,role,created_at').order('created_at',{ascending:false}),
-  sb.from('patients').select('id,user_id,subscription_id')
- ]);
- if(p.error)throw p.error;if(s.error)throw s.error;if(prof.error)throw prof.error;if(pat.error)throw pat.error;
- state.plans=p.data||[];state.subs=s.data||[];state.profiles=prof.data||[];state.patients=pat.data||[];
-  renderRequests();renderPlans();renderDoctors();
-  await loadAnnouncements();
+ const {data:plans,error}=await sb.from('subscription_plans').select('*').order('created_at',{ascending:true});
+ if(error)throw error;state.plans=plans||[];renderPlans();
+ if(state.activeTab==='doctors')await loadDoctorsPage();else await loadRequestsPage();
+}
+function renderPager(id,page,total,onNext,onPrev){
+ let host=$(id);
+ if(!host){host=document.createElement('div');host.id=id;host.className='admin-pagination';host.style.cssText='display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;flex-wrap:wrap';$(id==='requestPager'?'requestWrap':'doctorWrap').insertAdjacentElement('afterend',host)}
+ const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));host.replaceChildren();
+ const info=document.createElement('span');info.textContent=`صفحة ${page+1} من ${pages} — ${total} سجل`;info.style.cssText='font-size:13px;color:var(--dp-text-2,#718096)';
+ const prev=document.createElement('button');prev.type='button';prev.className='btn btn-outline';prev.textContent='السابق';prev.disabled=page<=0;prev.onclick=onPrev;
+ const next=document.createElement('button');next.type='button';next.className='btn btn-outline';next.textContent='عرض 20 التالية';next.disabled=(page+1)*PAGE_SIZE>=total;next.onclick=onNext;host.append(prev,info,next);
+}
+async function loadRequestsPage(page=0){
+ state.requestPage=Math.max(0,page);setState('request','جاري تحميل الطلبات...');
+ const from=state.requestPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.requestSearch.trim().replace(/[,%()]/g,' ');
+ try{
+  const statuses=await Promise.all(['pending','paid','canceled'].map(status=>sb.from('subscriptions').select('id',{count:'exact',head:true}).eq('status',status)));
+  statuses.forEach(r=>{if(r.error)throw r.error});
+  const [allCount,profilesResult]=await Promise.all([
+   sb.from('subscriptions').select('id',{count:'exact',head:true}),
+   q?sb.from('profiles').select('id').or(`full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`).limit(500):Promise.resolve({data:[],error:null})
+  ]);
+  if(allCount.error)throw allCount.error;if(profilesResult.error)throw profilesResult.error;
+  const profileIds=(profilesResult.data||[]).map(x=>x.id),planIds=q?state.plans.filter(p=>String(p.name||'').toLowerCase().includes(q.toLowerCase())).map(p=>p.id):[],filters=[];
+  if(q){filters.push(`full_name.ilike.%${q}%`);if(profileIds.length)filters.push(`user_id.in.(${profileIds.join(',')})`);if(planIds.length)filters.push(`plan_id.in.(${planIds.join(',')})`)}
+  let query=sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot',{count:'exact'}).order('created_at',{ascending:false});
+  if(state.requestStatus!=='all')query=query.eq('status',state.requestStatus);
+  if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;state.requestAllTotal=allCount.count||0;$('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;renderRequests();return}query=query.or(filters.join(','))}
+  const result=await query.range(from,to);if(result.error)throw result.error;
+  state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;
+  const ids=[...new Set(state.subs.map(s=>s.user_id).filter(Boolean))];
+  if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=p.data||[]}else state.profiles=[];
+  $('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;$('totalCount').textContent=allCount.count||0;
+  renderRequests();
+ }catch(error){console.error('Admin requests page load failed:',error);setState('request',error.message||'تعذر تحميل الطلبات.')}
+}
+async function loadDoctorsPage(page=0){
+ state.doctorPage=Math.max(0,page);setState('doctor','جاري تحميل المستخدمين...');
+ const from=state.doctorPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.doctorSearch.trim().replace(/[,%()]/g,' '),today=new Date().toISOString().slice(0,10);
+ try{
+  let query=sb.from('profiles').select('id,full_name,email,phone,role,created_at',{count:'exact'}).order('created_at',{ascending:false});
+  if(q)query=query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
+  const [profilesResult,activeResult]=await Promise.all([
+   query.range(from,to),
+   sb.from('subscriptions').select('id',{count:'exact',head:true}).eq('status','paid').lte('start_date',today).gte('expiry_date',today)
+  ]);
+  if(profilesResult.error)throw profilesResult.error;if(activeResult.error)throw activeResult.error;
+  state.profiles=profilesResult.data||[];state.doctorTotal=profilesResult.count||0;
+  const ids=state.profiles.map(p=>p.id);
+  if(ids.length){
+   const sr=await sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot').in('user_id',ids).order('created_at',{ascending:false});
+   if(sr.error)throw sr.error;state.subs=sr.data||[];
+   const subscriptionIds=state.subs.map(s=>s.id);
+   let patientQuery=sb.from('patients').select('id,user_id,subscription_id');
+   patientQuery=subscriptionIds.length
+    ?patientQuery.or(`user_id.in.(${ids.join(',')}),subscription_id.in.(${subscriptionIds.join(',')})`)
+    :patientQuery.in('user_id',ids);
+   const patientResult=await patientQuery;if(patientResult.error)throw patientResult.error;
+   state.patients=state.profiles.map(profile=>{
+    const current=latestSub(profile.id);
+    const count=(patientResult.data||[]).filter(patient=>current?patient.subscription_id===current.id:patient.user_id===profile.id).length;
+    return {user_id:profile.id,count};
+   });
+  }else{state.subs=[];state.patients=[]}
+  state.doctorActiveTotal=activeResult.count||0;renderDoctors();
+ }catch(error){console.error('Admin doctors page load failed:',error);setState('doctor',error.message||'تعذر تحميل المستخدمين.')}
 }
 function renderRequests(){
  const body=$('requestsBody');
- const counts={all:state.subs.length,pending:state.subs.filter(s=>s.status==='pending').length,paid:state.subs.filter(s=>s.status==='paid').length,canceled:state.subs.filter(s=>s.status==='canceled').length};
- $('totalCount').textContent=counts.all;$('pendingCount').textContent=counts.pending;$('paidCount').textContent=counts.paid;$('canceledCount').textContent=counts.canceled;
+ $('totalCount').textContent=state.requestAllTotal;
  document.querySelectorAll('[data-request-filter]').forEach(b=>{
   const active=b.dataset.requestFilter===state.requestStatus;
   b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));
  });
- const q=state.requestSearch.trim().toLocaleLowerCase();
- const filtered=state.subs.filter(s=>{
-  if(state.requestStatus!=='all'&&s.status!==state.requestStatus)return false;
-  if(!q)return true;
-  const profile=state.profiles.find(p=>p.id===s.user_id);
-  return [s.full_name,profile?.full_name,profile?.email,profile?.phone,planName(s.plan_id),s.status].some(v=>String(v||'').toLocaleLowerCase().includes(q));
- });
- if(!filtered.length){setState('request',state.subs.length?'لا توجد نتائج مطابقة للبحث أو الحالة المحددة.':'لا توجد طلبات اشتراك حاليًا.');return}
- body.innerHTML=filtered.map(s=>`<tr>
+ const rows=state.subs;
+ if(!rows.length){setState('request',state.requestTotal?'لا توجد نتائج مطابقة للبحث أو الحالة المحددة.':'لا توجد طلبات اشتراك حاليًا.');renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));return}
+ body.innerHTML=rows.map(s=>`<tr>
  <td><span class="name">${esc(s.full_name||'بدون اسم')}</span><span class="meta">${esc(state.profiles.find(p=>p.id===s.user_id)?.email||'')}</span></td>
  <td>${esc(planName(s.plan_id))}</td><td>${money(state.plans.find(p=>p.id===s.plan_id)?.price)}</td><td>${dateTime(s.created_at)}</td>
  <td>${date(s.start_date)}<br>${date(s.expiry_date)}</td><td>${statusBadge(s.status,s.expiry_date)}</td>
  <td>${s.payment_proof_path?'<button class="icon-btn" title="عرض الإثبات" data-proof="'+esc(s.id)+'"><i class="fa-solid fa-image"></i></button>':'—'}</td>
  <td class="actions-cell"><button class="icon-btn" title="تعديل" data-edit-sub="${esc(s.id)}"><i class="fa-solid fa-pen"></i></button>
  <button class="icon-btn danger" title="حذف" data-del-sub="${esc(s.id)}"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
- setState('request','',true)
+ setState('request','',true);
+ renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));
 }
 const featureLabel=k=>PLAN_FEATURES.find(x=>x.key===k)?.label||k;
 function featuresText(f){const a=PLAN_FEATURES.filter(x=>f?.[x.key]===true).map(x=>x.label);return a.length?a.join('، '):'—'}
@@ -91,14 +142,14 @@ function isActivePaidSub(s){
   // The current plan is the valid paid subscription, not a newer canceled request.
   return userSubs.find(isActivePaidSub)||userSubs.find(s=>s.status==='pending')||userSubs[0]||null;
  }
-function patientCountForSub(sub){return sub?state.patients.filter(p=>p.subscription_id===sub.id).length:state.patients.filter(p=>p.user_id===sub?.user_id).length}
+function patientCountForSub(sub){return state.patients.find(p=>p.user_id===sub?.user_id)?.count||0}
 function roleLabel(role){return role==='admin'?'Admin':'User'}
 function roleOptions(selected){return `<option value="user" ${selected==='user'?'selected':''}>User</option><option value="admin" ${selected==='admin'?'selected':''}>Admin</option>`}
 function renderDoctors(){
- const q=($('doctorSearch').value||'').trim().toLowerCase();
- const doctors=state.profiles.filter(p=>!q||[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q)));
- $('doctorCount').textContent=state.profiles.length;$('doctorActiveCount').textContent=state.profiles.filter(p=>isActivePaidSub(latestSub(p.id))).length;
- const body=$('doctorsBody');if(!doctors.length){setState('doctor','لا توجد نتائج.');return}
+ $('doctorCount').textContent=state.doctorTotal;
+ $('doctorActiveCount').textContent=state.doctorActiveTotal;
+ const doctors=state.profiles;
+ const body=$('doctorsBody');if(!doctors.length){setState('doctor',state.doctorTotal?'لا توجد نتائج مطابقة للبحث.':'لا يوجد مستخدمون.');renderPager('doctorPager',state.doctorPage,state.doctorTotal,()=>loadDoctorsPage(state.doctorPage+1),()=>loadDoctorsPage(state.doctorPage-1));return}
  body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);const max=s?.max_patients_snapshot;
  const actions=s
   ? '<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>'
@@ -108,7 +159,8 @@ function renderDoctors(){
  <td>${s?esc(planName(s.plan_id)):'—'}</td><td>${date(s?.start_date)}</td><td>${date(s?.expiry_date)}</td>
  <td>${count} / ${max==null?'∞':esc(max)}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
  <td class="actions-cell">${actions}</td></tr>`}).join('');
- setState('doctor','',true)
+ setState('doctor','',true);
+ renderPager('doctorPager',state.doctorPage,state.doctorTotal,()=>loadDoctorsPage(state.doctorPage+1),()=>loadDoctorsPage(state.doctorPage-1));
 }
 
 function planForm(p){
@@ -257,9 +309,10 @@ function deleteSubscription(s){
   toast('تم حذف الاشتراك');await loadAll()
  })
 }
-function deletePlan(p){
- const used=state.subs.some(s=>s.plan_id===p.id);
- if(used){toast('لا يمكن حذف خطة مرتبطة باشتراكات. عطّلها بدلًا من حذفها.');return}
+async function deletePlan(p){
+ const {count,error}=await sb.from('subscriptions').select('id',{count:'exact',head:true}).eq('plan_id',p.id);
+ if(error){toast(error.message||'تعذر التحقق من ارتباط الخطة بالاشتراكات.');return}
+ if(count>0){toast('لا يمكن حذف خطة مرتبطة باشتراكات. عطّلها بدلًا من حذفها.');return}
  askConfirm('حذف الخطة','هل أنت متأكد من حذف خطة <b>'+esc(p.name)+'</b>؟<br>لن يمكن التراجع عن هذه العملية.',async()=>{
   const r=await sb.from('subscription_plans').delete().eq('id',p.id);if(r.error){toast(r.error.message||'تعذر حذف الخطة');return}toast('تم حذف الخطة');await loadAll()
  })
@@ -401,12 +454,19 @@ async function savePrivacyPolicy(){
 }
 
 function switchTab(tab){
- state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
- ['requests','plans','doctors','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});if(tab==='doctors')renderDoctors();if(tab==='announcements')loadAnnouncements();if(tab==='privacy')loadPrivacyPolicy()
+  state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  ['requests','plans','doctors','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
+  if(tab==='requests')loadRequestsPage();
+  if(tab==='doctors')loadDoctorsPage();
+  if(tab==='announcements')loadAnnouncements();
+  if(tab==='privacy')loadPrivacyPolicy();
 }
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-$('newPlanBtn').onclick=()=>openPlan(null);$('refreshBtn').onclick=()=>loadAll();$('refreshDoctorsBtn').onclick=()=>loadAll();$('doctorSearch').oninput=renderDoctors;
+$('newPlanBtn').onclick=()=>openPlan(null);
+ $('refreshBtn').onclick=()=>loadRequestsPage(0);
+ $('refreshDoctorsBtn').onclick=()=>loadDoctorsPage(0);
+ $('doctorSearch').oninput=()=>{clearTimeout(doctorSearchTimer);doctorSearchTimer=setTimeout(()=>{state.doctorSearch=$('doctorSearch').value.trim();state.doctorPage=0;loadDoctorsPage(0)},300)};
 $('refreshPrivacyPolicyBtn').onclick=()=>loadPrivacyPolicy();$('savePrivacyPolicyBtn').onclick=savePrivacyPolicy;
 $('newAnnouncementBtn').onclick=()=>openAnnouncementForm();$('refreshAnnouncementsBtn').onclick=()=>loadAnnouncements();
 $('announcementList').onclick=e=>{
@@ -415,8 +475,8 @@ $('announcementList').onclick=e=>{
  else if(toggle)toggleAnnouncement(toggle.dataset.announcementToggle);
  else if(del)deleteAnnouncement(del.dataset.announcementDelete);
 };
- $('requestSearch').oninput=e=>{state.requestSearch=e.target.value;renderRequests()};
- document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;renderRequests()});
+ $('requestSearch').oninput=e=>{clearTimeout(requestSearchTimer);requestSearchTimer=setTimeout(()=>{state.requestSearch=e.target.value.trim();state.requestPage=0;loadRequestsPage(0)},300)};
+ document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;state.requestPage=0;loadRequestsPage(0)});
 $('modalClose').onclick=closeModal;$('modalBg').onclick=e=>{if(e.target===e.currentTarget)closeModal()};
 $('confirmClose').onclick=closeConfirm;$('confirmNo').onclick=closeConfirm;$('confirmYes').onclick=async()=>{const a=confirmAction;if(!a)return;confirmAction=null;$('confirmBg').style.display='none';await a()};
 $('confirmBg').onclick=e=>{if(e.target===e.currentTarget)closeConfirm()};$('proofClose').onclick=()=>{$('proofBg').style.display='none'};$('proofBg').onclick=e=>{if(e.target===e.currentTarget)$('proofBg').style.display='none'};
