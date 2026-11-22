@@ -13,7 +13,6 @@
     loading: document.getElementById("loadingScreen"),
     accountName: document.getElementById("doctorName"),
     logout: document.getElementById("logoutBtn"),
-    adminCard: document.getElementById("adminCard"),
   };
 
   // ---------------------------------------------------------
@@ -78,11 +77,6 @@
     }
   }
 
-  function renderAdminCard(isAdmin) {
-    // The professional dashboard is shared; only this action is admin-specific.
-    // CSS explicitly honors [hidden], so visibility has one source of truth.
-    if (elements.adminCard) elements.adminCard.hidden = isAdmin !== true;
-  }
 
   // ---------------------------------------------------------
   // Notification card indicators
@@ -374,20 +368,17 @@
         await access.getAccessStatus();
 
       if (!status.authenticated || !status.user) {
-        renderAdminCard(false);
         renderVisitorDashboard();
         renderDashboardNotifications([], "unavailable");
         return;
       }
 
       await renderAccountName(status.user, status.isAdmin === true);
-      renderAdminCard(status.isAdmin);
       // Load the dashboard notification summary after authentication.
       await loadDashboardNotifications(status.user.id);
     } catch (error) {
       console.error("Dashboard access verification failed:", error);
       // The public dashboard remains available even when account verification fails.
-      renderAdminCard(false);
       renderVisitorDashboard();
       renderDashboardNotifications([], "unavailable");
     }
