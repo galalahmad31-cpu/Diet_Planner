@@ -3,7 +3,7 @@
 const db=window.DietPlannerAccess?.supabaseClient;
 const $=id=>document.getElementById(id);
 const PAGE_SIZE=20;
-const state={profiles:[],offers:new Map(),offset:0,loading:false,selectedProfile:null,requestStatus:new Map()};
+const state={profiles:[],offers:new Map(),offset:0,loading:false,selectedProfile:null,requestStatus:new Map(),currentUserId:null};
 const modeLabels={online:"متابعة أونلاين",in_person:"متابعة حضورية",phone:"متابعة هاتفية"};
 const esc=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const arr=value=>Array.isArray(value)?value:[];
@@ -54,6 +54,7 @@ async function loadOffers(profiles){
 }
 async function loadMyRequests(){
  const user=await window.DietPlannerAccess?.getCurrentUser();
+ state.currentUserId=user?.id||null;
  if(!user||!db)return;
  const {data,error}=await db.rpc("list_my_professional_connection_requests");
  if(error){console.warn("[Professional Directory] Existing requests could not be loaded:",error);return;}
@@ -65,7 +66,9 @@ async function loadProfiles(){
  state.loading=true;const more=$("directoryMore");more.disabled=true;
  $("directoryStatus").textContent=state.profiles.length?"جاري تحميل المزيد...":"جاري تحميل المتخصصين...";
  try{
-  const {data,error}=await db.from("professional_directory_profiles").select("user_id,display_name,professional_title,bio,specialties,city,governorate,experience_years,service_modes").order("governorate").range(state.offset,state.offset+PAGE_SIZE-1);
+  let query=db.from("professional_directory_profiles").select("user_id,display_name,professional_title,bio,specialties,city,governorate,experience_years,service_modes").eq("listing_status","published").eq("is_verified",true).order("governorate");
+  if(state.currentUserId)query=query.neq("user_id",state.currentUserId);
+  const {data,error}=await query.range(state.offset,state.offset+PAGE_SIZE-1);
   if(error)throw error;
   const page=Array.isArray(data)?data:[];
   await loadOffers(page);
