@@ -33,17 +33,19 @@ function showEmpty(message) {
   if (hint) hint.textContent = message;
 }
 
-function closeDeleteModal() {
-  state.deletingId = null;
-  $("deleteModal")?.classList.add("hidden");
-  $("deleteModal")?.classList.remove("flex");
-}
-
-function openDeleteModal(id) {
+async function openDeleteModal(id) {
   if (!state.isAdmin) return;
+  const section = state.sections.find(item => item.id === id);
+  if (!section) return;
+  const confirmed = await window.DPConfirm?.ask({
+    title: "حذف المحتوى؟",
+    message: `هل تريد حذف «${section.title || "هذا المربع"}»؟ لا يمكن التراجع عن الحذف.`,
+    confirmText: "حذف",
+    variant: "danger"
+  });
+  if (!confirmed) return;
   state.deletingId = id;
-  $("deleteModal")?.classList.remove("hidden");
-  $("deleteModal")?.classList.add("flex");
+  await confirmDelete();
 }
 
 function openLinkModal(id) {
@@ -430,29 +432,14 @@ async function confirmDelete() {
   const id = state.deletingId;
   if (!id || !state.isAdmin) return;
 
-  const button = $("confirmDeleteBtn");
-  if (button) {
-    button.disabled = true;
-    button.textContent = "جاري الحذف...";
-  }
-
   const { error } = await db.from("about_sections").delete().eq("id", id);
   if (error) {
     console.error("Delete about section failed:", error);
-    if (button) {
-      button.disabled = false;
-      button.textContent = "حذف";
-    }
     alert("تعذر حذف المربع: " + error.message);
     return;
   }
 
   state.sections = state.sections.filter(item => item.id !== id);
-  if (button) {
-    button.disabled = false;
-    button.textContent = "حذف";
-  }
-  closeDeleteModal();
   render();
 }
 
@@ -480,8 +467,6 @@ document.querySelectorAll(".about-tab").forEach(tab => {
 });
 
 $("addSectionBtn")?.addEventListener("click", addSection);
-$("cancelDeleteBtn")?.addEventListener("click", closeDeleteModal);
-$("confirmDeleteBtn")?.addEventListener("click", confirmDelete);
 $("cancelLinkBtn")?.addEventListener("click", closeLinkModal);
 $("applyLinkBtn")?.addEventListener("click", applyLink);
 $("linkUrlInput")?.addEventListener("keydown", event => {
@@ -493,9 +478,6 @@ $("linkUrlInput")?.addEventListener("keydown", event => {
     event.preventDefault();
     closeLinkModal();
   }
-});
-$("deleteModal")?.addEventListener("click", event => {
-  if (event.target === $("deleteModal")) closeDeleteModal();
 });
 $("linkModal")?.addEventListener("click", event => {
   if (event.target === $("linkModal")) closeLinkModal();
