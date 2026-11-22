@@ -77,8 +77,8 @@ async function save(){
  if(readError){setStatus("تعذر التحقق من الملف: "+readError.message);return false;}
  const result=existing?await db.from("professional_directory_profiles").update(profile).eq("user_id",user.id):await db.from("professional_directory_profiles").insert(profile);
  if(result.error){setStatus("تعذر حفظ البيانات المهنية: "+result.error.message);return false;}
- if(!await saveOffers())return false;
  profileExists=true;
+ if(!await saveOffers())return false;
  setStatus("تم حفظ الملف المهني والخدمات والأسعار.");
  return true;
 }
