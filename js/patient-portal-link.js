@@ -26,7 +26,7 @@
         <button type="button" class="patient-portal-invite-close" aria-label="إغلاق">×</button>
         <span class="patient-portal-invite-icon"><i class="fa-solid fa-link"></i></span>
         <h3 id="patientPortalInviteTitle">دعوة المريض لربط حسابه</h3>
-        <p class="patient-portal-invite-description">أرسل هذا الرابط للمريض. يمكن استخدامه مرة واحدة خلال 24 ساعة، وبعد تسجيل الدخول سيُربط حسابه بملفه الحالي.</p>
+        <p class="patient-portal-invite-description">أرسل الرابط أو كود الربط للمريض. إذا كان لديه حساب مريض نشط، يتحول استخدام الكود إلى طلب متابعة ينتظر موافقتك؛ وإذا لم يكن مرتبطًا بحساب، يُربط بالملف الحالي. صالح لمرة واحدة خلال 24 ساعة.</p>
         <label for="patientPortalInviteUrl">رابط الدعوة</label>
         <input id="patientPortalInviteUrl" type="text" readonly dir="ltr">
         <label for="patientPortalInviteCode">كود الربط (يمكن إدخاله داخل بوابة المريض)</label>
