@@ -111,14 +111,14 @@ function renderRequests(){
  });
  const rows=state.subs;
  if(!rows.length){setState('request',state.requestTotal?'لا توجد نتائج مطابقة للبحث أو الحالة المحددة.':'لا توجد طلبات اشتراك حاليًا.');renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));return}
- body.innerHTML=rows.map(s=>`<tr>
- <td><span class="name">${esc(s.full_name||'بدون اسم')}</span><span class="meta">${esc(state.profiles.find(p=>p.id===s.user_id)?.email||'')}</span></td>
- <td>${accountTypeBadge(state.profiles.find(p=>p.id===s.user_id)?.account_type,state.profiles.find(p=>p.id===s.user_id)?.role)}</td>
+ body.innerHTML=rows.map(s=>{const profile=state.profiles.find(p=>p.id===s.user_id);return `<tr>
+ <td><span class="name">${esc(s.full_name||'بدون اسم')}</span><span class="meta">${esc(profile?.email||'')}</span></td>
+ <td>${accountTypeBadge(profile?.account_type,profile?.role)}</td>
  <td>${esc(planName(s.plan_id))}</td><td>${money(state.plans.find(p=>p.id===s.plan_id)?.price)}</td><td>${dateTime(s.created_at)}</td>
  <td>${date(s.start_date)}<br>${date(s.expiry_date)}</td><td>${statusBadge(s.status,s.expiry_date)}</td>
  <td>${s.payment_proof_path?'<button class="icon-btn" title="عرض الإثبات" data-proof="'+esc(s.id)+'"><i class="fa-solid fa-image"></i></button>':'—'}</td>
  <td class="actions-cell"><button class="icon-btn" title="تعديل" data-edit-sub="${esc(s.id)}"><i class="fa-solid fa-pen"></i></button>
- <button class="icon-btn danger" title="حذف" data-del-sub="${esc(s.id)}"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+ <button class="icon-btn danger" title="حذف" data-del-sub="${esc(s.id)}"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join('');
  setState('request','',true);
  renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));
 }
