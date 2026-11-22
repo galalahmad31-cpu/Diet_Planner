@@ -66,7 +66,7 @@ async function loadRequestsPage(page=0){
   const result=await query.range(from,to);if(result.error)throw result.error;
   state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;
   const ids=[...new Set(state.subs.map(s=>s.user_id).filter(Boolean))];
-  if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=p.data||[]}else state.profiles=[];
+  if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,account_type,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=p.data||[]}else state.profiles=[];
   $('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;$('totalCount').textContent=allCount.count||0;
   renderRequests();
  }catch(error){console.error('Admin requests page load failed:',error);setState('request',error.message||'تعذر تحميل الطلبات.')}
@@ -75,7 +75,7 @@ async function loadDoctorsPage(page=0){
  state.doctorPage=Math.max(0,page);setState('doctor','جاري تحميل المستخدمين...');
  const from=state.doctorPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.doctorSearch.trim().replace(/[,%()]/g,' '),today=new Date().toISOString().slice(0,10);
  try{
-  let query=sb.from('profiles').select('id,full_name,email,phone,role,created_at',{count:'exact'}).order('created_at',{ascending:false});
+  let query=sb.from('profiles').select('id,full_name,email,phone,role,account_type,created_at',{count:'exact'}).order('created_at',{ascending:false});
   if(q)query=query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
   const [profilesResult,activeResult]=await Promise.all([
    query.range(from,to),
@@ -113,6 +113,7 @@ function renderRequests(){
  if(!rows.length){setState('request',state.requestTotal?'لا توجد نتائج مطابقة للبحث أو الحالة المحددة.':'لا توجد طلبات اشتراك حاليًا.');renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));return}
  body.innerHTML=rows.map(s=>`<tr>
  <td><span class="name">${esc(s.full_name||'بدون اسم')}</span><span class="meta">${esc(state.profiles.find(p=>p.id===s.user_id)?.email||'')}</span></td>
+ <td>${accountTypeBadge(state.profiles.find(p=>p.id===s.user_id)?.account_type,state.profiles.find(p=>p.id===s.user_id)?.role)}</td>
  <td>${esc(planName(s.plan_id))}</td><td>${money(state.plans.find(p=>p.id===s.plan_id)?.price)}</td><td>${dateTime(s.created_at)}</td>
  <td>${date(s.start_date)}<br>${date(s.expiry_date)}</td><td>${statusBadge(s.status,s.expiry_date)}</td>
  <td>${s.payment_proof_path?'<button class="icon-btn" title="عرض الإثبات" data-proof="'+esc(s.id)+'"><i class="fa-solid fa-image"></i></button>':'—'}</td>
@@ -144,6 +145,13 @@ function isActivePaidSub(s){
  }
 function patientCountForSub(sub){return state.patients.find(p=>p.user_id===sub?.user_id)?.count||0}
 function roleLabel(role){return role==='admin'?'Admin':'User'}
+function accountTypeBadge(type,role){
+ if(role==='admin')return '<span class="badge active">مسؤول الإدارة</span>';
+ if(type==='professional')return '<span class="badge active">مختص</span>';
+ if(type==='patient')return '<span class="badge pending">مريض</span>';
+ if(type==='pending')return '<span class="badge off">لم يحدد بعد</span>';
+ return '<span class="badge off">غير محدد</span>';
+}
 function roleOptions(selected){return `<option value="user" ${selected==='user'?'selected':''}>User</option><option value="admin" ${selected==='admin'?'selected':''}>Admin</option>`}
 function renderDoctors(){
  $('doctorCount').textContent=state.doctorTotal;
@@ -155,6 +163,7 @@ function renderDoctors(){
   ? '<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>'
   : '<button class="icon-btn" title="إضافة اشتراك" data-add-sub="'+esc(p.id)+'"><i class="fa-solid fa-pen"></i></button>';
  return `<tr><td><span class="name">${esc(p.full_name||'بدون اسم')}</span><span class="meta">${esc(p.email||'')}</span></td>
+ <td>${accountTypeBadge(p.account_type,p.role)}</td>
  <td><span class="badge ${p.role==='admin'?'active':'off'}">${roleLabel(p.role)}</span></td>
  <td>${s?esc(planName(s.plan_id)):'—'}</td><td>${date(s?.start_date)}</td><td>${date(s?.expiry_date)}</td>
  <td>${count} / ${max==null?'∞':esc(max)}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
