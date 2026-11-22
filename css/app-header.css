@@ -1,5 +1,6 @@
 /* Diet Planner — one responsive header system for guests, patients and professionals. */
 .dp-app-header{
+  cursor:pointer;
   position:relative;z-index:30;width:min(100% - 24px,1600px);margin:12px auto 18px;
   padding:15px 18px 12px;color:#fff;border:1px solid rgba(255,255,255,.13);
   border-radius:24px;background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
@@ -11,8 +12,7 @@
 .dp-app-header__brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:#fff}
 .dp-app-header__logo-link{display:inline-flex;flex:0 0 auto;color:inherit;text-decoration:none}
 .dp-app-header__logo{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid rgba(255,255,255,.18);border-radius:15px;background:rgba(255,255,255,.13);font-size:20px}
-.dp-app-header__brand-copy{display:flex;flex-direction:column;gap:1px;min-width:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-family:var(--dp-font,Cairo,sans-serif);text-align:start;line-height:1.35;cursor:pointer}
-.dp-app-header__brand-copy:focus-visible{outline:2px solid #fff;outline-offset:5px;border-radius:5px}
+.dp-app-header__brand-copy{display:flex;cursor:default;flex-direction:column;gap:1px;min-width:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-family:var(--dp-font,Cairo,sans-serif);text-align:start;line-height:1.35;cursor:pointer}
 .dp-app-header__brand-copy strong{font-size:19px;font-weight:900;letter-spacing:-.2px;color:#fff}
 .dp-app-header__brand-copy small{font-size:11px;font-weight:700;color:rgba(255,255,255,.82)}
 .dp-app-header__account{position:relative;z-index:1;display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto;flex-wrap:wrap}
@@ -28,14 +28,16 @@
 .dp-app-header__theme{width:36px;padding:0}
 .dp-app-header__account [hidden],.dp-app-header__context[hidden],.dp-app-header__notification-badge[hidden]{display:none!important}
 .dp-app-header__account-link:disabled{opacity:.65;cursor:wait}
-.dp-app-header__nav{position:relative;z-index:1;display:flex;flex-direction:column;align-items:stretch;gap:7px;width:100%;min-width:0}
+.dp-app-header__nav{position:relative;cursor:default;z-index:1;display:flex;flex-direction:column;align-items:stretch;gap:7px;width:100%;min-width:0}
 .dp-app-header.is-collapsed .dp-app-header__track > .dp-app-header__link:nth-child(n+7){display:none!important}
 .dp-app-header.is-collapsed .dp-app-header__page-title,
 .dp-app-header.is-collapsed .dp-app-header__context{display:none!important}
 .dp-app-header.is-collapsed{padding-bottom:11px}
 .dp-app-header.is-collapsed .dp-app-header__brand-row{margin-bottom:0}
+.dp-app-header.is-collapsed .dp-app-header__collapse-hint{margin-top:7px}
 .dp-app-header__track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;width:100%;min-width:0}
 .dp-app-header__link{
+  cursor:pointer;
   position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:40px;
   padding:8px 7px;border:1px solid rgba(255,255,255,.12);border-radius:12px;
   background:rgba(255,255,255,.09);color:#f2fbf8;font-family:var(--dp-font,Cairo,sans-serif);
@@ -50,6 +52,9 @@
   position:absolute;top:2px;inset-inline-start:4px;display:grid;place-items:center;min-width:17px;height:17px;
   padding:0 3px;border:2px solid #087765;border-radius:999px;background:#d94848;color:#fff;font-size:9px;font-weight:900;line-height:1
 }
+.dp-app-header__collapse-hint{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;width:max-content;max-width:100%;margin:9px auto 0;padding:4px 11px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.09);color:rgba(255,255,255,.84);font-family:var(--dp-font,Cairo,sans-serif);font-size:10px;font-weight:700;line-height:1.4;pointer-events:none;cursor:default}
+.dp-app-header__collapse-hint i{font-size:11px;opacity:.9}
+.dp-app-header:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .dp-app-header__page-title{position:relative;z-index:1;margin-top:8px;color:rgba(255,255,255,.84);font-size:11px;font-weight:700}
 .dp-app-header__page-title:empty{display:none}
 .dp-app-header__context{display:flex;align-items:center;flex-wrap:wrap;gap:9px;width:100%;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.16)}
@@ -62,6 +67,7 @@
   .dp-app-header__brand-row{gap:7px;margin-bottom:9px}
   .dp-app-header__logo{width:38px;height:38px;flex-basis:38px;border-radius:12px;font-size:17px}
   .dp-app-header__brand{gap:8px}
+  .dp-app-header__collapse-hint{margin-top:7px;padding:3px 9px;font-size:9px}
   .dp-app-header__brand-copy strong{font-size:16px}
   .dp-app-header__brand-copy small{font-size:9px}
   .dp-app-header__account{gap:5px}
