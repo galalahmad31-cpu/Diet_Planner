@@ -22,9 +22,8 @@
   color:#fff;font:inherit;font-family:var(--dp-font,Cairo,sans-serif);font-size:11px;font-weight:800;
   text-decoration:none;white-space:nowrap;cursor:pointer
 }
-.dp-app-header__register,.dp-app-header__my-account{background:#fff;border-color:#fff;color:#15594d}
 .dp-app-header__account-link:hover,.dp-app-header__theme:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)}
-.dp-app-header__register:hover,.dp-app-header__my-account:hover{background:#edf8f3}
+.dp-app-header__register:hover{background:#edf8f3}
 .dp-app-header__theme{width:36px;padding:0}
 .dp-app-header__account [hidden],.dp-app-header__context[hidden],.dp-app-header__notification-badge[hidden]{display:none!important}
 .dp-app-header__account-link:disabled{opacity:.65;cursor:wait}
@@ -51,7 +50,7 @@
   position:absolute;top:2px;inset-inline-start:4px;display:grid;place-items:center;min-width:17px;height:17px;
   padding:0 3px;border:2px solid #087765;border-radius:999px;background:#d94848;color:#fff;font-size:9px;font-weight:900;line-height:1
 }
-.dp-app-header__collapse-toggle{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;justify-self:center;gap:7px;min-width:112px;min-height:32px;margin:0;padding:5px 11px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(255,255,255,.13);color:rgba(255,255,255,.94);font:inherit;font-family:var(--dp-font,Cairo,sans-serif);font-size:10px;font-weight:800;line-height:1;white-space:nowrap;cursor:pointer;transition:background .18s,border-color .18s}
+.dp-app-header__collapse-toggle{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;justify-self:center;gap:0;width:34px;min-width:34px;min-height:34px;margin:0;padding:0;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(255,255,255,.13);color:rgba(255,255,255,.94);font:inherit;font-family:var(--dp-font,Cairo,sans-serif);font-size:0;font-weight:800;line-height:1;white-space:nowrap;cursor:pointer;transition:background .18s,border-color .18s}
 .dp-app-header__collapse-toggle:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.42)}
 .dp-app-header__collapse-toggle i{font-size:10px;transition:transform .18s ease}
 .dp-app-header.is-collapsed .dp-app-header__collapse-toggle i{transform:rotate(180deg)}
@@ -68,8 +67,8 @@
   .dp-app-header__brand-row{gap:7px;margin-bottom:9px}
   .dp-app-header__logo{width:38px;height:38px;flex-basis:38px;border-radius:12px;font-size:17px}
   .dp-app-header__brand{gap:8px}
-  .dp-app-header__collapse-toggle{min-width:92px;min-height:28px;padding:4px 7px;font-size:8px;gap:5px}
-  .dp-app-header__collapse-toggle i{font-size:9px}
+  .dp-app-header__collapse-toggle{width:30px;min-width:30px;min-height:30px}
+  .dp-app-header__collapse-toggle i{font-size:10px}
   .dp-app-header__brand-copy strong{font-size:16px}
   .dp-app-header__brand-copy small{font-size:9px}
   .dp-app-header__account{gap:5px}

@@ -105,8 +105,6 @@
       toggle.setAttribute("aria-expanded", String(!collapsed));
       toggle.setAttribute("aria-label", actionLabel);
       toggle.title = actionLabel;
-      const label = toggle.querySelector("span");
-      if (label) label.textContent = actionLabel;
     }
     if (persist) {
       try { localStorage.setItem(HEADER_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
@@ -146,23 +144,21 @@
     header.dataset.accountRole = role;
     header.dir = "rtl";
     const homeHref = role === "patient" ? "patient-portal.html" : role === "professional" ? "app.html" : "index.html";
-    const subtitle = role === "patient" ? "مساحة المريض" : role === "professional" ? "مساحة المختص" : "منصة التغذية العلاجية";
-    header.innerHTML = `
+      header.innerHTML = `
       <div class="dp-app-header__brand-row">
         <div class="dp-app-header__brand">
           <a class="dp-app-header__logo-link" href="${base + homeHref}" aria-label="Diet Planner - الرئيسية">
             <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
           </a>
           <div class="dp-app-header__brand-copy">
-            <strong>Diet Planner</strong><small>${subtitle}</small>
+            <strong>Diet Planner</strong>
           </div>
         </div>
-        <button class="dp-app-header__collapse-toggle" type="button" aria-expanded="true" aria-controls="dp-app-header-track" aria-label="طي القائمة" title="طي القائمة"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i><span>طي القائمة</span></button>
+        <button class="dp-app-header__collapse-toggle" type="button" aria-expanded="true" aria-controls="dp-app-header-track" aria-label="طي القائمة" title="طي القائمة"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
         <div class="dp-app-header__account">
           <a class="dp-app-header__account-link dp-app-header__login" href="${base}login.html">تسجيل الدخول</a>
           <a class="dp-app-header__account-link dp-app-header__register" href="${base}login.html#register">إنشاء حساب</a>
-          <a class="dp-app-header__account-link dp-app-header__my-account" href="${base + homeHref}" hidden>حسابي</a>
-          <button type="button" class="dp-app-header__account-link dp-app-header__logout" hidden><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
+          <button type="button" class="dp-app-header__account-link dp-app-header__logout" aria-label="تسجيل الخروج" title="تسجيل الخروج" hidden><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></button>
           <button type="button" class="dp-app-header__theme" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
         </div>
       </div>
@@ -214,7 +210,6 @@
     });
     header.querySelector(".dp-app-header__login").hidden = signedIn;
     header.querySelector(".dp-app-header__register").hidden = signedIn;
-    header.querySelector(".dp-app-header__my-account").hidden = !signedIn;
     logout.hidden = !signedIn;
 
     const pageTitle = header.querySelector(".dp-app-header__page-title");
