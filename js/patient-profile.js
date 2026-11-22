@@ -599,7 +599,7 @@
 
     dietPlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-diet-plan.js?v=20261121-save-queue-v4';
+      script.src = 'js/visit-diet-plan.js?v=20261122-simple-confirm-v1';
       script.async = true;
       script.onload = () => {
         if (typeof window.dietPlan?.openPlan !== 'function') {
