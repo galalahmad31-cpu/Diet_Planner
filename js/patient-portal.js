@@ -344,7 +344,8 @@
   async function deletePatientMeasurement(id, button) {
     const log = state.logs.find(item => String(item.id) === String(id));
     if (!log || log.created_by !== state.user?.id || state.busy) return;
-    if (!window.confirm("هل تريد حذف القياس الذي سجلته؟ لا يمكن التراجع عن الحذف.")) return;
+    const confirmed = await window.DPConfirm?.ask({ title: "حذف القياس؟", message: "هل تريد حذف القياس الذي سجلته؟ لا يمكن التراجع عن الحذف.", confirmText: "حذف", variant: "danger" });
+    if (!confirmed) return;
     state.busy = true; button.disabled = true;
     try {
       const { error } = await supabase.from("weight_logs").delete()
@@ -510,7 +511,8 @@
     root.className = "portal-plans-list";
     root.innerHTML = data.map(item => `<article class="portal-plan-card"><div class="portal-plan-head"><div><strong>${escapeHtml(item.professional_name || "مختص")}</strong><small>${escapeHtml(item.professional_title || "")}</small></div><span class="portal-plan-status">${escapeHtml(status[item.status] || item.status)}</span></div>${item.status === "pending" ? `<button type="button" class="portal-primary-button" data-cancel-professional-request="${escapeHtml(item.request_id)}">إلغاء الطلب</button>` : ""}</article>`).join("");
     root.querySelectorAll("[data-cancel-professional-request]").forEach(button => button.addEventListener("click", async () => {
-      if (!confirm("هل تريد إلغاء طلب المحادثة؟")) return;
+      const confirmed = await window.DPConfirm?.ask({ title: "إلغاء طلب المحادثة؟", message: "هل تريد إلغاء طلب المحادثة؟", confirmText: "إلغاء الطلب", variant: "danger" });
+      if (!confirmed) return;
       button.disabled = true;
       const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", { p_request_id: button.dataset.cancelProfessionalRequest });
       if (cancelError) { button.disabled = false; root.dataset.error = cancelError.message; return; }
