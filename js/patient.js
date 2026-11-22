@@ -187,13 +187,39 @@
 
       const pagePatients = patients || [];
       const patientIds = pagePatients.map((patient) => patient.id).filter(Boolean);
+      const linkedPatientIds = new Set();
+
+      if (patientIds.length && state.user?.id && !state.isAdmin) {
+        const [requestsResult, careTeamResult] = await Promise.all([
+          supabase
+            .from('professional_connection_requests')
+            .select('patient_id')
+            .eq('professional_id', state.user.id)
+            .in('status', ['accepted', 'active'])
+            .in('patient_id', patientIds),
+          supabase
+            .from('patient_care_team')
+            .select('patient_id')
+            .eq('professional_id', state.user.id)
+            .eq('status', 'active')
+            .in('patient_id', patientIds)
+        ]);
+
+        if (requestsResult.error) throw requestsResult.error;
+        if (careTeamResult.error) throw careTeamResult.error;
+
+        (requestsResult.data || []).forEach(item => linkedPatientIds.add(item.patient_id));
+        (careTeamResult.data || []).forEach(item => linkedPatientIds.add(item.patient_id));
+      }
+
+      const unlinkedPatientIds = patientIds.filter(id => !linkedPatientIds.has(id));
       let financeRows = [];
 
-      if (patientIds.length) {
+      if (unlinkedPatientIds.length) {
         const { data, error: financeError } = await supabase
           .from('patient_finances')
           .select('patient_id,subscription_start_date,subscription_end_date,next_follow_up_date')
-          .in('patient_id', patientIds);
+          .in('patient_id', unlinkedPatientIds);
 
         if (financeError) throw financeError;
         financeRows = data || [];
@@ -212,9 +238,31 @@
         }
       });
 
+      const nextAppointmentByPatient = new Map();
+      if (linkedPatientIds.size) {
+        const { data: appointments, error: appointmentsError } = await supabase
+          .from('patient_appointments')
+          .select('patient_id,scheduled_at')
+          .in('patient_id', [...linkedPatientIds])
+          .eq('status', 'confirmed')
+          .gte('scheduled_at', new Date().toISOString())
+          .order('scheduled_at', { ascending: true });
+
+        if (appointmentsError) throw appointmentsError;
+        (appointments || []).forEach(item => {
+          if (!nextAppointmentByPatient.has(item.patient_id)) {
+            nextAppointmentByPatient.set(item.patient_id, item.scheduled_at);
+          }
+        });
+      }
+
       state.patients.push(...pagePatients.map((patient) => ({
         ...patient,
-        finance: financeByPatient.get(patient.id) || null
+        isLinked: linkedPatientIds.has(patient.id),
+        nextAppointmentAt: nextAppointmentByPatient.get(patient.id) || null,
+        finance: linkedPatientIds.has(patient.id)
+          ? null
+          : financeByPatient.get(patient.id) || null
       })));
 
       state.hasMorePatients = state.patients.length < state.totalPatients;
@@ -253,6 +301,7 @@
   }
 
   function getPatientSubscriptionStatus(patient) {
+    if (patient.isLinked) return 'linked';
     const expiryDate = String(patient.finance?.subscription_end_date || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(expiryDate)) return 'unknown';
     return expiryDate >= localDateKey() ? 'active' : 'expired';
@@ -272,7 +321,7 @@
   }
 
   function updatePatientStats() {
-    const counts = { all: state.patients.length, active: 0, expired: 0, unknown: 0 };
+    const counts = { all: state.patients.length, active: 0, expired: 0, unknown: 0, linked: 0 };
 
     state.patients.forEach((patient) => {
       counts[getPatientSubscriptionStatus(patient)] += 1;
@@ -282,7 +331,8 @@
       totalPatientsCount: state.totalPatients,
       activePatientsCount: counts.active,
       expiredPatientsCount: counts.expired,
-      unknownPatientsCount: counts.unknown
+      unknownPatientsCount: counts.unknown,
+      linkedPatientsCount: counts.linked
     };
 
     Object.entries(values).forEach(([id, value]) => {
@@ -327,7 +377,8 @@
     const statusLabels = {
       active: 'نشط',
       expired: 'منتهي',
-      unknown: 'غير محدد'
+      unknown: 'غير محدد',
+      linked: 'مرتبط'
     };
 
     box.innerHTML = filtered.map((patient) => {
@@ -335,7 +386,10 @@
       const diagnosis = patient.diagnosis
         ? escapeHtml(patient.diagnosis)
         : 'التشخيص غير مسجل';
-      const followUp = formatPatientDate(patient.finance?.next_follow_up_date);
+      const followUp = patient.isLinked
+        ? (patient.nextAppointmentAt ? formatPatientDate(patient.nextAppointmentAt) : 'لا يوجد موعد مؤكد')
+        : formatPatientDate(patient.finance?.next_follow_up_date);
+      const followUpLabel = patient.isLinked ? 'الموعد القادم' : 'المتابعة';
 
       return `
         <article class="patient-row" role="link" tabindex="0"
@@ -347,7 +401,7 @@
               <span class="patient-diagnosis" title="التشخيص">${diagnosis}</span>
               <span class="patient-follow-up">
                 <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                <span>المتابعة: ${escapeHtml(followUp)}</span>
+                <span>${followUpLabel}: ${escapeHtml(followUp)}</span>
               </span>
             </div>
           </div>
