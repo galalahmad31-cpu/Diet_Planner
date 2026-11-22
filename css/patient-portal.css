@@ -255,3 +255,25 @@
 .portal-health-audit-item time,.portal-health-audit-item p{font-size:10px;color:var(--dp-muted)}
 .portal-health-audit-item p{margin:6px 0 0}
 @media(max-width:520px){.portal-shared-health-grid{grid-template-columns:minmax(0,1fr)}.portal-shared-health-grid .is-wide{grid-column:auto}}
+
+
+/* Patient care management: grouped specialists with independently collapsible agreements. */
+.portal-care-management-list{display:grid;gap:10px}
+.portal-care-professional{border:1px solid var(--dp-border);border-radius:14px;background:var(--dp-card);overflow:hidden}
+.portal-care-professional>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;cursor:pointer;list-style:none}
+.portal-care-professional>summary::-webkit-details-marker,.portal-care-agreement>summary::-webkit-details-marker{display:none}
+.portal-care-professional>summary>span:first-child,.portal-care-agreement>summary>span{display:grid;gap:3px;min-width:0}
+.portal-care-professional>summary strong{font-size:13px;color:var(--dp-text);font-weight:900}
+.portal-care-professional>summary small,.portal-care-agreement>summary small{font-size:10px;color:var(--dp-muted)}
+.portal-care-count{display:grid;place-items:center;min-width:27px;height:27px;padding:0 7px;border-radius:99px;background:var(--dp-surface-2);color:var(--dp-primary);font-size:10px;font-weight:900}
+.portal-care-professional__agreements{display:grid;gap:8px;padding:0 10px 10px}
+.portal-care-agreement{border:1px solid var(--dp-border);border-radius:11px;background:var(--dp-surface-2);overflow:hidden}
+.portal-care-agreement>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;cursor:pointer;list-style:none}
+.portal-care-agreement>summary strong{font-size:11px;color:var(--dp-text);font-weight:900}
+.portal-care-agreement>summary>i{color:var(--dp-muted);font-size:10px;transition:transform .18s}
+.portal-care-agreement[open]>summary>i{transform:rotate(180deg)}
+.portal-care-agreement__body{display:grid;gap:10px;padding:0 12px 12px}
+.portal-care-agreement__body>p{margin:0;color:var(--dp-muted);font-size:10px;line-height:1.8;white-space:pre-wrap}
+.portal-care-agreement__details-wrap .portal-care-agreement__details{margin-top:0}
+.portal-care-agreement__body .portal-care-agreement__actions{display:flex;gap:7px;flex-wrap:wrap}
+@media(max-width:600px){.portal-care-professional>summary{padding:11px}.portal-care-professional__agreements{padding:0 7px 7px}.portal-care-agreement>summary{padding:10px}.portal-care-agreement__body{padding:0 9px 10px}}
