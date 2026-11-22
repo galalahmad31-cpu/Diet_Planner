@@ -752,21 +752,26 @@
     renderToolMeals(tool);
   }
 
+  const insulinMealIcrOverrides = Object.create(null);
+
   function calculateInsulinEstimate() {
     const regimen = $("portalInsulinRegimen")?.value || "basal_bolus";
     const kind = $("portalInsulinKind")?.value || "rapid";
     const tddInput = $("portalInsulinTdd")?.value ?? "";
     const currentInput = $("portalCurrentGlucose")?.value ?? "";
     const targetInput = $("portalTargetGlucose")?.value ?? "";
-    const tdd = Number(tddInput);
-    const current = Number(currentInput);
-    const target = Number(targetInput);
+    const mealKey = $("portalInsulinMeal")?.value || "breakfast";
+    const carbsInput = $("portalMealCarbs")?.value ?? "";
+    const icrInput = $("portalMealIcr")?.value ?? "";
+    const tdd = Number(tddInput), current = Number(currentInput), target = Number(targetInput);
+    const carbs = Number(carbsInput), manualIcr = Number(icrInput);
     const outputs = {
       tdd: $("portalInsulinTddResult"),
       icr: $("portalInsulinIcrResult"),
       isf: $("portalInsulinIsfResult"),
       difference: $("portalGlucoseDifference"),
-      correction: $("portalCorrectionEstimate")
+      correction: $("portalCorrectionEstimate"),
+      meal: $("portalMealInsulinEstimate")
     };
     const message = $("portalInsulinMessage");
     const show = (node, value) => { if (node) node.textContent = value; };
@@ -774,37 +779,53 @@
     Object.values(outputs).forEach(node => show(node, "—"));
     if (!message) return;
 
+    if (icrInput !== "" && Number.isFinite(manualIcr) && manualIcr > 0 && manualIcr <= 200) {
+      insulinMealIcrOverrides[mealKey] = manualIcr;
+    }
     const validTdd = tddInput !== "" && Number.isFinite(tdd) && tdd > 0 && tdd <= 500;
     if (regimen !== "basal_bolus") {
       show(message, regimen === "basal_only"
-        ? "النظام القاعدي فقط لا يتيح اشتقاق ICR وISF بهذه الأداة."
-        : "الإنسولين المخلوط أو الجرعات الثابتة تحتاج خطة مختلفة؛ لا نشتق منها ICR وISF تلقائيًا.");
+        ? "النظام القاعدي فقط لا يتيح تقدير إنسولين الوجبة بهذه الأداة."
+        : "الإنسولين المخلوط أو الجرعات الثابتة يحتاجان خطة مختلفة؛ لا نحسب لهما إنسولين الوجبة هنا.");
       setState(message, "warning");
       return;
     }
     if (!validTdd) {
-      show(message, "أدخل إجمالي وحدات الإنسولين المستخدمة خلال 24 ساعة، شاملًا القاعدي وجرعات الوجبات والتصحيح.");
+      show(message, "أدخل إجمالي الإنسولين خلال 24 ساعة لعرض المعاملات الابتدائية.");
       setState(message, "notice");
       return;
     }
 
-    const icr = 500 / tdd;
+    const startingIcr = 500 / tdd;
     const isf = (kind === "regular" ? 1500 : 1800) / tdd;
+    const mealIcr = insulinMealIcrOverrides[mealKey] || startingIcr;
+    const mealIcrInput = $("portalMealIcr");
+    if (mealIcrInput && document.activeElement !== mealIcrInput) {
+      mealIcrInput.value = insulinMealIcrOverrides[mealKey] ? String(insulinMealIcrOverrides[mealKey]) : "";
+      mealIcrInput.placeholder = startingIcr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " (ابتدائي)";
+    }
     show(outputs.tdd, tdd.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " وحدة");
-    show(outputs.icr, "1 وحدة لكل " + icr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
+    show(outputs.icr, "1 وحدة لكل " + startingIcr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
     show(outputs.isf, "1 وحدة لكل " + isf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " mg/dL");
-    show(message, "تم حساب المعاملات بصورة استرشادية.");
+
+    if (carbsInput !== "") {
+      if (Number.isFinite(carbs) && carbs >= 0 && carbs <= 500) {
+        show(outputs.meal, (carbs / mealIcr).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة (نظريًا)");
+      } else {
+        show(outputs.meal, "قيمة غير صالحة");
+      }
+    }
+    show(message, "المعامل الابتدائي تقديري. يمكنك إدخال معامل مختلف للوجبة المختارة؛ التعديل مؤقت ولا يُحفظ بعد مغادرة الصفحة.");
     setState(message, "notice");
 
     if (currentInput === "" || targetInput === "") return;
     if (!Number.isFinite(current) || !Number.isFinite(target) || current < 20 || current > 600 || target < 70 || target > 250) {
       show(outputs.difference, "قيمة غير صالحة");
       show(outputs.correction, "—");
-      show(message, "يرجى مراجعة قيم السكر المدخلة؛ تأكد من أن القياس والهدف ضمن النطاقات المحددة.");
+      show(message, "يرجى مراجعة قياس السكر والهدف المدخلين.");
       setState(message, "warning");
       return;
     }
-
     const difference = current - target;
     show(outputs.difference, (difference > 0 ? "+" : "") + difference.toLocaleString("en-US") + " mg/dL");
     if (difference <= 0) {
@@ -815,11 +836,7 @@
       }
       return;
     }
-
-    const theoreticalUnits = difference / isf;
-    show(outputs.correction, theoreticalUnits.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة (نظريًا)");
-    show(message, "تم حساب الفرق والناتج الاسترشادي باستخدام معامل التصحيح التقديري.");
-    setState(message, "warning");
+    show(outputs.correction, (difference / isf).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة (نظريًا)");
   }
 
   async function loadPortal() {
@@ -967,10 +984,10 @@
     $("portalToolsPanel")?.addEventListener("click", handlePatientToolsClick);
     $("portalToolsPanel")?.addEventListener("change", handleToolQuantity);
     $("portalToolsPanel")?.addEventListener("input", event => {
-      if (event.target.matches("#portalInsulinTdd, #portalCurrentGlucose, #portalTargetGlucose")) calculateInsulinEstimate();
+      if (event.target.matches("#portalInsulinTdd, #portalCurrentGlucose, #portalTargetGlucose, #portalMealCarbs, #portalMealIcr")) calculateInsulinEstimate();
     });
     $("portalToolsPanel")?.addEventListener("change", event => {
-      if (event.target.matches("#portalDiabetesType, #portalInsulinRegimen, #portalInsulinKind")) calculateInsulinEstimate();
+      if (event.target.matches("#portalDiabetesType, #portalInsulinRegimen, #portalInsulinKind, #portalInsulinMeal")) calculateInsulinEstimate();
     });
     $("portalCarbSearch")?.addEventListener("input", event => renderFoodSearchResults(event.target.value));
     $("portalCarbPicker")?.addEventListener("keydown", event => { if (event.key === "Escape") closeFoodPicker(); });
