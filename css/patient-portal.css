@@ -241,13 +241,10 @@
 @media(max-width:360px){.portal-care-agreement__details{grid-template-columns:minmax(0,1fr)}}
 
 
-/* Shared health record */
+/* Shared health record: identity, demographics, then clinical details. */
 .portal-shared-health-form{display:grid;gap:14px}
-.portal-shared-health-name-row{display:grid;grid-template-columns:1fr;gap:7px;margin-bottom:14px}
-.portal-shared-health-name-row>label{font-size:11px;font-weight:800;color:var(--dp-text)}
-.portal-shared-health-name-row input{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--dp-border);border-radius:9px;padding:10px;background:var(--dp-surface);color:var(--dp-text);font:12px Cairo,sans-serif}
 .portal-shared-health-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.portal-shared-health-grid label{display:grid;gap:6px;font-size:11px;font-weight:800;color:var(--dp-text)}
+.portal-shared-health-grid label{display:grid;gap:6px;min-width:0;font-size:11px;font-weight:800;color:var(--dp-text)}
 .portal-shared-health-grid input,.portal-shared-health-grid select,.portal-shared-health-grid textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--dp-border);border-radius:9px;padding:10px;background:var(--dp-surface);color:var(--dp-text);font:12px Cairo,sans-serif}
 .portal-shared-health-grid input[readonly]{opacity:.72;background:var(--dp-surface-2)}
 .portal-shared-health-grid .is-wide{grid-column:1/-1}
@@ -257,7 +254,7 @@
 .portal-health-audit-item strong{font-size:11px;color:var(--dp-text)}
 .portal-health-audit-item time,.portal-health-audit-item p{font-size:10px;color:var(--dp-muted)}
 .portal-health-audit-item p{margin:6px 0 0}
-@media(max-width:520px){.portal-shared-health-grid{grid-template-columns:minmax(0,1fr)}.portal-shared-health-grid .is-wide{grid-column:auto}}
+@media(max-width:360px){.portal-shared-health-grid{grid-template-columns:minmax(0,1fr)}.portal-shared-health-grid .is-wide{grid-column:auto}}
 
 
 /* Patient care management: grouped specialists with independently collapsible agreements. */
