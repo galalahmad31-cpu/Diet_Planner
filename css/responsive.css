@@ -1,0 +1,53 @@
+/* Diet Planner — centralized responsive foundation.
+   Shared overflow and intrinsic-sizing safeguards only.
+   Page-specific breakpoints and component layouts stay in their owning CSS files. */
+
+/* Prevent flex/grid children from forcing the viewport wider than the page. */
+:where(.flex, .grid, [class*="grid-cols-"], [class*="flex"]) > * {
+  min-width: 0;
+}
+
+/* Media and embedded content must respect their parent width. */
+:where(img, video, canvas, iframe) {
+  max-width: 100%;
+}
+
+:where(input, select, textarea, button) {
+  max-width: 100%;
+}
+
+/* Long identifiers, URLs and generated content must not create page overflow. */
+:where(pre, code, samp, kbd) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+:where(p, li, dd, dt, label, a, small, strong, span) {
+  min-width: 0;
+}
+
+/* Explicit opt-in horizontal scrollers for wide tables and data regions. */
+.dp-responsive-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Small-screen baseline: controls remain inside their available column. */
+@media (max-width: 767px) {
+  :where(input, select, textarea) {
+    min-width: 0;
+  }
+
+  .dp-responsive-scroll {
+    scrollbar-width: thin;
+  }
+}
+
+/* Respect reduced-motion preference for shared responsive scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  .dp-responsive-scroll {
+    scroll-behavior: auto;
+  }
+}
