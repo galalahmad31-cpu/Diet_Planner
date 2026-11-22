@@ -23,7 +23,7 @@ let activePlanStartDate=null, activePlanName=null;
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], foodById=new Map(), daysData=[], savedDaysData=[], dayEditModes={};
 const savingDayIds=new Set();
 let daySaveQueue=Promise.resolve();
-let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null, confirmCallback=null;
+let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null;
 let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
 const FIXED_DIET_CACHE_V2='fixed-diet-cache-v2';
 const FIXED_DIET_CACHE_TTL=5*60*1000;
