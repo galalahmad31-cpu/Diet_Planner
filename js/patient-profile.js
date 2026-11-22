@@ -1233,7 +1233,6 @@
       const { data, error } = await supabase.from('patient_finances')
         .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,is_paid,subscription_amount,discount_percent,discounted_amount,last_visit_date,next_follow_up_date')
         .eq('patient_id', patientId)
-        .eq('user_id', state.user.id)
         .maybeSingle();
       if (error) throw error;
       fillPatientFinance(data);
@@ -1275,7 +1274,7 @@
     try {
       const payload = {
         patient_id: patientId,
-        user_id: state.user.id,
+        user_id: state.patient.user_id,
         subscription_start_date: startDate,
         subscription_months: months,
         subscription_amount: amount,
@@ -1319,8 +1318,7 @@
     try {
       const { error } = await supabase.from('patient_finances')
         .delete()
-        .eq('patient_id', patientId)
-        .eq('user_id', state.user.id);
+        .eq('patient_id', patientId);
       if (error) throw error;
       fillPatientFinance(null);
       const errorBox = $('patientFinanceError');
