@@ -146,8 +146,6 @@
         const targets = {
           portalPlansPanel: "portalPlansLoading",
           portalMeasurementsPanel: "portalMeasurementsError",
-          portalAppointmentsPanel: "portalFollowUpError",
-          portalCommunicationPanel: "patientProfessionalRequests",
           portalCareManagementPanel: "patientCareManagementContent",
           portalSharedHealthPanel: "patientSharedHealthStatus"
         };
@@ -1120,10 +1118,6 @@
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
     $("patientSharedHealthForm")?.addEventListener("submit", saveSharedHealthRecord);
-    document.querySelector("[data-open-patient-messages]")?.addEventListener("click", () => {
-      activateHealthTab("portalCommunicationPanel");
-      $("patientPortalMessages")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab(tab.dataset.planTab)));
     const initialSection = window.location.hash.slice(1);
