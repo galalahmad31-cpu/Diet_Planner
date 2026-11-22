@@ -13,20 +13,12 @@
 
 /* Patient portal home and service navigation */
 .portal-home{display:grid;gap:18px}.portal-home-welcome{margin-bottom:0}
-.portal-services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.portal-service-card{position:relative;display:flex;align-items:center;gap:14px;min-width:0;min-height:112px;padding:19px;background:var(--portal-card);border:1px solid var(--portal-line);border-radius:18px;box-shadow:var(--portal-shadow);color:var(--portal-ink);text-decoration:none;text-align:right;font:inherit;cursor:pointer;transition:border-color .18s,transform .18s,box-shadow .18s}
-.portal-service-card:not(.portal-service-upcoming):hover{border-color:var(--portal-accent);transform:translateY(-2px);box-shadow:0 14px 30px var(--dp-shadow)}
-.portal-service-featured{border-color:var(--dp-border);background:linear-gradient(135deg,var(--portal-card),var(--portal-soft))}
-.portal-service-icon{width:49px;height:49px;flex:0 0 49px;display:grid;place-items:center;border-radius:15px;background:var(--portal-soft);color:var(--portal-accent);font-size:20px}
-.portal-service-copy{display:grid;gap:4px;min-width:0}.portal-service-copy strong{font-size:14px;font-weight:900}.portal-service-copy small{font-size:11px;line-height:1.8;color:var(--portal-muted)}
-.portal-service-copy em{justify-self:start;margin-top:3px;padding:3px 9px;border-radius:20px;background:var(--portal-bg);color:var(--portal-muted);font-size:9px;font-style:normal;font-weight:800}
-.portal-service-arrow{margin-right:auto;color:var(--portal-accent);font-size:13px}.portal-service-upcoming{cursor:default}
 .portal-home-note{display:flex;align-items:center;gap:9px;margin:0;padding:13px 16px;border-radius:13px;background:var(--portal-bg);color:var(--portal-muted);font-size:11px;line-height:1.8}
 .portal-home-note i{color:var(--portal-accent)}.portal-health-area{display:grid;gap:14px;grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%}
 
 
 
-@media(max-width:640px){.portal-services{grid-template-columns:1fr;gap:10px}.portal-service-card{min-height:94px;padding:14px;border-radius:15px}.portal-service-icon{width:43px;height:43px;flex-basis:43px}.portal-service-copy strong{font-size:13px}.portal-service-copy small{font-size:10px}.portal-home{gap:12px}.portal-health-area{gap:10px}}
+@media(max-width:640px){.portal-home{gap:12px}.portal-health-area{gap:10px}}
 
 
 /* Keep wide shared tables inside their panel; never let them resize the page or app header. */
