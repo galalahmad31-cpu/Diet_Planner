@@ -71,9 +71,8 @@
 
       state.isAdmin = accessStatus?.isAdmin === true;
 
-      // Patient records belong to their creating professional only.
-      // Administrators and patient accounts do not receive professional workspace access.
-      if (state.isAdmin || state.accountType !== 'professional') {
+      // Admin accounts with a professional profile use their own isolated workspace.
+      if (state.accountType !== 'professional') {
         state.canAddPatient = false;
         updateWriteControls();
         return;
@@ -96,7 +95,7 @@
   function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
-    const canAdd = !state.isAdmin && state.accountType === 'professional' && state.canAddPatient;
+    const canAdd = state.accountType === 'professional' && state.canAddPatient;
 
     // Do not show subscription/quota warnings on the patient directory.
     // The add action itself is controlled solely by the authoritative quota RPC.
@@ -134,7 +133,7 @@
 
     try {
       if (!supabase) throw new Error('Supabase client is not available.');
-      if (!state.user || state.isAdmin || state.accountType !== 'professional') {
+      if (!state.user || state.accountType !== 'professional') {
         throw new Error('Professional-only patient workspace access required.');
       }
 
@@ -409,7 +408,7 @@
         state.accessPromise = state.accessPromise || refreshAccess();
         await state.accessPromise;
       }
-      if (state.isAdmin || state.accountType !== 'professional' || !state.canAddPatient) return;
+      if (state.accountType !== 'professional' || !state.canAddPatient) return;
 
       const modal = $('addPatientModal');
       if (!modal) return;
@@ -434,7 +433,7 @@
   }
 
   async function createPatient() {
-    if (!state.isAdmin && !state.canAddPatient) return;
+    if (state.accountType !== 'professional' || !state.canAddPatient) return;
 
     const input = $('newPatientName');
     const name = input?.value.trim();
@@ -568,10 +567,10 @@
 
     state.accessPromise = refreshAccess();
     await state.accessPromise;
-    if (!state.user || state.isAdmin || state.accountType !== 'professional') {
+    if (!state.user || state.accountType !== 'professional') {
       window.DietPlannerAccess?.showAccessPrompt?.({
-        title: state.isAdmin ? "مساحة المرضى غير متاحة للإدارة" : "حساب المختص مطلوب",
-        message: state.isAdmin ? "ملفات المرضى خاصة بالمختص المسؤول عنها ولا يمكن لحساب الإدارة الاطلاع عليها." : "سجّل الدخول بحساب مختص لعرض قائمة مرضاك وملفاتهم.",
+        title: "حساب المختص مطلوب",
+        message: "سجّل الدخول بحساب مختص لعرض قائمة مرضاك وملفاتهم، بما في ذلك حسابات الإدارة ذات نوع الحساب المهني.",
         actionLabel: "العودة للرئيسية",
         actionHref: "app.html"
       });
