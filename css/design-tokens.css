@@ -18,6 +18,8 @@
   --dp-surface:#FFFFFF;
   --dp-surface-2:#F8FBFA;
   --dp-surface-3:#DCEFE8;
+  --dp-card:var(--dp-surface);
+  --dp-soft:var(--dp-surface-3);
   --dp-text:#263238;
   --dp-text-2:#52636A;
   --dp-muted:#52636A;
@@ -63,6 +65,8 @@ html[data-theme="dark"]{
   --dp-surface:#20332E;
   --dp-surface-2:#172622;
   --dp-surface-3:#293D37;
+  --dp-card:var(--dp-surface);
+  --dp-soft:var(--dp-surface-3);
   --dp-text:#F1F7F4;
   --dp-text-2:#C1D0CA;
   --dp-muted:#91A69C;
