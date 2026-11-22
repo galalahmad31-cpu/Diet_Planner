@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
     <link rel="stylesheet" href="css/dark-theme.css?v=20261120-home-layout-v1">
     <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
-    <link rel="stylesheet" href="css/app.css?v=20261122-shared-announcements-v1">
+    <link rel="stylesheet" href="css/app.css?v=20261122-welcome-card-toggle-v1">
     <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
     <link rel="stylesheet" href="css/announcements.css?v=20261122-shared-announcements-v1">
 
@@ -60,22 +60,23 @@
         <div class="mx-auto max-w-6xl dp-home-container">
 
             <div data-dp-app-header data-page-title="الرئيسية"></div>
-            <section class="dp-dashboard-welcome mt-5" aria-labelledby="dashboardWelcomeTitle">
-                <div class="dp-dashboard-welcome-card dp-home-hero">
-                    <div class="dp-dashboard-welcome-copy">
+            <section class="dp-dashboard-welcome mt-5" aria-label="بطاقة الترحيب">
+                <details class="dp-dashboard-welcome-card dp-home-hero" open>
+                    <summary class="dp-dashboard-welcome-summary">
                         <span class="dp-dashboard-eyebrow">PROFESSIONAL SPACE</span>
-                        <h1 id="dashboardWelcomeTitle">أهلاً بك في Diet Planner</h1>
-                        <p>مساحة عملك لإدارة ملفات المرضى، والاحتياجات الغذائية، والخطط والمتابعة في مكان واحد.</p>
+                        <span class="dp-dashboard-welcome-title" id="dashboardWelcomeTitle">أهلاً بك في Diet Planner</span>
+                        <span class="dp-dashboard-welcome-description">مساحة عملك لإدارة ملفات المرضى، والاحتياجات الغذائية، والخطط والمتابعة في مكان واحد.</span>
+                    </summary>
+                    <div class="dp-dashboard-welcome-content">
                         <a class="dp-dashboard-about-link" href="about.html" aria-label="التعرف على تطبيق Diet Planner ومميزاته">
                             <span class="dp-dashboard-about-link-icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
                             <span class="dp-dashboard-about-link-copy">
                                 <strong>تعرّف على التطبيق</strong>
                                 <small>اكتشف مميزات Diet Planner وكيف يساعدك في تنظيم عملك الغذائي</small>
                             </span>
-                            <i class="fa-solid fa-arrow-left dp-dashboard-about-link-arrow" aria-hidden="true"></i>
                         </a>
                     </div>
-                </div>
+                </details>
             </section>
 
             
