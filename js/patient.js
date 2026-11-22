@@ -448,32 +448,18 @@
     }
   }
 
-  function askDelete(id) {
+  async function askDelete(id) {
     const patient = state.patients.find((item) => item.id === id);
     if (!patient) return;
-
+    const confirmed = await window.DPConfirm?.ask({
+      title: "حذف المريض؟",
+      message: `هل تريد حذف ملف «${patient.name || 'بدون اسم'}»؟`,
+      confirmText: "حذف",
+      variant: "danger"
+    });
+    if (!confirmed) return;
     state.pendingDeleteId = id;
-
-    const text = $('deleteText');
-    if (text) {
-      text.textContent = `هل أنت متأكد من حذف ملف «${patient.name || 'بدون اسم'}»؟`;
-    }
-
-    const modal = $('deleteModal');
-    if (!modal) return;
-
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  }
-
-  function closeDeleteModal() {
-    state.pendingDeleteId = null;
-
-    const modal = $('deleteModal');
-    if (!modal) return;
-
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+    await deletePatient();
   }
 
   async function deletePatient() {
@@ -495,12 +481,12 @@
 
       state.patients = state.patients.filter((patient) => patient.id !== id);
       state.totalPatients = Math.max(0, state.totalPatients - 1);
-      closeDeleteModal();
+
       renderPatients();
       showStatus('تم حذف المريض.', 'success');
     } catch (error) {
       console.error('Delete patient failed:', error);
-      closeDeleteModal();
+
       showStatus('تعذر حذف المريض.');
     }
   }
@@ -524,7 +510,6 @@
     }
     if (action === 'close-add-patient') closeAddPatientModal();
     if (action === 'create-patient') createPatient();
-    if (action === 'close-delete') closeDeleteModal();
     if (action === 'open-patient') openPatient(target.dataset.patientId);
     if (action === 'ask-delete') {
       event.preventDefault();
@@ -560,11 +545,6 @@
       if (event.target === $('addPatientModal')) closeAddPatientModal();
     });
 
-    $('deleteModal')?.addEventListener('click', (event) => {
-      if (event.target === $('deleteModal')) closeDeleteModal();
-    });
-
-    $('confirmDeleteBtn')?.addEventListener('click', deletePatient);
   }
 
   async function init() {
