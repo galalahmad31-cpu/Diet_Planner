@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
+  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, activePlanTab: "self", loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -105,9 +105,8 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel", "portalCareManagementPanel", "portalSharedHealthPanel"];
+    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalCareManagementPanel", "portalSharedHealthPanel"];
     if (!allowed.includes(panelId)) return;
-    if (!state.hasActiveCareTeam && !["portalCommunicationPanel", "portalCareManagementPanel", "portalSharedHealthPanel"].includes(panelId)) return;
 
     // Keep the selected panel's ancestors visible. Tabs live outside portalContent,
     // so a hidden parent would otherwise leave an active tab with a completely blank body.
@@ -130,10 +129,8 @@
     if (state.loadedPanels.has(panelId)) return;
     if (state.loadingPanels.has(panelId)) return state.loadingPanels.get(panelId);
     const loaders = {
-      portalPlansPanel: loadPlans,
+      portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
       portalMeasurementsPanel: loadMeasurements,
-      portalAppointmentsPanel: loadSubscriptionFollowUp,
-      portalCommunicationPanel: loadProfessionalRequests,
       portalCareManagementPanel: loadProfessionalCareManagement,
       portalSharedHealthPanel: loadSharedHealthRecord
     };
@@ -183,7 +180,7 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel","portalCareManagementPanel","portalSharedHealthPanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalCareManagementPanel","portalSharedHealthPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
@@ -375,46 +372,22 @@
   }
 
 
-  async function loadSubscriptionFollowUp() {
-    const loading = $("portalFollowUpLoading");
-    const errorBox = $("portalFollowUpError");
-    const empty = $("portalFollowUpEmpty");
-    const content = $("portalFollowUpContent");
-    if (loading) loading.hidden = false;
-    if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
-    if (empty) empty.hidden = true;
-    if (content) content.hidden = true;
-    try {
-      // A narrow RPC returns only the three dates; it does not expose finance amounts.
-      const { data, error } = await supabase.rpc("get_patient_subscription_follow_up");
-      if (error) throw error;
-      const record = Array.isArray(data) ? data[0] : data;
-      if (!record) {
-        if (empty) empty.hidden = false;
-        return;
-      }
-      $("portalSubscriptionStart").textContent = formatDate(record.subscription_start_date);
-      $("portalSubscriptionEnd").textContent = formatDate(record.subscription_end_date);
-      $("portalNextFollowUp").textContent = formatDate(record.next_follow_up_date);
-      const hint = $("portalFollowUpHint");
-      if (hint) {
-        if (!record.next_follow_up_date) hint.textContent = "لم يحدد المختص موعد المتابعة القادمة بعد";
-        else {
-          const today = localToday();
-          hint.textContent = record.next_follow_up_date < today
-            ? "موعد المتابعة المحدد قد مضى؛ تواصل مع مختصك لتحديثه"
-            : "يحدده المختص المسؤول عن ملفك";
-        }
-      }
-      if (content) content.hidden = false;
-    } catch (error) {
-      console.error("Patient subscription/follow-up load failed:", error);
-      if (errorBox) {
-        errorBox.textContent = error.message || "تعذر تحميل بيانات الاشتراك والمتابعة.";
-        errorBox.hidden = false;
-      }
-    } finally {
-      if (loading) loading.hidden = true;
+  function activatePlanTab(tab) {
+    if (!["self", "professional"].includes(tab)) return;
+    if (tab === "professional" && !state.hasActiveCareTeam) return;
+    state.activePlanTab = tab;
+    document.querySelectorAll("[data-plan-tab]").forEach(button => {
+      const active = button.dataset.planTab === tab;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    const selfPanel = $("portalPlansSelfPanel");
+    const professionalPanel = $("portalPlansProfessionalPanel");
+    if (selfPanel) selfPanel.hidden = tab !== "self";
+    if (professionalPanel) professionalPanel.hidden = tab !== "professional";
+    if (tab === "professional") {
+      state.loadedPanels.delete("portalPlansPanel");
+      void ensureHealthPanelLoaded("portalPlansPanel");
     }
   }
 
@@ -627,6 +600,7 @@
   async function loadProfessionalCareManagement() {
     const root = $("patientCareManagementContent");
     if (!root) return;
+    await loadProfessionalRequests("patientProfessionalRequests");
     root.textContent = "جاري تحميل الاتفاقات...";
     const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
     if (error) throw error;
@@ -997,7 +971,8 @@
 
   async function loadPortal() {
     showOnly("portalLoading");
-    const account = await getPatientAccount();
+    let account = await getPatientAccount();
+
     if (!account?.patient_id) {
       const token = new URLSearchParams(window.location.search).get("invite");
       if (token) {
@@ -1011,22 +986,27 @@
           return;
         }
       }
-      await loadProfessionalRequests("patientProfessionalRequestsUnlinked");
-      showOnly("portalUnlinked");
-      return;
+
+      // One durable patient record is created on first entry; accepted requests reuse it.
+      const { data: patientId, error: ensureError } = await supabase.rpc("ensure_patient_self_record");
+      if (ensureError) throw ensureError;
+      if (!isValidPatientId(patientId)) throw new Error("تعذر إنشاء الملف الصحي المستقل. يرجى إعادة المحاولة.");
+      account = { patient_id: patientId };
     }
 
     const nextPatientId = account.patient_id;
     if (!isValidPatientId(nextPatientId)) {
       state.patientId = null;
-      throw new Error("بيانات ربط حساب المريض غير مكتملة أو غير صالحة. يرجى التواصل مع الدعم.");
+      throw new Error("بيانات ملف المريض غير مكتملة أو غير صالحة. يرجى التواصل مع الدعم.");
     }
     if (state.patientId !== nextPatientId) {
       state.loadedPanels.clear();
       state.loadingPanels.clear();
       state.logs = [];
+      state.patient = null;
     }
     state.patientId = nextPatientId;
+
     const { data: careLinks, error: careError } = await supabase
       .from("patient_care_team")
       .select("id")
@@ -1037,21 +1017,13 @@
     state.hasActiveCareTeam = Boolean(careLinks?.length);
 
     await loadPatient();
-    if (state.hasActiveCareTeam) {
-      document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
-      showOnly("portalContent");
-      activateHealthTab("portalPlansPanel");
-    } else {
-      document.querySelectorAll("[data-health-tab]").forEach(tab => {
-        tab.hidden = !["portalCommunicationPanel", "portalCareManagementPanel", "portalSharedHealthPanel"].includes(tab.dataset.healthTab);
-      });
-      ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel"].forEach(id => {
-        const panel = $(id);
-        if (panel) panel.hidden = true;
-      });
-      showOnly("portalContent");
-      activateHealthTab("portalCommunicationPanel");
-    }
+    document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
+    const professionalPlanTab = document.querySelector('[data-plan-tab="professional"]');
+    if (professionalPlanTab) professionalPlanTab.hidden = !state.hasActiveCareTeam;
+
+    showOnly("portalContent");
+    activatePlanTab(state.hasActiveCareTeam ? "professional" : "self");
+    activateHealthTab("portalPlansPanel");
 
     void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
       patientId: state.patientId,
@@ -1153,6 +1125,7 @@
       $("patientPortalMessages")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
+    document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab(tab.dataset.planTab)));
     const initialSection = window.location.hash.slice(1);
     const patientSections = new Set([
       "portalHome",
@@ -1219,8 +1192,6 @@
         "portalContent",
         "portalPlansPanel",
         "portalMeasurementsPanel",
-        "portalAppointmentsPanel",
-        "portalCommunicationPanel",
         "portalCareManagementPanel",
         "portalSharedHealthPanel"
       ];
