@@ -196,7 +196,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 
 
 @media(max-width:640px){
- .measurements-toolbar{align-items:stretch;flex-direction:column;gap:8px}
 }
 
 /* Host-level confirmation for actions initiated inside the nutrition-support iframe. */
