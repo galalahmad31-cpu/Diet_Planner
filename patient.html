@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
-  <script src="js/patient.js?v=20261122-patient-uuid-guard-v1" defer></script>
+  <script src="js/patient.js?v=20261122-linked-patient-routing-v1" defer></script>
 
   <link rel="stylesheet" href="css/patient.css?v=20261122-patient-toolbar-inline-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
@@ -68,6 +68,10 @@
       <button type="button" class="patient-stat" data-status-filter="unknown" aria-pressed="false">
         <span class="patient-stat-label">اشتراك غير محدد</span>
         <strong id="unknownPatientsCount">—</strong>
+      </button>
+      <button type="button" class="patient-stat" data-status-filter="linked" aria-pressed="false">
+        <span class="patient-stat-label">مرضى مرتبطون</span>
+        <strong id="linkedPatientsCount">—</strong>
       </button>
     </div>
 
