@@ -977,6 +977,11 @@
       return;
     }
     state.user = user;
+    void window.DietPlannerPatientNotifications?.init($("patientNotifications"), user.id).catch(error => {
+      console.error("Patient notifications initialization failed:", error);
+      const status = $("patientNotifications")?.querySelector("[data-patient-notification-status]");
+      if (status) status.textContent = "تعذر تحميل الإشعارات حاليًا.";
+    });
     void loadPatientAnnouncements();
     $("portalLogout")?.addEventListener("click", () => access.logout());
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
