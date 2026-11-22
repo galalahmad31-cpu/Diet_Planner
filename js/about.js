@@ -396,7 +396,7 @@ async function saveSection(id) {
 
   const request = section._new
     ? db.from("about_sections").insert(payload).select("id,title,content,audience,display_order,created_at,updated_at").single()
-    : db.from("about_sections").update(payload).eq("id", id).select("id,title,content,display_order,created_at,updated_at").single();
+    : db.from("about_sections").update(payload).eq("id", id).select("id,title,content,audience,display_order,created_at,updated_at").single();
 
   const { data, error } = await request;
   if (error) {
