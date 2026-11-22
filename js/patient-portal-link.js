@@ -3,7 +3,11 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const params = new URLSearchParams(window.location.search);
-  const patientId = params.get("id") || params.get("patient") || params.get("patient_id");
+  const rawPatientId = params.get("id") || params.get("patient") || params.get("patient_id");
+  const patientId = typeof rawPatientId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(rawPatientId)
+    ? rawPatientId
+    : null;
   let dialog;
 
   const create = (tag, className, text) => {
