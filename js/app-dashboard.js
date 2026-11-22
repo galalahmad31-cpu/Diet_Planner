@@ -13,7 +13,6 @@
     loading: document.getElementById("loadingScreen"),
     accountName: document.getElementById("doctorName"),
     logout: document.getElementById("logoutBtn"),
-    adminCard: document.getElementById("adminCard"),
   };
 
   // ---------------------------------------------------------
@@ -78,11 +77,6 @@
     }
   }
 
-  function renderAdminCard(isAdmin) {
-    // The professional dashboard is shared; only this action is admin-specific.
-    // CSS explicitly honors [hidden], so visibility has one source of truth.
-    if (elements.adminCard) elements.adminCard.hidden = isAdmin !== true;
-  }
 
   // ---------------------------------------------------------
   // Notification card indicators
@@ -309,9 +303,9 @@
     try {
       const now = new Date().toISOString();
       const { data, error } = await supabase.from("announcements")
-        .select("id,title,content,type,audience,is_pinned,starts_at,expires_at,created_at")
+        .select("id,title,content,type,audience,priority,starts_at,expires_at,created_at")
         .eq("is_active", true).in("audience", ["professional", "both"]).lte("starts_at", now)
-        .order("is_pinned", { ascending: false }).order("starts_at", { ascending: false }).limit(30);
+        .order("priority", { ascending: false }).order("starts_at", { ascending: false }).order("created_at", { ascending: false }).limit(30);
       if (error) throw error;
       const current = (data || []).filter(item => !item.expires_at || new Date(item.expires_at).getTime() > Date.now()).slice(0, 3);
       host.replaceChildren();
@@ -324,7 +318,6 @@
         const label = document.createElement("span"); label.className = `dashboard-announcement-type ${type.className}`;
         const icon = document.createElement("i"); icon.className = `fa-solid ${type.icon}`; icon.setAttribute("aria-hidden", "true");
         label.append(icon, document.createTextNode(" " + type.label)); top.appendChild(label);
-        if (item.is_pinned) { const pin=document.createElement("span");pin.className="dashboard-announcement-pinned";pin.textContent="مثبت";top.appendChild(pin); }
         const title=document.createElement("h4");title.textContent=item.title;
         const content=document.createElement("p");content.textContent=item.content;
         const footer=document.createElement("div");footer.className="dashboard-announcement-card-footer";
@@ -375,20 +368,17 @@
         await access.getAccessStatus();
 
       if (!status.authenticated || !status.user) {
-        renderAdminCard(false);
         renderVisitorDashboard();
         renderDashboardNotifications([], "unavailable");
         return;
       }
 
       await renderAccountName(status.user, status.isAdmin === true);
-      renderAdminCard(status.isAdmin);
       // Load the dashboard notification summary after authentication.
       await loadDashboardNotifications(status.user.id);
     } catch (error) {
       console.error("Dashboard access verification failed:", error);
       // The public dashboard remains available even when account verification fails.
-      renderAdminCard(false);
       renderVisitorDashboard();
       renderDashboardNotifications([], "unavailable");
     }

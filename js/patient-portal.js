@@ -925,12 +925,13 @@
     try {
       const now = new Date().toISOString();
       const { data, error } = await supabase.from("announcements")
-        .select("id,title,content,type,is_pinned,starts_at,expires_at,created_at")
+        .select("id,title,content,type,priority,starts_at,expires_at,created_at")
         .eq("is_active", true)
         .in("audience", ["patient", "both"])
         .lte("starts_at", now)
-        .order("is_pinned", { ascending: false })
+        .order("priority", { ascending: false })
         .order("starts_at", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(30);
       if (error) throw error;
       const current = (data || []).filter(item => !item.expires_at || new Date(item.expires_at).getTime() > Date.now()).slice(0, 3);
@@ -953,7 +954,6 @@
         const content = document.createElement("p");
         content.textContent = item.content || "";
         card.append(summary, content);
-        if (item.is_pinned) card.open = true;
         host.appendChild(card);
       });
       section.hidden = false;

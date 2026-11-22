@@ -184,22 +184,11 @@
   max-width:680px;margin:7px 0 0;color:rgba(255,255,255,.86);
   font-size:13px;font-weight:500;line-height:1.8;
 }
-.dp-dashboard-admin-link{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  flex:0 0 auto;min-height:40px;padding:9px 14px;
-  border:1px solid rgba(255,255,255,.25);border-radius:12px;
-  background:rgba(255,255,255,.14);color:#fff;
-  font-size:12px;font-weight:800;text-decoration:none;
-  transition:background .18s,border-color .18s;
-}
-.dp-dashboard-admin-link:hover{background:rgba(255,255,255,.23);border-color:rgba(255,255,255,.4)}
-.dp-dashboard-admin-link[hidden]{display:none!important}
 @media(max-width:640px){
   .dp-dashboard-welcome-card{align-items:flex-start;flex-direction:column;gap:13px;padding:17px;border-radius:18px}
   .dp-dashboard-welcome-card h1{font-size:21px}
   .dp-dashboard-welcome-card p{margin-top:6px;font-size:12px;line-height:1.75}
 }
-@media(prefers-reduced-motion:reduce){.dp-dashboard-admin-link{transition:none}}
 
 /* Dashboard notifications workspace */
 .dashboard-notifications-section{
