@@ -525,7 +525,7 @@
   function renderSharedHealthForm() {
     const patient = state.patient || {};
     $("sharedHealthName").value = patient.name || "";
-    $("sharedHealthGender").value = patient.gender || "";
+    $("sharedHealthGender").value = ["male", "ذكر"].includes(patient.gender) ? "male" : ["female", "أنثى"].includes(patient.gender) ? "female" : "";
     $("sharedHealthBirthDate").value = patient.birth_date || "";
     $("sharedHealthHeight").value = patient.height ?? "";
     $("sharedHealthDiagnosis").value = patient.diagnosis || "";
