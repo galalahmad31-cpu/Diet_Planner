@@ -71,19 +71,6 @@ function addMonthsToDateKey(baseDate, months) {
   ].join('-');
 }
 
-function daysUntil(targetDate, referenceDate) {
-  const target = dateKey(targetDate);
-  const reference = dateKey(referenceDate);
-
-  const [ty, tm, td] = target.split('-').map(Number);
-  const [ry, rm, rd] = reference.split('-').map(Number);
-
-  const targetUtc = Date.UTC(ty, tm - 1, td);
-  const referenceUtc = Date.UTC(ry, rm - 1, rd);
-
-  return Math.round((targetUtc - referenceUtc) / 86400000);
-}
-
 function formatDate(value) {
   const key = dateKey(value);
   if (!key) return '—';
