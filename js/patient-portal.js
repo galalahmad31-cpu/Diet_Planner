@@ -1145,7 +1145,8 @@
 
     showOnly("portalContent");
     activatePlanTab("self");
-    activateHealthTab(invitationStatus ? "portalCareManagementPanel" : "portalPlansPanel");
+    // The invitation result is rendered beside the code field in the professional-plan tab.
+    activateHealthTab("portalPlansPanel");
     if (invitationStatus) {
       setMessage("patientProfessionalCodeStatus", invitationStatus,
         invitationStatus.startsWith("تم التحقق") ? "success" : "error");
