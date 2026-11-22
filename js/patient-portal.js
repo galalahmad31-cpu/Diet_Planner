@@ -1226,28 +1226,38 @@
       ];
       const destination = id === "portalTools" ? "portalToolsPanel" : id;
 
-      // Hide the previous top-level section synchronously, before awaiting Supabase.
-      // In the previous flow, an early return from loadPortal() (for example, an
-      // unlinked patient) could leave the old profile/tools view visible underneath.
-      showPortalDestination(destination);
-
       if (healthSections.includes(id)) {
-        if (!state.patientId || $("portalContent")?.hidden) {
+        // Never activate a health tab before loadPortal resolves the patient UUID.
+        // showPortalDestination() activates tabs and starts their loaders, so calling
+        // it before this gate causes shared-health queries with a null patientId.
+        const healthArea = $("portalHealthArea");
+        const home = $("portalHome");
+        const profile = $("portalProfileArea");
+        const tools = $("portalToolsPanel");
+        if (healthArea) healthArea.hidden = false;
+        if (home) home.hidden = true;
+        if (profile) profile.hidden = true;
+        if (tools) tools.hidden = true;
+
+        if (!isValidPatientId(state.patientId) || $("portalContent")?.hidden) {
           try {
             await loadPortal();
           } catch (error) {
             fail(error.message || "تعذر تحميل الملف الصحي.");
             return;
           }
-          // loadPortal may intentionally show the unlinked/error state instead
-          // of portalContent. Do not switch back to a health tab in that case.
-          if ($("portalContent")?.hidden) return;
+          // An unlinked account intentionally remains on the unlinked screen.
+          if ($("portalContent")?.hidden || !isValidPatientId(state.patientId)) return;
         }
-        // Re-apply the requested tab after loadPortal has populated patient state.
+
+        // Patient identity and access state are now resolved; it is safe to activate
+        // the requested panel and start its data loader.
         showPortalDestination(destination);
         return;
       }
 
+      // Non-health destinations do not require a patient UUID.
+      showPortalDestination(destination);
       if (id === "portalProfileArea") {
         try {
           await loadSelfProfile();
