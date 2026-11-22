@@ -13,6 +13,7 @@
     statusFilter: 'all',
     statusTimer: null,
     user: null,
+    accountType: null,
     isAdmin: false,
     hasActiveSubscription: false,
     canAddPatient: false,
@@ -61,6 +62,7 @@
     try {
       const accessStatus = await access?.getAccessStatus?.();
       state.user = accessStatus?.user || null;
+      state.accountType = accessStatus?.accountType || null;
 
       if (!state.user) {
         state.isAdmin = false;
@@ -73,11 +75,11 @@
 
       state.isAdmin = accessStatus?.isAdmin === true;
 
-      // Administrators are explicitly exempt from subscription and patient-quota UI gates.
-      // The database RLS policy remains the final authorization for INSERT.
-      if (state.isAdmin) {
-        state.hasActiveSubscription = true;
-        state.canAddPatient = true;
+      // Patient records belong to their creating professional only.
+      // Administrators and patient accounts do not receive professional workspace access.
+      if (state.isAdmin || state.accountType !== 'professional') {
+        state.hasActiveSubscription = false;
+        state.canAddPatient = false;
         state.activeSubscriptionId = null;
         updateWriteControls();
         return;
@@ -119,7 +121,7 @@
   function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
-    const canAdd = state.isAdmin || state.canAddPatient;
+    const canAdd = !state.isAdmin && state.accountType === 'professional' && state.canAddPatient;
 
     // Do not show subscription/quota warnings on the patient directory.
     // The add action itself is controlled solely by the authoritative quota RPC.
@@ -157,11 +159,15 @@
 
     try {
       if (!supabase) throw new Error('Supabase client is not available.');
+      if (!state.user || state.isAdmin || state.accountType !== 'professional') {
+        throw new Error('Professional-only patient workspace access required.');
+      }
 
       if (reset) {
         const { count, error: countError } = await supabase
           .from('patients')
-          .select('id', { count: 'exact', head: true });
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', state.user.id);
         if (countError) throw countError;
         state.totalPatients = count || 0;
       }
@@ -171,6 +177,7 @@
       const { data: patients, error: patientsError } = await supabase
         .from('patients')
         .select('id,user_id,name,diagnosis')
+        .eq('user_id', state.user.id)
         .order('name', { ascending: true })
         .order('id', { ascending: true })
         .range(from, to);
@@ -181,7 +188,8 @@
       const patientIds = pagePatients.map((patient) => patient.id).filter(Boolean);
       const linkedPatientIds = new Set();
 
-      if (patientIds.length && state.user?.id && !state.isAdmin) {
+      let careTeamPatientIds = new Set();
+      if (patientIds.length && state.user?.id) {
         const [requestsResult, careTeamResult] = await Promise.all([
           supabase
             .from('professional_connection_requests')
@@ -201,7 +209,10 @@
         if (careTeamResult.error) throw careTeamResult.error;
 
         (requestsResult.data || []).forEach(item => linkedPatientIds.add(item.patient_id));
-        (careTeamResult.data || []).forEach(item => linkedPatientIds.add(item.patient_id));
+        (careTeamResult.data || []).forEach(item => {
+          linkedPatientIds.add(item.patient_id);
+          careTeamPatientIds.add(item.patient_id);
+        });
       }
 
       const unlinkedPatientIds = patientIds.filter(id => !linkedPatientIds.has(id));
@@ -231,11 +242,11 @@
       });
 
       const nextAppointmentByPatient = new Map();
-      if (linkedPatientIds.size) {
+      if (careTeamPatientIds.size) {
         const { data: appointments, error: appointmentsError } = await supabase
           .from('patient_appointments')
           .select('patient_id,scheduled_at')
-          .in('patient_id', [...linkedPatientIds])
+          .in('patient_id', [...careTeamPatientIds])
           .eq('status', 'confirmed')
           .gte('scheduled_at', new Date().toISOString())
           .order('scheduled_at', { ascending: true });
@@ -423,7 +434,7 @@
         state.accessPromise = state.accessPromise || refreshAccess();
         await state.accessPromise;
       }
-      if (!state.isAdmin && !state.canAddPatient) return;
+      if (state.isAdmin || state.accountType !== 'professional' || !state.canAddPatient) return;
 
       const modal = $('addPatientModal');
       if (!modal) return;
@@ -476,7 +487,7 @@
           diagnosis: null,
           complaints: null,
           clinical_notes: null,
-          subscription_id: state.isAdmin ? null : state.activeSubscriptionId
+          subscription_id: state.activeSubscriptionId
         })
         .select('id')
         .single();
@@ -488,7 +499,7 @@
       showStatus('تم حفظ المريض بنجاح.', 'success');
     } catch (error) {
       console.error('Create patient failed:', error);
-      showStatus('تعذر حفظ المريض في قاعدة البيانات.');
+      showStatus(error?.message || 'تعذر حفظ المريض في قاعدة البيانات.');
     }
   }
 
@@ -594,12 +605,12 @@
 
     state.accessPromise = refreshAccess();
     await state.accessPromise;
-    if (!state.user) {
+    if (!state.user || state.isAdmin || state.accountType !== 'professional') {
       window.DietPlannerAccess?.showAccessPrompt?.({
-        title: "تسجيل الدخول مطلوب",
-        message: "سجّل الدخول أولًا لعرض قائمة المرضى وملفاتهم.",
-        actionLabel: "تسجيل الدخول",
-        actionHref: "login.html"
+        title: state.isAdmin ? "مساحة المرضى غير متاحة للإدارة" : "حساب المختص مطلوب",
+        message: state.isAdmin ? "ملفات المرضى خاصة بالمختص المسؤول عنها ولا يمكن لحساب الإدارة الاطلاع عليها." : "سجّل الدخول بحساب مختص لعرض قائمة مرضاك وملفاتهم.",
+        actionLabel: "العودة للرئيسية",
+        actionHref: "app.html"
       });
       const list = $("patientsList");
       if (list) list.innerHTML = "";
