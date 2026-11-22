@@ -29,7 +29,7 @@
   <script src="js/patient-messages.js?v=20261122-central-floating-chat-v2" defer></script>
   <script src="js/patient-notifications.js?v=20261122-patient-notifications-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261122-patient-name-edit-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261122-unified-health-save-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -219,7 +219,7 @@
         <section class="portal-section" aria-labelledby="patientSharedHealthTitle">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية المشتركة</h2><p>بيانات أساسية يمكن للمريض والمختص المخوّل مراجعتها وتحديثها أثناء المتابعة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
           <form id="patientSharedHealthForm" class="portal-shared-health-form">
-            <div class="portal-shared-health-name-row"><label for="sharedHealthName">اسم المريض</label><div><input id="sharedHealthName" type="text" maxlength="120" autocomplete="name"><button id="savePatientRecordName" type="button" class="portal-secondary-button">حفظ الاسم</button></div><p id="patientRecordNameStatus" class="portal-inline-message" role="status"></p></div>
+            <div class="portal-shared-health-name-row"><label for="sharedHealthName">اسم المريض</label><input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" required></div>
             <div class="portal-shared-health-grid">
               <label for="sharedHealthGender">النوع (اختياري)<select id="sharedHealthGender"><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></label>
               <label>تاريخ الميلاد<input id="sharedHealthBirthDate" type="date"></label>
