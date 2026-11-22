@@ -99,8 +99,15 @@
 
   function setCollapsed(header, collapsed, persist = true) {
     header.classList.toggle("is-collapsed", collapsed);
-    const hint = header.querySelector(".dp-app-header__collapse-hint span");
-    if (hint) hint.textContent = collapsed ? "اضغط لعرض باقي التبويبات" : "اضغط لطي القائمة";
+    const toggle = header.querySelector(".dp-app-header__collapse-toggle");
+    if (toggle) {
+      const actionLabel = collapsed ? "عرض باقي التبويبات" : "طي القائمة";
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", actionLabel);
+      toggle.title = actionLabel;
+      const label = toggle.querySelector("span");
+      if (label) label.textContent = actionLabel;
+    }
     if (persist) {
       try { localStorage.setItem(HEADER_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
       catch (error) { console.warn("Could not save header display preference:", error); }
@@ -150,7 +157,7 @@
             <strong>Diet Planner</strong><small>${subtitle}</small>
           </div>
         </div>
-        <div class="dp-app-header__collapse-hint" aria-hidden="true"><i class="fa-solid fa-grip-lines"></i><span>اضغط لطي القائمة</span></div>
+        <button class="dp-app-header__collapse-toggle" type="button" aria-expanded="true" aria-controls="dp-app-header-track" aria-label="طي القائمة" title="طي القائمة"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i><span>طي القائمة</span></button>
         <div class="dp-app-header__account">
           <a class="dp-app-header__account-link dp-app-header__login" href="${base}login.html">تسجيل الدخول</a>
           <a class="dp-app-header__account-link dp-app-header__register" href="${base}login.html#register">إنشاء حساب</a>
@@ -169,6 +176,9 @@
     items.forEach(item => track.append(makeLink(item, role)));
     header.addEventListener("click", event => {
       if (event.target.closest("a, button, input, select, textarea, [role=button], .dp-app-header__link, .dp-app-header__brand-copy")) return;
+      setCollapsed(header, !header.classList.contains("is-collapsed"));
+    });
+    header.querySelector(".dp-app-header__collapse-toggle").addEventListener("click", () => {
       setCollapsed(header, !header.classList.contains("is-collapsed"));
     });
     header.addEventListener("keydown", event => {
