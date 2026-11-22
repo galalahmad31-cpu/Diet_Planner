@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-four-tab-health-v2">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-care-management-layout-v1">
   <link rel="stylesheet" href="css/announcements.css?v=20261122-shared-announcements-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
@@ -29,7 +29,7 @@
   <script src="js/patient-messages.js?v=20261122-chat-agreement-separation-v2" defer></script>
   <script src="js/patient-notifications.js?v=20261122-patient-notifications-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261122-self-plans-tab-v8" defer></script>
+  <script src="js/patient-portal.js?v=20261122-care-management-layout-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -205,14 +205,13 @@
       </div>
 
       <div id="portalCareManagementPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
-        <section class="portal-section" aria-labelledby="portalDirectoryRequestsTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL REQUESTS</span><h2 id="portalDirectoryRequestsTitle">طلبات المختصين والتواصل</h2><p>تابع طلباتك وتواصل مع المختص قبل وأثناء المتابعة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
-          <div id="patientProfessionalRequests" class="portal-empty-state">جاري تحميل الطلبات...</div>
-          <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
-        </section>
         <section class="portal-section" aria-labelledby="patientCareManagementTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">CARE AGREEMENT</span><h2 id="patientCareManagementTitle">إدارة الاتفاق والمتابعة</h2><p>راجع الخدمة والسعر والمدة وتأكيدات الدفع وحالة المتابعة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-handshake"></i></span></div>
-          <div id="patientCareManagementContent" class="portal-care-management-list">جاري تحميل الاتفاقات...</div>
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">CARE MANAGEMENT</span><h2 id="patientCareManagementTitle">إدارة المتابعة</h2><p>كل طلب واتفاق في بطاقة واحدة، مع حالة واضحة وإجراءات المرحلة الحالية فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-handshake"></i></span></div>
+          <div id="patientCareManagementContent" class="portal-care-management-list">جاري تحميل طلبات المتابعة...</div>
+        </section>
+        <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>المحادثات والرسائل في مكان واحد، دون تكرار بيانات الاتفاق.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
+          <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
         </section>
       </div>
 
