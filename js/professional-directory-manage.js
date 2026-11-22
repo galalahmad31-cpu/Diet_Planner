@@ -107,6 +107,25 @@ async function load(){
 document.addEventListener("DOMContentLoaded",()=>{
  $("addProfessionalOffer").addEventListener("click",addOffer);
  $("professionalProfileForm").addEventListener("submit",async e=>{e.preventDefault();if(await save())await load();});
+ $("saveAndSubmitForReview").addEventListener("click",async()=>{
+  const form=$("professionalProfileForm");
+  if(!form.reportValidity())return;
+  const button=$("saveAndSubmitForReview");
+  button.disabled=true;
+  try{
+   if(!await save())return;
+   const {error}=await db.rpc("submit_professional_directory_profile");
+   if(error){
+    await load();
+    setStatus("تم حفظ الملف كمسودة، لكن تعذر إرساله للاعتماد: "+error.message);
+    return;
+   }
+   await load();
+   setStatus("تم حفظ الملف وإرساله للمراجعة. لن يظهر للعامة حتى تعتمد إدارة المنصة الملف.");
+  }finally{
+   button.disabled=false;
+  }
+ });
  $("editProfessionalProfile").addEventListener("click",()=>{
   if(!["draft","rejected"].includes(profileStatus))return;
   setProfileView(false);setEditorLocked(false);$("professionalProfileForm").scrollIntoView({behavior:"smooth",block:"start"});
@@ -126,9 +145,14 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  $("submitForReview").addEventListener("click",async()=>{
   const button=$("submitForReview");button.disabled=true;
-  const {error}=await db.rpc("submit_professional_directory_profile");
-  if(error){setStatus("تعذر إرسال الملف: "+error.message);button.disabled=false;return;}
-  setStatus("تم إرسال الملف للمراجعة. لن يظهر للعامة حتى يعتمد من إدارة المنصة.");await load();
+  try{
+   const {error}=await db.rpc("submit_professional_directory_profile");
+   if(error){setStatus("تعذر إرسال الملف: "+error.message);return;}
+   await load();
+   setStatus("تم إرسال الملف للمراجعة. لن يظهر للعامة حتى تعتمد إدارة المنصة الملف.");
+  }finally{
+   button.disabled=false;
+  }
  });
  $("withdrawDirectoryProfile").addEventListener("click",async()=>{
   if(!confirm("سيختفي ملفك من الدليل، لكن علاقات الرعاية الحالية لن تُحذف. هل تريد المتابعة؟"))return;
