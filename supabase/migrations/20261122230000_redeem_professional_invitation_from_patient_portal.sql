@@ -78,8 +78,9 @@ begin
       payment_sent_at = null,
       payment_received_at = null,
       ended_at = null,
+      end_reason = null,
       updated_at = now()
-  where public.professional_connection_requests.status in ('declined', 'cancelled')
+  where public.professional_connection_requests.status in ('declined', 'cancelled', 'ended')
   returning id into v_request_id;
 
   if v_request_id is null then
