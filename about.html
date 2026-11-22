@@ -39,7 +39,7 @@
     }
   </script>
 
-  <link rel="stylesheet" href="css/about.css?v=20261120-about-grid-v2">
+  <link rel="stylesheet" href="css/about.css?v=20261122-about-audience-tabs-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
@@ -65,7 +65,15 @@
         </div>
 
       <section>
-        <div id="sectionsContainer" class="about-sections-grid"></div>
+        <div class="about-tabs" role="tablist" aria-label="أقسام شرح المنصة">
+          <button type="button" class="about-tab is-active" id="patientTab" role="tab" aria-selected="true" aria-controls="sectionsContainer" data-audience="patient">
+            <i class="fa-solid fa-user"></i><span>مساحة المريض</span>
+          </button>
+          <button type="button" class="about-tab" id="professionalTab" role="tab" aria-selected="false" aria-controls="sectionsContainer" data-audience="professional">
+            <i class="fa-solid fa-user-doctor"></i><span>مساحة المختص</span>
+          </button>
+        </div>
+        <div id="sectionsContainer" class="about-sections-grid" role="tabpanel" aria-labelledby="patientTab"></div>
 
         <div id="emptyState" class="hidden rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm">
@@ -116,7 +124,7 @@
   </div>
 
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
-  <script src="js/about.js?v=20261120-about-editable-content-v2"></script>
+  <script src="js/about.js?v=20261122-about-audience-tabs-v1"></script>
   
 </body>
 </html>
