@@ -56,21 +56,6 @@ function addMonthsToDateKey(baseDate, months) {
   return window.DPDate.addMonths(baseDate, months);
 }
 
-  const [year, month, day] = key.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-  date.setMonth(date.getMonth() + Number(months));
-
-  // Match the finance page: preserve end-of-month behavior.
-  if (date.getDate() !== day) {
-    date.setDate(0);
-  }
-
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0')
-  ].join('-');
-}
 
 function formatDate(value) {
   const key = dateKey(value);
