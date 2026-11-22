@@ -45,15 +45,7 @@ const TAB_INFO = {
   }
 };
 
-function esc(value) {
-  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  }[char]));
-}
+const esc = window.DPUtils.escapeHtml;
 
 /*
  * PostgreSQL date fields are handled as calendar dates.
