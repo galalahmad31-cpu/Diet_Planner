@@ -36,28 +36,16 @@
 .professional-offer-remove{justify-self:start;border:0;background:transparent;color:#b54747;font:700 10px Cairo,sans-serif}
 .professional-offers-status{margin:0;font-size:10px;color:var(--d-muted)}
 
-.professional-profile-saved-view{display:grid;gap:14px}
-.professional-profile-saved-view[hidden]{display:none}
-.professional-profile-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.professional-profile-summary-item{display:grid;gap:5px;min-width:0;padding:11px;border:1px solid var(--d-line,#e2ebea);border-radius:10px;background:var(--d-bg,#f4f8f7)}
-.professional-profile-summary-item span{color:var(--d-muted,#71858a);font-size:10px;font-weight:700}
-.professional-profile-summary-item strong{overflow-wrap:anywhere;color:var(--d-ink,#173b40);font-size:12px}
-.professional-profile-summary-item:last-child{grid-column:1/-1}
-.professional-profile-saved-actions{display:flex;flex-wrap:wrap;gap:9px}
-.professional-profile-saved-actions button,.professional-profile-actions button{min-height:40px;padding:9px 15px;border:0;border-radius:9px;font:700 11px Cairo,sans-serif;cursor:pointer}
+.professional-profile-actions button{min-height:40px;padding:9px 15px;border:0;border-radius:9px;font:700 11px Cairo,sans-serif;cursor:pointer}
 .professional-profile-delete{background:#fff0f0;color:#b42318}
-.professional-profile-cancel{background:var(--d-bg);color:var(--d-ink)}
-.professional-profile-location-grid [hidden],.professional-profile-saved-actions [hidden]{display:none!important}
+.directory-editor [hidden]{display:none!important}
 @media(max-width:760px){
  .professional-profile-location-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
  .professional-profile-location-grid label{font-size:9px}
  .professional-profile-location-grid input{padding:8px 6px;font-size:10px}
  .professional-profile-service-modes{gap:6px;padding:7px 5px}
  .professional-profile-service-modes label{font-size:9px}
- .professional-profile-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:560px){
  .professional-profile-location-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .professional-profile-summary{grid-template-columns:1fr 1fr}
- .professional-profile-saved-actions{display:grid;grid-template-columns:1fr 1fr}
 }
