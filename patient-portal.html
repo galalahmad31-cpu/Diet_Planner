@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-insulin-remove-duplicate-v1">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-patient-announcements-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
@@ -24,7 +24,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261122-insulin-remove-duplicate-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261122-patient-announcements-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -35,14 +35,10 @@
         <div><span class="portal-eyebrow">PATIENT SPACE</span><h1>أهلًا بك في <strong>Diet Planner</strong></h1><p>مساحتك لإدارة صحتك الغذائية، واكتشاف المختصين، والوصول إلى خدمات التغذية من مكان واحد.</p></div>
         <div class="portal-welcome-icon"><i class="fa-solid fa-leaf"></i></div>
       </section>
-      <section class="portal-services" aria-label="خدمات بوابة المريض">
-        <button type="button" class="portal-service-card portal-service-featured" data-portal-open-health><span class="portal-service-icon"><i class="fa-solid fa-folder-heart"></i></span><span class="portal-service-copy"><strong>ملفي الصحي</strong><small>بياناتي الصحية، القياسات، الخطط والمتابعة مع المختص.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></button>
-        <a class="portal-service-card" href="professional-directory.html"><span class="portal-service-icon"><i class="fa-solid fa-user-doctor"></i></span><span class="portal-service-copy"><strong>استكشف المختصين</strong><small>ابحث عن مختص تغذية واطلب المتابعة معه.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></a>
-        <article class="portal-service-card portal-service-upcoming" id="portalDietBuilder"><span class="portal-service-icon"><i class="fa-solid fa-bowl-food"></i></span><span class="portal-service-copy"><strong>صمم نظامك الغذائي</strong><small>أنشئ نظامك الغذائي وتابع التزامك بنفسك.</small><em>قريبًا</em></span></article>
-        <button type="button" class="portal-service-card" id="portalTools" data-open-patient-tools><span class="portal-service-icon"><i class="fa-solid fa-calculator"></i></span><span class="portal-service-copy"><strong>أدوات التغذية</strong><small>احسب الكربوهيدرات وتعرّف على القيم الغذائية للأطعمة.</small></span><i class="fa-solid fa-arrow-left portal-service-arrow"></i></button>
-        <article class="portal-service-card portal-service-upcoming" id="portalEducation"><span class="portal-service-icon"><i class="fa-solid fa-book-open"></i></span><span class="portal-service-copy"><strong>المكتبة والتثقيف</strong><small>محتوى علمي وإرشادات غذائية مبسطة.</small><em>قريبًا</em></span></article>
+      <section id="patientAnnouncementsSection" class="portal-announcements" aria-labelledby="patientAnnouncementsTitle" hidden>
+        <div class="portal-announcements-heading"><div><span class="portal-section-kicker">LATEST UPDATES</span><h2 id="patientAnnouncementsTitle">الإعلانات والتحديثات</h2><p>آخر المستجدات الموجهة لمساحة المريض.</p></div><span class="portal-announcements-icon"><i class="fa-solid fa-bullhorn"></i></span></div>
+        <div id="patientAnnouncementsList" class="portal-announcements-list" aria-live="polite"></div>
       </section>
-      <p class="portal-home-note"><i class="fa-solid fa-shield-heart"></i> يمكنك استخدام الخدمات العامة دون الارتباط بمختص. أرسل طلب محادثة من دليل المختصين؛ وبعد قبول المختص يمكنكما الاتفاق على الخدمة والسعر والمدة. تبدأ المتابعة ويُتاح الملف الصحي للمختص بعد تأكيد استلام المبلغ، أو يمكنك ربط ملف موجود عبر رمز الدعوة.</p>
     </section>
     <section id="portalToolsPanel" class="portal-tools-area" hidden aria-labelledby="portalToolsTitle">
       <nav class="portal-tools-tabs" role="tablist" aria-label="أدوات التغذية">
