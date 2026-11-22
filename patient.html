@@ -11,12 +11,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
+  <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
   <script src="js/patient.js?v=20261120-paged-50-v1" defer></script>
 
   <link rel="stylesheet" href="css/patient.css?v=20261122-patient-toolbar-inline-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
+  <link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
   <script src="js/theme.js?v=20261121-header-only-v15"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
@@ -112,25 +114,7 @@
   </div>
 </div>
 
-<!-- CONFIRM DELETE -->
-<div id="deleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-center">
-    <div class="w-14 h-14 mx-auto rounded-full bg-red-50 flex items-center justify-center text-2xl">🗑️</div>
-    <h3 class="font-black text-slate-800 mt-3">حذف المريض</h3>
-    <p id="deleteText" class="text-xs text-slate-500 mt-2"></p>
 
-    <div class="flex gap-2 mt-5">
-      <button id="confirmDeleteBtn"
-        class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs py-2.5 rounded-xl">
-        حذف
-      </button>
-      <button data-action="close-delete"
-        class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl">
-        إلغاء
-      </button>
-    </div>
-  </div>
-</div>
 
   
 </body>
