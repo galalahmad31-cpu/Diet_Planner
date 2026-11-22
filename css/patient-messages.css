@@ -11,7 +11,7 @@ html[data-theme="dark"] .patient-message-bubble.is-mine{background:#214c43;color
 @media(max-width:640px){.patient-messages-shell{padding:10px}.patient-message-bubble{max-width:92%}.patient-messages-list{max-height:360px}.patient-messages-contact{align-items:flex-start;flex-direction:column}.patient-messages-contact select{width:100%}}
 
 
-/* Shared contact inbox and one responsive conversation drawer. */
+/* One compact, fixed chat widget shared by patient and professional pages. */
 .dp-chat-inbox,.dp-chat-contact-list{display:grid;gap:7px;min-width:0}
 .dp-chat-contact{display:flex;align-items:center;gap:10px;width:100%;min-width:0;padding:11px 12px;border:1px solid var(--dp-border,#dce8e4);border-radius:12px;background:var(--dp-card,#fff);color:var(--dp-text,#183c3b);text-align:right;cursor:pointer;font-family:Cairo,sans-serif}
 .dp-chat-contact:hover,.dp-chat-contact:focus-visible{border-color:var(--dp-primary,#168579);background:var(--dp-surface-2,#f3f7f5);outline:none}
@@ -20,15 +20,31 @@ html[data-theme="dark"] .patient-message-bubble.is-mine{background:#214c43;color
 .dp-chat-contact-copy strong{font-size:12px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dp-chat-contact-copy small,.dp-chat-contact-status{font-size:9px;color:var(--dp-muted,#7c9090)}
 .dp-chat-contact-status{white-space:nowrap}
-.dp-chat-overlay{position:fixed;inset:0;z-index:1300;display:flex;align-items:stretch;justify-content:flex-start;background:rgba(8,24,28,.38);backdrop-filter:blur(2px)}
-.dp-chat-drawer{display:flex;flex-direction:column;width:min(410px,calc(100vw - 24px));height:100%;min-height:0;background:var(--dp-card,#fff);color:var(--dp-text,#183c3b);box-shadow:12px 0 40px rgba(0,0,0,.18);overflow:hidden}
-.dp-chat-drawer-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--dp-border,#dce8e4);background:var(--dp-surface-2,#f3f7f5)}
-.dp-chat-drawer-header>div{display:grid;gap:3px;min-width:0}.dp-chat-drawer-header strong{font-size:13px;font-weight:900}.dp-chat-drawer-header small{font-size:9px;color:var(--dp-muted,#7c9090)}
-.dp-chat-drawer-header button{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--dp-border,#dce8e4);border-radius:50%;background:var(--dp-card,#fff);color:var(--dp-text);cursor:pointer}
-.dp-chat-drawer-body{display:flex;flex:1;min-height:0;overflow:hidden;padding:10px}
-.dp-chat-drawer-body>[data-patient-messages]{display:flex;flex:1;min-width:0;min-height:0}
-.dp-chat-drawer .patient-messages-shell{display:flex;flex:1;flex-direction:column;min-height:0;padding:0;border:0;background:transparent;overflow:hidden}
-.dp-chat-drawer .patient-messages-toolbar,.dp-chat-drawer .patient-messages-compose{flex:0 0 auto}
-.dp-chat-drawer .patient-messages-list{flex:1;min-height:0;max-height:none;overflow:auto}
-.dp-chat-drawer .patient-messages-contact{display:none}
-@media(max-width:680px){.dp-chat-overlay{align-items:flex-end;justify-content:center}.dp-chat-drawer{width:100%;height:min(88dvh,780px);border-radius:20px 20px 0 0}.dp-chat-drawer-header{padding-top:19px;position:relative}.dp-chat-drawer-header:before{content:"";position:absolute;top:6px;left:50%;width:38px;height:4px;border-radius:99px;background:var(--dp-border);transform:translateX(-50%)}}
+.dp-central-chat[hidden],.dp-central-chat-launcher[hidden]{display:none!important}
+.dp-central-chat{position:fixed;right:18px;bottom:76px;z-index:1401;display:flex;flex-direction:column;width:min(370px,calc(100vw - 32px));height:min(480px,68dvh);min-height:300px;overflow:hidden;border:1px solid var(--dp-border,#dce8e4);border-radius:16px;background:var(--dp-card,#fff);color:var(--dp-text,#183c3b);box-shadow:0 12px 42px rgba(0,0,0,.22)}
+.dp-central-chat__header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto;padding:11px 13px;background:var(--dp-surface-2,#f3f7f5);border-bottom:1px solid var(--dp-border,#dce8e4)}
+.dp-central-chat__identity{display:grid;gap:3px;min-width:0}
+.dp-central-chat__identity strong{font:900 12px Cairo,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dp-central-chat__identity small{font:500 9px Cairo,sans-serif;color:var(--dp-muted,#7c9090)}
+.dp-central-chat__controls{display:flex;gap:5px;flex:0 0 auto}
+.dp-central-chat__controls button{display:grid;place-items:center;width:29px;height:29px;border:1px solid var(--dp-border,#dce8e4);border-radius:8px;background:var(--dp-card,#fff);color:var(--dp-text,#183c3b);cursor:pointer}
+.dp-central-chat__body{display:flex;flex:1;min-height:0;overflow:hidden;padding:9px}
+.dp-central-chat__body>[data-patient-messages]{display:flex;flex:1;min-width:0;min-height:0}
+.dp-central-chat .patient-messages-shell{display:flex;flex:1;flex-direction:column;gap:8px;min-height:0;padding:0;border:0;border-radius:0;background:transparent;overflow:hidden}
+.dp-central-chat .patient-messages-toolbar{flex:0 0 auto}
+.dp-central-chat .patient-messages-toolbar strong{font-size:11px}
+.dp-central-chat .patient-messages-toolbar small{font-size:9px}
+.dp-central-chat .patient-messages-refresh{padding:5px 8px;font-size:9px}
+.dp-central-chat .patient-messages-list{flex:1;min-height:90px;max-height:none;padding:8px;gap:7px;overflow:auto}
+.dp-central-chat .patient-message-bubble{max-width:90%;padding:8px 10px}
+.dp-central-chat .patient-message-body{font-size:10px;line-height:1.7}
+.dp-central-chat .patient-messages-compose{flex:0 0 auto;gap:5px}
+.dp-central-chat .patient-messages-compose textarea{min-height:54px;max-height:90px;resize:vertical;padding:7px 9px;font-size:10px}
+.dp-central-chat .patient-messages-compose-footer button{padding:7px 12px}
+.dp-central-chat .patient-messages-disclaimer{font-size:8px}
+.dp-central-chat-launcher{position:fixed;right:18px;bottom:18px;z-index:1402;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:0;border-radius:999px;background:var(--dp-primary,#168579);color:#fff;box-shadow:0 5px 20px rgba(0,0,0,.2);font:800 11px Cairo,sans-serif;cursor:pointer}
+.dp-central-chat-launcher:hover,.dp-central-chat-launcher:focus-visible{filter:brightness(1.06);outline:2px solid var(--dp-primary,#168579);outline-offset:3px}
+@media(max-width:640px){
+ .dp-central-chat{right:12px;bottom:70px;width:calc(100vw - 24px);height:min(440px,66dvh);min-height:270px}
+ .dp-central-chat-launcher{right:12px;bottom:12px}
+}
