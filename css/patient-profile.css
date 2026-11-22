@@ -121,33 +121,74 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #saveArea[hidden],#editButton[hidden]{display:none!important}
 @media(max-width:760px){.patient-data-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.patient-name-bar{padding:11px 12px}.patient-data-summary{min-height:32px;gap:5px}.patient-data-title strong{font-size:9px}.patient-data-title small{font-size:7px}.patient-data-actions,.patient-data-actions .patient-save-actions{gap:3px!important}.patient-data-actions button{min-height:27px;padding:4px 6px;font-size:8px}.patient-data-fields{gap:8px}.patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea{font-size:10px;padding:6px}.patient-data-fields textarea{min-height:58px}}
-/* Patient profile modules: five aligned tabs with one full-width workspace. */
-.patient-module-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%;margin:0 0 12px}
-.patient-module-tab{display:flex;align-items:center;gap:10px;min-width:0;min-height:76px;padding:12px 14px;border:1px solid var(--dp-tab-border);border-radius:13px;background:var(--dp-tab-bg);color:var(--dp-tab-text);text-align:right;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 2px 9px var(--dp-shadow);transition:background .16s,border-color .16s,box-shadow .16s}
-.patient-module-tab-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
-.patient-module-tab-copy strong{font-size:12px;font-weight:900;line-height:1.5}
-.patient-module-tab-copy small{font-size:9px;font-weight:600;color:var(--dp-text-2);line-height:1.45}
-.patient-module-tab .dashboard-icon{width:36px;height:36px;flex:0 0 36px}
-.patient-module-tab:hover{border-color:var(--dp-primary);background:var(--dp-surface-2)}
-.patient-module-tab.is-active{border-color:var(--dp-primary);background:var(--dp-tab-active-bg);color:var(--dp-tab-active-text);box-shadow:inset 0 0 0 1px var(--dp-primary),0 4px 12px var(--dp-shadow)}
-.patient-module-tab.is-active .patient-module-tab-copy strong,.patient-module-tab.is-active .patient-module-tab-copy small{color:var(--dp-tab-active-text)}
-.patient-module-tab:focus-visible{outline:3px solid #8bd2c2;outline-offset:2px}
-.patient-module-panel{width:100%;min-width:0;background:#fff;border:1px solid #dfe9ec;border-radius:14px;box-shadow:0 3px 12px rgba(20,45,60,.035);overflow:hidden}
+/* Patient profile modules: one shared gray navigation strip and one workspace. */
+.patient-module-tabs{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:stretch;
+  gap:2px;
+  width:100%;
+  min-width:0;
+  margin:0 0 12px;
+  padding:5px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  background:#e9ecef;
+  border:1px solid #d9dee3;
+  border-radius:11px;
+  box-shadow:none;
+  scrollbar-width:thin;
+  scrollbar-color:#b8c0c8 transparent;
+  -webkit-overflow-scrolling:touch;
+}
+.patient-module-tabs::-webkit-scrollbar{height:4px}
+.patient-module-tabs::-webkit-scrollbar-thumb{background:var(--dp-border);border-radius:10px}
+.patient-module-tab{
+  display:flex;
+  flex:1 1 0;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  min-height:42px;
+  padding:7px 9px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:#49515a;
+  box-shadow:none;
+  text-align:center;
+  font-family:'Cairo',sans-serif;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background .16s,color .16s;
+}
+.patient-module-tab-copy{display:block;min-width:0}
+.patient-module-tab-copy strong{color:inherit;font-size:12px;font-weight:800;line-height:1.4}
+.patient-module-tab:hover{border:0;background:#dde2e7}
+.patient-module-tab.is-active{
+  border:0;
+  border-bottom:3px solid #536779;
+  border-radius:0;
+  background:transparent;
+  color:#26313b;
+  box-shadow:none;
+}
+.patient-module-tab:focus-visible{outline:2px solid #647b91;outline-offset:-2px}
+.patient-module-panel{width:100%;min-width:0;background:var(--dp-surface);border:1px solid var(--dp-border);border-radius:14px;box-shadow:0 3px 12px rgba(20,45,60,.035);overflow:hidden}
 .patient-module-panel[hidden]{display:none!important}
 .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:16px}
 .patient-support-panel{padding:0}
 #nutritionSupportFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:var(--dp-bg)}
 @media(max-width:680px){
- .patient-module-tabs{display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:9px;overflow-x:auto;overflow-y:hidden;padding:2px 1px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
- .patient-module-tab{flex:0 0 132px;min-width:132px;min-height:66px;padding:8px 7px;gap:6px;justify-content:center;flex-direction:column;text-align:center;border-radius:11px;scroll-snap-align:start}
- .patient-module-tab .dashboard-icon{width:29px;height:29px;flex-basis:29px;font-size:13px;border-radius:8px}
- .patient-module-tab-copy{gap:1px}
- .patient-module-tab-copy strong{font-size:9px;line-height:1.4}
- .patient-module-tab-copy small{font-size:7px;line-height:1.3}
- .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:11px 9px}
-
+  .patient-module-tabs{gap:2px;padding:4px;margin-bottom:9px;border-radius:9px}
+  .patient-module-tab{flex:0 0 auto;min-width:max-content;min-height:38px;padding:7px 11px;border-radius:6px}
+  .patient-module-tab-copy strong{font-size:10px}
+  .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:11px 9px}
 }
-@media(max-width:360px){.patient-module-tab{flex-basis:124px;min-width:124px;padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
+@media(max-width:360px){
+  .patient-module-tab{padding-inline:9px}
+  .patient-module-tab-copy strong{font-size:9px}
+}
 
 /* Measurement history: one semantic, readable table in the patient workspace. */
 .measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
@@ -161,9 +202,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 
 
 
-
-@media(max-width:640px){
-}
 
 /* Host-level confirmation for actions initiated inside the nutrition-support iframe. */
 body.support-delete-modal-open{overflow:hidden}
@@ -906,70 +944,3 @@ body.patient-conversation-open{overflow:hidden}
 .patient-care-module-panel #patientLinkedCareView[hidden],.patient-care-module-panel #patientLegacyFinanceView[hidden]{display:none!important}
 .patient-module-tabs::-webkit-scrollbar{height:4px}
 .patient-module-tabs::-webkit-scrollbar-thumb{background:var(--dp-border);border-radius:10px}
-
-
-/* Unified gray navigation strip: five text-only segments, not separate cards. */
-.patient-module-tabs{
-  display:flex;
-  flex-wrap:nowrap;
-  align-items:stretch;
-  gap:2px;
-  width:100%;
-  min-width:0;
-  margin:0 0 12px;
-  padding:5px;
-  overflow-x:auto;
-  overflow-y:hidden;
-  background:#e9ecef;
-  border:1px solid #d9dee3;
-  border-radius:11px;
-  box-shadow:none;
-  scrollbar-width:thin;
-  scrollbar-color:#b8c0c8 transparent;
-}
-.patient-module-tab{
-  flex:1 1 0;
-  min-width:0;
-  min-height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:7px 9px;
-  border:0;
-  border-radius:7px;
-  background:transparent;
-  color:#49515a;
-  box-shadow:none;
-  text-align:center;
-  white-space:nowrap;
-}
-.patient-module-tab:hover{
-  border:0;
-  background:#dde2e7;
-}
-.patient-module-tab.is-active{
-  border:0;
-  border-bottom:3px solid #536779;
-  border-radius:0;
-  background:transparent;
-  color:#26313b;
-  box-shadow:none;
-}
-.patient-module-tab.is-active .patient-module-tab-copy strong,
-.patient-module-tab .patient-module-tab-copy strong{
-  color:inherit;
-  font-size:12px;
-  font-weight:800;
-  line-height:1.4;
-}
-.patient-module-tab-copy{display:block;min-width:0}
-.patient-module-tab:focus-visible{outline:2px solid #647b91;outline-offset:-2px}
-@media(max-width:680px){
-  .patient-module-tabs{gap:2px;padding:4px;border-radius:9px}
-  .patient-module-tab{flex:0 0 auto;min-width:max-content;min-height:38px;padding:7px 11px;border-radius:6px}
-  .patient-module-tab .patient-module-tab-copy strong{font-size:10px}
-}
-@media(max-width:360px){
-  .patient-module-tab{padding-inline:9px}
-  .patient-module-tab .patient-module-tab-copy strong{font-size:9px}
-}
