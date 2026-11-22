@@ -26,7 +26,8 @@
     ["article.html", "المقالات", "fa-newspaper"],
     ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
-    ["patient-portal.html#portalProfileArea", "الملف الشخصي", "fa-user"]
+    ["patient-portal.html#portalProfileArea", "الملف الشخصي", "fa-user"],
+    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"]
   ];
   // Professional navigation is the single source of truth for all professional pages.
   // Keep the requested order; the shared six-column grid wraps naturally into rows of six.
@@ -46,8 +47,10 @@
     ["profile.html", "الصفحة الشخصية", "fa-user"],
     ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
-    ["about.html", "عن المنصة", "fa-circle-info"]
+    ["about.html", "عن المنصة", "fa-circle-info"],
+    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"]
   ];
+  const adminPage = ["admin.html", "الإدارة", "fa-shield-halved"];
   const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
   const titles = {
     "patient-profile.html":"ملف المريض", "visit.html":"الخطة الغذائية",
@@ -133,7 +136,7 @@
     return link;
   }
 
-  function buildHeader({ role, signedIn, title, pageActions }) {
+  function buildHeader({ role, signedIn, isAdmin, title, pageActions }) {
     const header = document.createElement("header");
     header.className = "dp-app-header no-print";
     header.dataset.accountRole = role;
@@ -163,7 +166,7 @@
     const track = header.querySelector(".dp-app-header__track");
     const nav = header.querySelector(".dp-app-header__nav");
     const toggle = header.querySelector(".dp-app-header__toggle");
-    const items = role === "patient" ? patientPages : role === "professional" ? professionalPages : publicPages;
+    const items = role === "patient" ? patientPages : role === "professional" ? (isAdmin ? [...professionalPages, adminPage] : professionalPages) : publicPages;
     items.forEach(item => track.append(makeLink(item, role)));
     toggle.addEventListener("click", () => {
       setCollapsed(nav, toggle, toggle.getAttribute("aria-expanded") === "true");
@@ -266,17 +269,18 @@
     notificationUserId = null;
   }
 
-  async function resolveRole(user) {
-    if (!user?.id) return "guest";
+  async function resolveAccount(user) {
+    if (!user?.id) return { role: "guest", isAdmin: false };
     try {
       const status = await access()?.getAccessStatus?.();
-      if (status?.accountType === "patient") return "patient";
-      if (status?.accountType === "professional" || status?.isAdmin) return "professional";
+      if (status?.accountType === "patient") return { role: "patient", isAdmin: false };
+      if (status?.accountType === "professional" || status?.isAdmin === true) {
+        return { role: "professional", isAdmin: status.isAdmin === true };
+      }
     } catch (error) {
       console.error("Header account type lookup failed:", error);
     }
-    if (isPatientRoute()) return "patient";
-    return "professional";
+    return { role: isPatientRoute() ? "patient" : "professional", isAdmin: false };
   }
 
   function findPageActions() {
@@ -285,13 +289,13 @@
     return document.querySelector(".dp-public-header__page-actions, .dp-patient-header__page-actions, .dp-app-header__context");
   }
 
-  function mountHeader(role, user, revision) {
+  function mountHeader(role, user, revision, isAdmin) {
     if (revision !== renderRevision || !document.body) return;
     const placeholder = document.querySelector("[data-dp-app-header], [data-dp-patient-header]");
     const existing = document.querySelector(".dp-app-header");
     const actions = findPageActions();
     const pageTitle = (placeholder?.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim()).trim();
-    const header = buildHeader({ role, signedIn: Boolean(user?.id), title: pageTitle, pageActions: actions });
+    const header = buildHeader({ role, signedIn: Boolean(user?.id), isAdmin: isAdmin === true, title: pageTitle, pageActions: actions });
     if (placeholder) placeholder.replaceWith(header);
     else if (existing) existing.replaceWith(header);
     else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
@@ -304,11 +308,11 @@
 
   async function renderForSession(user) {
     const revision = ++renderRevision;
-    const role = await resolveRole(user);
+    const account = await resolveAccount(user);
     if (revision !== renderRevision) return;
     const publicRoute = isPublicRoute();
-    const selectedRole = user?.id ? role : (publicRoute ? "guest" : (isPatientRoute() ? "patient" : "professional"));
-    mountHeader(selectedRole, user, revision);
+    const selectedRole = user?.id ? account.role : (publicRoute ? "guest" : (isPatientRoute() ? "patient" : "professional"));
+    mountHeader(selectedRole, user, revision, Boolean(user?.id && account.isAdmin && selectedRole === "professional"));
   }
 
   async function initialize() {
