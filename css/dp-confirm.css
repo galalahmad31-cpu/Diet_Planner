@@ -1,0 +1,17 @@
+.dp-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(12,35,33,.56);opacity:1;transition:opacity .16s ease}
+.dp-confirm-backdrop[hidden]{display:none!important}
+.dp-confirm-dialog{width:min(100%,380px);padding:22px 20px 18px;border:1px solid var(--dp-border,#e1eae7);border-radius:20px;background:var(--dp-surface,#fff);color:var(--dp-text,#203b37);box-shadow:0 18px 55px rgba(12,35,33,.2);font-family:Cairo,sans-serif;direction:rtl}
+.dp-confirm-dialog h2{margin:0 0 9px;font-size:17px;font-weight:800;line-height:1.6}
+.dp-confirm-dialog p{margin:0;color:var(--dp-muted,#71817d);font-size:13px;font-weight:500;line-height:1.9;overflow-wrap:anywhere}
+.dp-confirm-actions{display:flex;gap:9px;margin-top:20px}
+.dp-confirm-actions button{flex:1;min-width:0;min-height:42px;padding:9px 14px;border:1px solid transparent;border-radius:10px;font:700 13px Cairo,sans-serif;cursor:pointer;transition:background .15s ease,border-color .15s ease}
+.dp-confirm-primary{background:var(--dp-primary,#147b6d);color:#fff}
+.dp-confirm-primary:hover{filter:brightness(.96)}
+.dp-confirm-primary.is-danger{background:#b94f55;color:#fff}
+.dp-confirm-secondary{border-color:var(--dp-border,#dce6e2)!important;background:var(--dp-soft,#f2f6f4);color:var(--dp-text,#344b46)}
+.dp-confirm-actions button:focus-visible{outline:3px solid rgba(20,123,109,.24);outline-offset:2px}
+body.dp-confirm-open{overflow:hidden}
+[data-theme="dark"] .dp-confirm-dialog,body.dark-mode .dp-confirm-dialog{background:var(--dp-surface,#183b38);color:var(--dp-text,#edf5f2);border-color:var(--dp-border,#31534d)}
+[data-theme="dark"] .dp-confirm-dialog p,body.dark-mode .dp-confirm-dialog p{color:var(--dp-muted,#b4c5bf)}
+[data-theme="dark"] .dp-confirm-secondary,body.dark-mode .dp-confirm-secondary{background:var(--dp-soft,#234641);color:var(--dp-text,#edf5f2);border-color:var(--dp-border,#31534d)!important}
+@media(max-width:420px){.dp-confirm-dialog{padding:19px 16px 15px;border-radius:18px}.dp-confirm-dialog h2{font-size:16px}.dp-confirm-dialog p{font-size:12px}.dp-confirm-actions{margin-top:17px}}
