@@ -183,8 +183,6 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 @media(max-width:360px){.patient-module-tab{padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
 
 /* Measurement history: one semantic, readable table in the patient workspace. */
-.measurements-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.measurements-access-status{margin:0;color:#64748b;font-size:11px;font-weight:700;line-height:1.7}
 .measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
 .measurement-edit-button{border:1px solid #cfe4ee;background:#f0f8fc;color:#17617d}
 .measurement-edit-button:hover{background:#e0f0f7}
