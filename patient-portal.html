@@ -64,27 +64,18 @@
             <div><label for="portalInsulinRegimen">نظام الإنسولين</label><select id="portalInsulinRegimen"><option value="basal_bolus">قاعدي + سريع مع الوجبات</option><option value="basal_only">قاعدي فقط</option><option value="premix">إنسولين مخلوط / جرعات ثابتة</option></select></div>
             <div><label for="portalInsulinKind">نوع إنسولين الوجبات</label><select id="portalInsulinKind"><option value="rapid">سريع المفعول (Rapid-acting)</option><option value="regular">Regular (قصير المفعول)</option></select></div>
             <div><label for="portalInsulinTdd">إجمالي الإنسولين خلال 24 ساعة (وحدة)</label><input id="portalInsulinTdd" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="مجموع القاعدي والوجبات والتصحيح"></div>
+            <div><label for="portalCurrentGlucose">قياس السكر الحالي (mg/dL)</label><input id="portalCurrentGlucose" type="number" min="20" max="600" step="1" inputmode="numeric" placeholder="مثال: 250"></div>
+            <div><label for="portalTargetGlucose">السكر المستهدف (mg/dL)</label><input id="portalTargetGlucose" type="number" min="70" max="250" step="1" inputmode="numeric" placeholder="يحدده الطبيب"></div>
           </div>
           <div class="portal-insulin-result" aria-live="polite">
             <div><span>إجمالي الجرعة اليومية TDD</span><strong id="portalInsulinTddResult">—</strong></div>
             <div><span>معامل الوجبة ICR</span><strong id="portalInsulinIcrResult">—</strong></div>
             <div><span>معامل التصحيح ISF</span><strong id="portalInsulinIsfResult">—</strong></div>
+            <div><span>فرق السكر عن الهدف</span><strong id="portalGlucoseDifference">—</strong></div>
+            <div><span>ناتج التصحيح الحسابي النظري</span><strong id="portalCorrectionEstimate">—</strong></div>
           </div>
-          <div class="portal-insulin-correction">
-            <div class="portal-insulin-correction-heading"><strong>مساعد فهم تصحيح سكر الدم</strong><span>أداة تعليمية فقط</span></div>
-            <div class="portal-insulin-fields portal-insulin-glucose-fields">
-              <div><label for="portalCurrentGlucose">قياس السكر الحالي (mg/dL)</label><input id="portalCurrentGlucose" type="number" min="20" max="600" step="1" inputmode="numeric" placeholder="مثال: 250"></div>
-              <div><label for="portalTargetGlucose">السكر المستهدف (mg/dL)</label><input id="portalTargetGlucose" type="number" min="70" max="250" step="1" inputmode="numeric" placeholder="يحدده الطبيب"></div>
-            </div>
-            <div class="portal-insulin-correction-results" aria-live="polite">
-              <div><span>الفرق عن الهدف</span><strong id="portalGlucoseDifference">—</strong></div>
-              <div><span>الناتج الحسابي النظري</span><strong id="portalCorrectionEstimate">—</strong></div>
-            </div>
-            <p id="portalCorrectionMessage" class="portal-insulin-message" role="status">أدخل قياس السكر الحالي والهدف، مع إدخال TDD صالح لعرض المثال الحسابي.</p>
-          </div>
-          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل إجمالي الإنسولين اليومي واختر نظام العلاج لعرض التقدير.</p>
-          <div class="portal-insulin-explainer"><strong>ما المقصود بالإنسولين النشط (IOB)؟</strong><p>هو جزء من جرعة إنسولين سابقة ما زال تأثيره قائمًا. قد يؤثر في التصحيح ويزيد خطر هبوط السكر عند تكرار الجرعات. هذه النسخة لا تتصل بسجل الجرعات، ولا تحسب IOB أو تخصمه؛ لذلك لا يمكن اعتبار الناتج جرعة مقترحة.</p></div>
-          <p class="portal-tool-footnote">تنبيه مهم: الناتج الحسابي النظري للتصحيح ليس جرعة للحقن ولا توصية علاجية. يعتمد على ISF تقديري من قاعدة 1800/1500، ولا يراعي الإنسولين النشط (IOB) أو اختلاف الحساسية خلال اليوم أو عوامل المرض والنشاط. لا تستخدمه لاتخاذ قرار جرعة أو تعديلها؛ اتبع خطة التصحيح المكتوبة من الطبيب. عند انخفاض السكر أو وجود أعراض هبوط، لا تستخدم هذه الحاسبة للتصحيح.</p>
+          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل إجمالي الإنسولين اليومي وقياس السكر والهدف لعرض التقدير الحسابي.</p>
+          <p class="portal-tool-footnote">معامل التصحيح المعروض بصيغة «1 وحدة لكل ... mg/dL». ناتج التصحيح حساب رياضي تعليمي باستخدام ISF تقديري، وليس جرعة للحقن أو توصية علاجية؛ لا يخصم الإنسولين النشط (IOB) ولا يراعي اختلاف الحساسية خلال اليوم أو العوامل السريرية. اتبع خطة التصحيح المعتمدة من الطبيب، ولا تستخدم الناتج لاتخاذ قرار جرعة. عند انخفاض السكر أو وجود أعراض هبوط، اتبع خطة التعامل مع الهبوط.</p>
         </section>
       </section>
 
