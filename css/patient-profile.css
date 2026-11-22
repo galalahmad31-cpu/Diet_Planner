@@ -121,8 +121,8 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #saveArea[hidden],#editButton[hidden]{display:none!important}
 @media(max-width:760px){.patient-data-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.patient-name-bar{padding:11px 12px}.patient-data-summary{min-height:32px;gap:5px}.patient-data-title strong{font-size:9px}.patient-data-title small{font-size:7px}.patient-data-actions,.patient-data-actions .patient-save-actions{gap:3px!important}.patient-data-actions button{min-height:27px;padding:4px 6px;font-size:8px}.patient-data-fields{gap:8px}.patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea{font-size:10px;padding:6px}.patient-data-fields textarea{min-height:58px}}
-/* Patient profile modules: three aligned tabs with one full-width workspace. */
-.patient-module-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;margin:0 0 12px}
+/* Patient profile modules: five aligned tabs with one full-width workspace. */
+.patient-module-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%;margin:0 0 12px}
 .patient-module-tab{display:flex;align-items:center;gap:10px;min-width:0;min-height:76px;padding:12px 14px;border:1px solid var(--dp-tab-border);border-radius:13px;background:var(--dp-tab-bg);color:var(--dp-tab-text);text-align:right;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 2px 9px var(--dp-shadow);transition:background .16s,border-color .16s,box-shadow .16s}
 .patient-module-tab-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
 .patient-module-tab-copy strong{font-size:12px;font-weight:900;line-height:1.5}
@@ -138,8 +138,8 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-support-panel{padding:0}
 #nutritionSupportFrame{display:block;width:100%;height:1px;min-height:0!important;border:0;background:var(--dp-bg)}
 @media(max-width:680px){
- .patient-module-tabs{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:9px}
- .patient-module-tab{min-height:66px;padding:8px 7px;gap:6px;justify-content:center;flex-direction:column;text-align:center;border-radius:11px}
+ .patient-module-tabs{display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:9px;overflow-x:auto;overflow-y:hidden;padding:2px 1px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+ .patient-module-tab{flex:0 0 132px;min-width:132px;min-height:66px;padding:8px 7px;gap:6px;justify-content:center;flex-direction:column;text-align:center;border-radius:11px;scroll-snap-align:start}
  .patient-module-tab .dashboard-icon{width:29px;height:29px;flex-basis:29px;font-size:13px;border-radius:8px}
  .patient-module-tab-copy{gap:1px}
  .patient-module-tab-copy strong{font-size:9px;line-height:1.4}
@@ -147,7 +147,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
  .patient-module-panel .dashboard-panel,.patient-module-panel .measurements-panel{padding:11px 9px}
 
 }
-@media(max-width:360px){.patient-module-tab{padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
+@media(max-width:360px){.patient-module-tab{flex-basis:124px;min-width:124px;padding-inline:4px}.patient-module-tab-copy strong{font-size:8px}}
 
 /* Measurement history: one semantic, readable table in the patient workspace. */
 .measurement-row-actions button{min-width:48px;min-height:30px;margin:2px 3px;padding:5px 9px;border-radius:7px;font:800 10px Cairo,sans-serif;cursor:pointer}
@@ -898,3 +898,11 @@ body.patient-conversation-open{overflow:hidden}
 
 
 #professionalSharedHealthSection[hidden]{display:none!important}
+
+
+/* Unified patient-care module */
+.patient-care-module-panel .patient-care-content{display:grid;gap:14px;padding:14px;color:var(--dp-text)}
+.patient-care-module-panel .patient-care-content>div{min-width:0}
+.patient-care-module-panel #patientLinkedCareView[hidden],.patient-care-module-panel #patientLegacyFinanceView[hidden]{display:none!important}
+.patient-module-tabs::-webkit-scrollbar{height:4px}
+.patient-module-tabs::-webkit-scrollbar-thumb{background:var(--dp-border);border-radius:10px}
