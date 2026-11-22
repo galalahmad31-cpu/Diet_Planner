@@ -74,9 +74,8 @@
       state.hasActiveSubscription = false;
       updateWriteControls();
     } finally {
-      if (state.user?.id) {
-        if (state.patient) await loadPatientCareMode();
-        await loadSharedHealthHistory();
+      if (state.user?.id && state.patient) {
+        await loadPatientCareMode();
       }
     }
   }
@@ -1013,7 +1012,7 @@
   }
 
   async function loadSharedHealthHistory() {
-    if (!patientId || !supabase || !state.user?.id || sharedHealthState.loading) return;
+    if (state.patientCareMode !== 'linked' || !patientId || !supabase || !state.user?.id || sharedHealthState.loading) return;
     sharedHealthState.loading = true;
     const root = $('professionalSharedHealthHistory');
     if (root) root.textContent = 'جاري تحميل سجل التعديلات...';
@@ -1099,6 +1098,8 @@
     const linked = mode === 'linked';
     const linkedView = $('patientLinkedCareView');
     const financeView = $('patientLegacyFinanceView');
+    const sharedHealthSection = $('professionalSharedHealthSection');
+    if (sharedHealthSection) sharedHealthSection.hidden = !linked;
     if (linkedView) linkedView.hidden = !linked;
     if (financeView) financeView.hidden = linked;
     const subtitle = $('patientCareSubtitle');
@@ -1135,12 +1136,15 @@
         await loadProfessionalAgreementStatus();
         await loadCareAgreementPanel();
         mountProfessionalAppointments();
+        await loadSharedHealthHistory();
       } else {
         await loadPatientLegacyFinance();
       }
     } catch (error) {
       console.error('Patient care mode resolution failed:', error);
       state.patientCareMode = 'error';
+      const sharedHealthSection = $('professionalSharedHealthSection');
+      if (sharedHealthSection) sharedHealthSection.hidden = true;
       if (root) root.hidden = true;
       const financeError = $('patientFinanceError');
       if (financeError) {
@@ -1387,7 +1391,7 @@
       if (!patientSaved) return;
 
       fillPatientData();
-      await loadSharedHealthHistory();
+      if (state.patientCareMode === 'linked') await loadSharedHealthHistory();
       setEditing(false);
       showPatientProfileSuccess();
     } catch (error) {
