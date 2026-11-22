@@ -60,11 +60,11 @@
   let notificationChannel = null;
   let notificationUserId = null;
   let renderRevision = 0;
-  const NAV_STATE_KEY = "dp-app-header-nav-state";
+  const HEADER_STATE_KEY = "dp-app-header-card-state";
 
   function getSavedCollapsedState() {
-    try { return localStorage.getItem(NAV_STATE_KEY) !== "expanded"; }
-    catch { return true; }
+    try { return localStorage.getItem(HEADER_STATE_KEY) === "collapsed"; }
+    catch { return false; }
   }
 
   if (new URLSearchParams(location.search).get("embed") === "1" ||
@@ -97,15 +97,13 @@
     return false;
   }
 
-  function setCollapsed(nav, toggle, collapsed, persist = true) {
-    nav.classList.toggle("is-collapsed", collapsed);
-    nav.classList.toggle("is-expanded", !collapsed);
-    toggle.setAttribute("aria-expanded", String(!collapsed));
-    toggle.setAttribute("aria-label", collapsed ? "إظهار باقي التابات" : "طي باقي التابات");
-    toggle.title = collapsed ? "إظهار باقي التابات" : "طي باقي التابات";
+  function setCollapsed(header, trigger, collapsed, persist = true) {
+    header.classList.toggle("is-collapsed", collapsed);
+    trigger.setAttribute("aria-expanded", String(!collapsed));
+    trigger.setAttribute("aria-label", collapsed ? "فتح الهيدر والتنقل" : "طي الهيدر والتنقل");
     if (persist) {
-      try { localStorage.setItem(NAV_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
-      catch (error) { console.warn("Could not save header navigation preference:", error); }
+      try { localStorage.setItem(HEADER_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
+      catch (error) { console.warn("Could not save header display preference:", error); }
     }
   }
 
@@ -144,10 +142,14 @@
     const subtitle = role === "patient" ? "مساحة المريض" : role === "professional" ? "مساحة المختص" : "منصة التغذية العلاجية";
     header.innerHTML = `
       <div class="dp-app-header__brand-row">
-        <a class="dp-app-header__brand" href="${base + homeHref}" aria-label="Diet Planner - الرئيسية">
-          <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
-          <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>${subtitle}</small></span>
-        </a>
+        <div class="dp-app-header__brand">
+          <a class="dp-app-header__logo-link" href="${base + homeHref}" aria-label="Diet Planner - الرئيسية">
+            <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
+          </a>
+          <button class="dp-app-header__brand-copy" type="button" aria-controls="dp-app-header-nav" aria-expanded="true">
+            <strong>Diet Planner</strong><small>${subtitle}</small>
+          </button>
+        </div>
         <div class="dp-app-header__account">
           <a class="dp-app-header__account-link dp-app-header__login" href="${base}login.html">تسجيل الدخول</a>
           <a class="dp-app-header__account-link dp-app-header__register" href="${base}login.html#register">إنشاء حساب</a>
@@ -156,21 +158,24 @@
           <button type="button" class="dp-app-header__theme" aria-label="تغيير المظهر" title="تغيير المظهر"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
         </div>
       </div>
-      <nav class="dp-app-header__nav is-collapsed" aria-label="التنقل الرئيسي">
-        <div class="dp-app-header__nav-top"><button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-app-header-track" aria-label="إظهار باقي التابات" title="إظهار باقي التابات"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button></div>
+      <nav class="dp-app-header__nav" id="dp-app-header-nav" aria-label="التنقل الرئيسي">
         <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
       <div class="dp-app-header__page-title"></div>
       <div class="dp-app-header__context" hidden></div>`;
     const track = header.querySelector(".dp-app-header__track");
-    const nav = header.querySelector(".dp-app-header__nav");
-    const toggle = header.querySelector(".dp-app-header__toggle");
+    const collapseTrigger = header.querySelector(".dp-app-header__brand-copy");
     const items = role === "patient" ? patientPages : role === "professional" ? (isAdmin ? [...professionalPages, adminPage] : professionalPages) : publicPages;
     items.forEach(item => track.append(makeLink(item, role)));
-    toggle.addEventListener("click", () => {
-      setCollapsed(nav, toggle, toggle.getAttribute("aria-expanded") === "true");
+    collapseTrigger.addEventListener("click", () => {
+      setCollapsed(header, collapseTrigger, collapseTrigger.getAttribute("aria-expanded") === "true");
     });
-    setCollapsed(nav, toggle, getSavedCollapsedState(), false);
+    header.addEventListener("click", event => {
+      if (event.target === header) {
+        setCollapsed(header, collapseTrigger, !header.classList.contains("is-collapsed"));
+      }
+    });
+    setCollapsed(header, collapseTrigger, getSavedCollapsedState(), false);
     track.addEventListener("click", event => {
       const link = event.target.closest(".dp-app-header__link");
       if (!link) return;
