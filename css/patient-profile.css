@@ -219,8 +219,8 @@ body.support-delete-modal-open{overflow:hidden}
 .followup-add-button:disabled{opacity:.5;cursor:not-allowed}
 .followup-add-exchange-button{background:#6d45a8;color:#fff}
 .followup-add-exchange-button:hover:not(:disabled){background:#59368f}
-.followup-add-button:hover:not(:disabled){background:#1d6249}
-.followup-add-button:disabled{opacity:.5;cursor:not-allowed}
+
+
 .followup-state{padding:8px;text-align:center;color:#8a9891;font-size:9px;font-weight:700}
 .followup-days-list{
   display:flex;flex-flow:row nowrap;align-items:center;gap:6px;width:100%;min-width:0;
