@@ -248,12 +248,12 @@ body.support-delete-modal-open{overflow:hidden}
 @media(max-width:640px){
   .followup-days-card{padding:10px}
   .followup-days-heading{align-items:stretch;flex-direction:column;gap:8px;padding:0 1px 9px}
-    .followup-plan-actions{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .followup-plan-actions{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
   .followup-plan-actions .followup-add-button{width:100%;min-height:40px;padding:7px 6px;font-size:10px;white-space:normal;line-height:1.4}
   .followup-days-list{gap:5px;padding-bottom:6px}
   .followup-day-row{min-width:105px;max-width:165px;padding:5px 6px;gap:5px}
   .followup-day-open{max-width:125px;gap:4px}
-    .followup-day-delete{width:22px;height:22px;flex-basis:22px}
+  .followup-day-delete{width:22px;height:22px;flex-basis:22px}
   .patient-plan-workspace-panel .visit-main-shell{padding:0}
   #planWorkspace .embedded-diet-plan>.visit-diet-inner{gap:9px!important}
   #planWorkspace .embedded-diet-plan>.visit-diet-inner>section:first-child{padding:10px!important;border-radius:12px!important}
@@ -844,7 +844,7 @@ body.patient-conversation-open{overflow:hidden}
  .patient-profile-actions>button{width:100%;min-width:0;min-height:44px;padding:8px 6px;white-space:normal;line-height:1.45}
  .patient-data-heading{margin-top:8px!important}
  .patient-data-summary{min-height:40px;gap:6px}
-  .patient-data-actions,.patient-data-actions .patient-save-actions{gap:4px!important}
+ .patient-data-actions,.patient-data-actions .patient-save-actions{gap:4px!important}
  .patient-data-actions button{min-height:30px;padding:5px 7px;font-size:9px}
  .patient-conversation-overlay{align-items:flex-end;justify-content:center;padding:0;background:rgba(9,25,29,.48)}
  .patient-conversation-drawer{width:100%;height:min(86vh,780px);height:min(86dvh,780px);max-height:92dvh;border:0;border-top:1px solid var(--dp-border);border-radius:22px 22px 0 0;box-shadow:0 -12px 42px rgba(0,0,0,.2);animation:patientConversationSlideUp .24s ease-out}
