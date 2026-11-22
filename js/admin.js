@@ -4,7 +4,7 @@ const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
 const PAGE_SIZE=20;
 const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,requestsLoaded:false,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0,doctorsLoaded:false};
-let confirmAction=null;
+let confirmAction=null,requestSearchTimer=null,doctorSearchTimer=null;
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
@@ -62,7 +62,7 @@ async function loadRequestsPage(page=0){
   if(q){filters.push(`full_name.ilike.%${q}%`);if(profileIds.length)filters.push(`user_id.in.(${profileIds.join(',')})`);if(planIds.length)filters.push(`plan_id.in.(${planIds.join(',')})`)}
   let query=sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot',{count:'exact'}).order('created_at',{ascending:false});
   if(state.requestStatus!=='all')query=query.eq('status',state.requestStatus);
-  if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;renderRequests();return}query=query.or(filters.join(','))}
+  if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;state.requestAllTotal=allCount.count||0;state.requestsLoaded=true;$('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;renderRequests();return}query=query.or(filters.join(','))}
   const result=await query.range(from,to);if(result.error)throw result.error;
   state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;state.requestsLoaded=true;
   const ids=[...new Set(state.subs.map(s=>s.user_id).filter(Boolean))];
@@ -460,7 +460,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.t
 $('newPlanBtn').onclick=()=>openPlan(null);
  $('refreshBtn').onclick=()=>loadRequestsPage(0);
  $('refreshDoctorsBtn').onclick=()=>loadDoctorsPage(0);
- $('doctorSearch').oninput=()=>{state.doctorSearch=$('doctorSearch').value.trim();state.doctorPage=0;loadDoctorsPage(0)};
+ $('doctorSearch').oninput=()=>{clearTimeout(doctorSearchTimer);doctorSearchTimer=setTimeout(()=>{state.doctorSearch=$('doctorSearch').value.trim();state.doctorPage=0;loadDoctorsPage(0)},300)};
 $('refreshPrivacyPolicyBtn').onclick=()=>loadPrivacyPolicy();$('savePrivacyPolicyBtn').onclick=savePrivacyPolicy;
 $('newAnnouncementBtn').onclick=()=>openAnnouncementForm();$('refreshAnnouncementsBtn').onclick=()=>loadAnnouncements();
 $('announcementList').onclick=e=>{
@@ -469,7 +469,7 @@ $('announcementList').onclick=e=>{
  else if(toggle)toggleAnnouncement(toggle.dataset.announcementToggle);
  else if(del)deleteAnnouncement(del.dataset.announcementDelete);
 };
- $('requestSearch').oninput=e=>{state.requestSearch=e.target.value.trim();state.requestPage=0;loadRequestsPage(0)};
+ $('requestSearch').oninput=e=>{clearTimeout(requestSearchTimer);requestSearchTimer=setTimeout(()=>{state.requestSearch=e.target.value.trim();state.requestPage=0;loadRequestsPage(0)},300)};
  document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;state.requestPage=0;loadRequestsPage(0)});
 $('modalClose').onclick=closeModal;$('modalBg').onclick=e=>{if(e.target===e.currentTarget)closeModal()};
 $('confirmClose').onclick=closeConfirm;$('confirmNo').onclick=closeConfirm;$('confirmYes').onclick=async()=>{const a=confirmAction;if(!a)return;confirmAction=null;$('confirmBg').style.display='none';await a()};
