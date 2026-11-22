@@ -60,6 +60,7 @@
         : (await access?.hasActiveSubscription?.(state.user.id)) === true;
 
       updateWriteControls();
+      await loadSharedHealthHistory();
     } catch (error) {
       console.error('Patient profile access check failed:', error);
       state.isAdmin = false;
