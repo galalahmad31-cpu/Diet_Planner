@@ -4,7 +4,11 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const patientParams = new URLSearchParams(window.location.search);
-  const patientId = patientParams.get('id') || patientParams.get('patient') || patientParams.get('patient_id');
+  const rawPatientId = patientParams.get('id') || patientParams.get('patient') || patientParams.get('patient_id');
+  const patientId = typeof rawPatientId === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(rawPatientId)
+    ? rawPatientId
+    : null;
 
   const state = {
     patient: null,
