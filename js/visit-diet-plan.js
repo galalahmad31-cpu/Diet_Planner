@@ -46,18 +46,10 @@ function ensureDietModalPortal(id){
  return modal;
 }
 function openConfirmModal(title,text,callback){
- const modal=ensureDietModalPortal('confirmModal');
- if(!modal)return;
- document.getElementById('confirmTitle').textContent=title;
- document.getElementById('confirmText').textContent=text;
- confirmCallback=callback;
- modal.classList.remove('hidden');
+ if(typeof callback!=="function")return;
+ void window.DPConfirm?.ask({title,message:text,confirmText:"تأكيد",variant:"danger"}).then(confirmed=>{if(confirmed)return callback();});
 }
-function closeConfirmModal(){
- const modal=document.getElementById('confirmModal');
- if(modal)modal.classList.add('hidden');
- confirmCallback=null;
-}
+function closeConfirmModal(){window.DPConfirm?.close?.();}
 function scaleHouseholdMeasure(measure,grams){
  if(!measure)return'—'; const g=Number(grams); if(!Number.isFinite(g)||g<0)return measure;
  const factor=g/100, arabic={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
@@ -998,13 +990,6 @@ function executePrint(){
 function goBack(){location.href=`patient-profile.html?id=${encodeURIComponent(window.currentPatientId||patientId)}`;
 }
 
-async function confirmAction(){
- if(!confirmCallback)return false;
- const callback=confirmCallback;
- closeConfirmModal();
- await callback();
- return true;
-}
 let dietInitPromise=null;
 function init(){
  if(dietInitPromise)return dietInitPromise;
@@ -1062,6 +1047,6 @@ async function openPlan(planId=null, createNew=false){
  return init();
 }
 
-window.dietPlan = {confirmAction,escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
+window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
 window.__dpDietPlanLoadError = null;
 })();
