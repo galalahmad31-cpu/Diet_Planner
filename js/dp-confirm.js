@@ -31,6 +31,7 @@
 
   function finish(confirmed) {
     if (!pending) return;
+    if (root?.dataset.mode === "text" && confirmed === false) confirmed = null;
     const resolve = pending.resolve;
     pending = null;
     root.hidden = true;
