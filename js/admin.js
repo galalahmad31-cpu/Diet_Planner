@@ -153,6 +153,7 @@ function accountTypeBadge(type,role){
  return '<span class="badge off">غير محدد</span>';
 }
 function roleOptions(selected){return `<option value="user" ${selected==='user'?'selected':''}>User</option><option value="admin" ${selected==='admin'?'selected':''}>Admin</option>`}
+function accountTypeOptions(selected){return `<option value="patient" ${selected==='patient'?'selected':''}>مريض</option><option value="professional" ${selected==='professional'?'selected':''}>مختص</option><option value="pending" ${selected==='pending'?'selected':''}>لم يحدد بعد</option>`}
 function renderDoctors(){
  $('doctorCount').textContent=state.doctorTotal;
  $('doctorActiveCount').textContent=state.doctorActiveTotal;
@@ -200,6 +201,7 @@ function subForm(s){
  return `<form id="subForm"><div class="grid">
  <div class="field"><label>اسم الطبيب في سجل الاشتراك</label><input id="s_name" value="${esc(s.full_name||'')}"></div>
  <div class="field"><label for="s_role">الدور</label><select id="s_role" ${profile&&profile.id!==state.currentUserId?'':'disabled'}>${roleOptions(profile?.role||'user')}</select></div>
+ <div class="field"><label for="s_account_type">نوع الحساب</label><select id="s_account_type">${accountTypeOptions(profile?.account_type||'pending')}</select></div>
  <div class="field"><label>الخطة</label><select id="s_plan">${state.plans.map(p=>`<option value="${p.id}" ${p.id===s.plan_id?'selected':''}>${esc(p.name)} — ${money(p.price)}</option>`).join('')}</select></div>
  <div class="field"><label>الحالة</label><select id="s_status"><option value="pending" ${s.status==='pending'?'selected':''}>قيد المراجعة</option><option value="paid" ${s.status==='paid'?'selected':''}>مفعّلة</option><option value="canceled" ${s.status==='canceled'?'selected':''}>ملغاة</option></select></div>
  <div class="field"><label>تاريخ الطلب</label><input value="${esc(dateTime(s.created_at))}" disabled></div>
@@ -270,7 +272,9 @@ async function saveSub(s){
  const profile=state.profiles.find(p=>p.id===s.user_id);
  if(!profile){toast('تعذر تحديد حساب المستخدم المرتبط بالاشتراك.');return}
  const newRole=$('s_role').value;
+ const newAccountType=$('s_account_type').value;
  if(!['user','admin'].includes(newRole)){toast('الدور المحدد غير صالح.');return}
+ if(!['patient','professional','pending'].includes(newAccountType)){toast('نوع الحساب المحدد غير صالح.');return}
  if(!selectedPlan){toast('الخطة المحددة غير موجودة');return}
  const payload={
   full_name:$('s_name').value.trim()||null,
@@ -292,7 +296,12 @@ async function saveSub(s){
   if(roleResult.error){toast('تم حفظ الاشتراك، لكن تعذر تغيير الدور: '+(roleResult.error.message||'خطأ غير معروف'));await loadAll();return}
   profile.role=newRole;
  }
- closeModal();toast('تم حفظ الاشتراك والدور بنجاح');await loadAll()
+ if(newAccountType!==profile.account_type){
+  const accountTypeResult=await sb.rpc('admin_set_profile_account_type',{target_user_id:s.user_id,new_account_type:newAccountType});
+  if(accountTypeResult.error){toast('تم حفظ الاشتراك، لكن تعذر تغيير نوع الحساب: '+(accountTypeResult.error.message||'خطأ غير معروف'));await loadAll();return}
+  profile.account_type=newAccountType;
+ }
+ closeModal();toast('تم حفظ الاشتراك والدور ونوع الحساب بنجاح');await loadAll()
 }
 function openRoleEditor(profile){
  openModal('تعديل دور المستخدم',`<form id="roleForm"><div class="field"><label for="roleOnlySelect">الدور</label><select id="roleOnlySelect">${roleOptions(profile.role)}</select></div><div class="modal-foot"><button class="btn btn-primary" type="submit">حفظ الدور</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`);
