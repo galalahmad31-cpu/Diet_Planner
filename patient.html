@@ -13,7 +13,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient.js?v=20261120-paged-50-v1" defer></script>
 
-  <link rel="stylesheet" href="css/patient.css?v=20261120-patient-list-compact-v1">
+  <link rel="stylesheet" href="css/patient.css?v=20261122-patient-toolbar-inline-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
@@ -32,22 +32,21 @@
   <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
     <div class="p-5 border-b border-slate-100">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="patient-list-heading">
         <div>
           <h2 class="font-black text-slate-800 text-xl">ملفات المرضى</h2>
           <p class="text-xs text-slate-400 mt-1">اختر المريض لفتح ملفه الكامل.</p>
         </div>
+      </div>
 
+      <div class="patient-toolbar" role="group" aria-label="إضافة مريض والبحث">
         <button id="addPatientBtn" type="button" data-action="open-add-patient"
           class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition shadow-sm">
           + إضافة مريض
         </button>
-      </div>
-
-      <div class="mt-4">
         <input id="searchInput" type="search"
           placeholder="البحث باسم المريض..."
-          
+          aria-label="البحث باسم المريض"
           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-emerald-500">
       </div>
     </div>
