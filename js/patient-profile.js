@@ -27,7 +27,6 @@
 
   const $ = (id) => document.getElementById(id);
 
-  // Local HTML escaping for patient-entered text rendered in this page.
   let dietPlanModulePromise = null;
 
   function setLink(id, page) {
