@@ -4,7 +4,7 @@ const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
 const PAGE_SIZE=20;
 const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0,professionalReviewFilter:'pending_review',professionalReviewSearch:'',professionalReviewPage:0,professionalReviewTotal:0,professionalReviewProfiles:[]};
-let confirmAction=null,requestSearchTimer=null,doctorSearchTimer=null,professionalReviewSearchTimer=null;
+let requestSearchTimer=null,doctorSearchTimer=null,professionalReviewSearchTimer=null;
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
@@ -22,9 +22,12 @@ function statusBadge(s,expiry){
 }
 function closeModal(){ $('modalBg').style.display='none' }
 function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modalBg').style.display='flex'}
-function askConfirm(title,text,action){$('confirmTitle').textContent=title;$('confirmText').innerHTML=text;$('confirmBg').style.display='flex';confirmAction=action}
-function closeConfirm(){ $('confirmBg').style.display='none';confirmAction=null }
-window.DietPlannerConfirm=Object.freeze({ask(title,message,action){if(typeof action!=='function')return;askConfirm(title,esc(message),action)}});
+function askConfirm(title,text,action){
+ if(typeof action!=="function"||!window.DPConfirm)return;
+ const message=String(text??"").replace(/<br\s*\/?\s*>/gi,"\n").replace(/<[^>]*>/g,"");
+ void window.DPConfirm.ask({title,message,confirmText:"تأكيد"}).then(confirmed=>{if(confirmed)return action();});
+}
+window.DietPlannerConfirm=Object.freeze({ask(title,message,action){askConfirm(title,message,action)}});
 
 async function requireAdmin(){
  if(!sb||!access){location.replace('index.html');return false}
@@ -309,7 +312,7 @@ function openRoleEditor(profile){
  $('roleForm').addEventListener('submit',async event=>{
   event.preventDefault();const newRole=$('roleOnlySelect').value;
   if(newRole===profile.role){closeModal();return}
-  if(!window.confirm(`تأكيد تغيير دور ${profile.full_name||profile.email||'المستخدم'} إلى ${roleLabel(newRole)}؟`))return;
+  const confirmed=await window.DPConfirm?.ask({title:"تأكيد تغيير الدور",message:`هل تريد تغيير دور ${profile.full_name||profile.email||"المستخدم"} إلى ${roleLabel(newRole)}؟`,confirmText:"تأكيد"});if(!confirmed)return;
   const button=$('roleForm').querySelector('[type="submit"]');button.disabled=true;
   const result=await sb.rpc('admin_set_profile_role',{target_user_id:profile.id,new_role:newRole});
   if(result.error){button.disabled=false;toast(result.error.message||'تعذر تغيير الدور.');return}
@@ -548,8 +551,7 @@ $('announcementList').onclick=e=>{
  $('requestSearch').oninput=e=>{clearTimeout(requestSearchTimer);requestSearchTimer=setTimeout(()=>{state.requestSearch=e.target.value.trim();state.requestPage=0;loadRequestsPage(0)},300)};
  document.querySelectorAll('[data-request-filter]').forEach(b=>b.onclick=()=>{state.requestStatus=b.dataset.requestFilter;state.requestPage=0;loadRequestsPage(0)});
 $('modalClose').onclick=closeModal;$('modalBg').onclick=e=>{if(e.target===e.currentTarget)closeModal()};
-$('confirmClose').onclick=closeConfirm;$('confirmNo').onclick=closeConfirm;$('confirmYes').onclick=async()=>{const a=confirmAction;if(!a)return;confirmAction=null;$('confirmBg').style.display='none';await a()};
-$('confirmBg').onclick=e=>{if(e.target===e.currentTarget)closeConfirm()};$('proofClose').onclick=()=>{$('proofBg').style.display='none'};$('proofBg').onclick=e=>{if(e.target===e.currentTarget)$('proofBg').style.display='none'};
+$('proofClose').onclick=()=>{$('proofBg').style.display='none'};$('proofBg').onclick=e=>{if(e.target===e.currentTarget)$('proofBg').style.display='none'};
 
 $('requestsBody').onclick=e=>{
  const proofBtn=e.target.closest('[data-proof]'),edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-del-sub]');
