@@ -948,7 +948,7 @@
     history: []
   };
   const sharedHealthLabels = {
-    gender: 'النوع', birth_date: 'تاريخ الميلاد', height: 'الطول',
+    gender: 'النوع', birth_date: 'تاريخ الميلاد', age: 'العمر', height: 'الطول',
     diagnosis: 'التشخيص', complaints: 'الشكوى'
   };
 
@@ -1339,7 +1339,7 @@
     const saveButton = $('savePatientButton');
     if (saveButton) {
       saveButton.disabled = true;
-      saveButton.textContent = 'جارٍ حفظ القسمين...';
+      saveButton.textContent = 'جارٍ حفظ التعديلات...';
     }
 
     try {
@@ -1384,7 +1384,7 @@
       toast.className = 'patient-finance-success-toast';
       toast.setAttribute('role', 'status');
       toast.setAttribute('aria-live', 'polite');
-      toast.textContent = 'تم حفظ بيانات المريض والاشتراك بنجاح';
+      toast.textContent = 'تم حفظ بيانات الملف والسجل الصحي والاشتراك بنجاح';
       document.body.appendChild(toast);
     }
     toast.classList.remove('is-visible');
