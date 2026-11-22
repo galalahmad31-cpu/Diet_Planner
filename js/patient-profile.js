@@ -394,45 +394,23 @@
       return;
     }
 
-    const result = await Swal.fire({
-      title: 'حذف القياس',
-      text: 'هل أنت متأكد من حذف القياس المحدد؟',
-      showCancelButton: true,
-      confirmButtonText: 'حذف',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#ffffff',
-      reverseButtons: true,
-      width: '290px',
-      padding: '.85rem 1rem .7rem',
-      customClass: {
-        popup: 'visit-delete-popup',
-        title: 'visit-delete-title',
-        htmlContainer: 'visit-delete-text',
-        confirmButton: 'visit-delete-confirm',
-        cancelButton: 'visit-delete-cancel'
-      },
-      buttonsStyling: true,
-      heightAuto: false,
-      allowOutsideClick: () => !Swal.isLoading(),
-      showLoaderOnConfirm: true,
-      preConfirm: async () => {
-        try {
-          const { error } = await supabase.from('weight_logs')
-            .delete()
-            .eq('id', entry.id)
-            .eq('patient_id', patientId);
-          if (error) throw error;
-          return true;
-        } catch (error) {
-          console.error('Delete patient measurement failed:', error);
-          Swal.showValidationMessage('تعذر حذف القياس من قاعدة البيانات. حاول مرة أخرى.');
-          return false;
-        }
-      }
+    const confirmed = await window.DPConfirm?.ask({
+      title: 'حذف القياس؟',
+      message: 'هل أنت متأكد من حذف القياس المحدد؟',
+      confirmText: 'حذف',
+      variant: 'danger'
     });
+    if (!confirmed) return;
 
-    if (!result.isConfirmed) return;
+    const { error } = await supabase.from('weight_logs')
+      .delete()
+      .eq('id', entry.id)
+      .eq('patient_id', patientId);
+    if (error) {
+      console.error('Delete patient measurement failed:', error);
+      await Swal.fire('تعذر الحذف', 'تعذر حذف القياس من قاعدة البيانات. حاول مرة أخرى.', 'error');
+      return;
+    }
 
     measurementState.logs = measurementState.logs.filter(log => log.id !== entry.id);
     renderMeasurements();
@@ -797,17 +775,13 @@
       window.exchangePlan.deletePlan();
       return;
     }
-    const result = await Swal.fire({
-      title: 'حذف الخطة الغذائية',
-      text: `هل تريد حذف "${plan.plan_name || 'الخطة'}"؟ سيتم حذف الأيام والوجبات والأصناف التابعة لها.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'حذف الخطة',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#dc2626',
-      reverseButtons: true
+    const confirmed = await window.DPConfirm?.ask({
+      title: 'حذف الخطة الغذائية؟',
+      message: `هل تريد حذف "${plan.plan_name || 'الخطة'}"؟ سيتم حذف الأيام والوجبات والأصناف التابعة لها.`,
+      confirmText: 'حذف الخطة',
+      variant: 'danger'
     });
-    if (!result.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       const { error } = await supabase
@@ -1336,28 +1310,20 @@
       }
 
       if (event.data?.type === 'dp-nsp-open-delete-modal') {
-        const modal = $('supportDayDeleteModal');
-        if (!modal) return;
-        const message = modal.querySelector('[data-delete-message]');
-        const confirm = modal.querySelector('[data-delete-confirm]');
-        const cancel = modal.querySelector('[data-delete-cancel]');
-        if (!message || !confirm || !cancel) return;
-
-        message.textContent = String(event.data.message || 'هل تريد حذف يوم المتابعة المحدد؟');
-        modal.hidden = false;
-        document.body.classList.add('support-delete-modal-open');
-        const close = (approved) => {
-          modal.hidden = true;
-          document.body.classList.remove('support-delete-modal-open');
-          confirm.onclick = null;
-          cancel.onclick = null;
-          modal.onclick = null;
-          frame.contentWindow?.postMessage({ type: 'dp-nsp-delete-modal-result', approved }, window.location.origin);
-        };
-        confirm.onclick = () => close(true);
-        cancel.onclick = () => close(false);
-        modal.onclick = (clickEvent) => { if (clickEvent.target === modal) close(false); };
-        cancel.focus();
+        const requestId = String(event.data.requestId || '');
+        const message = String(event.data.message || 'هل تريد حذف يوم الدعم الغذائي؟');
+        void window.DPConfirm?.ask({
+          title: 'حذف يوم الدعم الغذائي؟',
+          message,
+          confirmText: 'حذف',
+          variant: 'danger'
+        }).then(approved => {
+          if (frame.contentWindow) frame.contentWindow.postMessage({
+            type: 'dp-nsp-delete-modal-result',
+            requestId,
+            approved
+          }, window.location.origin);
+        });
       }
     });
     // Keep the workspace compact on first load; open a module only after an explicit selection.
