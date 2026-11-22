@@ -1,3 +1,5 @@
+@import url("./responsive.css?v=20261122-responsive-foundation-v1");
+
 /* Diet Planner — shared semantic design tokens.
    One token set, switched by the active theme. */
 :root{
