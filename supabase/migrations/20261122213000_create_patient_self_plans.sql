@@ -34,5 +34,7 @@ on public.patient_self_plans for update to authenticated
 using (private.is_active_patient_account(patient_id, auth.uid()) and created_by = auth.uid())
 with check (private.is_active_patient_account(patient_id, auth.uid()) and created_by = auth.uid());
 
-drop policy if exists patient_self_plans_delete_owner on public.patient_self_plans
+drop policy if exists patient_self_plans_delete_owner on public.patient_self_plans;
+create policy patient_self_plans_delete_owner
+on public.patient_self_plans for delete to authenticated
 using (private.is_active_patient_account(patient_id, auth.uid()) and created_by = auth.uid());
