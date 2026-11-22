@@ -183,21 +183,30 @@
       setCollapsed(header, !header.classList.contains("is-collapsed"));
     });
     setCollapsed(header, getSavedCollapsedState(), false);
-    track.addEventListener("click", event => {
+    track.addEventListener("click", async event => {
       const link = event.target.closest(".dp-app-header__link");
       if (!link) return;
       const href = link.dataset.headerHref;
       if (role === "patient" && href.includes("#") && path === "patient-portal.html") {
         event.preventDefault();
         const section = href.split("#")[1];
-        window.DietPlannerPatientPortal?.navigateToSection(section);
-        history.replaceState(null, "", location.pathname + "#" + section);
+        const navigate = window.DietPlannerPatientPortal?.navigateToSection;
+        if (typeof navigate !== "function") {
+          console.error("Patient portal navigation is not ready.");
+          return;
+        }
         track.querySelectorAll(".dp-app-header__link").forEach(node => {
           const active = node === link;
           node.classList.toggle("is-active", active);
           if (active) node.setAttribute("aria-current", "page");
           else node.removeAttribute("aria-current");
         });
+        try {
+          await navigate(section);
+          history.replaceState(null, "", location.pathname + location.search + "#" + section);
+        } catch (error) {
+          console.error("Patient portal navigation failed:", error);
+        }
       }
     });
     header.querySelector(".dp-app-header__theme").addEventListener("click", () => window.DietPlannerTheme?.toggle?.());
