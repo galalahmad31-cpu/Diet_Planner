@@ -25,8 +25,10 @@
   }
 
   function openHealthArea() {
-    $("portalHome").hidden = true;
-    $("portalHealthArea").hidden = false;
+    // Switch the top-level view before starting asynchronous data loading.
+    // This prevents the previously visible portal section from remaining on screen
+    // if the health file resolves to loading, unlinked, or error state.
+    showPortalDestination("portalContent");
     loadPortal().catch(error => {
       console.error("Patient health area load failed:", error);
       fail(error.message || "تعذر تحميل الملف الصحي.");
@@ -1056,21 +1058,44 @@
 
   window.DietPlannerPatientPortal = Object.freeze({
     async navigateToSection(id) {
-      if (id === "portalContent" || ["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel"].includes(id)) {
+      const healthSections = [
+        "portalContent",
+        "portalPlansPanel",
+        "portalMeasurementsPanel",
+        "portalAppointmentsPanel",
+        "portalCommunicationPanel"
+      ];
+      const destination = id === "portalTools" ? "portalToolsPanel" : id;
+
+      // Hide the previous top-level section synchronously, before awaiting Supabase.
+      // In the previous flow, an early return from loadPortal() (for example, an
+      // unlinked patient) could leave the old profile/tools view visible underneath.
+      showPortalDestination(destination);
+
+      if (healthSections.includes(id)) {
         if (!state.patientId || $("portalContent")?.hidden) {
-          $("portalHome").hidden = true;
-          $("portalHealthArea").hidden = false;
-          try { await loadPortal(); }
-          catch (error) { fail(error.message || "تعذر تحميل الملف الصحي."); return; }
+          try {
+            await loadPortal();
+          } catch (error) {
+            fail(error.message || "تعذر تحميل الملف الصحي.");
+            return;
+          }
+          // loadPortal may intentionally show the unlinked/error state instead
+          // of portalContent. Do not switch back to a health tab in that case.
           if ($("portalContent")?.hidden) return;
         }
+        // Re-apply the requested tab after loadPortal has populated patient state.
+        showPortalDestination(destination);
+        return;
       }
-      if (id === "portalTools") { showPortalDestination("portalToolsPanel"); return; }
+
       if (id === "portalProfileArea") {
-        try { await loadSelfProfile(); }
-        catch (error) { setMessage("selfProfileMessage", error.message || "تعذر تحميل بيانات الحساب.", "error"); }
+        try {
+          await loadSelfProfile();
+        } catch (error) {
+          setMessage("selfProfileMessage", error.message || "تعذر تحميل بيانات الحساب.", "error");
+        }
       }
-      showPortalDestination(id === "portalTools" ? "portalToolsPanel" : id);
     }
   });
 
