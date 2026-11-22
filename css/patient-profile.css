@@ -54,15 +54,15 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 #editButton.hidden{display:none!important}
 
 /* Agreement and appointment summary — one read-only source per domain */
-.patient-finance-details{margin-top:14px;border-top:1px solid var(--dp-border)}
-.patient-finance-summary{display:flex;align-items:center;gap:10px;min-height:62px;padding:10px 2px;cursor:pointer;list-style:none}
-.patient-finance-summary::-webkit-details-marker{display:none}
-.patient-finance-heading{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}
-.patient-finance-heading strong{color:var(--dp-text);font-size:12px;font-weight:900}
-.patient-finance-heading small{color:var(--dp-text-2);font-size:9px;font-weight:600}
-.patient-finance-chevron{flex:0 0 auto;color:var(--dp-muted);font-size:10px;transition:transform .2s}
-.patient-finance-details[open] .patient-finance-chevron{transform:rotate(180deg);color:var(--dp-accent)}
-.patient-finance-content{display:grid;gap:14px;padding:14px 2px 4px;border-top:1px solid var(--dp-border);color:var(--dp-text)}
+.patient-care-details{margin-top:14px;border-top:1px solid var(--dp-border)}
+.patient-care-summary{display:flex;align-items:center;gap:10px;min-height:62px;padding:10px 2px;cursor:pointer;list-style:none}
+.patient-care-summary::-webkit-details-marker{display:none}
+.patient-care-heading{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}
+.patient-care-heading strong{color:var(--dp-text);font-size:12px;font-weight:900}
+.patient-care-heading small{color:var(--dp-text-2);font-size:9px;font-weight:600}
+.patient-care-chevron{flex:0 0 auto;color:var(--dp-muted);font-size:10px;transition:transform .2s}
+.patient-care-details[open] .patient-care-chevron{transform:rotate(180deg);color:var(--dp-accent)}
+.patient-care-content{display:grid;gap:14px;padding:14px 2px 4px;border-top:1px solid var(--dp-border);color:var(--dp-text)}
 .patient-care-section{min-width:0}
 .patient-care-section>h3{margin:0 0 9px;color:var(--dp-text);font-size:12px;font-weight:900}
 .patient-care-agreement-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-surface-2)}
@@ -75,7 +75,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-care-empty{padding:12px;border:1px dashed var(--dp-border);border-radius:10px;color:var(--dp-text-2);font-size:10px}
 .patient-profile-success-toast{position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translate(-50%,-12px);opacity:0;pointer-events:none;width:max-content;max-width:calc(100vw - 32px);padding:11px 18px;border:1px solid #cce9df;border-radius:12px;background:#eaf7f1;color:#176b57;box-shadow:0 8px 28px rgba(16,42,53,.16);font:800 12px Cairo,sans-serif;text-align:center;transition:opacity .2s ease,transform .2s ease}
 .patient-profile-success-toast.is-visible{opacity:1;transform:translate(-50%,0)}
-@media(max-width:520px){.patient-care-agreement-card{grid-template-columns:1fr 1fr}.patient-finance-content{padding-inline:0}}
+@media(max-width:520px){.patient-care-agreement-card{grid-template-columns:1fr 1fr}.patient-care-content{padding-inline:0}}
 /* Unified dashboard card palette */
 #modulesSection .plans-card .dashboard-details>summary{background:linear-gradient(120deg,#17633d,#26965d)!important}
 #modulesSection .plans-card .dashboard-card-head h3,#modulesSection .plans-card .dashboard-card-head p{color:#fff!important}
