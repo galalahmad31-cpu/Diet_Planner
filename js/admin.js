@@ -287,7 +287,7 @@ async function loadAnnouncements(){
  const host=$('announcementList'),box=$('announcementState');
  if(!host||!box)return;
  box.style.display='block';box.textContent='جاري تحميل الإعلانات...';host.style.display='none';
- const {data,error}=await sb.from('announcements').select('id,title,content,type,audience,is_active,is_pinned,starts_at,expires_at,created_at,updated_at').order('is_pinned',{ascending:false}).order('created_at',{ascending:false});
+ const {data,error}=await sb.from('announcements').select('id,title,content,type,audience,is_active,priority,starts_at,expires_at,created_at,updated_at').order('priority',{ascending:false}).order('starts_at',{ascending:false}).order('created_at',{ascending:false});
  if(error){box.textContent='تعذر تحميل الإعلانات. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.';console.error('Announcements load failed:',error);return}
  state.announcements=data||[];
  $('announcementCount').textContent=state.announcements.length;
@@ -304,13 +304,13 @@ function renderAnnouncements(){
   return `<article class="announcement-admin-item ${type.className}">
    <div class="announcement-admin-top"><span class="announcement-admin-type"><i class="fa-solid ${type.icon}"></i> ${type.label}</span><span class="badge ${a.is_active?'paid':'off'}">${a.is_active?'منشور':'مسودة / متوقف'}</span></div>
    <h3>${esc(a.title)}</h3><p>${esc(a.content).replace(/\n/g,'<br>')}</p>
-   <div class="announcement-admin-meta"><span><i class="fa-regular fa-calendar"></i> ${announcementDate(a.created_at)}</span><span>${a.expires_at?'ينتهي: '+announcementDate(a.expires_at):'دون تاريخ انتهاء'}</span><span>الظهور: ${a.audience==='patient'?'المريض':a.audience==='professional'?'المختص':'المساحتان'}</span>${a.is_pinned?'<span class="announcement-pin"><i class="fa-solid fa-thumbtack"></i> مثبت</span>':''}</div>
+   <div class="announcement-admin-meta"><span><i class="fa-regular fa-calendar"></i> ${announcementDate(a.created_at)}</span><span>${a.expires_at?'ينتهي: '+announcementDate(a.expires_at):'دون تاريخ انتهاء'}</span><span>الظهور: ${a.audience==='patient'?'المريض':a.audience==='professional'?'المختص':'المساحتان'}</span><span>الأولوية: ${Number(a.priority)||0}</span></div>
    <div class="announcement-admin-actions"><button class="btn btn-outline" type="button" data-announcement-edit="${a.id}"><i class="fa-solid fa-pen"></i> تعديل</button><button class="btn btn-outline" type="button" data-announcement-toggle="${a.id}">${a.is_active?'إيقاف النشر':'نشر الآن'}</button><button class="btn btn-danger" type="button" data-announcement-delete="${a.id}"><i class="fa-solid fa-trash"></i> حذف</button></div>
   </article>`;
  }).join('');
 }
 function openAnnouncementForm(item=null){
- const a=item||{},type=a.type||'update';
+ const a=item||{},type=a.type||'update',priority=Number.isInteger(a.priority)?Math.min(100,Math.max(0,a.priority)):0;
  const expiry=a.expires_at?new Date(a.expires_at).toISOString().slice(0,10):'';
  openModal(item?'تعديل الإعلان':'إضافة إعلان جديد',`
   <form id="announcementForm" class="announcement-form">
@@ -318,8 +318,9 @@ function openAnnouncementForm(item=null){
    <div class="field full"><label for="announcementContent">نص الإعلان</label><textarea id="announcementContent" maxlength="5000" required rows="5" placeholder="اكتب تفاصيل الإعلان هنا...">${esc(a.content||'')}</textarea></div>
    <div class="field"><label for="announcementAudience">مكان ظهور الإعلان</label><select id="announcementAudience"><option value="both" ${(a.audience||'both')==='both'?'selected':''}>مساحة المريض والمختص</option><option value="patient" ${a.audience==='patient'?'selected':''}>مساحة المريض فقط</option><option value="professional" ${a.audience==='professional'?'selected':''}>مساحة المختص فقط</option></select></div>
    <div class="field"><label for="announcementType">نوع الإعلان</label><select id="announcementType"><option value="update" ${type==='update'?'selected':''}>تحديث جديد</option><option value="announcement" ${type==='announcement'?'selected':''}>إعلان مهم</option><option value="tip" ${type==='tip'?'selected':''}>نصيحة واستخدام</option><option value="alert" ${type==='alert'?'selected':''}>تنبيه</option></select></div>
+   <div class="field"><label for="announcementPriority">الأولوية (0–100، الأعلى يظهر أولًا)</label><input id="announcementPriority" type="number" min="0" max="100" step="1" required value="${priority}"></div>
    <div class="field"><label for="announcementExpiry">تاريخ انتهاء الإعلان (اختياري)</label><input id="announcementExpiry" type="date" value="${expiry}"></div>
-   <div class="announcement-form-options"><label class="check"><input id="announcementActive" type="checkbox" ${item?(a.is_active?'checked':''):'checked'}> نشر الإعلان</label><label class="check"><input id="announcementPinned" type="checkbox" ${a.is_pinned?'checked':''}> تثبيت الإعلان في الأعلى</label></div>
+   <div class="announcement-form-options"><label class="check"><input id="announcementActive" type="checkbox" ${item?(a.is_active?'checked':''):'checked'}> نشر الإعلان</label></div>
    <div class="modal-foot"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i> ${item?'حفظ التعديلات':'نشر الإعلان'}</button><button class="btn btn-outline" type="button" id="announcementCancel">إلغاء</button></div>
   </form>`);
  $('announcementCancel').onclick=closeModal;
@@ -331,12 +332,14 @@ async function saveAnnouncement(event,id){
  if(!form.reportValidity())return;
  const title=$('announcementTitle').value.trim(),content=$('announcementContent').value.trim();
  if(title.length<3||!content){toast('أدخل عنوانًا واضحًا ونص الإعلان.');return}
+ const priority=Number($('announcementPriority').value);
+ if(!Number.isInteger(priority)||priority<0||priority>100){toast('الأولوية يجب أن تكون رقمًا صحيحًا من 0 إلى 100.');$('announcementPriority').focus();return}
  const expiryValue=$('announcementExpiry').value;
  const expiresAt=expiryValue?new Date(expiryValue+'T23:59:59').toISOString():null;
  if(expiresAt&&new Date(expiresAt)<=new Date()){toast('تاريخ الانتهاء يجب أن يكون في المستقبل.');return}
  const button=form.querySelector('button[type="submit"]');
  const original=button.innerHTML;button.disabled=true;button.textContent='جاري الحفظ...';
- const payload={title,content,type:$('announcementType').value,audience:$('announcementAudience').value,is_active:$('announcementActive').checked,is_pinned:$('announcementPinned').checked,expires_at:expiresAt,updated_at:new Date().toISOString()};
+ const payload={title,content,type:$('announcementType').value,audience:$('announcementAudience').value,is_active:$('announcementActive').checked,priority,expires_at:expiresAt,updated_at:new Date().toISOString()};
  try{
   let result;
   if(id)result=await sb.from('announcements').update(payload).eq('id',id);
