@@ -60,12 +60,16 @@
         : (await access?.hasActiveSubscription?.(state.user.id)) === true;
 
       updateWriteControls();
-      await loadSharedHealthHistory();
     } catch (error) {
       console.error('Patient profile access check failed:', error);
       state.isAdmin = false;
       state.hasActiveSubscription = false;
       updateWriteControls();
+    } finally {
+      if (state.user?.id) {
+        await loadProfessionalAgreementStatus();
+        await loadSharedHealthHistory();
+      }
     }
   }
 
@@ -852,6 +856,8 @@
     $('genderInput').value = patient.gender || '';
     $('birthDateInput').value = patient.birth_date || '';
     $('ageInput').value = patient.age ?? '';
+    $('ageInput').disabled = true;
+    $('ageInput').readOnly = true;
     $('heightInput').value = patient.height ?? '';
     $('diagnosisInput').value = patient.diagnosis || '';
     $('complaintsInput').value = patient.complaints || '';
@@ -863,7 +869,7 @@
     'genderInput', 'birthDateInput', 'heightInput', 'diagnosisInput', 'complaintsInput'
   ];
   const patientFieldIds = [
-    'nameInput', 'phoneInput', 'ageInput', 'notesInput'
+    'nameInput', 'phoneInput', 'notesInput'
   ];
   const patientFinanceFieldIds = [
     'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
@@ -934,7 +940,13 @@
     return true;
   }
 
-  const sharedHealthState = { loaded: false, loading: false, saving: false, history: [] };
+  const sharedHealthState = {
+    loaded: false,
+    loading: false,
+    saving: false,
+    expired: false,
+    history: []
+  };
   const sharedHealthLabels = {
     gender: 'النوع', birth_date: 'تاريخ الميلاد', height: 'الطول',
     diagnosis: 'التشخيص', complaints: 'الشكوى'
@@ -956,6 +968,38 @@
     if (button) button.disabled = state.isSaving || sharedHealthState.saving;
   }
 
+  async function loadProfessionalAgreementStatus() {
+    if (!state.user?.id || state.isAdmin || !patientId || !supabase) {
+      sharedHealthState.expired = false;
+      updateSharedHealthWriteState();
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('professional_connection_requests')
+        .select('agreement_end_date')
+        .eq('patient_id', patientId)
+        .eq('professional_id', state.user.id)
+        .eq('status', 'active')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      const today = new Date().toISOString().slice(0, 10);
+      sharedHealthState.expired = Boolean(
+        data?.agreement_end_date && data.agreement_end_date < today
+      );
+    } catch (error) {
+      // The database RPC remains the authoritative write gate if this read is unavailable.
+      sharedHealthState.expired = false;
+      console.warn('Could not pre-check care agreement expiry:', error);
+    }
+
+    updateSharedHealthWriteState();
+  }
+
   function renderSharedHealthInProfessionalProfile() {
     const patient = state.patient;
     if (!patient) return;
@@ -971,10 +1015,12 @@
       article.className = 'professional-health-audit-item';
       const heading = document.createElement('div');
       const actor = document.createElement('strong');
-      actor.textContent = item.actor_id === state.user?.id
-        ? 'أنت (المختص)'
-        : item.actor_role === 'patient' ? 'المريض'
-        : item.actor_role === 'admin' ? 'إدارة المنصة' : 'مستخدم مخوّل';
+      const actorLabel = item.actor_role === 'patient'
+        ? 'المريض'
+        : item.actor_role === 'professional'
+          ? 'المختص'
+          : item.actor_role === 'admin' ? 'إدارة المنصة' : 'مستخدم مخوّل';
+      actor.textContent = item.actor_id === state.user?.id ? `أنت — ${actorLabel}` : actorLabel;
       const time = document.createElement('time');
       time.dateTime = item.created_at;
       time.textContent = new Date(item.created_at).toLocaleString('ar-EG');
@@ -988,7 +1034,7 @@
   }
 
   async function loadSharedHealthHistory() {
-    if (!patientId || !supabase || sharedHealthState.loading) return;
+    if (!patientId || !supabase || !state.user?.id || sharedHealthState.loading) return;
     sharedHealthState.loading = true;
     const root = $('professionalSharedHealthHistory');
     if (root) root.textContent = 'جاري تحميل سجل التعديلات...';
@@ -1464,7 +1510,6 @@
     });
     $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', saveAllPatientData);
-    void loadSharedHealthHistory();
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     window.addEventListener('dp-exchange-plan-deleted', () => {
