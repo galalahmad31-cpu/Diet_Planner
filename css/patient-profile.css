@@ -371,7 +371,7 @@ body.support-delete-modal-open{overflow:hidden}
 }
 #patientEnergyPanel #calcTab #eqBtnMifflin.bg-white,
 #patientEnergyPanel #calcTab #eqBtnSchofield.bg-white{
-  border-color:var(--dp-border,#e1e8e4)!important;
+  border-color:var(--dp-border,var(--dp-border))!important;
   background:var(--dp-surface,var(--dp-surface))!important;
   color:var(--dp-primary)!important;
   box-shadow:0 1px 2px rgba(25,55,43,.06);
