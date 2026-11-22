@@ -461,22 +461,20 @@ async function saveFinance() {
    Delete subscription
    ========================================================= */
 
-function openDeleteConfirmation() {
+async function openDeleteConfirmation() {
     if (!selected) return;
-    $('deleteConfirm').classList.remove('hidden');
-    $('deleteConfirm').classList.add('flex');
-}
-
-function closeDeleteConfirmation() {
-    $('deleteConfirm').classList.add('hidden');
-    $('deleteConfirm').classList.remove('flex');
+    const confirmed = await window.DPConfirm?.ask({
+        title: 'حذف بيانات الاشتراك؟',
+        message: 'هل تريد حذف بيانات الاشتراك المالي لهذا المريض؟',
+        confirmText: 'حذف',
+        variant: 'danger'
+    });
+    if (confirmed) await deleteFinance();
 }
 
 async function deleteFinance() {
     if (!canWriteFinance()) { showFinanceAccessMessage(); return; }
     if (!selected) return;
-
-    $('deleteYes').disabled = true;
 
     try {
         const { error } = await supabase
@@ -487,7 +485,6 @@ async function deleteFinance() {
 
         if (error) throw error;
 
-        closeDeleteConfirmation();
         closeFinanceModal();
         showToast('تم حذف بيانات الاشتراك.');
         await loadData();
@@ -495,7 +492,6 @@ async function deleteFinance() {
         console.error(error);
         showToast(error.message || 'تعذر حذف بيانات الاشتراك.', true);
     } finally {
-        $('deleteYes').disabled = false;
     }
 }
 
@@ -528,12 +524,6 @@ function bindEvents() {
     $('closeModal').addEventListener('click', closeFinanceModal);
     $('cancel').addEventListener('click', closeFinanceModal);
     $('deleteFinance').addEventListener('click', openDeleteConfirmation);
-    $('deleteNo').addEventListener('click', closeDeleteConfirmation);
-    $('deleteConfirm').addEventListener('click', (event) => {
-        if (event.target === $('deleteConfirm')) closeDeleteConfirmation();
-    });
-    $('deleteYes').setAttribute('data-finance-write','true');
-    $('deleteYes').addEventListener('click', deleteFinance);
     $('editModal').addEventListener('click', (event) => {
         if (event.target === $('editModal')) closeFinanceModal();
     });
