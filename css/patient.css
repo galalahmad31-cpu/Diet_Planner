@@ -48,7 +48,7 @@ main>section>div:first-child{padding:18px!important}
 
 .patient-stats{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:9px;
   padding:0 18px 14px;
 }
@@ -78,6 +78,7 @@ main>section>div:first-child{padding:18px!important}
 .patient-stat[data-status-filter="active"] strong{color:#16835f}
 .patient-stat[data-status-filter="expired"] strong{color:#b94b58}
 .patient-stat[data-status-filter="unknown"] strong{color:#8b7844}
+.patient-stat[data-status-filter="linked"] strong{color:#3567a8}
 
 #patientsList.patient-list{
   display:flex;
@@ -151,6 +152,7 @@ main>section>div:first-child{padding:18px!important}
 .patient-status--active{background:#e5f5ed;color:#16734f}
 .patient-status--expired{background:#fff0f1;color:#b44755}
 .patient-status--unknown{background:#f4f2e9;color:#817143}
+.patient-status--linked{background:#eaf1fb;color:#315d98}
 .patient-delete{
   width:29px;height:29px;flex-shrink:0;display:grid;place-items:center;
   border:1px solid #f1dfe2;border-radius:9px;background:#fff8f8;
