@@ -309,9 +309,9 @@
     try {
       const now = new Date().toISOString();
       const { data, error } = await supabase.from("announcements")
-        .select("id,title,content,type,audience,is_pinned,starts_at,expires_at,created_at")
+        .select("id,title,content,type,audience,priority,starts_at,expires_at,created_at")
         .eq("is_active", true).in("audience", ["professional", "both"]).lte("starts_at", now)
-        .order("is_pinned", { ascending: false }).order("starts_at", { ascending: false }).limit(30);
+        .order("priority", { ascending: false }).order("starts_at", { ascending: false }).order("created_at", { ascending: false }).limit(30);
       if (error) throw error;
       const current = (data || []).filter(item => !item.expires_at || new Date(item.expires_at).getTime() > Date.now()).slice(0, 3);
       host.replaceChildren();
@@ -324,7 +324,6 @@
         const label = document.createElement("span"); label.className = `dashboard-announcement-type ${type.className}`;
         const icon = document.createElement("i"); icon.className = `fa-solid ${type.icon}`; icon.setAttribute("aria-hidden", "true");
         label.append(icon, document.createTextNode(" " + type.label)); top.appendChild(label);
-        if (item.is_pinned) { const pin=document.createElement("span");pin.className="dashboard-announcement-pinned";pin.textContent="مثبت";top.appendChild(pin); }
         const title=document.createElement("h4");title.textContent=item.title;
         const content=document.createElement("p");content.textContent=item.content;
         const footer=document.createElement("div");footer.className="dashboard-announcement-card-footer";
