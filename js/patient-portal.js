@@ -952,7 +952,7 @@
       activateHealthTab("portalPlansPanel");
     } else {
       document.querySelectorAll("[data-health-tab]").forEach(tab => {
-        tab.hidden = tab.dataset.healthTab !== "portalCommunicationPanel";
+        tab.hidden = !["portalCommunicationPanel", "portalCareManagementPanel"].includes(tab.dataset.healthTab);
       });
       ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel"].forEach(id => {
         const panel = $(id);
@@ -1128,7 +1128,8 @@
         "portalPlansPanel",
         "portalMeasurementsPanel",
         "portalAppointmentsPanel",
-        "portalCommunicationPanel"
+        "portalCommunicationPanel",
+        "portalCareManagementPanel"
       ];
       const destination = id === "portalTools" ? "portalToolsPanel" : id;
 
