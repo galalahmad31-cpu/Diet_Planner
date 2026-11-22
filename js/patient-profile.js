@@ -669,19 +669,11 @@
 
     const isDietPlanElement = (element) => Boolean(
       element?.closest(
-        '#planWorkspace, #foodModal, #fixedMealsModal, #addMealModal, #confirmModal, #printSettingsModal, #dayDetailsModal'
+        '#planWorkspace, #foodModal, #fixedMealsModal, #addMealModal, #printSettingsModal, #dayDetailsModal'
       )
     );
 
     document.addEventListener('click', async (event) => {
-      const confirmButton = event.target.closest('#confirmOkBtn');
-      if (confirmButton && isDietPlanElement(confirmButton)) {
-        event.preventDefault();
-        if (await window.exchangePlan?.hasPendingConfirm?.()) await window.exchangePlan.confirmAction();
-        else await window.dietPlan?.confirmAction?.();
-        return;
-      }
-
       const target = event.target.closest('[data-action]');
       if (!target || !isDietPlanElement(target)) return;
       const action = target.dataset.action || '';
@@ -703,11 +695,6 @@
         event.preventDefault();
         $('printSettingsModal')?.classList.add('hidden');
         delete $('executePrintBtn')?.dataset.printMode;
-        return;
-      }
-      if (action === 'dietPlan.closeConfirmModal' && await window.exchangePlan?.hasPendingConfirm?.()) {
-        event.preventDefault();
-        window.exchangePlan.closeConfirmModal();
         return;
       }
       const method = window.dietPlan?.[action.slice('dietPlan.'.length)];
