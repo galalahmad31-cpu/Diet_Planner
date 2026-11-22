@@ -8,7 +8,7 @@
 .dp-confirm-primary{background:var(--dp-primary,#147b6d);color:#fff}
 .dp-confirm-primary:hover{filter:brightness(.96)}
 .dp-confirm-primary.is-danger{background:#b94f55;color:#fff}
-.dp-confirm-secondary{border-color:var(--dp-border,#dce6e2)!important;background:var(--dp-soft,#f2f6f4);color:var(--dp-text,#344b46)}
+.dp-confirm-secondary{border-color:var(--dp-border,#dce6e2)!important;background:var(--dp-surface-2,#f2f6f4);color:var(--dp-text,#344b46)}
 .dp-confirm-actions button:focus-visible{outline:3px solid rgba(20,123,109,.24);outline-offset:2px}
 body.dp-confirm-open{overflow:hidden}
 [data-theme="dark"] .dp-confirm-dialog,body.dark-mode .dp-confirm-dialog{background:var(--dp-surface,#183b38);color:var(--dp-text,#edf5f2);border-color:var(--dp-border,#31534d)}
