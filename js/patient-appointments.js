@@ -55,7 +55,15 @@
             </div>
             <div class="patient-appointment-form-footer"><span data-appointment-status class="patient-appointments-status" role="status"></span><button type="submit" data-appointment-submit><i class="fa-regular fa-calendar-plus"></i> إرسال طلب الموعد</button></div>
           </form>
-        ` : `<p class="patient-appointments-hint">يمكنك تأكيد الطلب أو رفضه. لا يصبح الموعد مؤكدًا إلا بعد موافقتك.</p><span data-appointment-status class="patient-appointments-status" role="status"></span>`}
+        ` : \`<form class="patient-appointment-form" data-professional-appointment-form>
+          <div class="patient-appointment-fields">
+            <div><label for="professionalAppointmentDate">التاريخ والوقت المتفق عليهما</label><input id="professionalAppointmentDate" data-professional-appointment-date type="datetime-local" required></div>
+            <div><label for="professionalAppointmentDuration">المدة</label><select id="professionalAppointmentDuration" data-professional-appointment-duration><option value="30">30 دقيقة</option><option value="45">45 دقيقة</option><option value="60">60 دقيقة</option><option value="90">90 دقيقة</option></select></div>
+            <div><label for="professionalAppointmentType">نوع الموعد</label><select id="professionalAppointmentType" data-professional-appointment-type><option value="online">أونلاين</option><option value="in_person">حضور شخصي</option><option value="phone">مكالمة هاتفية</option></select></div>
+            <div class="patient-appointment-note"><label for="professionalAppointmentNote">ملاحظات (اختياري)</label><textarea id="professionalAppointmentNote" data-professional-appointment-note maxlength="1000" rows="2" placeholder="ملاحظات الموعد أو ما تم الاتفاق عليه"></textarea></div>
+          </div>
+          <div class="patient-appointment-form-footer"><span data-appointment-status class="patient-appointments-status" role="status"></span><button type="submit" data-professional-appointment-submit><i class="fa-regular fa-calendar-plus"></i> تسجيل موعد متفق عليه</button></div>
+        </form>\`
         <div class="patient-appointments-list" data-appointment-list><div class="patient-appointments-empty">جاري تحميل المواعيد...</div></div>
         <p class="patient-appointments-disclaimer">المواعيد هنا طلبات متابعة وليست خدمة طوارئ. لا يتم تحصيل أي مدفوعات من خلال هذه المرحلة.</p>
       </div>`;
@@ -69,6 +77,8 @@
     const refresh = root.querySelector("[data-appointment-refresh]");
     const form = root.querySelector("[data-appointment-form]");
     const submit = root.querySelector("[data-appointment-submit]");
+    const professionalForm = root.querySelector("[data-professional-appointment-form]");
+    const professionalSubmit = root.querySelector("[data-professional-appointment-submit]");
     const providerSelect = root.querySelector("[data-appointment-provider]");
     let busy = false;
     let localMin = "";
@@ -106,6 +116,10 @@
       const now = new Date(Date.now() + 15 * 60000);
       localMin = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0,16);
       dateInput.min = localMin;
+    } else {
+      const now = new Date(Date.now() + 15 * 60000);
+      localMin = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+      root.querySelector("[data-professional-appointment-date]").min = localMin;
     }
 
     async function loadAppointments() {
@@ -184,6 +198,45 @@
         } finally {
           busy = false;
           submit.disabled = false;
+        }
+      });
+    }
+
+    if (professionalForm) {
+      professionalForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        if (busy) return;
+        const dateValue = root.querySelector("[data-professional-appointment-date]").value;
+        const date = new Date(dateValue);
+        if (!dateValue || Number.isNaN(date.getTime()) || date.getTime() <= Date.now() + 15 * 60000) {
+          setStatus(root, "اختر تاريخًا ووقتًا مستقبليين.", "error");
+          return;
+        }
+        busy = true;
+        professionalSubmit.disabled = true;
+        setStatus(root, "جاري تسجيل الموعد...");
+        try {
+          const { error } = await supabase.rpc("create_professional_patient_appointment", {
+            p_patient_id: patientId,
+            p_scheduled_at: date.toISOString(),
+            p_duration_minutes: Number(root.querySelector("[data-professional-appointment-duration]").value),
+            p_appointment_type: root.querySelector("[data-professional-appointment-type]").value,
+            p_professional_note: root.querySelector("[data-professional-appointment-note]").value.trim() || null
+          });
+          if (error) throw error;
+          professionalForm.reset();
+          root.querySelector("[data-professional-appointment-date]").min = localMin;
+          setStatus(root, "تم تسجيل الموعد كموعد مؤكد متفق عليه.", "success");
+          await loadAppointments();
+        } catch (error) {
+          console.error("Professional appointment creation failed:", error);
+          const message = error.message === "appointment_time_conflict"
+            ? "هذا التوقيت يتعارض مع موعد مؤكد آخر."
+            : error.message || "تعذر تسجيل الموعد.";
+          setStatus(root, message, "error");
+        } finally {
+          busy = false;
+          professionalSubmit.disabled = false;
         }
       });
     }
