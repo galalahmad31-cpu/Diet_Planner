@@ -171,7 +171,7 @@
   function showPortalDestination(id) {
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
-    if (home) home.hidden = !["portalHome", "portalDietBuilder", "portalEducation"].includes(id) || toolsOpen;
+    if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
     if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
@@ -184,7 +184,7 @@
       tools?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-    if (["portalDietBuilder","portalEducation"].includes(id)) {
+    if (id === "portalDietBuilder") {
       $(id)?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -990,8 +990,7 @@
       "portalHome",
       "portalContent",
       "portalDietBuilder",
-      "portalEducation",
-      "portalTools",
+            "portalTools",
       "portalProfileArea"
     ]);
     if (initialSection !== "portalProfileArea") {
