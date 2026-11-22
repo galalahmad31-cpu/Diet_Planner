@@ -224,3 +224,23 @@
 
 
 
+
+
+/* Patient announcements: one compact, expandable feed on the home screen. */
+.portal-announcements{min-width:0;padding:17px;border:1px solid var(--dp-border);border-radius:17px;background:var(--dp-surface);color:var(--dp-text);box-shadow:var(--dp-shadow-sm,0 4px 16px rgba(0,0,0,.04))}
+.portal-announcements[hidden]{display:none!important}
+.portal-announcements-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.portal-announcements-heading h2{margin:3px 0;font-size:16px;font-weight:900;color:var(--dp-text)}
+.portal-announcements-heading p{margin:0;font-size:10px;color:var(--dp-muted)}
+.portal-announcements-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:var(--dp-surface-2);color:var(--dp-primary)}
+.portal-announcements-list{display:grid;gap:8px}
+.portal-announcement-card{min-width:0;border:1px solid var(--dp-border);border-radius:12px;background:var(--dp-surface-2);overflow:hidden}
+.portal-announcement-card summary{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px;cursor:pointer;list-style:none}
+.portal-announcement-card summary::-webkit-details-marker{display:none}
+.portal-announcement-type{font-size:9px;font-weight:900;color:var(--dp-primary);white-space:nowrap}
+.portal-announcement-card summary strong{min-width:0;font-size:12px;font-weight:900;color:var(--dp-text);overflow-wrap:anywhere}
+.portal-announcement-toggle{font-size:9px;color:var(--dp-muted);white-space:nowrap}
+.portal-announcement-card[open] .portal-announcement-toggle{font-size:0}
+.portal-announcement-card[open] .portal-announcement-toggle:after{content:"إخفاء التفاصيل";font-size:9px}
+.portal-announcement-card>p{margin:0;padding:0 12px 13px;color:var(--dp-text-2);font-size:11px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:520px){.portal-announcements{padding:13px}.portal-announcement-card summary{grid-template-columns:1fr auto;gap:5px 9px}.portal-announcement-type{grid-column:1/-1}.portal-announcement-card summary strong{font-size:11px}}
