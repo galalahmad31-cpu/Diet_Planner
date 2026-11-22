@@ -77,28 +77,21 @@ async function confirmCareStep(button){
 function renderConversationHistory(requests){
  const root=$("professionalConversationHistory");
  const conversations=requests.filter(item=>["accepted","active","ended"].includes(item.status));
- if(!conversations.length){root.innerHTML='<div class="directory-empty-state">لا توجد محادثات مقبولة حتى الآن. ستظهر المحادثات هنا بعد قبول طلب جديد.</div>';return;}
- root.innerHTML=conversations.map(r=>{
-  const active=r.status==="active";
-  const ended=r.status==="ended";
-  const chat='<div class="professional-request-chat" data-request-chat data-request-id="'+esc(r.request_id)+'" data-patient-id="'+esc(r.patient_id)+'"></div>';
+ if(!conversations.length){root.innerHTML='<div class="directory-empty-state">لا توجد محادثات مقبولة حتى الآن. ستظهر هنا بعد قبول طلب جديد.</div>';return;}
+ const latestByPatient=new Map(),rank={active:3,accepted:2,ended:1};
+ conversations.forEach(item=>{const old=latestByPatient.get(item.patient_id);if(!old||(rank[item.status]||0)>(rank[old.status]||0))latestByPatient.set(item.patient_id,item);});
+ const contacts=[...latestByPatient.values()];
+ root.innerHTML='<div id="professionalChatInbox" class="professional-chat-inbox"></div><div class="professional-agreements-list"><h3>اتفاقات المتابعة</h3>'+
+ conversations.map(r=>{
+  const active=r.status==="active",state=r.status==="ended"?"انتهت المتابعة":active?"المتابعة نشطة":"بانتظار الاتفاق والدفع";
   const activeLink=active?'<a class="directory-secondary-button" href="patient-profile.html?id='+encodeURIComponent(r.patient_id)+'">فتح ملف المريض</a>':"";
   const endButton=active?'<button type="button" class="professional-end-followup-button" data-end-followup="'+esc(r.request_id)+'">إنهاء المتابعة</button>':"";
-  const state=ended?"انتهت المتابعة":active?"المتابعة نشطة":"محادثة مفتوحة · بانتظار الاتفاق والدفع";
-  return '<article class="directory-card professional-conversation-card" id="connection-request-'+esc(r.request_id)+'"><div class="directory-card-heading"><strong>'+esc(r.patient_name||"مريض")+'</strong><span class="directory-chip">'+state+'</span></div><p>'+esc(r.message||"بدأت المحادثة دون رسالة افتتاحية.")+'</p><div class="professional-conversation-actions">'+activeLink+endButton+'</div>'+chat+professionalAgreementMarkup(r)+'</article>';
- }).join("");
-
+  return '<details class="professional-agreement-accordion" id="connection-request-'+esc(r.request_id)+'"><summary><span><strong>'+esc(r.patient_name||"مريض")+'</strong><small>'+esc(r.agreement_service_title||"طلب متابعة")+'</small></span><span class="directory-chip">'+state+'</span></summary><div class="professional-agreement-accordion-body"><div class="professional-conversation-actions">'+activeLink+endButton+'</div>'+professionalAgreementMarkup(r)+'</div></details>';
+ }).join("")+'</div>';
+ void window.DietPlannerPatientMessages?.mountInbox($("professionalChatInbox"),{role:"professional",contacts});
  root.querySelectorAll("[data-agreement-form]").forEach(form=>form.addEventListener("submit",event=>{event.preventDefault();void submitAgreementForm(form);}));
  root.querySelectorAll("[data-care-step]").forEach(button=>button.addEventListener("click",()=>void confirmCareStep(button)));
-
- root.querySelectorAll("[data-request-chat]").forEach(node=>{
-  void window.DietPlannerPatientMessages?.mount(node,{
-   patientId:node.dataset.patientId,requestId:node.dataset.requestId,role:"professional"
-  });
- });
- root.querySelectorAll("[data-end-followup]").forEach(button=>button.addEventListener("click",()=>{
-  openEndFollowupDialog(button.dataset.endFollowup);
- }));
+ root.querySelectorAll("[data-end-followup]").forEach(button=>button.addEventListener("click",()=>openEndFollowupDialog(button.dataset.endFollowup)));
 }
 function openEndFollowupDialog(requestId){
  const dialog=$("endProfessionalFollowupDialog");
