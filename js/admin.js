@@ -87,11 +87,17 @@ async function loadDoctorsPage(page=0){
   if(ids.length){
    const sr=await sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot').in('user_id',ids).order('created_at',{ascending:false});
    if(sr.error)throw sr.error;state.subs=sr.data||[];
-   state.patients=await Promise.all(state.profiles.map(async p=>{
-    const current=latestSub(p.id);let patientQuery=sb.from('patients').select('id',{count:'exact',head:true});
-    patientQuery=current?patientQuery.eq('subscription_id',current.id):patientQuery.eq('user_id',p.id);
-    const result=await patientQuery;if(result.error)throw result.error;return {user_id:p.id,count:result.count||0};
-   }));
+   const subscriptionIds=state.subs.map(s=>s.id);
+   let patientQuery=sb.from('patients').select('id,user_id,subscription_id');
+   patientQuery=subscriptionIds.length
+    ?patientQuery.or(`user_id.in.(${ids.join(',')}),subscription_id.in.(${subscriptionIds.join(',')})`)
+    :patientQuery.in('user_id',ids);
+   const patientResult=await patientQuery;if(patientResult.error)throw patientResult.error;
+   state.patients=state.profiles.map(profile=>{
+    const current=latestSub(profile.id);
+    const count=(patientResult.data||[]).filter(patient=>current?patient.subscription_id===current.id:patient.user_id===profile.id).length;
+    return {user_id:profile.id,count};
+   });
   }else{state.subs=[];state.patients=[]}
   state.doctorActiveTotal=activeResult.count||0;state.doctorsLoaded=true;renderDoctors();
  }catch(error){console.error('Admin doctors page load failed:',error);setState('doctor',error.message||'تعذر تحميل المستخدمين.')}
