@@ -6,7 +6,7 @@
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const money=v=>Number(v||0).toLocaleString("ar-EG",{maximumFractionDigits:2})+" ج.م";
  const date=v=>v?new Date(v).toLocaleString("ar-EG",{dateStyle:"medium",timeStyle:"short"}):"—";
- const isValidTelegramUrl=value=>/^https:\/\/(?:t\.me|telegram\.me)\/(?:\+(?:[A-Za-z0-9_-]+)|joinchat\/[A-Za-z0-9_-]+|[A-Za-z][A-Za-z0-9_]{4,31})\/?$/i.test(value);
+ const isValidTelegramUrl=value=>typeof value==="string"&&/^https:\/\/(?:t\.me|telegram\.me)\/(?:\+(?:[A-Za-z0-9_-]+)|joinchat\/[A-Za-z0-9_-]+|[A-Za-z][A-Za-z0-9_]{4,31}\/?|[A-Za-z][A-Za-z0-9_]{4,31}\/[1-9][0-9]*(?:\?single)?)$/i.test(value);
  const coverUrl=path=>path?sb.storage.from("book-covers").getPublicUrl(path).data.publicUrl:"";
  let toastTimer=null;
  function toast(message){const box=$("booksAdminToast");box.textContent=message;box.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove("show"),2800)}
