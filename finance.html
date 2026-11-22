@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
+<link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
         <script src="js/theme.js?v=20261121-header-only-v15">
             </script>
           <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
@@ -201,32 +202,11 @@
                     </div>
                 </div>
             </div>
-            <div id="deleteConfirm" class="modal fixed inset-0 z-[90] hidden items-center justify-center p-4">
-                <div class="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl">
-                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-                        <i class="fa-solid fa-trash-can text-xl">
-                        </i>
-                    </div>
-                    <h3 class="mt-4 text-lg font-extrabold text-slate-800">
-                        حذف بيانات الاشتراك؟
-                    </h3>
-                    <p class="mt-2 text-sm leading-6 text-slate-500">
-                        سيتم حذف بيانات الاشتراك والمتابعة لهذا المريض نهائيًا. لن يتم حذف بيانات المريض نفسها.
-                    </p>
-                    <div class="mt-5 flex gap-3">
-                        <button id="deleteNo" type="button" class="h-11 flex-1 rounded-xl border border-slate-200 bg-white font-bold text-slate-600">
-                            إلغاء
-                        </button>
-                        <button id="deleteYes" type="button" class="h-11 flex-1 rounded-xl bg-red-600 font-bold text-white">
-                            نعم، احذف
-                        </button>
-                    </div>
-                </div>
-            </div>
             <div id="toast" class="hidden fixed bottom-5 left-1/2 z-[100] rounded-xl px-5 py-3 text-sm font-bold text-white shadow-xl">
             </div>
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
                 </script>
+                <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1"></script>
                 <script src="js/auth-access.js?v=20261121-google-account-type-v1">
                     </script>
                     <script src="js/finance.js?v=20261122-finance-dashboard-v1">
