@@ -178,30 +178,45 @@ async function loadData() {
 
     if (patientsError) throw patientsError;
 
-    const { data: finances, error: financesError } = await supabase
-        .from('patient_finances')
-        .select(`
-            id,
-            patient_id,
-            subscription_start_date,
-            subscription_months,
-            subscription_end_date,
-            subscription_amount,
-            discount_percent,
-            discounted_amount,
-            is_paid,
-            last_visit_date,
-            next_follow_up_date
-        `)
-        .eq('user_id', user.id);
+    const { data: connections, error: connectionsError } = await supabase
+        .from('professional_connection_requests')
+        .select('patient_id,status')
+        .eq('professional_id', user.id)
+        .in('status', ['accepted', 'active']);
 
-    if (financesError) throw financesError;
+    if (connectionsError) throw connectionsError;
 
-    const financeMap = new Map(
-        (finances || []).map((finance) => [finance.patient_id, finance])
-    );
+    const linkedPatientIds = new Set((connections || []).map(item => item.patient_id).filter(Boolean));
+    const unlinkedPatients = (patients || []).filter(patient => !linkedPatientIds.has(patient.id));
+    const unlinkedPatientIds = unlinkedPatients.map(patient => patient.id);
 
-    rows = (patients || []).map((patient) => ({
+    let finances = [];
+    if (unlinkedPatientIds.length) {
+        const { data, error } = await supabase
+            .from('patient_finances')
+            .select(`
+                id,
+                patient_id,
+                subscription_start_date,
+                subscription_months,
+                subscription_end_date,
+                subscription_amount,
+                discount_percent,
+                discounted_amount,
+                is_paid,
+                last_visit_date,
+                next_follow_up_date
+            `)
+            .eq('user_id', user.id)
+            .in('patient_id', unlinkedPatientIds);
+
+        if (error) throw error;
+        finances = data || [];
+    }
+
+    const financeMap = new Map(finances.map(finance => [finance.patient_id, finance]));
+
+    rows = unlinkedPatients.map(patient => ({
         ...patient,
         finance: financeMap.get(patient.id) || {
             patient_id: patient.id,
