@@ -918,6 +918,51 @@
     }
   }
 
+  async function loadPatientAnnouncements() {
+    const section = $("patientAnnouncementsSection");
+    const host = $("patientAnnouncementsList");
+    if (!section || !host || !supabase) return;
+    try {
+      const now = new Date().toISOString();
+      const { data, error } = await supabase.from("announcements")
+        .select("id,title,content,type,is_pinned,starts_at,expires_at,created_at")
+        .eq("is_active", true)
+        .in("audience", ["patient", "both"])
+        .lte("starts_at", now)
+        .order("is_pinned", { ascending: false })
+        .order("starts_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      const current = (data || []).filter(item => !item.expires_at || new Date(item.expires_at).getTime() > Date.now()).slice(0, 3);
+      host.replaceChildren();
+      if (!current.length) { section.hidden = true; return; }
+      const labels = { update: "تحديث جديد", announcement: "إعلان مهم", tip: "نصيحة واستخدام", alert: "تنبيه" };
+      current.forEach(item => {
+        const card = document.createElement("details");
+        card.className = "portal-announcement-card";
+        const summary = document.createElement("summary");
+        const type = document.createElement("span");
+        type.className = "portal-announcement-type";
+        type.textContent = labels[item.type] || labels.update;
+        const title = document.createElement("strong");
+        title.textContent = item.title || "";
+        const toggle = document.createElement("span");
+        toggle.className = "portal-announcement-toggle";
+        toggle.textContent = "عرض التفاصيل";
+        summary.append(type, title, toggle);
+        const content = document.createElement("p");
+        content.textContent = item.content || "";
+        card.append(summary, content);
+        if (item.is_pinned) card.open = true;
+        host.appendChild(card);
+      });
+      section.hidden = false;
+    } catch (error) {
+      section.hidden = true;
+      console.warn("Patient announcements could not be loaded:", error);
+    }
+  }
+
   async function init() {
     if (!supabase || !access?.getCurrentUser) {
       fail("تعذر تهيئة الاتصال الآمن. أعد تحميل الصفحة.");
@@ -930,6 +975,7 @@
       return;
     }
     state.user = user;
+    void loadPatientAnnouncements();
     $("portalLogout")?.addEventListener("click", () => access.logout());
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
