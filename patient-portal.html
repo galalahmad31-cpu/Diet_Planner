@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-insulin-meal-v1">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-insulin-remove-duplicate-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
@@ -24,7 +24,7 @@
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261122-insulin-clean-v2" defer></script>
+  <script src="js/patient-portal.js?v=20261122-insulin-remove-duplicate-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -80,7 +80,6 @@
             </div>
           </div>
           <div class="portal-insulin-result" aria-live="polite">
-            <div><span>إجمالي الجرعة اليومية TDD</span><strong id="portalInsulinTddResult">—</strong></div>
             <div><span>معامل التصحيح ISF</span><strong id="portalInsulinIsfResult">—</strong></div>
             <div><span>فرق السكر عن الهدف</span><strong id="portalGlucoseDifference">—</strong></div>
             <div><span>ناتج التصحيح الحسابي النظري</span><strong id="portalCorrectionEstimate">—</strong></div>
