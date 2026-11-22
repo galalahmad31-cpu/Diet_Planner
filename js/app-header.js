@@ -150,6 +150,7 @@
             <strong>Diet Planner</strong><small>${subtitle}</small>
           </div>
         </div>
+        <div class="dp-app-header__collapse-hint" aria-hidden="true"><i class="fa-solid fa-grip-lines"></i><span>اضغط لطي القائمة</span></div>
         <div class="dp-app-header__account">
           <a class="dp-app-header__account-link dp-app-header__login" href="${base}login.html">تسجيل الدخول</a>
           <a class="dp-app-header__account-link dp-app-header__register" href="${base}login.html#register">إنشاء حساب</a>
@@ -161,7 +162,6 @@
       <nav class="dp-app-header__nav" id="dp-app-header-nav" aria-label="التنقل الرئيسي">
         <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
-      <div class="dp-app-header__collapse-hint" aria-hidden="true"><i class="fa-solid fa-grip-lines"></i><span>اضغط لطي القائمة</span></div>
       <div class="dp-app-header__page-title"></div>
       <div class="dp-app-header__context" hidden></div>`;
     const track = header.querySelector(".dp-app-header__track");
