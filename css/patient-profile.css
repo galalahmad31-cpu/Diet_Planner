@@ -832,9 +832,19 @@ body.support-delete-modal-open{overflow:hidden}
 body.patient-conversation-open{overflow:hidden}
 @keyframes patientConversationSlideIn{from{transform:translateX(-24px);opacity:.75}to{transform:translateX(0);opacity:1}}
 @media(max-width:680px){
- .patient-profile-identity{align-items:flex-start;flex-direction:column}
- .patient-profile-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
- .patient-profile-actions>button{width:100%;min-width:0}
+ /* Compact patient identity: prevent the name row from stretching and pushing actions down. */
+ .patient-name-bar{display:block;height:auto!important;min-height:0!important;padding:12px!important}
+ #patientContent{display:block;height:auto!important;min-height:0!important}
+ .patient-profile-identity{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start!important;gap:8px;height:auto!important;min-height:0!important}
+ .patient-profile-identity #patientName{display:block;flex:0 1 auto!important;width:100%;max-width:100%;min-height:0!important;margin:0!important;line-height:1.45;overflow-wrap:anywhere}
+ .patient-profile-actions{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:7px}
+ .patient-profile-actions>button{width:100%;min-width:0;min-height:44px;padding:8px 6px;white-space:normal;line-height:1.45}
+ .patient-data-heading{margin-top:8px!important}
+ .patient-data-summary{min-height:40px;gap:6px}
+ .patient-data-title strong{font-size:10px}
+ .patient-data-title small{font-size:8px}
+ .patient-data-actions,.patient-data-actions .patient-save-actions{gap:4px!important}
+ .patient-data-actions button{min-height:30px;padding:5px 7px;font-size:9px}
  .patient-conversation-overlay{align-items:flex-end;justify-content:center;padding:0;background:rgba(9,25,29,.48)}
  .patient-conversation-drawer{width:100%;height:min(86vh,780px);height:min(86dvh,780px);max-height:92dvh;border:0;border-top:1px solid var(--dp-border);border-radius:22px 22px 0 0;box-shadow:0 -12px 42px rgba(0,0,0,.2);animation:patientConversationSlideUp .24s ease-out}
  .patient-conversation-drawer.is-unlinked{width:100%;height:auto;max-height:140px;min-height:0;align-self:flex-end;margin:0;border-radius:18px 18px 0 0}
