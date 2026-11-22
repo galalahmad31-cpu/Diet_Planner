@@ -300,6 +300,74 @@
   }
 
 
+  function ensureFloatingChatWidget() {
+    let widget = document.getElementById("dpCentralChatWidget");
+    if (widget) return widget;
+
+    widget = document.createElement("section");
+    widget.id = "dpCentralChatWidget";
+    widget.className = "dp-central-chat";
+    widget.hidden = true;
+    widget.setAttribute("aria-label", "نافذة المحادثة");
+    widget.innerHTML = `
+      <header class="dp-central-chat__header">
+        <div class="dp-central-chat__identity">
+          <strong data-central-chat-title>المحادثة</strong>
+          <small data-central-chat-subtitle>رسائل آمنة بين المريض والمختص</small>
+        </div>
+        <div class="dp-central-chat__controls">
+          <button type="button" data-central-chat-minimize aria-label="تصغير المحادثة" title="تصغير"><i class="fa-solid fa-minus"></i></button>
+          <button type="button" data-central-chat-close aria-label="إغلاق المحادثة" title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </header>
+      <div class="dp-central-chat__body" data-central-chat-body></div>`;
+    document.body.appendChild(widget);
+
+    const launcher = document.createElement("button");
+    launcher.type = "button";
+    launcher.id = "dpCentralChatLauncher";
+    launcher.className = "dp-central-chat-launcher";
+    launcher.innerHTML = '<i class="fa-solid fa-comments" aria-hidden="true"></i><span>المحادثات</span>';
+    launcher.setAttribute("aria-controls", widget.id);
+    launcher.setAttribute("aria-expanded", "false");
+    document.body.appendChild(launcher);
+
+    const hide = () => {
+      widget.hidden = true;
+      launcher.setAttribute("aria-expanded", "false");
+    };
+    const show = () => {
+      widget.hidden = false;
+      launcher.setAttribute("aria-expanded", "true");
+    };
+    launcher.addEventListener("click", () => {
+      if (widget.hidden) show();
+      else hide();
+    });
+    widget.querySelector("[data-central-chat-minimize]").addEventListener("click", hide);
+    widget.querySelector("[data-central-chat-close]").addEventListener("click", () => {
+      hide();
+      widget.querySelector("[data-central-chat-body]").replaceChildren();
+      widget.querySelector("[data-central-chat-title]").textContent = "المحادثة";
+      widget.querySelector("[data-central-chat-subtitle]").textContent = "اختر شخصًا من قائمة المحادثات لبدء التواصل";
+    });
+    return widget;
+  }
+
+  function openCentralConversation(contact, chatOptions) {
+    const widget = ensureFloatingChatWidget();
+    const body = widget.querySelector("[data-central-chat-body]");
+    widget.querySelector("[data-central-chat-title]").textContent = contact.name || "المحادثة";
+    widget.querySelector("[data-central-chat-subtitle]").textContent = contact.subtitle || "رسائل آمنة بين المريض والمختص";
+    body.replaceChildren();
+    const chatRoot = document.createElement("div");
+    chatRoot.dataset.patientMessages = "";
+    body.appendChild(chatRoot);
+    widget.hidden = false;
+    document.getElementById("dpCentralChatLauncher")?.setAttribute("aria-expanded", "true");
+    void mount(chatRoot, chatOptions);
+  }
+
   async function mountInbox(root, options = {}) {
     if (!root || root.dataset.inboxMounted === "true") return;
     if (!supabase || !access?.getCurrentUser) { root.textContent = "تعذر تهيئة قائمة المحادثات."; return; }
@@ -316,37 +384,46 @@
         const { data: requests, error: requestError } = await supabase.from("professional_connection_requests").select("id,professional_id,status,created_at").eq("patient_id", patientId).eq("requested_by", user.id).in("status", ["accepted", "active", "ended"]).order("created_at", { ascending: false });
         if (requestError) throw requestError;
         const byId = new Map();
-        (requests || []).forEach(item => { if (!byId.has(item.professional_id)) byId.set(item.professional_id,{id:item.professional_id,requestId:item.id,status:item.status}); });
-        const { data: team, error: teamError } = await supabase.from("patient_care_team").select("professional_id,relationship_role").eq("patient_id",patientId).eq("status","active");
+        (requests || []).forEach(item => { if (!byId.has(item.professional_id)) byId.set(item.professional_id, { id: item.professional_id, requestId: item.id, status: item.status }); });
+        const { data: team, error: teamError } = await supabase.from("patient_care_team").select("professional_id,relationship_role").eq("patient_id", patientId).eq("status", "active");
         if (teamError) throw teamError;
-        (team || []).forEach(item => { if (!byId.has(item.professional_id)) byId.set(item.professional_id,{id:item.professional_id,requestId:null,status:"active"}); });
-        const rows=[...byId.values()];
-        if(rows.length){
-          const {data:profiles,error:profileError}=await supabase.from("profiles").select("id,full_name,profession").in("id",rows.map(x=>x.id));
-          if(profileError)throw profileError;
-          const profileMap=new Map((profiles||[]).map(x=>[x.id,x]));
-          contacts=rows.map(x=>({...x,name:profileMap.get(x.id)?.full_name||"المختص",subtitle:profileMap.get(x.id)?.profession||"مختص مرتبط"}));
+        (team || []).forEach(item => { if (!byId.has(item.professional_id)) byId.set(item.professional_id, { id: item.professional_id, requestId: null, status: "active" }); });
+        const rows = [...byId.values()];
+        if (rows.length) {
+          const { data: profiles, error: profileError } = await supabase.from("profiles").select("id,full_name,profession").in("id", rows.map(x => x.id));
+          if (profileError) throw profileError;
+          const profileMap = new Map((profiles || []).map(x => [x.id, x]));
+          contacts = rows.map(x => ({ ...x, name: profileMap.get(x.id)?.full_name || "المختص", subtitle: profileMap.get(x.id)?.profession || "مختص مرتبط" }));
         }
       } else {
-        contacts=(options.contacts||[]).map(x=>({id:x.patient_id,patientId:x.patient_id,requestId:x.request_id,name:x.patient_name||"مريض",status:x.status,subtitle:x.status==="active"?"متابعة نشطة":x.status==="ended"?"انتهت المتابعة":"محادثة مفتوحة"}));
-        const seen=new Set(); contacts=contacts.filter(x=>x.id&&!seen.has(x.id)&&seen.add(x.id));
+        contacts = (options.contacts || []).map(x => ({ id: x.patient_id, patientId: x.patient_id, requestId: x.request_id, name: x.patient_name || "مريض", status: x.status, subtitle: x.status === "active" ? "متابعة نشطة" : x.status === "ended" ? "انتهت المتابعة" : "محادثة مفتوحة" }));
+        const seen = new Set();
+        contacts = contacts.filter(x => x.id && !seen.has(x.id) && seen.add(x.id));
       }
-      if(!contacts.length){list.innerHTML='<div class="patient-messages-empty">'+(role==="patient"?"لا توجد محادثات مرتبطة حتى الآن. يمكنك إرسال طلب من دليل المختصين.":"لا توجد محادثات مقبولة حتى الآن.")+'</div>';return;}
-      list.innerHTML=contacts.map(x=>'<button type="button" class="dp-chat-contact" data-chat-open="'+escapeHtml(x.id)+'"><span class="dp-chat-avatar"><i class="fa-solid '+(role==="patient"?"fa-user-doctor":"fa-user")+'"></i></span><span class="dp-chat-contact-copy"><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.subtitle||"")+'</small></span><span class="dp-chat-contact-status">'+(x.status==="active"?"نشطة":x.status==="ended"?"منتهية":"مفتوحة")+'</span><i class="fa-solid fa-chevron-left"></i></button>').join("");
-      list.querySelectorAll("[data-chat-open]").forEach(button=>button.addEventListener("click",()=>{
-        const contact=contacts.find(x=>x.id===button.dataset.chatOpen); if(!contact)return;
-        root.querySelector(".dp-chat-overlay")?.remove();
-        const overlay=document.createElement("div"); overlay.className="dp-chat-overlay";
-        overlay.innerHTML='<section class="dp-chat-drawer" role="dialog" aria-modal="true" aria-label="المحادثة"><header class="dp-chat-drawer-header"><div><strong></strong><small></small></div><button type="button" data-chat-close aria-label="إغلاق المحادثة"><i class="fa-solid fa-xmark"></i></button></header><div class="dp-chat-drawer-body" data-chat-body></div></section>';
-        overlay.querySelector("header strong").textContent=contact.name; overlay.querySelector("header small").textContent=contact.subtitle||"";
-        root.appendChild(overlay);
-        const close=()=>overlay.remove(); overlay.querySelector("[data-chat-close]").addEventListener("click",close);
-        overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
-        const chatRoot=document.createElement("div"); chatRoot.dataset.patientMessages=""; overlay.querySelector("[data-chat-body]").appendChild(chatRoot);
-        const chatOptions=role==="patient"?{patientId,role,professionalId:contact.id}:{patientId:contact.patientId,requestId:contact.requestId,role};
-        void mount(chatRoot,chatOptions);
+      if (!contacts.length) {
+        list.innerHTML = '<div class="patient-messages-empty">' + (role === "patient" ? "لا توجد محادثات مرتبطة حتى الآن. يمكنك إرسال طلب من دليل المختصين." : "لا توجد محادثات مقبولة حتى الآن.") + "</div>";
+        return;
+      }
+      ensureFloatingChatWidget();
+      list.innerHTML = contacts.map(x =>
+        '<button type="button" class="dp-chat-contact" data-chat-open="' + escapeHtml(x.id) + '">' +
+        '<span class="dp-chat-avatar"><i class="fa-solid ' + (role === "patient" ? "fa-user-doctor" : "fa-user") + '"></i></span>' +
+        '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(x.name) + '</strong><small>' + escapeHtml(x.subtitle || "") + '</small></span>' +
+        '<span class="dp-chat-contact-status">' + (x.status === "active" ? "نشطة" : x.status === "ended" ? "منتهية" : "مفتوحة") + '</span>' +
+        '<i class="fa-solid fa-chevron-left"></i></button>'
+      ).join("");
+      list.querySelectorAll("[data-chat-open]").forEach(button => button.addEventListener("click", () => {
+        const contact = contacts.find(x => x.id === button.dataset.chatOpen);
+        if (!contact) return;
+        const chatOptions = role === "patient"
+          ? { patientId, role, professionalId: contact.id }
+          : { patientId: contact.patientId, requestId: contact.requestId, role };
+        openCentralConversation(contact, chatOptions);
       }));
-    } catch(error){console.error("Conversation inbox load failed:",error);list.innerHTML='<div class="patient-messages-empty is-error">تعذر تحميل قائمة المحادثات. أعد تحميل الصفحة للمحاولة.</div>';}
+    } catch (error) {
+      console.error("Conversation inbox load failed:", error);
+      list.innerHTML = '<div class="patient-messages-empty is-error">تعذر تحميل قائمة المحادثات. أعد تحميل الصفحة للمحاولة.</div>';
+    }
   }
 
   window.DietPlannerPatientMessages = { mount, mountInbox };
