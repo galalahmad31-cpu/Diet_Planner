@@ -658,7 +658,7 @@
       input.value = "";
       setMessage("patientProfessionalCodeStatus", "تم التحقق من الكود وإرسال طلب المتابعة للمختص. ستظهر حالته هنا.", "success");
       state.loadedPanels.delete("portalCareManagementPanel");
-      await loadProfessionalCareManagement();
+      await ensureHealthPanelLoaded("portalCareManagementPanel");
     } catch (error) {
       console.error("Professional invitation redemption failed:", error);
       const messages = {
@@ -1072,6 +1072,28 @@
   async function loadPortal() {
     showOnly("portalLoading");
     let account = await getPatientAccount();
+    const invitationToken = new URLSearchParams(window.location.search).get("invite");
+    let invitationStatus = "";
+
+    // Existing self-owned patient accounts redeem professional invitations as requests,
+    // while unlinked accounts keep the original invitation-to-record linking flow below.
+    if (account?.patient_id && invitationToken) {
+      try {
+        const { error } = await supabase.rpc("redeem_patient_professional_invitation", { p_token: invitationToken });
+        if (error) throw error;
+        invitationStatus = "تم التحقق من رابط المختص وإرسال طلب المتابعة. يمكنك متابعة حالته من هذا القسم.";
+      } catch (error) {
+        console.error("Professional invitation link redemption failed:", error);
+        invitationStatus = error?.message === "already_in_care_team"
+          ? "أنت مرتبط بالفعل بهذا المختص."
+          : error?.message === "connection_request_already_open_or_processed"
+            ? "يوجد طلب أو متابعة سابقة مع هذا المختص بالفعل."
+            : "تعذر استخدام رابط الدعوة. قد يكون منتهي الصلاحية أو سبق استخدامه.";
+      }
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("invite");
+      window.history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    }
 
     if (!account?.patient_id) {
       const token = new URLSearchParams(window.location.search).get("invite");
@@ -1123,7 +1145,11 @@
 
     showOnly("portalContent");
     activatePlanTab("self");
-    activateHealthTab("portalPlansPanel");
+    activateHealthTab(invitationStatus ? "portalCareManagementPanel" : "portalPlansPanel");
+    if (invitationStatus) {
+      setMessage("patientProfessionalCodeStatus", invitationStatus,
+        invitationStatus.startsWith("تم التحقق") ? "success" : "error");
+    }
 
     if (state.messagesMountedFor !== state.patientId) {
       state.messagesMountedFor = state.patientId;
