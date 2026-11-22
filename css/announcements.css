@@ -15,4 +15,5 @@
 .portal-announcement-card[open] .portal-announcement-toggle{font-size:0}
 .portal-announcement-card[open] .portal-announcement-toggle:after{content:"إخفاء التفاصيل";font-size:9px}
 .portal-announcement-card>p{margin:0;padding:0 12px 13px;color:var(--dp-text-2);font-size:11px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere}
-@media(max-width:520px){.portal-announcements{padding:13px}.portal-announcement-card summary{grid-template-columns:1fr auto;gap:5px 9px}.portal-announcement-type{grid-column:1/-1}.portal-announcement-card summary strong{font-size:11px}}\n
+@media(max-width:520px){.portal-announcements{padding:13px}.portal-announcement-card summary{grid-template-columns:1fr auto;gap:5px 9px}.portal-announcement-type{grid-column:1/-1}.portal-announcement-card summary strong{font-size:11px}}
+.portal-announcements .portal-section-kicker{display:inline-block;color:var(--dp-primary);font-size:10px;font-weight:900;letter-spacing:1.1px;opacity:.78}
