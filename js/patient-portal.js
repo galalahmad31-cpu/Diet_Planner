@@ -980,7 +980,8 @@
     void window.DietPlannerPatientNotifications?.init($("patientNotifications"), user.id).catch(error => {
       console.error("Patient notifications initialization failed:", error);
       const status = $("patientNotifications")?.querySelector("[data-patient-notification-status]");
-      if (status) status.textContent = "تعذر تحميل الإشعارات حاليًا.";\n      const empty = $("patientNotifications")?.querySelector("[data-patient-notification-empty]");\n      if (empty) empty.hidden = true;
+      if (status) status.textContent = "تعذر تحميل الإشعارات حاليًا.";
+      const empty = $("patientNotifications")?.querySelector("[data-patient-notification-empty]");\n      if (empty) empty.hidden = true;
     });
     void loadPatientAnnouncements();
     $("portalLogout")?.addEventListener("click", () => access.logout());
