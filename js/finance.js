@@ -54,10 +54,7 @@ function showFinanceAccessMessage() {
    Date helpers
    ========================================================= */
 
-function todayISO() {
-    const now = new Date();
-    return formatISODate(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
-}
+const todayISO = window.DPDate.todayKey;
 
 function formatISODate(date) {
     const y = date.getFullYear();
