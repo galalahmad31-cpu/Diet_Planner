@@ -849,35 +849,28 @@ function closeEditor() {
   state.editor = { mode: null, productId: null, formulas: [] };
 }
 
-function openConfirm(_type, id) {
+async function openConfirm(_type, id) {
   if (!state.isAdmin) return;
+  const product = state.products.find(item => item.id === id);
+  if (!product) return;
+  const confirmed = await window.DPConfirm?.ask({
+    title: 'حذف الصنف؟',
+    message: 'سيتم حذف الصنف «' + (product.product_name || '') + '» وتركيباته المرتبطة به.',
+    confirmText: 'حذف',
+    variant: 'danger'
+  });
+  if (!confirmed) return;
   state.pendingDelete = { type: 'product', id };
-
-  const p = state.products.find(x => x.id === id);
-  $('confirmTitle').textContent = 'تأكيد حذف الصنف';
-  $('confirmMessage').textContent = 'سيتم حذف الصنف «' + (p?.product_name || '') + '» وتركيباته المرتبطة به. لا يمكن التراجع عن هذه العملية.';
-
-  $('confirmModal').style.display = 'flex';
-}
-
-function closeConfirm() {
-  $('confirmModal').style.display = 'none';
-  state.pendingDelete = null;
+  await deletePending();
 }
 
 async function deletePending() {
   if (!state.isAdmin || !state.pendingDelete) return;
-
   const { id } = state.pendingDelete;
-  $('confirmDeleteBtn').disabled = true;
-  $('confirmDeleteBtn').textContent = 'جاري الحذف...';
-
+  state.pendingDelete = null;
   try {
-    const table = 'food_products';
-    const { error } = await sb.from(table).delete().eq('id', id);
+    const { error } = await sb.from('food_products').delete().eq('id', id);
     if (error) throw error;
-
-    closeConfirm();
     await loadData();
     populateCategories();
     render();
@@ -885,9 +878,6 @@ async function deletePending() {
   } catch (e) {
     console.error(e);
     showToast(e.message || 'تعذر تنفيذ الحذف.', false);
-  } finally {
-    $('confirmDeleteBtn').disabled = false;
-    $('confirmDeleteBtn').textContent = 'حذف';
   }
 }
 
@@ -1160,8 +1150,7 @@ initRichEditors(document);
 $('addProductBtn')?.addEventListener('click', () => openEditor('add-product'));
 $('closeEditorBtn').onclick = closeEditor;
 $('cancelEditorBtn').onclick = closeEditor;
-$('cancelConfirmBtn').onclick = closeConfirm;
-$('confirmDeleteBtn').onclick = deletePending;
+
 $('editorForm').addEventListener('submit', saveEditor);
 $('addFormulaBtn').onclick = () => addFormula();
 
@@ -1218,9 +1207,6 @@ $('editorModal').addEventListener('click', e => {
   if (e.target === $('editorModal')) closeEditor();
 });
 
-$('confirmModal').addEventListener('click', e => {
-  if (e.target === $('confirmModal')) closeConfirm();
-});
 
 init();
 })();
