@@ -29,7 +29,7 @@
     catch(error){console.error("Patient notifications mark-all failed:",error);const status=root?.querySelector("[data-patient-notification-status]");if(status)status.textContent="تعذر تحديث الإشعارات. حاول مرة أخرى.";}
     finally{busy=false;if(button)button.disabled=false;}
   }
-  function subscribe(){if(!recipientId||channel)return;channel=supabase.channel("dp-patient-notifications-"+recipientId).on("postgres_changes",{event:"*",schema:"public",table:"notifications",filter:"recipient_id=eq."+recipientId},()=>load().catch(error=>console.error("Patient notifications refresh failed:",error))).subscribe();}
+  function subscribe(){if(!recipientId||channel)return;channel=supabase.channel("dp-patient-notifications-"+recipientId).on("postgres_changes",{event:"INSERT",schema:"public",table:"notifications",filter:"recipient_id=eq."+recipientId},()=>load().catch(error=>console.error("Patient notifications refresh failed:",error))).subscribe();}
   async function init(container,userId){
     if(!container||!userId||!supabase)return;if(recipientId===userId&&root){await load();return;}if(channel){await supabase.removeChannel(channel);channel=null;}root=container;recipientId=userId;
     root.addEventListener("click",async event=>{const all=event.target.closest("[data-patient-notification-read-all]");if(all){await markAllRead();return;}const button=event.target.closest("[data-open-patient-notification]");if(!button||busy)return;busy=true;button.disabled=true;
