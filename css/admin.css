@@ -75,14 +75,15 @@ body{padding-top:0}
 
 
 /* Doctors table: fixed RTL column order shared by header and rendered rows. */
-.doctors-table{direction:rtl;table-layout:fixed;min-width:1080px;width:100%}
-.doctors-table .doctor-col-user{width:22%}
+.doctors-table{direction:rtl;table-layout:fixed;min-width:1160px;width:100%}
+.doctors-table .doctor-col-user{width:20%}
+.doctors-table .doctor-col-account{width:10%}
 .doctors-table .doctor-col-role{width:8%}
-.doctors-table .doctor-col-plan{width:16%}
-.doctors-table .doctor-col-start,.doctors-table .doctor-col-end{width:11%}
-.doctors-table .doctor-col-patients{width:10%}
-.doctors-table .doctor-col-status{width:10%}
-.doctors-table .doctor-col-actions{width:12%}
+.doctors-table .doctor-col-plan{width:14%}
+.doctors-table .doctor-col-start,.doctors-table .doctor-col-end{width:10%}
+.doctors-table .doctor-col-patients{width:9%}
+.doctors-table .doctor-col-status{width:9%}
+.doctors-table .doctor-col-actions{width:10%}
 .doctors-table th,.doctors-table td{white-space:nowrap}
 .doctors-table td:first-child{white-space:normal;overflow-wrap:anywhere}
 .doctors-table td.actions-cell{display:table-cell;white-space:normal}.doctors-table td.actions-cell .icon-btn{margin-inline-start:4px}
