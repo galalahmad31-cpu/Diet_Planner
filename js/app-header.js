@@ -188,12 +188,6 @@
         });
       }
     });
-      track.querySelectorAll(".dp-app-header__link").forEach(node => {
-        node.classList.toggle("is-active", active);
-        if (active) node.setAttribute("aria-current", "page");
-        else node.removeAttribute("aria-current");
-      });
-    });
     header.querySelector(".dp-app-header__theme").addEventListener("click", () => window.DietPlannerTheme?.toggle?.());
     const logout = header.querySelector(".dp-app-header__logout");
     logout.addEventListener("click", async () => {
