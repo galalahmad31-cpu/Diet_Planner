@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
  });
  $("deleteProfessionalProfile").addEventListener("click",async()=>{
-  if(!confirm("سيتم حذف الملف المهني وخدماته وأسعاره نهائيًا. لن يتم حذف حسابك أو بيانات المرضى. هل تريد المتابعة؟"))return;
+  const confirmed=await window.DPConfirm?.ask({title:"حذف الملف المهني؟",message:"سيتم حذف الملف المهني وخدماته وأسعاره. لن تتأثر بيانات حسابك أو المرضى.",confirmText:"حذف",variant:"danger"});if(!confirmed)return;
   const button=$("deleteProfessionalProfile");button.disabled=true;setStatus("جارٍ حذف الملف المهني...");
   try{
    const {error}=await db.rpc("delete_my_professional_directory_profile");if(error)throw error;
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   const message=isPending
    ?"سيتم إلغاء إرسال الملف وإعادته إلى مسودة. ستظل بيانات الملف والخدمات محفوظة. هل تريد المتابعة؟"
    :"سيتم إلغاء نشر الملف وإخفاؤه من دليل الأطباء. ستظل بيانات الملف وسجلات التواصل والمتابعة محفوظة، ولن تُحذف بيانات المرضى. هل تريد المتابعة؟";
-  if(!confirm(message))return;
+  const confirmed=await window.DPConfirm?.ask({title:isPending?"إلغاء إرسال الملف؟":"إيقاف ظهور الملف؟",message,confirmText:isPending?"إلغاء الإرسال":"إيقاف الظهور",variant:"danger"});if(!confirmed)return;
   const button=$("withdrawDirectoryProfile");button.disabled=true;
   try{
    const {error}=await db.rpc("withdraw_professional_directory_profile");
