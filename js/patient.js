@@ -74,9 +74,7 @@
       // Patient records belong to their creating professional only.
       // Administrators and patient accounts do not receive professional workspace access.
       if (state.isAdmin || state.accountType !== 'professional') {
-        state.hasActiveSubscription = false;
         state.canAddPatient = false;
-        state.activeSubscriptionId = null;
         updateWriteControls();
         return;
       }
@@ -88,7 +86,6 @@
     } catch (error) {
       console.error('Patient access check failed:', error);
       state.isAdmin = false;
-      state.hasActiveSubscription = false;
       state.canAddPatient = false;
       updateWriteControls();
     } finally {
