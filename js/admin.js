@@ -262,7 +262,7 @@ function deleteSubscription(s){
   toast('تم حذف الاشتراك');await loadAll()
  })
 }
-function deletePlan(p){
+async function deletePlan(p){
  const usage=await sb.from('subscriptions').select('id',{count:'exact',head:true}).eq('plan_id',p.id);
  if(usage.error){toast('تعذر التحقق من ارتباط الخطة بالاشتراكات.');return}
  if((usage.count||0)>0){toast('لا يمكن حذف خطة مرتبطة باشتراكات. عطّلها بدلًا من حذفها.');return}
