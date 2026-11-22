@@ -29,3 +29,26 @@
 .professional-end-dialog__actions [data-end-followup-confirm]{background:#a33b3b;color:#fff}
 .professional-end-dialog__actions button:disabled{opacity:.6;cursor:wait}
 .professional-end-dialog #endProfessionalFollowupStatus{min-height:18px;color:#a33b3b}
+
+
+/* Structured direct-payment agreement workflow */
+.professional-agreement-form,.professional-agreement-summary{display:grid;gap:11px;margin-top:12px;padding:14px;border:1px solid var(--d-line);border-radius:13px;background:var(--d-surface)}
+.professional-agreement-form h4{margin:0;font-size:13px}
+.professional-agreement-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.professional-agreement-fields label{display:grid;gap:5px;font-size:10px;font-weight:800;color:var(--d-ink)}
+.professional-agreement-fields input,.professional-agreement-fields textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--d-line);border-radius:8px;padding:9px;background:var(--d-bg);color:var(--d-ink);font:11px Cairo,sans-serif}
+.professional-agreement-fields .is-wide{grid-column:1/-1}
+.professional-agreement-help,.professional-agreement-message{margin:0;font-size:10px;line-height:1.8;color:var(--d-muted)}
+.professional-agreement-summary>header{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.professional-agreement-summary>header strong{font-size:13px}
+.professional-agreement-summary>header span{font-size:10px;color:var(--d-muted)}
+.professional-agreement-summary__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.professional-agreement-summary__grid>div{display:grid;gap:4px;padding:8px;border-radius:8px;background:var(--d-bg);min-width:0}
+.professional-agreement-summary__grid small{font-size:9px;color:var(--d-muted)}
+.professional-agreement-summary__grid strong{font-size:11px;overflow-wrap:anywhere}
+.professional-agreement-summary p{margin:0;font-size:10px;line-height:1.8;color:var(--d-muted);white-space:pre-wrap}
+.professional-agreement-summary ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0;padding:0;list-style:none}
+.professional-agreement-summary li{padding:8px;border-radius:8px;background:var(--d-bg);font-size:10px;color:var(--d-muted)}
+.professional-agreement-summary li.is-done{color:var(--d-primary);font-weight:800}
+.professional-agreement-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:520px){.professional-agreement-fields,.professional-agreement-summary__grid,.professional-agreement-summary ol{grid-template-columns:repeat(2,minmax(0,1fr))}.professional-agreement-form,.professional-agreement-summary{padding:10px}}
