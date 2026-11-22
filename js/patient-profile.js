@@ -857,7 +857,7 @@
     $('patientName').textContent = patient.name || 'بدون اسم';
     $('nameInput').value = patient.name || '';
     $('phoneInput').value = patient.phone || '';
-    $('genderInput').value = patient.gender || '';
+    $('genderInput').value = ['male', 'ذكر'].includes(patient.gender) ? 'male' : ['female', 'أنثى'].includes(patient.gender) ? 'female' : '';
     $('birthDateInput').value = patient.birth_date || '';
     $('ageInput').value = patient.age ?? '';
     $('ageInput').disabled = true;
