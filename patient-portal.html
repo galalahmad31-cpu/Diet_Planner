@@ -29,7 +29,7 @@
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/patient-notifications.js?v=20261122-patient-notifications-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261122-shared-health-load-order-v2" defer></script>
+  <script src="js/patient-portal.js?v=20261122-independent-patient-record-v3" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -177,10 +177,6 @@
       <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
       <h1>لم تبدأ المتابعة بعد</h1>
       <p>يمكنك استكشاف دليل المختصين وإرسال طلب محادثة. بعد قبول المختص، يمكنكما الاتفاق على الخدمة والسعر والمدة ثم تأكيد الدفع. لا تبدأ المتابعة ولا يُتاح ملفها الصحي إلا بعد تأكيد المختص استلام المبلغ. إذا كان لديك ملف موجود بالفعل، استخدم رمز الدعوة الذي أرسله إليك المختص.</p>
-      <section class="portal-section portal-unlinked-requests" aria-labelledby="portalUnlinkedRequestsTitle">
-        <div class="portal-section-heading"><div><h2 id="portalUnlinkedRequestsTitle">طلبات المحادثة</h2><p>تابع طلبات المحادثة المرسلة للمختصين.</p></div></div>
-        <div id="patientProfessionalRequestsUnlinked" class="portal-empty-state">جاري تحميل الطلبات...</div>
-      </section>
       <form id="portalInviteForm" class="portal-invite-form">
         <label for="portalInviteToken">رمز الدعوة</label>
         <input id="portalInviteToken" type="text" inputmode="text" autocomplete="off" placeholder="الصق رمز الدعوة هنا" required>
