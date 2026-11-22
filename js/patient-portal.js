@@ -506,30 +506,44 @@
     const received = Boolean(item.payment_received_at);
     const expired = item.agreement_end_date && item.agreement_end_date < localToday();
     const money = item.agreement_amount == null ? "—" : Number(item.agreement_amount).toLocaleString("ar-EG") + " " + (item.agreement_currency || "EGP");
-    const status = item.status === "ended" ? "انتهت المتابعة — الملف محفوظ" :
-      expired ? "انتهت مدة الاتفاق — وضع القراءة فقط للمختص" :
-      item.status === "active" ? "المتابعة نشطة" : "بانتظار استكمال الاتفاق";
+    const statusLabels = {
+      pending: "طلب المحادثة قيد الانتظار",
+      accepted: "بانتظار استكمال الاتفاق",
+      active: "المتابعة نشطة",
+      ended: "انتهت المتابعة",
+      declined: "لم يتم قبول الطلب",
+      cancelled: "تم إلغاء الطلب"
+    };
+    const status = expired && item.status === "active"
+      ? "انتهت مدة الاتفاق — قراءة فقط"
+      : statusLabels[item.status] || "حالة الطلب غير محددة";
     let actions = "";
     if (hasAgreement && item.status === "accepted" && !item.patient_agreement_at) {
-      actions += '<button type="button" class="portal-primary-button" data-care-confirm="agreement" data-request-id="' + escapeHtml(item.request_id) + '">أوافق على الاتفاق</button>';
+      actions += '<button type="button" class="portal-primary-button" data-care-confirm="agreement" data-request-id="' + escapeHtml(item.request_id) + '">الموافقة على الاتفاق</button>';
     }
     if (agreed && item.status === "accepted" && !sent) {
-      actions += '<button type="button" class="portal-primary-button" data-care-confirm="payment_sent" data-request-id="' + escapeHtml(item.request_id) + '">تأكيد إرسال المبلغ للمختص</button>';
+      actions += '<button type="button" class="portal-primary-button" data-care-confirm="payment_sent" data-request-id="' + escapeHtml(item.request_id) + '">تأكيد إرسال المبلغ</button>';
     }
-    return '<article class="portal-care-agreement"><header><div><strong>' + escapeHtml(item.professional_name || "المختص") +
+    if (item.status === "pending") {
+      actions += '<button type="button" class="portal-secondary-button" data-cancel-professional-request="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button>';
+    }
+    const agreementDetails = hasAgreement
+      ? '<div class="portal-care-agreement__details"><div><small>الخدمة</small><strong>' + escapeHtml(item.agreement_service_title) +
+        '</strong></div><div><small>القيمة</small><strong>' + escapeHtml(money) +
+        '</strong></div><div><small>المدة</small><strong>' + escapeHtml(item.agreement_duration_days) + ' يوم</strong></div><div><small>من</small><strong>' + escapeHtml(formatDate(item.agreement_start_date)) +
+        '</strong></div><div><small>إلى</small><strong>' + escapeHtml(formatDate(item.agreement_end_date)) +
+        '</strong></div></div>' +
+        (item.agreement_service_description ? '<p>' + escapeHtml(item.agreement_service_description) + '</p>' : '') +
+        (item.agreement_terms ? '<p>' + escapeHtml(item.agreement_terms) + '</p>' : '') +
+        '<ol class="portal-care-steps"><li class="' + (item.patient_agreement_at ? 'is-done' : '') + '">موافقة المريض</li><li class="' + (item.professional_agreement_at ? 'is-done' : '') + '">موافقة المختص</li><li class="' + (sent ? 'is-done' : '') + '">إرسال المبلغ</li><li class="' + (received ? 'is-done' : '') + '">استلام المبلغ وبدء المتابعة</li></ol>'
+      : '<p>لم يرسل المختص تفاصيل الاتفاق بعد. ستظهر الخدمة والسعر والمدة هنا قبل أي التزام مالي.</p>';
+    return '<article class="portal-care-agreement" data-care-request-id="' + escapeHtml(item.request_id) + '"><header><div><strong>' + escapeHtml(item.professional_name || "المختص") +
       '</strong><small>' + escapeHtml(item.professional_title || "") + '</small></div><span>' + escapeHtml(status) +
-      '</span></header>' + (hasAgreement ?
-      '<div class="portal-care-agreement__details"><div><small>الخدمة</small><strong>' + escapeHtml(item.agreement_service_title) +
-      '</strong></div><div><small>القيمة</small><strong>' + escapeHtml(money) +
-      '</strong></div><div><small>المدة</small><strong>' + escapeHtml(item.agreement_duration_days) + ' يوم</strong></div><div><small>من</small><strong>' + escapeHtml(formatDate(item.agreement_start_date)) +
-      '</strong></div><div><small>إلى</small><strong>' + escapeHtml(formatDate(item.agreement_end_date)) +
-      '</strong></div></div>' + (item.agreement_service_description ? '<p>' + escapeHtml(item.agreement_service_description) + '</p>' : '') +
-      (item.agreement_terms ? '<p>' + escapeHtml(item.agreement_terms) + '</p>' : '') +
-      '<ol class="portal-care-steps"><li class="' + (item.patient_agreement_at ? 'is-done' : '') + '">موافقة المريض</li><li class="' + (item.professional_agreement_at ? 'is-done' : '') + '">موافقة المختص</li><li class="' + (sent ? 'is-done' : '') + '">تأكيد إرسال المبلغ</li><li class="' + (received ? 'is-done' : '') + '">تأكيد استلام المبلغ وبدء المتابعة</li></ol>' :
-      '<p>لم يرسل المختص اتفاقًا بعد. ستظهر تفاصيل الخدمة والسعر والمدة هنا قبل أي التزام مالي.</p>') +
-      '<div class="portal-care-agreement__actions">' + actions + '</div><p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p></article>';
+      '</span></header>' + agreementDetails +
+      '<div class="portal-care-agreement__actions">' + actions + '</div>' +
+      (hasAgreement ? '<p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p>' : '') +
+      '</article>';
   }
-
 
   function renderSharedHealthForm() {
     const patient = state.patient || {};
@@ -610,51 +624,65 @@
   async function loadProfessionalCareManagement() {
     const root = $("patientCareManagementContent");
     if (!root) return;
-    await loadProfessionalRequests("patientProfessionalRequests");
-    root.textContent = "جاري تحميل الاتفاقات...";
+    root.textContent = "جاري تحميل طلبات المتابعة...";
     const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
     if (error) throw error;
-    const rows = data || [];
-    const relevant = rows.filter(item => ["accepted", "active", "ended"].includes(item.status));
-    if (!relevant.length) {
-      root.textContent = "لا توجد اتفاقات متابعة حتى الآن. يمكنك إرسال طلب محادثة من دليل المختصين.";
+
+    const requests = Array.isArray(data) ? data : [];
+    if (!requests.length) {
+      root.textContent = "لا توجد طلبات أو اتفاقات متابعة حتى الآن. يمكنك اختيار مختص من الدليل لبدء التواصل.";
       return;
     }
-    root.innerHTML = relevant.map(careAgreementMarkup).join("");
+
+    root.innerHTML = requests.map(careAgreementMarkup).join("");
     root.querySelectorAll("[data-care-confirm]").forEach(button => button.addEventListener("click", async () => {
       if (button.disabled) return;
       const step = button.dataset.careConfirm;
-      const message = step === "agreement" ? "بتأكيدك، أنت توافق على الخدمة والسعر والمدة والشروط الموضحة." : "هل تؤكد أنك أرسلت المبلغ مباشرة إلى المختص؟";
-      const ok = await window.DPConfirm?.ask({title: step === "agreement" ? "تأكيد الاتفاق" : "تأكيد الدفع",message,confirmText:"تأكيد"});
+      const message = step === "agreement"
+        ? "بتأكيدك، أنت توافق على الخدمة والسعر والمدة والشروط الموضحة."
+        : "هل تؤكد أنك أرسلت المبلغ مباشرة إلى المختص؟";
+      const ok = await window.DPConfirm?.ask({
+        title: step === "agreement" ? "تأكيد الاتفاق" : "تأكيد الدفع",
+        message,
+        confirmText: "تأكيد"
+      });
       if (!ok) return;
+
       button.disabled = true;
-      const { error: rpcError } = await supabase.rpc("confirm_professional_connection_step", {p_request_id:button.dataset.requestId,p_step:step});
+      const { error: rpcError } = await supabase.rpc("confirm_professional_connection_step", {
+        p_request_id: button.dataset.requestId,
+        p_step: step
+      });
       if (rpcError) {
         button.disabled = false;
-        button.insertAdjacentText("afterend", " تعذر التأكيد: " + rpcError.message);
+        button.insertAdjacentHTML("afterend", '<p class="portal-inline-message is-error" role="status">تعذر تسجيل التأكيد: ' + escapeHtml(rpcError.message) + '</p>');
         return;
       }
       state.loadedPanels.delete("portalCareManagementPanel");
       await loadProfessionalCareManagement();
     }));
-  }
 
-  async function loadProfessionalRequests(rootId = "patientProfessionalRequests") {
-    const root = $(rootId);
-    if (!root) return;
-    const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
-    if (error) { root.textContent = "تعذر تحميل طلبات المحادثة."; return; }
-    if (!data?.length) { root.textContent = "لم ترسل طلبات محادثة حتى الآن."; return; }
-    const status = { pending: "طلب المحادثة قيد الانتظار", accepted: "المحادثة مفتوحة · بانتظار الاتفاق والدفع", active: "المتابعة نشطة", ended: "انتهت المتابعة", declined: "لم يتم قبول الطلب", cancelled: "ملغي" };
-    root.className = "portal-plans-list";
-    root.innerHTML = data.map(item => `<article class="portal-plan-card"><div class="portal-plan-head"><div><strong>${escapeHtml(item.professional_name || "مختص")}</strong><small>${escapeHtml(item.professional_title || "")}</small></div><span class="portal-plan-status">${escapeHtml(status[item.status] || item.status)}</span></div>${item.status === "pending" ? `<button type="button" class="portal-primary-button" data-cancel-professional-request="${escapeHtml(item.request_id)}">إلغاء الطلب</button>` : ""}</article>`).join("");
     root.querySelectorAll("[data-cancel-professional-request]").forEach(button => button.addEventListener("click", async () => {
-      const confirmed = await window.DPConfirm?.ask({ title: "إلغاء طلب المحادثة؟", message: "هل تريد إلغاء طلب المحادثة؟", confirmText: "إلغاء الطلب", variant: "danger" });
+      if (button.disabled) return;
+      const confirmed = await window.DPConfirm?.ask({
+        title: "إلغاء طلب المحادثة؟",
+        message: "هل تريد إلغاء هذا الطلب؟",
+        confirmText: "إلغاء الطلب",
+        variant: "danger"
+      });
       if (!confirmed) return;
+
       button.disabled = true;
-      const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", { p_request_id: button.dataset.cancelProfessionalRequest });
-      if (cancelError) { button.disabled = false; root.dataset.error = cancelError.message; return; }
-      await loadProfessionalRequests(rootId);
+      const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", {
+        p_request_id: button.dataset.cancelProfessionalRequest
+      });
+      if (cancelError) {
+        button.disabled = false;
+        button.insertAdjacentHTML("afterend", '<p class="portal-inline-message is-error" role="status">تعذر إلغاء الطلب: ' + escapeHtml(cancelError.message) + '</p>');
+        return;
+      }
+      state.loadedPanels.delete("portalCareManagementPanel");
+      await loadProfessionalCareManagement();
     }));
   }
 
