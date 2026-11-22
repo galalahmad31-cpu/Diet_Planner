@@ -21,7 +21,6 @@
     editingId: null,
     saving: false,
     deleting: false,
-    pendingDeleteId: null,
     feedbacks: []
   };
 
