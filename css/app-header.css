@@ -8,7 +8,7 @@
 }
 .dp-app-header:before{content:"";position:absolute;inset:0 auto 0 0;width:34%;pointer-events:none;background:radial-gradient(circle at 10% 15%,rgba(255,255,255,.12),transparent 48%)}
 .dp-app-header__brand-row,.dp-app-header__brand,.dp-app-header__nav,.dp-app-header__context{position:relative;z-index:1;min-width:0}
-.dp-app-header__brand-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
+.dp-app-header__brand-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:14px;margin-bottom:12px}
 .dp-app-header__brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:#fff}
 .dp-app-header__logo-link{display:inline-flex;flex:0 0 auto;color:inherit;text-decoration:none}
 .dp-app-header__logo{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid rgba(255,255,255,.18);border-radius:15px;background:rgba(255,255,255,.13);font-size:20px}
@@ -51,8 +51,10 @@
   position:absolute;top:2px;inset-inline-start:4px;display:grid;place-items:center;min-width:17px;height:17px;
   padding:0 3px;border:2px solid #087765;border-radius:999px;background:#d94848;color:#fff;font-size:9px;font-weight:900;line-height:1
 }
-.dp-app-header__collapse-hint{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;flex:0 1 auto;min-width:0;max-width:38%;margin:0 auto;padding:5px 10px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.09);color:rgba(255,255,255,.88);font-family:var(--dp-font,Cairo,sans-serif);font-size:10px;font-weight:700;line-height:1.4;text-align:center;pointer-events:none;cursor:default}
-.dp-app-header__collapse-hint i{font-size:11px;opacity:.9}
+.dp-app-header__collapse-toggle{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;justify-self:center;gap:7px;min-width:112px;min-height:32px;margin:0;padding:5px 11px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(255,255,255,.13);color:rgba(255,255,255,.94);font:inherit;font-family:var(--dp-font,Cairo,sans-serif);font-size:10px;font-weight:800;line-height:1;white-space:nowrap;cursor:pointer;transition:background .18s,border-color .18s}
+.dp-app-header__collapse-toggle:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.42)}
+.dp-app-header__collapse-toggle i{font-size:10px;transition:transform .18s ease}
+.dp-app-header.is-collapsed .dp-app-header__collapse-toggle i{transform:rotate(180deg)}
 .dp-app-header:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .dp-app-header__page-title{position:relative;z-index:1;margin-top:8px;color:rgba(255,255,255,.84);font-size:11px;font-weight:700}
 .dp-app-header__page-title:empty{display:none}
@@ -66,7 +68,8 @@
   .dp-app-header__brand-row{gap:7px;margin-bottom:9px}
   .dp-app-header__logo{width:38px;height:38px;flex-basis:38px;border-radius:12px;font-size:17px}
   .dp-app-header__brand{gap:8px}
-  .dp-app-header__collapse-hint{max-width:34%;padding:4px 7px;font-size:8px;gap:4px}
+  .dp-app-header__collapse-toggle{min-width:92px;min-height:28px;padding:4px 7px;font-size:8px;gap:5px}
+  .dp-app-header__collapse-toggle i{font-size:9px}
   .dp-app-header__brand-copy strong{font-size:16px}
   .dp-app-header__brand-copy small{font-size:9px}
   .dp-app-header__account{gap:5px}
