@@ -185,6 +185,12 @@ function updateTabs() {
     tab.setAttribute("aria-selected", String(active));
     tab.tabIndex = active ? 0 : -1;
   });
+
+  const panel = $("sectionsContainer");
+  if (panel) panel.setAttribute(
+    "aria-labelledby",
+    state.activeTab === "patient" ? "patientTab" : "professionalTab"
+  );
 }
 
 function viewHtml(section) {
