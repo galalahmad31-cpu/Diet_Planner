@@ -952,7 +952,7 @@
     history: []
   };
   const sharedHealthLabels = {
-    gender: 'النوع', birth_date: 'تاريخ الميلاد', age: 'العمر', height: 'الطول',
+    name: 'اسم المريض', gender: 'النوع', birth_date: 'تاريخ الميلاد', age: 'العمر', height: 'الطول',
     diagnosis: 'التشخيص', complaints: 'الشكوى'
   };
 
