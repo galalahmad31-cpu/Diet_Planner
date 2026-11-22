@@ -13,5 +13,5 @@
 body.dp-confirm-open{overflow:hidden}
 [data-theme="dark"] .dp-confirm-dialog,body.dark-mode .dp-confirm-dialog{background:var(--dp-surface,#183b38);color:var(--dp-text,#edf5f2);border-color:var(--dp-border,#31534d)}
 [data-theme="dark"] .dp-confirm-dialog p,body.dark-mode .dp-confirm-dialog p{color:var(--dp-muted,#b4c5bf)}
-[data-theme="dark"] .dp-confirm-secondary,body.dark-mode .dp-confirm-secondary{background:var(--dp-soft,#234641);color:var(--dp-text,#edf5f2);border-color:var(--dp-border,#31534d)!important}
+[data-theme="dark"] .dp-confirm-secondary,body.dark-mode .dp-confirm-secondary{background:var(--dp-surface-2,#234641);color:var(--dp-text,#edf5f2);border-color:var(--dp-border,#31534d)!important}
 @media(max-width:420px){.dp-confirm-dialog{padding:19px 16px 15px;border-radius:18px}.dp-confirm-dialog h2{font-size:16px}.dp-confirm-dialog p{font-size:12px}.dp-confirm-actions{margin-top:17px}}
