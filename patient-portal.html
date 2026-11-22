@@ -197,6 +197,18 @@
         </section>
         <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel" hidden>
           <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المهنية التي شاركها المختص المرتبط بك.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
+          <section class="portal-connection-options" aria-labelledby="patientConnectionOptionsTitle">
+            <div class="portal-connection-options__heading"><strong id="patientConnectionOptionsTitle">البدء مع مختص</strong><p>إذا كان لديك كود ربط أرسله المختص، أدخله هنا. أو استعرض دليل المختصين واختر من يناسبك لبدء طلب متابعة.</p></div>
+            <form id="patientProfessionalCodeForm" class="portal-professional-code-form">
+              <label for="patientProfessionalCode">كود الربط المرسل من المختص</label>
+              <div class="portal-professional-code-form__row">
+                <input id="patientProfessionalCode" name="invitationCode" type="text" inputmode="text" autocomplete="off" maxlength="36" dir="ltr" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+                <button type="submit" class="portal-primary-button">تأكيد الكود</button>
+              </div>
+              <p id="patientProfessionalCodeStatus" class="portal-inline-message" role="status" aria-live="polite"></p>
+            </form>
+            <a class="portal-directory-link" href="professional-directory.html"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> استعراض دليل المختصين</a>
+          </section>
           <div id="portalProfessionalPlanUnavailable" class="portal-empty-state" hidden>تظهر هنا الخطط التي يشاركها معك المختص بعد تفعيل المتابعة وتأكيد بدء الاتفاق.</div>
           <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
           <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
@@ -208,18 +220,6 @@
         <section class="portal-section" aria-labelledby="patientCareManagementTitle">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">CARE MANAGEMENT</span><h2 id="patientCareManagementTitle">إدارة المتابعة</h2><p>كل طلب واتفاق في بطاقة واحدة، مع حالة واضحة وإجراءات المرحلة الحالية فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-handshake"></i></span></div>
           <div id="patientCareManagementContent" class="portal-care-management-list">جاري تحميل طلبات المتابعة...</div>
-          <section class="portal-connection-options" aria-labelledby="patientConnectionOptionsTitle">
-            <div class="portal-connection-options__heading"><strong id="patientConnectionOptionsTitle">ربط حسابك بمختص</strong><p>إذا أرسل لك مختص كود ربط، أدخله هنا. أو اختر مختصًا من الدليل وأرسل طلب متابعة.</p></div>
-            <form id="patientProfessionalCodeForm" class="portal-professional-code-form">
-              <label for="patientProfessionalCode">كود الربط المرسل من المختص</label>
-              <div class="portal-professional-code-form__row">
-                <input id="patientProfessionalCode" name="invitationCode" type="text" inputmode="text" autocomplete="off" maxlength="36" dir="ltr" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
-                <button type="submit" class="portal-primary-button">تأكيد الكود</button>
-              </div>
-              <p id="patientProfessionalCodeStatus" class="portal-inline-message" role="status" aria-live="polite"></p>
-            </form>
-            <a class="portal-directory-link" href="professional-directory.html"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> استعراض دليل المختصين</a>
-          </section>
         </section>
         <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>المحادثات والرسائل في مكان واحد، دون تكرار بيانات الاتفاق.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
