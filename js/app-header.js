@@ -22,7 +22,6 @@
     ["patient-portal.html#portalHome", "الرئيسية", "fa-house"],
     ["patient-portal.html#portalContent", "الملف الصحي", "fa-heart-pulse"],
     ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
-    ["patient-portal.html#portalDietBuilder", "صمم نظامك الغذائي", "fa-bowl-food"],
     ["article.html", "المقالات", "fa-newspaper"],
     ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
