@@ -65,15 +65,7 @@ function formatISODate(date) {
 
 const addMonths = window.DPDate.addMonths;
 
-function fmt(value) {
-    if (!value) return '—';
-
-    const [y, m, d] = String(value).slice(0, 10).split('-');
-    if (!y || !m || !d) return '—';
-
-    return `${d}/${m}/${y}`;
-}
-
+const fmt = window.DPDate.formatDMY;
 /* =========================================================
    General helpers
    ========================================================= */
