@@ -41,7 +41,7 @@
     root.innerHTML = `
       <div class="patient-appointments-shell">
         <div class="patient-appointments-heading">
-          <div><strong>${role === "patient" ? "مواعيدي" : "مواعيد المريض"}</strong><small>${role === "patient" ? "أرسل طلب موعد وانتظر تأكيد المختص" : "راجع طلبات المواعيد وأكد المناسب منها"}</small></div>
+          <div><strong>${role === "patient" ? "مواعيدي" : "مواعيد المريض"}</strong><small>${role === "patient" ? "أرسل طلب موعد وانتظر تأكيد المختص" : "سجل المواعيد المتفق عليها وراجع طلبات المرضى"}</small></div>
           <button type="button" data-appointment-refresh><i class="fa-solid fa-rotate"></i> تحديث</button>
         </div>
         ${role === "patient" ? `
