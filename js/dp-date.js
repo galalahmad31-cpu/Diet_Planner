@@ -30,5 +30,26 @@
     return Math.round((targetUtc - referenceUtc) / 86400000);
   }
 
-  window.DPDate = Object.freeze({ dateKey, todayKey, daysUntil });
+  function addMonths(value, months) {
+    const key = dateKey(value);
+    const monthCount = Number(months);
+    if (!key || !Number.isFinite(monthCount) || monthCount === 0) return "";
+
+    const [year, month, day] = key.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setMonth(date.getMonth() + monthCount);
+
+    if (!Number.isFinite(date.getTime())) return "";
+
+    // Preserve the source date's day when possible; otherwise use month end.
+    if (date.getDate() !== day) date.setDate(0);
+
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0")
+    ].join("-");
+  }
+
+  window.DPDate = Object.freeze({ dateKey, todayKey, daysUntil, addMonths });
 })();
