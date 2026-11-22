@@ -1065,10 +1065,7 @@
 
     if (state.messagesMountedFor !== state.patientId) {
       state.messagesMountedFor = state.patientId;
-      void window.DietPlannerPatientMessages?.mount($("patientPortalMessages"), {
-        patientId: state.patientId,
-        role: "patient"
-      });
+      void window.DietPlannerPatientMessages?.mountInbox($("patientPortalMessages"), { patientId: state.patientId, role: "patient" });
     }
   }
 
