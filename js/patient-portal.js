@@ -522,6 +522,41 @@
       (hasAgreement ? '<p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p>' : '') + '</div></details>';
   }
 
+  async function savePatientRecordName() {
+    const input = $("sharedHealthName");
+    const button = $("savePatientRecordName");
+    const name = input?.value.trim() || "";
+    if (!isValidPatientId(state.patientId) || !button || !input) return;
+    if (name.length < 2 || name.length > 120) {
+      setMessage("patientRecordNameStatus", "الاسم يجب أن يكون من 2 إلى 120 حرفًا.", "error");
+      return;
+    }
+
+    button.disabled = true;
+    setMessage("patientRecordNameStatus", "جاري حفظ الاسم...");
+    try {
+      const { data, error } = await supabase.rpc("update_my_patient_record_name", {
+        p_patient_id: state.patientId,
+        p_name: name
+      });
+      if (error) throw error;
+      state.patient = { ...state.patient, name: data?.name || name };
+      input.value = state.patient.name;
+      setMessage("patientRecordNameStatus", "تم تحديث اسم المريض بنجاح.", "success");
+      await loadSharedHealthRecord();
+    } catch (error) {
+      console.error("Patient record name update failed:", error);
+      const message = error.message === "patient_record_access_denied"
+        ? "لا تملك صلاحية تعديل هذا الملف."
+        : error.message === "invalid_patient_name"
+          ? "الاسم يجب أن يكون من 2 إلى 120 حرفًا."
+          : (error.message || "تعذر حفظ الاسم.");
+      setMessage("patientRecordNameStatus", message, "error");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
   function renderSharedHealthForm() {
     const patient = state.patient || {};
     $("sharedHealthName").value = patient.name || "";
@@ -548,7 +583,7 @@
       .eq("patient_id", state.patientId).order("created_at", { ascending: false }).limit(100);
     if (error) throw error;
     status.textContent = "يمكنك مراجعة بياناتك الأساسية وتحديثها. يحتفظ النظام بسجل لمن قام بالتعديل ووقته.";
-    const labels = {gender:"النوع",birth_date:"تاريخ الميلاد",age:"العمر",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
+    const labels = {name:"اسم المريض",gender:"النوع",birth_date:"تاريخ الميلاد",age:"العمر",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
     const healthEvents = (data || []).filter(item =>
       (item.changed_fields || []).some(field => Object.prototype.hasOwnProperty.call(labels, field))
     ).slice(0, 30);
@@ -1144,6 +1179,7 @@
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
     $("patientSharedHealthForm")?.addEventListener("submit", saveSharedHealthRecord);
+    $("savePatientRecordName")?.addEventListener("click", savePatientRecordName);
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab(tab.dataset.planTab)));
     const initialSection = window.location.hash.slice(1);
