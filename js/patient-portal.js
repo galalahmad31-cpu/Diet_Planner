@@ -19,6 +19,11 @@
     node.className = "portal-inline-message" + (type ? " is-" + type : "");
   }
 
+  function isValidPatientId(value) {
+    return typeof value === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  }
+
   function showOnly(id) {
     ["portalLoading", "portalError", "portalUnlinked"].forEach(key => { if ($(key)) $(key).hidden = key !== id; });
     if ($("portalContent")) $("portalContent").hidden = id !== "portalContent";
@@ -222,6 +227,9 @@
   }
 
   async function loadPatient() {
+    if (!isValidPatientId(state.patientId)) {
+      throw new Error("معرّف الملف الصحي غير صالح. أعد تحميل بوابة المريض أو أعد ربط الحساب.");
+    }
     const { data, error } = await supabase
       .from("patients")
       .select("id,name,gender,birth_date,age,height,diagnosis,complaints")
@@ -553,6 +561,12 @@
   async function loadSharedHealthRecord() {
     const status = $("patientSharedHealthStatus");
     const history = $("patientHealthAuditList");
+    if (!isValidPatientId(state.patientId)) {
+      const message = "تعذر تحديد ملفك الصحي المرتبط. أعد تحميل الصفحة، وإذا استمرت المشكلة تواصل مع الدعم.";
+      if (status) setMessage("patientSharedHealthStatus", message, "error");
+      if (history) history.textContent = message;
+      throw new Error("Invalid patient UUID in patient portal shared health loader.");
+    }
     status.textContent = "جاري تحميل البيانات الصحية...";
     renderSharedHealthForm();
     const { data, error } = await supabase.from("patient_health_audit")
@@ -576,7 +590,12 @@
   async function saveSharedHealthRecord(event) {
     event.preventDefault();
     const form = $("patientSharedHealthForm");
-    const button = form.querySelector('button[type="submit"]');
+    const button = form?.querySelector('button[type="submit"]');
+    if (!isValidPatientId(state.patientId)) {
+      setMessage("patientSharedHealthStatus", "تعذر حفظ البيانات لأن ملف المريض غير محدد بشكل صحيح. أعد تحميل البوابة.", "error");
+      return;
+    }
+    if (!form || !button) return;
     const raw = $("sharedHealthHeight").value.trim();
     const height = raw === "" ? null : Number(raw);
     if (height !== null && (!Number.isFinite(height) || height < 30 || height > 260)) {
@@ -998,6 +1017,10 @@
     }
 
     const nextPatientId = account.patient_id;
+    if (!isValidPatientId(nextPatientId)) {
+      state.patientId = null;
+      throw new Error("بيانات ربط حساب المريض غير مكتملة أو غير صالحة. يرجى التواصل مع الدعم.");
+    }
     if (state.patientId !== nextPatientId) {
       state.loadedPanels.clear();
       state.loadingPanels.clear();
