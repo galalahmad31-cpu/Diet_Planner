@@ -7,7 +7,6 @@ const $ = (id) => document.getElementById(id);
 let user = null;
 let rows = [];
 let selected = null;
-let pendingFollowUpPatient = null;
 let toastTimer = null;
 
 async function refreshFinanceWriteAccess() {
@@ -217,124 +216,140 @@ async function loadData() {
    Patient cards
    ========================================================= */
 
+function getDiscountedSubscriptionAmount(finance) {
+    if (Number.isFinite(Number(finance.discounted_amount)) && finance.discounted_amount !== null) {
+        return Math.max(0, Number(finance.discounted_amount));
+    }
+    if (finance.subscription_amount === null || finance.subscription_amount === undefined || finance.subscription_amount === '') return null;
+    const amount = Number(finance.subscription_amount);
+    const discount = Number(finance.discount_percent || 0);
+    if (!Number.isFinite(amount) || amount < 0 || !Number.isFinite(discount)) return null;
+    return Math.max(0, amount * (1 - discount / 100));
+}
+
+function formatMoney(value) {
+    if (value === null || !Number.isFinite(value)) return '—';
+    return new Intl.NumberFormat('ar-EG', { maximumFractionDigits: 2 }).format(value) + ' ج.م';
+}
+
+function getFinancePeriodRange() {
+    const mode = $('financePeriod').value;
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    if (mode === 'previous') {
+        start.setMonth(start.getMonth() - 1);
+        end.setFullYear(start.getFullYear(), start.getMonth() + 1, 0);
+    } else if (mode === '3months' || mode === '6months') {
+        start.setMonth(start.getMonth() - (mode === '3months' ? 2 : 5));
+    } else if (mode === 'year') {
+        start.setMonth(0, 1);
+    } else if (mode === 'custom') {
+        return { from: $('financeFrom').value, to: $('financeTo').value };
+    }
+    return { from: formatISODate(start), to: formatISODate(end) };
+}
+
+function updateFinancialSummary() {
+    const range = getFinancePeriodRange();
+    const custom = $('financePeriod').value === 'custom';
+    const validRange = range.from && range.to && range.from <= range.to;
+    const periodRows = validRange ? rows.filter((row) => {
+        const start = String(row.finance.subscription_start_date || '').slice(0, 10);
+        return start && start >= range.from && start <= range.to;
+    }) : [];
+    let total = 0, paid = 0, unpaid = 0, knownAmounts = 0;
+    periodRows.forEach((row) => {
+        const amount = getDiscountedSubscriptionAmount(row.finance);
+        if (amount === null) return;
+        knownAmounts++;
+        total += amount;
+        if (row.finance.is_paid) paid += amount;
+        else unpaid += amount;
+    });
+    $('periodTotal').textContent = validRange && knownAmounts ? formatMoney(total) : '—';
+    $('periodPaid').textContent = validRange && knownAmounts ? formatMoney(paid) : '—';
+    $('periodUnpaid').textContent = validRange && knownAmounts ? formatMoney(unpaid) : '—';
+    $('periodCount').textContent = validRange ? String(periodRows.length) : '—';
+    $('financeCustomRange').hidden = !custom;
+    const invalid = custom && range.from && range.to && range.from > range.to;
+    $('periodTotal').title = invalid ? 'تاريخ البداية يجب أن يسبق تاريخ النهاية.' : '';
+}
+
 function renderPatients() {
     const query = $('search').value.trim().toLowerCase();
-
-    const visibleRows = rows.filter((row) =>
-        !query || String(row.name || '').toLowerCase().includes(query)
-    );
-
-    const grid = $('grid');
-    grid.innerHTML = '';
-
-    $('empty').classList.toggle('hidden', visibleRows.length > 0);
-
-    let paid = 0;
-    let unpaid = 0;
-    let expired = 0;
-
-    rows.forEach((row) => {
+    const statusFilter = $('statusFilter').value;
+    const sortMode = $('sortPatients').value;
+    const today = todayISO();
+    const visibleRows = rows.filter((row) => {
         const finance = row.finance;
-
-        if (finance.is_paid) {
-            paid++;
-        } else {
-            unpaid++;
-        }
-
-        if (
-            finance.subscription_end_date &&
-            finance.subscription_end_date < todayISO()
-        ) {
-            expired++;
-        }
+        const matchesName = !query || String(row.name || '').toLowerCase().includes(query);
+        const expired = Boolean(finance.subscription_end_date && finance.subscription_end_date < today);
+        const paid = Boolean(finance.is_paid);
+        const matchesStatus = statusFilter === 'all' ||
+            (statusFilter === 'active' && !expired) ||
+            (statusFilter === 'expired' && expired) ||
+            (statusFilter === 'paid' && paid) ||
+            (statusFilter === 'unpaid' && !paid);
+        return matchesName && matchesStatus;
     });
 
+    visibleRows.sort((a, b) => {
+        if (sortMode === 'end-asc') return String(a.finance.subscription_end_date || '9999-12-31').localeCompare(String(b.finance.subscription_end_date || '9999-12-31'));
+        if (sortMode === 'due-desc') return (getDiscountedSubscriptionAmount(b.finance) || 0) * Number(!b.finance.is_paid) - (getDiscountedSubscriptionAmount(a.finance) || 0) * Number(!a.finance.is_paid);
+        return String(a.name || '').localeCompare(String(b.name || ''), 'ar');
+    });
+
+    const grid = $('grid');
+    grid.replaceChildren();
+    $('empty').classList.toggle('hidden', visibleRows.length > 0);
+
+    let paidCount = 0, unpaidCount = 0, expiredCount = 0, activeCount = 0;
+    rows.forEach((row) => {
+        const finance = row.finance;
+        const expired = Boolean(finance.subscription_end_date && finance.subscription_end_date < today);
+        if (finance.is_paid) paidCount++; else unpaidCount++;
+        if (expired) expiredCount++; else if (finance.subscription_end_date) activeCount++;
+    });
     $('totalCount').textContent = rows.length;
-    $('paidCount').textContent = paid;
-    $('unpaidCount').textContent = unpaid;
-    $('expiredCount').textContent = expired;
+    $('activeCount').textContent = activeCount;
+    $('unpaidCount').textContent = unpaidCount;
+    $('expiredCount').textContent = expiredCount;
+    updateFinancialSummary();
 
     visibleRows.forEach((row) => {
         const finance = row.finance;
         const [statusText, statusClass] = getSubscriptionStatus(finance);
-
-        const card = document.createElement('div');
+        const amount = getDiscountedSubscriptionAmount(finance);
+        const remaining = amount === null ? null : (finance.is_paid ? 0 : amount);
+        const card = document.createElement('article');
         card.className = 'card glass rounded-3xl p-5 text-right shadow-sm cursor-pointer';
         card.dataset.id = row.id;
-
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', 'فتح بيانات اشتراك ' + row.name);
         card.innerHTML = `
             <div class="flex items-start justify-between gap-3">
                 <div class="flex min-w-0 items-center gap-3">
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <h3 class="truncate text-lg font-extrabold text-slate-800">${esc(row.name)}</h3>
-                        <p class="mt-1 text-xs text-slate-400">بيانات الاشتراك</p>
-                    </div>
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600"><i class="fa-solid fa-user"></i></div>
+                    <div class="min-w-0"><h3 class="truncate text-base font-extrabold text-slate-800">${esc(row.name)}</h3><p class="mt-1 text-xs text-slate-400">بيانات الاشتراك</p></div>
                 </div>
-
-                <span class="shrink-0 rounded-full px-3 py-1 text-[11px] font-bold ${statusClass}">
-                    ${statusText}
-                </span>
+                <span class="shrink-0 rounded-full px-3 py-1 text-[11px] font-bold ${statusClass}">${statusText}</span>
             </div>
-
-            <div class="mt-5 grid grid-cols-2 gap-3 border-t pt-4">
-                <div>
-                    <div class="text-[11px] text-slate-400">بداية الاشتراك</div>
-                    <div class="mt-1 text-sm font-bold">${fmt(finance.subscription_start_date)}</div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] text-slate-400">المدة</div>
-                    <div class="mt-1 text-sm font-bold">
-                        ${finance.subscription_months ? `${esc(finance.subscription_months)} شهر` : '—'}
-                    </div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] text-slate-400">تاريخ انتهاء الاشتراك</div>
-                    <div class="mt-1 text-sm font-bold">${fmt(finance.subscription_end_date)}</div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] text-slate-400">السداد</div>
-                    <div class="mt-1 text-sm font-bold">${finance.is_paid ? 'نعم' : 'لا'}</div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] text-slate-400">آخر زيارة فعلية</div>
-                    <div class="mt-1 text-sm font-bold">${fmt(finance.last_visit_date)}</div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] text-slate-400">موعد المتابعة القادم</div>
-                    <div class="mt-1 text-sm font-bold">${fmt(finance.next_follow_up_date)}</div>
-                </div>
+            <div class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t pt-4">
+                <div><div class="text-[11px] text-slate-400">قيمة الاشتراك</div><div class="mt-1 text-sm font-extrabold">${formatMoney(amount)}</div></div>
+                <div><div class="text-[11px] text-slate-400">المتبقي</div><div class="mt-1 text-sm font-extrabold ${remaining > 0 ? 'text-amber-700' : 'text-emerald-700'}">${formatMoney(remaining)}</div></div>
+                <div><div class="text-[11px] text-slate-400">مدة الاشتراك</div><div class="mt-1 text-sm font-bold">${finance.subscription_months ? esc(finance.subscription_months) + ' شهر' : '—'}</div></div>
+                <div><div class="text-[11px] text-slate-400">حالة السداد</div><div class="mt-1 text-sm font-bold">${finance.is_paid ? 'مسدد' : 'غير مسدد'}</div></div>
+                <div><div class="text-[11px] text-slate-400">تاريخ البداية</div><div class="mt-1 text-sm font-bold">${fmt(finance.subscription_start_date)}</div></div>
+                <div><div class="text-[11px] text-slate-400">تاريخ الانتهاء</div><div class="mt-1 text-sm font-bold">${fmt(finance.subscription_end_date)}</div></div>
+                <div><div class="text-[11px] text-slate-400">آخر زيارة</div><div class="mt-1 text-sm font-bold">${fmt(finance.last_visit_date)}</div></div>
+                <div><div class="text-[11px] text-slate-400">موعد المتابعة القادم</div><div class="mt-1 text-sm font-bold">${fmt(finance.next_follow_up_date)}</div></div>
             </div>
-
-            <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <span class="text-xs font-bold text-brand-600">
-                    <i class="fa-solid fa-pen ml-1"></i>
-                    فتح بيانات الاشتراك
-                </span>
-
-                <button
-                    type="button"
-                    class="follow-btn inline-flex h-9 items-center justify-center rounded-xl bg-brand-50 px-3 text-xs font-extrabold text-brand-700"
-                    data-follow="${esc(row.id)}"
-                >
-                    <i class="fa-solid fa-calendar-check ml-1"></i>
-                    تسجيل حضور المتابعة
-                </button>
-            </div>
-        `;
-
+            <div class="mt-4 border-t pt-3 text-xs font-extrabold text-brand-700"><i class="fa-solid fa-pen ml-1"></i>فتح بيانات الاشتراك</div>`;
         grid.appendChild(card);
     });
 }
-
 /* =========================================================
    Subscription modal
    ========================================================= */
@@ -367,56 +382,6 @@ function closeFinanceModal() {
     selected = null;
     $('editModal').classList.add('hidden');
     document.body.classList.remove('overflow-hidden');
-}
-
-/* =========================================================
-   Follow-up attendance modal
-   ========================================================= */
-
-function openFollowUpConfirmation(patientId) {
-    const row = rows.find((item) => item.id === patientId);
-
-    if (!row) return;
-
-    pendingFollowUpPatient = patientId;
-    $('followVisitDate').value = todayISO();
-
-    $('followConfirm').classList.remove('hidden');
-    $('followConfirm').classList.add('flex');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeFollowUpConfirmation() {
-    pendingFollowUpPatient = null;
-    $('followConfirm').classList.add('hidden');
-    $('followConfirm').classList.remove('flex');
-    document.body.classList.remove('overflow-hidden');
-}
-
-async function recordAttendance(patientId, actualVisitDate) {
-    if (!canWriteFinance()) { showFinanceAccessMessage(); return; }
-    const row = rows.find((item) => item.id === patientId);
-
-    if (!row) return;
-
-    const visitDate = actualVisitDate || todayISO();
-
-    const { error } = await supabase
-        .from('patient_finances')
-        .upsert({
-            patient_id: patientId,
-            user_id: user.id,
-            last_visit_date: visitDate
-        }, { onConflict: 'patient_id' });
-
-    if (error) {
-        console.error(error);
-        showToast(error.message || 'تعذر تسجيل الحضور.', true);
-        return;
-    }
-
-    showToast('تم تسجيل الحضور. أدخل موعد المتابعة القادم يدويًا من بيانات الاشتراك.');
-    await loadData();
 }
 
 /* =========================================================
@@ -540,25 +505,23 @@ async function deleteFinance() {
 
 function bindEvents() {
     $('search').addEventListener('input', renderPatients);
+    $('statusFilter').addEventListener('change', renderPatients);
+    $('sortPatients').addEventListener('change', renderPatients);
+    $('financePeriod').addEventListener('change', () => { updateFinancialSummary(); });
+    $('financeFrom').addEventListener('change', updateFinancialSummary);
+    $('financeTo').addEventListener('change', updateFinancialSummary);
 
     $('grid').addEventListener('click', (event) => {
-        const followButton = event.target.closest('[data-follow]');
-
-        if (followButton) {
-            event.preventDefault();
-            event.stopPropagation();
-            openFollowUpConfirmation(followButton.dataset.follow);
-            return;
-        }
-
         const card = event.target.closest('[data-id]');
-
         if (!card) return;
-
         const row = rows.find((item) => item.id === card.dataset.id);
-
-        if (row) {
-            openFinanceModal(row);
+        if (row) openFinanceModal(row);
+    });
+    $('grid').addEventListener('keydown', (event) => {
+        if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-id]')) {
+            event.preventDefault();
+            const row = rows.find((item) => item.id === event.target.dataset.id);
+            if (row) openFinanceModal(row);
         }
     });
 
@@ -566,57 +529,22 @@ function bindEvents() {
     $('cancel').addEventListener('click', closeFinanceModal);
     $('deleteFinance').addEventListener('click', openDeleteConfirmation);
     $('deleteNo').addEventListener('click', closeDeleteConfirmation);
-
     $('deleteConfirm').addEventListener('click', (event) => {
-        if (event.target === $('deleteConfirm')) {
-            closeDeleteConfirmation();
-        }
+        if (event.target === $('deleteConfirm')) closeDeleteConfirmation();
     });
-
     $('deleteYes').setAttribute('data-finance-write','true');
     $('deleteYes').addEventListener('click', deleteFinance);
-
     $('editModal').addEventListener('click', (event) => {
-        if (event.target === $('editModal')) {
-            closeFinanceModal();
-        }
+        if (event.target === $('editModal')) closeFinanceModal();
     });
-
     $('startDate').addEventListener('input', updateSubscriptionPreview);
     $('months').addEventListener('input', updateSubscriptionPreview);
-
     $('amount').addEventListener('input', updateDiscountPreview);
     $('discount').addEventListener('input', updateDiscountPreview);
-
     $('paid').addEventListener('change', updatePaymentText);
-
-    $('followNo').addEventListener('click', closeFollowUpConfirmation);
-
-    $('followConfirm').addEventListener('click', (event) => {
-        if (event.target === $('followConfirm')) {
-            closeFollowUpConfirmation();
-        }
-    });
-
-    $('followYes').addEventListener('click', async () => {
-        if (!pendingFollowUpPatient) return;
-
-        const patientId = pendingFollowUpPatient;
-        const visitDate = $('followVisitDate').value;
-
-        if (!visitDate) {
-            showToast('اختر تاريخ الحضور.', true);
-            return;
-        }
-
-        closeFollowUpConfirmation();
-        await recordAttendance(patientId, visitDate);
-    });
-
     $('save').setAttribute('data-finance-write','true');
     $('save').addEventListener('click', saveFinance);
 }
-
 /* =========================================================
    App start
    ========================================================= */
