@@ -1629,7 +1629,7 @@ html[data-theme="dark"] :is(
   .patient-finance-readonly output,.patient-finance-discounted output
 ){background:var(--dp-surface-3)!important;color:var(--dp-text)!important}
 
-/* Patient energy calculator: every nested surface and field uses shared tokens. */
+/* Patient energy calculator — centralized dark palette using shared semantic tokens. */
 html[data-theme="dark"] #patientEnergyPanel{
   background:var(--dp-bg)!important;
   color:var(--dp-text)!important;
@@ -1637,8 +1637,7 @@ html[data-theme="dark"] #patientEnergyPanel{
 }
 html[data-theme="dark"] #patientEnergyPanel #calcTab :is(
   .energy-workspace,.macro-workspace,.patient-inputs>div,.activity-row,
-  .energy-results>div,.energy-results .primary,.schofield-note,
-  .target-energy,.target-adjustment,.macro-item,.equation-switch
+  .energy-results>div,.target-energy,.target-adjustment,.equation-switch
 ){
   background:var(--dp-surface)!important;
   color:var(--dp-text)!important;
@@ -1675,8 +1674,22 @@ html[data-theme="dark"] #patientEnergyPanel #calcTab :is(
   background:color-mix(in srgb,var(--dp-success) 13%,var(--dp-surface))!important;
   border-color:var(--dp-success)!important;
 }
+html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-item.protein{
+  background:color-mix(in srgb,var(--dp-success) 15%,var(--dp-surface))!important;
+  border-color:color-mix(in srgb,var(--dp-success) 38%,var(--dp-border))!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-item.carbs{
+  background:color-mix(in srgb,var(--dp-info) 15%,var(--dp-surface))!important;
+  border-color:color-mix(in srgb,var(--dp-info) 38%,var(--dp-border))!important;
+}
+html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-item.fats{
+  background:color-mix(in srgb,var(--dp-warning) 15%,var(--dp-surface))!important;
+  border-color:color-mix(in srgb,var(--dp-warning) 38%,var(--dp-border))!important;
+}
 html[data-theme="dark"] #patientEnergyPanel #calcTab .macro-alert{
-  background:#351d23!important;color:#fda4af!important;border-color:#6b343d!important;
+  background:color-mix(in srgb,var(--dp-danger) 15%,var(--dp-surface))!important;
+  color:var(--dp-danger)!important;
+  border-color:color-mix(in srgb,var(--dp-danger) 40%,var(--dp-border))!important;
 }
 
 /* Visit editor: both standalone and patient-profile iframe share the same theme. */
