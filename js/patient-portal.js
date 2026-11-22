@@ -766,7 +766,6 @@
     const tdd = Number(tddInput), current = Number(currentInput), target = Number(targetInput);
     const carbs = Number(carbsInput), manualIcr = Number(icrInput);
     const outputs = {
-      tdd: $("portalInsulinTddResult"),
       icr: $("portalInsulinIcrResult"),
       isf: $("portalInsulinIsfResult"),
       difference: $("portalGlucoseDifference"),
@@ -806,7 +805,6 @@
       mealIcrInput.value = insulinMealIcrOverrides[mealKey] ? String(insulinMealIcrOverrides[mealKey]) : "";
       mealIcrInput.placeholder = startingIcr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " (ابتدائي)";
     }
-    show(outputs.tdd, tdd.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " وحدة");
     show(outputs.icr, "1 وحدة لكل " + startingIcr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
     show(outputs.isf, "1 وحدة لكل " + isf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " mg/dL");
 
