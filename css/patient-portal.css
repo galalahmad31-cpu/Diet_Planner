@@ -277,3 +277,15 @@
 .portal-care-agreement__details-wrap .portal-care-agreement__details{margin-top:0}
 .portal-care-agreement__body .portal-care-agreement__actions{display:flex;gap:7px;flex-wrap:wrap}
 @media(max-width:600px){.portal-care-professional>summary{padding:11px}.portal-care-professional__agreements{padding:0 7px 7px}.portal-care-agreement>summary{padding:10px}.portal-care-agreement__body{padding:0 9px 10px}}
+
+/* Patient-to-professional connection entry point */
+.portal-connection-options{margin-top:16px;padding:18px;border:1px solid var(--portal-line);border-radius:16px;background:var(--portal-bg)}
+.portal-connection-options__heading strong{display:block;font-size:13px;font-weight:900;color:var(--portal-ink)}
+.portal-connection-options__heading p{margin:4px 0 13px;color:var(--portal-muted);font-size:11px;line-height:1.8}
+.portal-professional-code-form label{display:block;margin-bottom:6px;color:var(--portal-muted);font-size:10px;font-weight:800}
+.portal-professional-code-form__row{display:flex;gap:8px;align-items:stretch}
+.portal-professional-code-form__row input{flex:1;min-width:0;border:1px solid var(--portal-line);border-radius:10px;background:var(--portal-card);color:var(--portal-ink);padding:10px 12px;font:12px Arial,sans-serif}
+.portal-professional-code-form__row input:focus{outline:2px solid color-mix(in srgb,var(--portal-accent) 25%,transparent);border-color:var(--portal-accent)}
+.portal-directory-link{display:inline-flex;align-items:center;gap:7px;margin-top:10px;color:var(--portal-accent);font-size:11px;font-weight:900;text-decoration:none}
+.portal-directory-link:hover{text-decoration:underline}
+@media(max-width:560px){.portal-professional-code-form__row{flex-direction:column}.portal-professional-code-form__row .portal-primary-button{width:100%}}
