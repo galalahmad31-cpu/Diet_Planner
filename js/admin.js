@@ -37,12 +37,13 @@ async function requireAdmin(){
 async function loadAll(){
  const {data,error}=await sb.from('subscription_plans').select('*').order('created_at',{ascending:true});
  if(error)throw error;state.plans=data||[];renderPlans();
- await Promise.all([loadRequests(),loadDoctors(),loadAnnouncements()]);
+ await Promise.all([loadRequests(),loadAnnouncements()]);
+ if(state.activeTab==='doctors')await loadDoctors();
 }
 function cleanSearch(value){return String(value||'').trim().replace(/[%,()\\]/g,' ').replace(/\\s+/g,' ').slice(0,100)}
 async function matchingProfileIds(term){
  if(!term)return null;
- const {data,error}=await sb.from('profiles').select('id').or(`full_name.ilike.%${term}%,email.ilike.%${term}%,phone.ilike.%${term}%`).limit(500);
+ const {data,error}=await sb.from('profiles').select('id').or(`full_name.ilike.%${term}%,email.ilike.%${term}%,phone.ilike.%${term}%`).limit(1000);
  if(error)throw error;return (data||[]).map(row=>row.id).filter(Boolean);
 }
 function applyRequestFilters(query,status,term,profileIds){
@@ -210,7 +211,7 @@ function openSubAssignment(profile){
 }
 async function saveSub(s){
  const selectedPlan=state.plans.find(p=>p.id===$('s_plan').value);
- const profile=state.profiles.find(p=>p.id===s.user_id);
+ const profile=findProfile(s.user_id);
  if(!profile){toast('تعذر تحديد حساب المستخدم المرتبط بالاشتراك.');return}
  const newRole=$('s_role').value;
  if(!['user','admin'].includes(newRole)){toast('الدور المحدد غير صالح.');return}
@@ -441,7 +442,7 @@ $('doctorsBody').onclick=e=>{
  const edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-del-sub]'),add=e.target.closest('[data-add-sub]');
  if(edit){const s=state.doctorSubs.find(x=>x.id===edit.dataset.editSub);if(s)openSub(s)}
  else if(del){const s=state.doctorSubs.find(x=>x.id===del.dataset.delSub);if(s)deleteSubscription(s)}
- else if(add){const profile=state.profiles.find(x=>x.id===add.dataset.addSub);if(profile)openSubAssignment(profile)}
+ else if(add){const profile=state.doctorProfiles.find(x=>x.id===add.dataset.addSub);if(profile)openSubAssignment(profile)}
 };
 
 (async function init(){try{if(await requireAdmin())await loadAll()}catch(e){console.error(e);['request','plan','doctor'].forEach(x=>setState(x,e.message||'حدث خطأ'))}})();
