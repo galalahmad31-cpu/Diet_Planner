@@ -18,6 +18,10 @@
     isEditing: false,
     isSaving: false,
     isCreatingPlan: false,
+    patientCareMode: null,
+    patientFinance: null,
+    patientFinanceEditing: false,
+    patientFinanceLoading: false,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -71,9 +75,7 @@
       updateWriteControls();
     } finally {
       if (state.user?.id) {
-        await loadProfessionalAgreementStatus();
-        await loadCareAgreementPanel();
-        mountProfessionalAppointments();
+        if (state.patient) await loadPatientCareMode();
         await loadSharedHealthHistory();
       }
     }
@@ -184,6 +186,7 @@
 
     state.patient = data;
     fillPatientData();
+    if (state.user?.id) void loadPatientCareMode();
 
     // Reveal the loaded patient immediately. Access checks and secondary modules
     // run afterward and cannot block the main patient record.
@@ -1084,6 +1087,251 @@
       updateSharedHealthWriteState();
     }
   }
+  const patientFinanceFields = [
+    'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
+    'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollowUp'
+  ];
+
+  function setPatientCareView(mode) {
+    const linked = mode === 'linked';
+    const linkedView = $('patientLinkedCareView');
+    const financeView = $('patientLegacyFinanceView');
+    if (linkedView) linkedView.hidden = !linked;
+    if (financeView) financeView.hidden = linked;
+    state.patientCareMode = mode;
+  }
+
+  async function loadPatientCareMode() {
+    if (!patientId || !state.user?.id || !state.patient || state.patientCareMode) return;
+    const root = $('patientCareDetails');
+    try {
+      const [requestsResult, careTeamResult] = await Promise.all([
+        supabase.from('professional_connection_requests')
+          .select('id')
+          .eq('patient_id', patientId)
+          .in('status', ['accepted', 'active'])
+          .limit(1),
+        supabase.from('patient_care_team')
+          .select('id')
+          .eq('patient_id', patientId)
+          .eq('status', 'active')
+          .limit(1)
+      ]);
+      if (requestsResult.error) throw requestsResult.error;
+      if (careTeamResult.error) throw careTeamResult.error;
+
+      const linked = Boolean((requestsResult.data || []).length || (careTeamResult.data || []).length);
+      setPatientCareView(linked ? 'linked' : 'unlinked');
+
+      if (linked) {
+        await loadProfessionalAgreementStatus();
+        await loadCareAgreementPanel();
+        mountProfessionalAppointments();
+      } else {
+        await loadPatientLegacyFinance();
+      }
+    } catch (error) {
+      console.error('Patient care mode resolution failed:', error);
+      if (root) root.hidden = true;
+      const financeError = $('patientFinanceError');
+      if (financeError) {
+        financeError.hidden = false;
+        financeError.textContent = 'تعذر تحديد حالة ارتباط المريض؛ تم إيقاف عرض البيانات المالية مؤقتًا لحماية البيانات.';
+      }
+    }
+  }
+
+  function formatFinanceAmount(value) {
+    if (value === null || value === undefined || value === '') return '—';
+    return Number(value).toLocaleString('ar-EG', { maximumFractionDigits: 2 }) + ' جنيه';
+  }
+
+  function updatePatientFinancePreview() {
+    const amountRaw = $('pfInputAmount')?.value ?? '';
+    const discountRaw = $('pfInputDiscount')?.value ?? '0';
+    const amount = amountRaw === '' ? null : Number(amountRaw);
+    const discount = Number(discountRaw || 0);
+    const preview = $('pfInputDiscountedPreview');
+    if (preview) {
+      preview.textContent = amount === null || !Number.isFinite(amount) || !Number.isFinite(discount)
+        ? '—'
+        : formatFinanceAmount(Math.max(0, amount * (1 - discount / 100)));
+    }
+
+    const startValue = $('pfInputStart')?.value;
+    const months = Number($('pfInputMonths')?.value);
+    const end = $('pfInputEndDate');
+    if (end) {
+      if (!startValue || !Number.isInteger(months) || months < 1) {
+        end.textContent = '—';
+      } else {
+        const start = new Date(startValue + 'T00:00:00');
+        const day = start.getDate();
+        start.setDate(1);
+        start.setMonth(start.getMonth() + months);
+        start.setDate(Math.min(day, new Date(start.getFullYear(), start.getMonth(), 0).getDate()));
+        start.setDate(start.getDate() - 1);
+        end.textContent = start.toLocaleDateString('ar-EG');
+      }
+    }
+  }
+
+  function setPatientFinanceEditing(editing) {
+    state.patientFinanceEditing = editing;
+    const writable = canWrite() && state.patientCareMode === 'unlinked';
+    patientFinanceFields.forEach(id => {
+      const field = $(id);
+      if (field) field.disabled = !editing || !writable;
+    });
+    const edit = $('patientFinanceEdit');
+    const save = $('patientFinanceSave');
+    const cancel = $('patientFinanceCancel');
+    const remove = $('patientFinanceDelete');
+    if (edit) edit.hidden = editing || !writable;
+    if (save) save.hidden = !editing || !writable;
+    if (cancel) cancel.hidden = !editing;
+    if (remove) remove.hidden = editing || !writable || !state.patientFinance;
+    const note = $('patientFinanceAccessNote');
+    if (note) {
+      note.textContent = writable
+        ? 'يمكنك إدارة الاشتراك والسداد والمتابعة يدويًا لهذا المريض غير المرتبط.'
+        : 'بيانات Finance متاحة للعرض فقط؛ يتطلب التعديل اشتراكًا مهنيًا فعالًا.';
+    }
+  }
+
+  function fillPatientFinance(finance) {
+    state.patientFinance = finance || null;
+    $('pfInputStart').value = finance?.subscription_start_date || '';
+    $('pfInputMonths').value = finance?.subscription_months ?? '';
+    $('pfInputAmount').value = finance?.subscription_amount ?? '';
+    $('pfInputDiscount').value = finance?.discount_percent ?? 0;
+    $('pfInputPaid').value = String(Boolean(finance?.is_paid));
+    $('pfInputLastVisit').value = finance?.last_visit_date || '';
+    $('pfInputNextFollowUp').value = finance?.next_follow_up_date || '';
+    const empty = $('patientFinanceEmpty');
+    if (empty) empty.hidden = Boolean(finance);
+    updatePatientFinancePreview();
+    setPatientFinanceEditing(false);
+  }
+
+  async function loadPatientLegacyFinance() {
+    if (!state.patient || !state.user?.id || state.patientFinanceLoading) return;
+    state.patientFinanceLoading = true;
+    const loading = $('patientFinanceLoading');
+    const errorBox = $('patientFinanceError');
+    if (loading) loading.hidden = false;
+    if (errorBox) errorBox.hidden = true;
+    try {
+      const { data, error } = await supabase.from('patient_finances')
+        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,is_paid,subscription_amount,discount_percent,discounted_amount,last_visit_date,next_follow_up_date')
+        .eq('patient_id', patientId)
+        .eq('user_id', state.user.id)
+        .maybeSingle();
+      if (error) throw error;
+      fillPatientFinance(data);
+    } catch (error) {
+      console.error('Legacy patient finance load failed:', error);
+      if (errorBox) {
+        errorBox.hidden = false;
+        errorBox.textContent = 'تعذر تحميل بيانات Finance. تحقق من صلاحيات الوصول والاشتراك.';
+      }
+    } finally {
+      state.patientFinanceLoading = false;
+      if (loading) loading.hidden = true;
+    }
+  }
+
+  async function savePatientLegacyFinance() {
+    if (!canWrite() || state.patientCareMode !== 'unlinked' || !state.patient || !state.user?.id || !state.patientFinanceEditing) return;
+    const startDate = $('pfInputStart').value || null;
+    const months = $('pfInputMonths').value === '' ? null : Number($('pfInputMonths').value);
+    const amount = $('pfInputAmount').value === '' ? null : Number($('pfInputAmount').value);
+    const discount = $('pfInputDiscount').value === '' ? 0 : Number($('pfInputDiscount').value);
+    if ((startDate && (!Number.isInteger(months) || months < 1)) || (months && !startDate)) {
+      alert('أدخل تاريخ بداية الاشتراك ومدة صحيحة بالشهور.');
+      return;
+    }
+    if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
+      alert('قيمة الاشتراك يجب أن تكون رقمًا موجبًا أو صفرًا.');
+      return;
+    }
+    if (!Number.isFinite(discount) || discount < 0 || discount > 100) {
+      alert('نسبة الخصم يجب أن تكون بين 0 و100%.');
+      return;
+    }
+
+    const save = $('patientFinanceSave');
+    if (save) { save.disabled = true; save.textContent = 'جارٍ الحفظ...'; }
+    const errorBox = $('patientFinanceError');
+    if (errorBox) errorBox.hidden = true;
+    try {
+      const payload = {
+        patient_id: patientId,
+        user_id: state.user.id,
+        subscription_start_date: startDate,
+        subscription_months: months,
+        subscription_amount: amount,
+        discount_percent: discount,
+        is_paid: $('pfInputPaid').value === 'true',
+        last_visit_date: $('pfInputLastVisit').value || null,
+        next_follow_up_date: $('pfInputNextFollowUp').value || null
+      };
+      const { data, error } = await supabase.from('patient_finances')
+        .upsert(payload, { onConflict: 'patient_id' })
+        .select('id,patient_id,user_id,subscription_start_date,subscription_months,subscription_end_date,is_paid,subscription_amount,discount_percent,discounted_amount,last_visit_date,next_follow_up_date')
+        .single();
+      if (error) throw error;
+      fillPatientFinance(data);
+      if (errorBox) {
+        errorBox.hidden = false;
+        errorBox.textContent = 'تم حفظ بيانات Finance بنجاح.';
+        errorBox.classList.add('is-success');
+      }
+    } catch (error) {
+      console.error('Legacy patient finance save failed:', error);
+      if (errorBox) {
+        errorBox.hidden = false;
+        errorBox.textContent = error.message || 'تعذر حفظ بيانات Finance.';
+        errorBox.classList.remove('is-success');
+      }
+    } finally {
+      if (save) { save.disabled = false; save.textContent = 'حفظ البيانات'; }
+    }
+  }
+
+  async function deletePatientLegacyFinance() {
+    if (!canWrite() || state.patientCareMode !== 'unlinked' || !state.patientFinance) return;
+    const confirmed = await window.DPConfirm?.ask({
+      title: 'حذف بيانات Finance؟',
+      message: 'سيتم حذف سجل الاشتراك المالي لهذا المريض فقط.',
+      confirmText: 'حذف',
+      variant: 'danger'
+    });
+    if (!confirmed) return;
+    try {
+      const { error } = await supabase.from('patient_finances')
+        .delete()
+        .eq('patient_id', patientId)
+        .eq('user_id', state.user.id);
+      if (error) throw error;
+      fillPatientFinance(null);
+      const errorBox = $('patientFinanceError');
+      if (errorBox) {
+        errorBox.hidden = false;
+        errorBox.textContent = 'تم حذف سجل Finance.';
+        errorBox.classList.add('is-success');
+      }
+    } catch (error) {
+      console.error('Legacy patient finance delete failed:', error);
+      const errorBox = $('patientFinanceError');
+      if (errorBox) {
+        errorBox.hidden = false;
+        errorBox.textContent = error.message || 'تعذر حذف سجل Finance.';
+        errorBox.classList.remove('is-success');
+      }
+    }
+  }
+
   const careAgreementState = { loaded:false, loading:false, appointmentsMounted:false };
   const agreementStatusLabels = {pending:'بانتظار الموافقة',accepted:'بانتظار استكمال الدفع',active:'نشط',ended:'منتهٍ',declined:'مرفوض',cancelled:'ملغي'};
   function formatProfileDate(value) { if (!value) return '—'; const d=new Date(value+(String(value).length===10?'T00:00:00':'')); return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('ar-EG'); }
@@ -1292,6 +1540,17 @@
     });
   }
 
+  function bindPatientFinanceEvents() {
+    $('patientFinanceEdit')?.addEventListener('click', () => setPatientFinanceEditing(true));
+    $('patientFinanceCancel')?.addEventListener('click', () => fillPatientFinance(state.patientFinance));
+    $('patientFinanceSave')?.addEventListener('click', () => void savePatientLegacyFinance());
+    $('patientFinanceDelete')?.addEventListener('click', () => void deletePatientLegacyFinance());
+    ['pfInputAmount', 'pfInputDiscount', 'pfInputStart', 'pfInputMonths'].forEach(id => {
+      $(id)?.addEventListener('input', updatePatientFinancePreview);
+      $(id)?.addEventListener('change', updatePatientFinancePreview);
+    });
+  }
+
   function bindEvents() {
     bindPatientModuleTabs();
     bindPatientConversationDrawer();
@@ -1333,6 +1592,7 @@
   async function init() {
     try {
       bindEvents();
+      bindPatientFinanceEvents();
 
       if (!access || !supabase) {
         throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات.');
