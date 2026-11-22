@@ -1121,6 +1121,7 @@
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
+    $("patientSharedHealthForm")?.addEventListener("submit", saveSharedHealthRecord);
     document.querySelector("[data-open-patient-messages]")?.addEventListener("click", () => {
       activateHealthTab("portalCommunicationPanel");
       $("patientPortalMessages")?.scrollIntoView({ behavior: "smooth", block: "start" });
