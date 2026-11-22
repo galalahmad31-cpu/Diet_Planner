@@ -221,7 +221,7 @@
           <form id="patientSharedHealthForm" class="portal-shared-health-form">
             <div class="portal-shared-health-grid">
               <label>اسم المريض<input id="sharedHealthName" type="text" readonly></label>
-              <label>النوع<input id="sharedHealthGender" type="text" maxlength="30" placeholder="ذكر / أنثى"></label>
+              <label for="sharedHealthGender">النوع (اختياري)<select id="sharedHealthGender"><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></label>
               <label>تاريخ الميلاد<input id="sharedHealthBirthDate" type="date"></label>
               <label>الطول (سم)<input id="sharedHealthHeight" type="number" min="30" max="260" step="0.1"></label>
               <label class="is-wide">التشخيص<input id="sharedHealthDiagnosis" type="text" maxlength="4000"></label>
