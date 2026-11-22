@@ -32,8 +32,9 @@
     <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
     <link rel="stylesheet" href="css/dark-theme.css?v=20261120-home-layout-v1">
     <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
-    <link rel="stylesheet" href="css/app.css?v=20261122-admin-nav-cleanup-v1">
+    <link rel="stylesheet" href="css/app.css?v=20261122-shared-announcements-v1">
     <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
+    <link rel="stylesheet" href="css/announcements.css?v=20261122-shared-announcements-v1">
 
     <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
 
@@ -91,25 +92,17 @@
                 </div>
             </section>
 
-            <section id="dashboardAnnouncementsSection" class="dashboard-announcements-section mt-5" aria-labelledby="dashboardAnnouncementsTitle" hidden>
-                <div class="dashboard-announcements-header">
+            <section id="dashboardAnnouncementsSection" class="portal-announcements mt-5" aria-labelledby="dashboardAnnouncementsTitle" hidden>
+                <div class="portal-announcements-heading">
                     <div>
-                        <h3 id="dashboardAnnouncementsTitle" class="text-base font-extrabold text-slate-800">مركز الإعلانات والتحديثات</h3>
-                        <p class="mt-1 text-[11px] text-slate-500">آخر المستجدات والإعلانات المهمة من Diet Planner</p>
+                        <span class="portal-section-kicker">LATEST UPDATES</span>
+                        <h2 id="dashboardAnnouncementsTitle">الإعلانات والتحديثات</h2>
+                        <p>آخر المستجدات الموجهة لمساحة المختص.</p>
                     </div>
-                    <span class="dashboard-announcements-mark"><i class="fa-solid fa-bullhorn"></i> المستجدات</span>
+                    <span class="portal-announcements-icon"><i class="fa-solid fa-bullhorn"></i></span>
                 </div>
-                <div id="dashboardAnnouncementsList" class="dashboard-announcements-list" aria-live="polite"></div>
+                <div id="dashboardAnnouncementsList" class="portal-announcements-list" aria-live="polite"></div>
             </section>
-            <dialog id="dashboardAnnouncementDialog" class="dp-announcement-dialog" aria-labelledby="dashboardAnnouncementDialogTitle">
-                <div class="dp-announcement-dialog-head">
-                    <span class="dashboard-announcement-type" id="dashboardAnnouncementDialogType"></span>
-                    <button type="button" id="dashboardAnnouncementDialogClose" class="dp-announcement-close" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <h3 id="dashboardAnnouncementDialogTitle"></h3>
-                <p id="dashboardAnnouncementDialogContent"></p>
-                <div id="dashboardAnnouncementDialogDate" class="dp-announcement-dialog-date"></div>
-            </dialog>
 
             <footer class="py-8 text-center">
 

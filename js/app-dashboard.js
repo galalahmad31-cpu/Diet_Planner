@@ -258,73 +258,58 @@
   }
 
   // Public announcements feed; RLS limits this query to published items.
-  const ANNOUNCEMENT_PRESENTATION = {
-    update: { label: "تحديث جديد", icon: "fa-wand-magic-sparkles", className: "update" },
-    announcement: { label: "إعلان مهم", icon: "fa-bullhorn", className: "announcement" },
-    tip: { label: "نصيحة واستخدام", icon: "fa-lightbulb", className: "tip" },
-    alert: { label: "تنبيه", icon: "fa-triangle-exclamation", className: "alert" }
+  const ANNOUNCEMENT_LABELS = {
+    update: "تحديث جديد",
+    announcement: "إعلان مهم",
+    tip: "نصيحة واستخدام",
+    alert: "تنبيه"
   };
-
-  function announcementFormatDate(value) {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" });
-  }
-
-  function openDashboardAnnouncement(item) {
-    const dialog = document.getElementById("dashboardAnnouncementDialog");
-    if (!dialog) return;
-    const type = ANNOUNCEMENT_PRESENTATION[item.type] || ANNOUNCEMENT_PRESENTATION.update;
-    const typeNode = document.getElementById("dashboardAnnouncementDialogType");
-    const titleNode = document.getElementById("dashboardAnnouncementDialogTitle");
-    const contentNode = document.getElementById("dashboardAnnouncementDialogContent");
-    const dateNode = document.getElementById("dashboardAnnouncementDialogDate");
-    if (typeNode) { typeNode.className = `dashboard-announcement-type ${type.className}`; typeNode.textContent = type.label; }
-    if (titleNode) titleNode.textContent = item.title || "";
-    if (contentNode) contentNode.textContent = item.content || "";
-    if (dateNode) dateNode.textContent = announcementFormatDate(item.created_at);
-    if (typeof dialog.showModal === "function") dialog.showModal();
-    else dialog.setAttribute("open", "");
-  }
-
-  function bindAnnouncementDialog() {
-    const dialog = document.getElementById("dashboardAnnouncementDialog");
-    const close = document.getElementById("dashboardAnnouncementDialogClose");
-    if (!dialog || dialog.dataset.bound === "true") return;
-    dialog.dataset.bound = "true";
-    close?.addEventListener("click", () => dialog.close?.());
-    dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close?.(); });
-  }
 
   async function loadDashboardAnnouncements() {
     const section = document.getElementById("dashboardAnnouncementsSection");
     const host = document.getElementById("dashboardAnnouncementsList");
     const supabase = window.DietPlannerAccess?.supabaseClient;
     if (!section || !host || !supabase) return;
+
     try {
       const now = new Date().toISOString();
       const { data, error } = await supabase.from("announcements")
         .select("id,title,content,type,audience,priority,starts_at,expires_at,created_at")
-        .eq("is_active", true).in("audience", ["professional", "both"]).lte("starts_at", now)
-        .order("priority", { ascending: false }).order("starts_at", { ascending: false }).order("created_at", { ascending: false }).limit(30);
+        .eq("is_active", true)
+        .in("audience", ["professional", "both"])
+        .lte("starts_at", now)
+        .order("priority", { ascending: false })
+        .order("starts_at", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(30);
       if (error) throw error;
-      const current = (data || []).filter(item => !item.expires_at || new Date(item.expires_at).getTime() > Date.now()).slice(0, 3);
+
+      const current = (data || [])
+        .filter(item => !item.expires_at || new Date(item.expires_at).getTime() > Date.now())
+        .slice(0, 3);
       host.replaceChildren();
-      if (!current.length) { section.hidden = true; return; }
+      if (!current.length) {
+        section.hidden = true;
+        return;
+      }
+
       current.forEach(item => {
-        const type = ANNOUNCEMENT_PRESENTATION[item.type] || ANNOUNCEMENT_PRESENTATION.update;
-        const card = document.createElement("article");
-        card.className = `dashboard-announcement-card ${type.className}`;
-        const top = document.createElement("div"); top.className = "dashboard-announcement-card-top";
-        const label = document.createElement("span"); label.className = `dashboard-announcement-type ${type.className}`;
-        const icon = document.createElement("i"); icon.className = `fa-solid ${type.icon}`; icon.setAttribute("aria-hidden", "true");
-        label.append(icon, document.createTextNode(" " + type.label)); top.appendChild(label);
-        const title=document.createElement("h4");title.textContent=item.title;
-        const content=document.createElement("p");content.textContent=item.content;
-        const footer=document.createElement("div");footer.className="dashboard-announcement-card-footer";
-        const date=document.createElement("span");date.textContent=announcementFormatDate(item.created_at);
-        const more=document.createElement("button");more.type="button";more.className="dashboard-announcement-more";more.textContent="اقرأ التفاصيل";
-        more.addEventListener("click",()=>openDashboardAnnouncement(item));
-        footer.append(date,more);card.append(top,title,content,footer);host.appendChild(card);
+        const card = document.createElement("details");
+        card.className = "portal-announcement-card";
+        const summary = document.createElement("summary");
+        const type = document.createElement("span");
+        type.className = "portal-announcement-type";
+        type.textContent = ANNOUNCEMENT_LABELS[item.type] || ANNOUNCEMENT_LABELS.update;
+        const title = document.createElement("strong");
+        title.textContent = item.title || "";
+        const toggle = document.createElement("span");
+        toggle.className = "portal-announcement-toggle";
+        toggle.textContent = "عرض التفاصيل";
+        summary.append(type, title, toggle);
+        const content = document.createElement("p");
+        content.textContent = item.content || "";
+        card.append(summary, content);
+        host.appendChild(card);
       });
       section.hidden = false;
     } catch (error) {
@@ -333,7 +318,6 @@
     }
   }
 
-  // ---------------------------------------------------------
   // Initialization
   // ---------------------------------------------------------
   function renderVisitorDashboard() {
@@ -349,7 +333,6 @@
 
   async function initializeDashboard() {
     hideLoading();
-    bindAnnouncementDialog();
 
     const access =
       window.DietPlannerAccess;
