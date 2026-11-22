@@ -3,7 +3,7 @@
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
 const PAGE_SIZE=20;
-const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0};
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,requestsLoaded:false,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0,doctorsLoaded:false};
 let confirmAction=null;
 
 const $=id=>document.getElementById(id);
@@ -49,7 +49,7 @@ function renderPager(id,page,total,onNext,onPrev){
 }
 async function loadRequestsPage(page=0){
  state.requestPage=Math.max(0,page);setState('request','جاري تحميل الطلبات...');
- const from=state.requestPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.requestSearch.trim();
+ const from=state.requestPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.requestSearch.trim().replace(/[,%()]/g,' ');
  try{
   const statuses=await Promise.all(['pending','paid','canceled'].map(status=>sb.from('subscriptions').select('id',{count:'exact',head:true}).eq('status',status)));
   statuses.forEach(r=>{if(r.error)throw r.error});
@@ -64,7 +64,7 @@ async function loadRequestsPage(page=0){
   if(state.requestStatus!=='all')query=query.eq('status',state.requestStatus);
   if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;renderRequests();return}query=query.or(filters.join(','))}
   const result=await query.range(from,to);if(result.error)throw result.error;
-  state.subs=result.data||[];state.requestTotal=result.count||0;
+  state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;state.requestsLoaded=true;
   const ids=[...new Set(state.subs.map(s=>s.user_id).filter(Boolean))];
   if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=p.data||[]}else state.profiles=[];
   $('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;$('totalCount').textContent=allCount.count||0;
@@ -73,7 +73,7 @@ async function loadRequestsPage(page=0){
 }
 async function loadDoctorsPage(page=0){
  state.doctorPage=Math.max(0,page);setState('doctor','جاري تحميل المستخدمين...');
- const from=state.doctorPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.doctorSearch.trim(),today=new Date().toISOString().slice(0,10);
+ const from=state.doctorPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.doctorSearch.trim().replace(/[,%()]/g,' '),today=new Date().toISOString().slice(0,10);
  try{
   let query=sb.from('profiles').select('id,full_name,email,phone,role,created_at',{count:'exact'}).order('created_at',{ascending:false});
   if(q)query=query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
@@ -93,12 +93,12 @@ async function loadDoctorsPage(page=0){
     const result=await patientQuery;if(result.error)throw result.error;return {user_id:p.id,count:result.count||0};
    }));
   }else{state.subs=[];state.patients=[]}
-  $('doctorActiveCount').textContent=activeResult.count||0;renderDoctors();
+  state.doctorActiveTotal=activeResult.count||0;state.doctorsLoaded=true;renderDoctors();
  }catch(error){console.error('Admin doctors page load failed:',error);setState('doctor',error.message||'تعذر تحميل المستخدمين.')}
 }
 function renderRequests(){
  const body=$('requestsBody');
- $('totalCount').textContent=state.requestTotal;
+ $('totalCount').textContent=state.requestAllTotal;
  document.querySelectorAll('[data-request-filter]').forEach(b=>{
   const active=b.dataset.requestFilter===state.requestStatus;
   b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));
@@ -141,6 +141,7 @@ function roleLabel(role){return role==='admin'?'Admin':'User'}
 function roleOptions(selected){return `<option value="user" ${selected==='user'?'selected':''}>User</option><option value="admin" ${selected==='admin'?'selected':''}>Admin</option>`}
 function renderDoctors(){
  $('doctorCount').textContent=state.doctorTotal;
+ $('doctorActiveCount').textContent=state.doctorActiveTotal;
  const doctors=state.profiles;
  const body=$('doctorsBody');if(!doctors.length){setState('doctor',state.doctorTotal?'لا توجد نتائج مطابقة للبحث.':'لا يوجد مستخدمون.');renderPager('doctorPager',state.doctorPage,state.doctorTotal,()=>loadDoctorsPage(state.doctorPage+1),()=>loadDoctorsPage(state.doctorPage-1));return}
  body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);const max=s?.max_patients_snapshot;
@@ -449,8 +450,8 @@ async function savePrivacyPolicy(){
 function switchTab(tab){
   state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   ['requests','plans','doctors','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
-  if(tab==='requests'&&!state.subs.length)loadRequestsPage();
-  if(tab==='doctors'&&!state.profiles.length)loadDoctorsPage();
+  if(tab==='requests'&&!state.requestsLoaded)loadRequestsPage();
+  if(tab==='doctors'&&!state.doctorsLoaded)loadDoctorsPage();
   if(tab==='announcements')loadAnnouncements();
   if(tab==='privacy')loadPrivacyPolicy();
 }
