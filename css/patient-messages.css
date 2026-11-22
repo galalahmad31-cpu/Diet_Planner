@@ -9,34 +9,3 @@
 .patient-messages-compose{display:flex;flex-direction:column;gap:7px}.patient-messages-compose textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:72px;border:1px solid var(--dp-input-border,var(--dp-border,#dce8e4));border-radius:11px;background:var(--dp-input,#fff);color:var(--dp-text,#183c3b);padding:10px 12px;font:500 11px/1.8 Cairo,sans-serif}.patient-messages-compose textarea:focus,.patient-messages-contact select:focus{outline:2px solid var(--dp-primary,#168579);outline-offset:1px}.patient-messages-compose-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}.patient-messages-status{font-size:9px;color:var(--dp-muted,#7c9090)}.patient-messages-status.is-error{color:#b45353}.patient-messages-status.is-success{color:#168579}.patient-messages-compose-footer button{border:0;border-radius:9px;background:var(--dp-primary,#168579);color:#fff;padding:9px 16px;font:800 10px Cairo,sans-serif;cursor:pointer}.patient-messages-compose-footer button:disabled{opacity:.55;cursor:wait}.patient-messages-disclaimer{margin:0;color:var(--dp-muted,#7c9090);font-size:9px;line-height:1.7}
 html[data-theme="dark"] .patient-message-bubble.is-mine{background:#214c43;color:#c9f0e3}html[data-theme="dark"] .patient-message-meta{color:#a1b8b1}
 @media(max-width:640px){.patient-messages-shell{padding:10px}.patient-message-bubble{max-width:92%}.patient-messages-list{max-height:360px}.patient-messages-contact{align-items:flex-start;flex-direction:column}.patient-messages-contact select{width:100%}}
-
-.patient-messages-quick-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid var(--dp-border,#dce8e4);border-radius:12px;background:var(--dp-surface-2,#f7faf8)}
-.patient-messages-quick-actions[hidden]{display:none}
-.patient-messages-quick-actions-heading{display:flex;flex-direction:column;gap:2px}
-.patient-messages-quick-actions-heading strong{font-size:10px;font-weight:900;color:var(--dp-text,#183c3b)}
-.patient-messages-quick-actions-heading small{font-size:9px;color:var(--dp-muted,#7c9090)}
-.patient-messages-quick-actions-buttons{display:flex;flex-wrap:wrap;gap:7px}
-.patient-messages-quick-actions-buttons button{border:1px solid var(--dp-border,#dce8e4);border-radius:9px;background:var(--dp-card,#fff);color:var(--dp-primary,#168579);padding:7px 11px;font:800 10px Cairo,sans-serif;cursor:pointer}
-.patient-messages-quick-actions-buttons button:disabled{opacity:.5;cursor:wait}
-@media(max-width:640px){.patient-messages-quick-actions{align-items:stretch;flex-direction:column}.patient-messages-quick-actions-buttons{display:grid;grid-template-columns:1fr 1fr}.patient-messages-quick-actions-buttons button{min-height:38px}}
-
-/* Shared, accessible confirmation dialog for the three conversation milestones. */
-.patient-confirm-dialog{width:min(440px,calc(100% - 32px));max-width:440px;max-height:min(90dvh,620px);padding:0;border:1px solid var(--dp-border,#dce8e4);border-radius:20px;background:var(--dp-card,#fff);color:var(--dp-text,#183c3b);box-shadow:0 24px 80px rgba(12,42,37,.24);overflow:auto}
-.patient-confirm-dialog::backdrop{background:rgba(10,31,29,.58);backdrop-filter:blur(4px)}
-.patient-confirm-dialog__content{display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 24px 22px;text-align:center}
-.patient-confirm-dialog__icon{display:grid;place-items:center;width:54px;height:54px;border-radius:17px;background:color-mix(in srgb,var(--dp-primary,#168579) 12%,transparent);color:var(--dp-primary,#168579);font-size:22px}
-.patient-confirm-dialog__eyebrow{color:var(--dp-primary,#168579);font-size:10px;font-weight:900;letter-spacing:.2px}
-.patient-confirm-dialog__content h3{margin:0;color:var(--dp-text,#183c3b);font:900 18px/1.6 Cairo,sans-serif}
-.patient-confirm-dialog__content>p{margin:0;color:var(--dp-muted,#7c9090);font:600 12px/2 Cairo,sans-serif}
-.patient-confirm-dialog__notice{display:flex;align-items:flex-start;gap:9px;width:100%;box-sizing:border-box;margin-top:4px;padding:11px 12px;border:1px solid var(--dp-border,#dce8e4);border-radius:12px;background:var(--dp-surface-2,#f3f7f5);color:var(--dp-muted,#637b76);text-align:right;font:600 10px/1.9 Cairo,sans-serif}
-.patient-confirm-dialog__notice i{flex:0 0 auto;margin-top:4px;color:var(--dp-primary,#168579)}
-.patient-confirm-dialog__actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;margin-top:8px}
-.patient-confirm-dialog__actions button{min-height:42px;padding:9px 12px;border-radius:11px;font:800 11px Cairo,sans-serif;cursor:pointer;transition:transform .16s ease,opacity .16s ease}
-.patient-confirm-dialog__actions button:active{transform:scale(.98)}
-.patient-confirm-dialog__cancel{border:1px solid var(--dp-border,#dce8e4);background:var(--dp-surface-2,#f3f7f5);color:var(--dp-text,#183c3b)}
-.patient-confirm-dialog__accept{border:1px solid var(--dp-primary,#168579);background:var(--dp-primary,#168579);color:#fff}
-.patient-confirm-dialog__actions button:focus-visible{outline:3px solid color-mix(in srgb,var(--dp-primary,#168579) 35%,transparent);outline-offset:2px}
-html[data-theme="dark"] .patient-confirm-dialog{background:var(--dp-card,#172c2a);color:var(--dp-text,#e4efeb);box-shadow:0 24px 80px rgba(0,0,0,.48)}
-html[data-theme="dark"] .patient-confirm-dialog__notice{background:var(--dp-surface-2,#203936)}
-@media(max-width:480px){.patient-confirm-dialog__content{padding:22px 17px 18px}.patient-confirm-dialog__content h3{font-size:16px}.patient-confirm-dialog__actions{grid-template-columns:1fr}.patient-confirm-dialog__actions button{min-height:44px}}
-@media(prefers-reduced-motion:reduce){.patient-confirm-dialog__actions button{transition:none}}
