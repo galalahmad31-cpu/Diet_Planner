@@ -513,25 +513,30 @@ async function loadProfessionalReviewPage(page=0){
 }
 async function moderateProfessionalProfile(button){
  const userId=button.dataset.user,decision=button.dataset.professionalDecision,profile=state.professionalReviewProfiles.find(item=>item.user_id===userId);if(!profile)return;
- let note='';
- if(decision==='rejected'||decision==='suspended'){
-  if(!window.DPConfirm?.askText){toast('نافذة الإدخال المركزية غير متاحة.');return}
-  const entered=await window.DPConfirm.askText({
-   title:decision==='rejected'?'سبب رفض الملف':'سبب إيقاف النشر',
-   message:decision==='rejected'?'اكتب سبب الرفض والملاحظات التي يحتاج المختص لتعديلها:':'اكتب سبب إيقاف النشر:',
-   placeholder:decision==='rejected'?'وضح التعديلات المطلوبة من المختص...':'اكتب سبب الإيقاف...',
-   confirmText:decision==='rejected'?'متابعة الرفض':'متابعة الإيقاف',
-   variant:'danger'
-  });
-  if(entered===null)return;
-  note=entered.trim();
-  if(!note){toast('يجب كتابة سبب الإجراء.');return}
- }
- askConfirm(decision==='published'?'اعتماد ونشر الملف':'تأكيد الإجراء','هل تريد تنفيذ هذا الإجراء على ملف '+esc(profile.display_name)+'؟',async()=>{
-  button.disabled=true;const {error}=await sb.rpc('moderate_professional_directory_profile',{p_user_id:userId,p_decision:decision,p_note:note});
+ const applyDecision=async()=>{
+  button.disabled=true;
+  const {error}=await sb.rpc('moderate_professional_directory_profile',{p_user_id:userId,p_decision:decision,p_note:note});
   if(error){toast(error.message||'تعذر تحديث حالة الملف.');button.disabled=false;return}
-  toast(decision==='published'?'تم اعتماد الملف ونشره.':decision==='rejected'?'تم رفض الملف وإعادته للمختص للتعديل.':'تم إيقاف نشر الملف.');await loadProfessionalReviewPage(state.professionalReviewPage);
+  toast(decision==='published'?'تم اعتماد الملف ونشره.':decision==='rejected'?'تم رفض الملف وإعادته للمختص للتعديل.':'تم إيقاف نشر الملف.');
+  await loadProfessionalReviewPage(state.professionalReviewPage);
+ };
+ let note='';
+ if(decision==='published'){
+  askConfirm('اعتماد ونشر الملف','هل تريد اعتماد ونشر الملف المهني لـ '+esc(profile.display_name)+'؟',applyDecision);
+  return;
+ }
+ if(!window.DPConfirm?.askText){toast('نافذة الإدخال المركزية غير متاحة.');return}
+ const entered=await window.DPConfirm.askText({
+  title:decision==='rejected'?'سبب رفض الملف':'سبب إيقاف النشر',
+  message:decision==='rejected'?'اكتب سبب الرفض والملاحظات التي يحتاج المختص لتعديلها:':'اكتب سبب إيقاف النشر:',
+  placeholder:decision==='rejected'?'وضح التعديلات المطلوبة من المختص...':'اكتب سبب الإيقاف...',
+  confirmText:decision==='rejected'?'تأكيد الرفض':'تأكيد الإيقاف',
+  variant:'danger'
  });
+ if(entered===null)return;
+ note=entered.trim();
+ if(!note){toast('يجب كتابة سبب الإجراء.');return}
+ await applyDecision();
 }
 
 function switchTab(tab){
