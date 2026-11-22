@@ -99,14 +99,46 @@
                 <i class="fa-solid fa-chevron-down patient-care-chevron" aria-hidden="true"></i>
               </summary>
               <div class="patient-care-content">
-                <section class="patient-care-section">
-                  <h3>الاتفاق والاشتراك</h3>
-                  <div id="careAgreementSummary" aria-live="polite">جاري تحميل الاتفاق...</div>
-                </section>
-                <section class="patient-care-section">
-                  <h3>المواعيد والزيارات</h3>
-                  <div id="professionalAppointmentsRoot"></div>
-                </section>
+                <div id="patientLinkedCareView" hidden>
+                  <section class="patient-care-section">
+                    <h3>الاتفاق والاشتراك</h3>
+                    <div id="careAgreementSummary" aria-live="polite">جاري تحميل الاتفاق...</div>
+                  </section>
+                  <section class="patient-care-section">
+                    <h3>المواعيد والزيارات</h3>
+                    <div id="professionalAppointmentsRoot"></div>
+                  </section>
+                </div>
+
+                <div id="patientLegacyFinanceView" hidden>
+                  <div id="patientFinanceLoading" class="finance-state" hidden>جاري تحميل بيانات الاشتراك والمتابعة...</div>
+                  <div id="patientFinanceEmpty" class="patient-finance-empty" hidden>لا توجد بيانات مالية محفوظة لهذا المريض. يمكنك إدخالها يدويًا.</div>
+                  <div id="patientFinanceForm" class="patient-fields patient-finance-fields">
+                    <div class="patient-finance-row">
+                      <div><label for="pfInputStart">بداية الاشتراك</label><input id="pfInputStart" type="date" disabled></div>
+                      <div><label for="pfInputMonths">مدة الاشتراك (شهر)</label><input id="pfInputMonths" type="number" min="1" step="1" disabled></div>
+                      <div class="patient-finance-readonly"><label>نهاية الاشتراك</label><output id="pfInputEndDate">—</output></div>
+                    </div>
+                    <div class="patient-finance-row">
+                      <div><label for="pfInputAmount">قيمة الاشتراك (جنيه)</label><input id="pfInputAmount" type="number" min="0" step="0.01" disabled></div>
+                      <div><label for="pfInputDiscount">نسبة الخصم (%)</label><input id="pfInputDiscount" type="number" min="0" max="100" step="0.1" value="0" disabled></div>
+                      <div class="patient-finance-discounted"><label>قيمة الاشتراك بعد الخصم</label><output id="pfInputDiscountedPreview">—</output></div>
+                    </div>
+                    <div class="patient-finance-row">
+                      <div><label for="pfInputPaid">حالة السداد</label><select id="pfInputPaid" disabled><option value="false">غير مسدد</option><option value="true">مسدد</option></select></div>
+                      <div><label for="pfInputLastVisit">آخر زيارة فعلية</label><input id="pfInputLastVisit" type="date" disabled></div>
+                      <div><label for="pfInputNextFollowUp">موعد المتابعة القادم</label><input id="pfInputNextFollowUp" type="date" disabled></div>
+                    </div>
+                  </div>
+                  <div id="patientFinanceError" class="patient-finance-error" role="alert" hidden></div>
+                  <p id="patientFinanceAccessNote" class="patient-finance-access-note" aria-live="polite"></p>
+                  <div class="patient-finance-actions">
+                    <button type="button" id="patientFinanceEdit" class="patient-finance-action">تعديل البيانات</button>
+                    <button type="button" id="patientFinanceSave" class="patient-finance-action is-primary" hidden>حفظ البيانات</button>
+                    <button type="button" id="patientFinanceCancel" class="patient-finance-action" hidden>إلغاء</button>
+                    <button type="button" id="patientFinanceDelete" class="patient-finance-action is-danger" hidden>حذف السجل</button>
+                  </div>
+                </div>
               </div>
             </details>
           </div>
