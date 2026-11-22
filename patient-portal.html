@@ -29,7 +29,7 @@
   <script src="js/patient-messages.js?v=20261121-followup-end-v2" defer></script>
   <script src="js/patient-notifications.js?v=20261122-patient-notifications-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261122-independent-patient-record-v5" defer></script>
+  <script src="js/patient-portal.js?v=20261122-self-plans-tab-v6" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -197,6 +197,7 @@
         </section>
         <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel" hidden>
           <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المهنية التي شاركها المختص المرتبط بك.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
+          <div id="portalProfessionalPlanUnavailable" class="portal-empty-state" hidden>تظهر هنا الخطط التي يشاركها معك المختص بعد تفعيل المتابعة وتأكيد بدء الاتفاق.</div>
           <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
           <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
           <div id="portalPlansList" class="portal-plans-list"></div>
