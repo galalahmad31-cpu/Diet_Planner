@@ -96,15 +96,7 @@ function fmt(value) {
    General helpers
    ========================================================= */
 
-function esc(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    }[char]));
-}
+const esc = window.DPUtils.escapeHtml;
 
 function showToast(message, isError = false) {
     const element = $('toast');
