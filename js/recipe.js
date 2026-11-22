@@ -286,17 +286,17 @@
         $('viewModal').classList.add('hidden');
     }
 
-    function openDelete(recipe) {
+    async function openDelete(recipe) {
+        if (!recipe) return;
+        const confirmed = await window.DPConfirm?.ask({
+            title: 'حذف الوصفة؟',
+            message: `هل تريد حذف وصفة «${recipe.name}»؟ لا يمكن التراجع عن الحذف.`,
+            confirmText: 'حذف',
+            variant: 'danger'
+        });
+        if (!confirmed) return;
         deleteTarget = recipe;
-        $('deleteText').textContent = `هل تريد حذف وصفة «${recipe.name}»؟ لا يمكن التراجع عن الحذف.`;
-        $('deleteModal').classList.remove('hidden');
-        $('deleteModal').classList.add('flex');
-    }
-
-    function closeDelete() {
-        deleteTarget = null;
-        $('deleteModal').classList.add('hidden');
-        $('deleteModal').classList.remove('flex');
+        await deleteRecipe();
     }
 
     function render() {
@@ -458,22 +458,13 @@
     async function deleteRecipe() {
         if (!deleteTarget) return;
 
-        const button = $('confirmDelete');
-        button.disabled = true;
-        button.textContent = 'جاري الحذف...';
-
         const { error } = await supabase.from('recipes').delete().eq('id', deleteTarget.id);
-
-        button.disabled = false;
-        button.textContent = 'حذف الوصفة';
 
         if (error) {
             showToast('تعذر حذف الوصفة: ' + error.message, false);
-            closeDelete();
             return;
         }
 
-        closeDelete();
         showToast('تم حذف الوصفة');
         await loadRecipes();
     }
@@ -482,8 +473,6 @@
     $('closeModal').addEventListener('click', closeModal);
     $('cancelBtn').addEventListener('click', closeModal);
     $('closeView').addEventListener('click', closeView);
-    $('cancelDelete').addEventListener('click', closeDelete);
-    $('confirmDelete').addEventListener('click', deleteRecipe);
     $('closeLinkModal').addEventListener('click', closeLinkModal);
     $('cancelLink').addEventListener('click', closeLinkModal);
     $('applyLink').addEventListener('click', applyLink);
@@ -494,7 +483,6 @@
         if (event.key !== 'Escape') return;
         if (!$('linkModal').classList.contains('hidden')) closeLinkModal();
         else if (!$('viewModal').classList.contains('hidden')) closeView();
-        else if (!$('deleteModal').classList.contains('hidden')) closeDelete();
         else if (!$('recipeModal').classList.contains('hidden')) closeModal();
     });
 
