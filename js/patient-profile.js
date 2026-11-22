@@ -1102,17 +1102,12 @@
     if (sharedHealthSection) sharedHealthSection.hidden = !linked;
     if (linkedView) linkedView.hidden = !linked;
     if (financeView) financeView.hidden = linked;
-    const subtitle = $('patientCareSubtitle');
-    if (subtitle) subtitle.textContent = linked
-      ? 'الاتفاق الحالي وسجل المواعيد والزيارات'
-      : 'بيانات الاشتراك والسداد والمتابعة';
     state.patientCareMode = mode;
   }
 
   async function loadPatientCareMode() {
     if (!patientId || !state.user?.id || !state.patient || state.patientCareMode) return;
     state.patientCareMode = 'resolving';
-    const root = $('patientCareDetails');
     try {
       const [requestsResult, careTeamResult] = await Promise.all([
         supabase.from('professional_connection_requests')
@@ -1145,7 +1140,6 @@
       state.patientCareMode = 'error';
       const sharedHealthSection = $('professionalSharedHealthSection');
       if (sharedHealthSection) sharedHealthSection.hidden = true;
-      if (root) root.hidden = true;
       const financeError = $('patientFinanceError');
       if (financeError) {
         financeError.hidden = false;
