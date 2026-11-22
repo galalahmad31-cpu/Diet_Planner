@@ -270,8 +270,8 @@
   async function cancelPending() {
     const sub = state.currentSubscription;
     if (!sub || sub.status !== 'pending') return false;
-    const ok = await new Promise(resolve => { state.confirm = resolve; $('confirmTitle').textContent = 'تأكيد الإلغاء'; $('confirmMessage').textContent = 'هل أنت متأكد من إلغاء طلب الاشتراك؟'; $('confirmOverlay').style.display = 'flex'; });
-    if (!ok) return false;
+    const confirmed = await window.DPConfirm?.ask({ title: 'إلغاء طلب الاشتراك؟', message: 'هل أنت متأكد من إلغاء طلب الاشتراك؟', confirmText: 'إلغاء الطلب', variant: 'danger' });
+    if (!confirmed) return false;
     try {
       const { data, error } = await sb.rpc('cancel_pending_subscription', { p_subscription_id: sub.id });
       if (error) throw error;
@@ -299,8 +299,6 @@
     else if (action === 'close-modal') closeModal();
     else if (action === 'dashboard') window.location.href = 'app.html';
     else if (action === 'profile') window.location.href = 'profile.html';
-    else if (action === 'confirm-yes') { $('confirmOverlay').style.display = 'none'; state.confirm?.(true); state.confirm = null; }
-    else if (action === 'confirm-no') { $('confirmOverlay').style.display = 'none'; state.confirm?.(false); state.confirm = null; }
   });
 
   let subscriptionDataPromise = null;
