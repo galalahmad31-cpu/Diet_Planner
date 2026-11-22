@@ -29,7 +29,10 @@
         <p class="patient-portal-invite-description">أرسل هذا الرابط للمريض. يمكن استخدامه مرة واحدة خلال 24 ساعة، وبعد تسجيل الدخول سيُربط حسابه بملفه الحالي.</p>
         <label for="patientPortalInviteUrl">رابط الدعوة</label>
         <input id="patientPortalInviteUrl" type="text" readonly dir="ltr">
+        <label for="patientPortalInviteCode">كود الربط (يمكن إدخاله داخل بوابة المريض)</label>
+        <input id="patientPortalInviteCode" type="text" readonly dir="ltr">
         <div class="patient-portal-invite-actions">
+          <button type="button" class="patient-portal-copy-code"><i class="fa-regular fa-copy"></i> نسخ الكود</button>
           <button type="button" class="patient-portal-copy-link"><i class="fa-regular fa-copy"></i> نسخ الرابط</button>
           <button type="button" class="patient-portal-invite-done">إغلاق</button>
         </div>
@@ -40,6 +43,18 @@
     dialog.querySelector(".patient-portal-invite-close").addEventListener("click", close);
     dialog.querySelector(".patient-portal-invite-done").addEventListener("click", close);
     dialog.addEventListener("click", event => { if (event.target === dialog) close(); });
+    dialog.querySelector(".patient-portal-copy-code").addEventListener("click", async () => {
+      const input = dialog.querySelector("#patientPortalInviteCode");
+      const status = dialog.querySelector(".patient-portal-invite-status");
+      try {
+        await navigator.clipboard.writeText(input.value);
+        status.textContent = "تم نسخ كود الربط. أرسله للمريض ليُدخله في إدارة المتابعة.";
+      } catch {
+        input.focus();
+        input.select();
+        status.textContent = "تعذر النسخ التلقائي. حدّد الكود وانسخه يدويًا.";
+      }
+    });
     dialog.querySelector(".patient-portal-copy-link").addEventListener("click", async () => {
       const input = dialog.querySelector("#patientPortalInviteUrl");
       const status = dialog.querySelector(".patient-portal-invite-status");
@@ -69,6 +84,7 @@
       url.searchParams.set("invite", token);
       const modal = ensureDialog();
       modal.querySelector("#patientPortalInviteUrl").value = url.toString();
+      modal.querySelector("#patientPortalInviteCode").value = token;
       modal.querySelector(".patient-portal-invite-status").textContent = "الرابط صالح لمدة 24 ساعة ولمرة واحدة فقط.";
       modal.hidden = false;
     } catch (error) {
