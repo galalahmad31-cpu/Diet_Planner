@@ -116,18 +116,10 @@ async function ensureExchangePlan(skipAuth=false){
  S.plan=createdPlanId;
  return S.plan;
 }
-function closeConfirm(){S.confirm=null;if(window.Swal&&typeof window.Swal.close==='function')window.Swal.close();}
+function closeConfirm(){window.DPConfirm?.close?.();}
 function openConfirm(title,message,onConfirm){
- S.confirm=typeof onConfirm==='function'?onConfirm:null;
- if(window.Swal&&typeof window.Swal.fire==='function'){
-  window.Swal.fire({icon:'warning',title,text:message,showCancelButton:true,confirmButtonText:'تأكيد الحذف',cancelButtonText:'إلغاء',reverseButtons:true,focusCancel:true}).then(async result=>{
-   const action=S.confirm;S.confirm=null;
-   if(result.isConfirmed&&action)await action();
-  });
-  return;
- }
- const action=S.confirm;S.confirm=null;
- if(action&&window.confirm(message))void action();
+ if(typeof onConfirm!=="function")return;
+ void window.DPConfirm?.ask({title,message,confirmText:"تأكيد",variant:"danger"}).then(confirmed=>{if(confirmed)return onConfirm();});
 }
 function renderDays(){/* Legacy day-based editor removed: exchange plans use free-form notes. */}
 function openPrintSettings(){
@@ -235,7 +227,7 @@ function setupExchangePlanEvents(){
 }
 async function init(requestedPlanId=null){
  S.ready=false;
- S.plan=null;S.saved=false;S.editing=false;S.notes='';S.t={cal:0,pro:0,carb:0,fat:0};S.confirm=null;
+ S.plan=null;S.saved=false;S.editing=false;S.notes='';S.t={cal:0,pro:0,carb:0,fat:0};
  G.forEach(g=>S.r[g.k]={count:0,sub:g.k==='milk'?'خالى الدسم':g.k==='meat'?'خالية الدهون':''});
  setupExchangePlanEvents();
  try{
@@ -266,6 +258,5 @@ async function init(requestedPlanId=null){
   throw error;
  }
 }
-async function confirmAction(){const cb=S.confirm;if(!cb)return false;S.confirm=null;await cb();return true}
-window.exchangePlan={init,hasPendingConfirm:()=>typeof S.confirm==='function',confirmAction,save,saveAndPrintFromSettings,edit,deletePlan,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
+window.exchangePlan={init,save,saveAndPrintFromSettings,edit,deletePlan,printAll,openPrintSettings,buildPrintAll,executePrintAll,renderDays,closeConfirmModal:closeConfirm};
 })();
