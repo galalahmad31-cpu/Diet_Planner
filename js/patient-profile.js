@@ -19,6 +19,7 @@
     isSaving: false,
     isCreatingPlan: false,
     patientCareMode: null,
+    patientCareModePromise: null,
     patientFinance: null,
     patientFinanceEditing: false,
     patientFinanceLoading: false,
@@ -1106,48 +1107,59 @@
   }
 
   async function loadPatientCareMode() {
-    if (!patientId || !state.user?.id || !state.patient || state.patientCareMode) return;
+    if (!patientId || !state.user?.id || !state.patient) return;
+    if (state.patientCareMode === 'linked' || state.patientCareMode === 'unlinked') return;
+    if (state.patientCareModePromise) return state.patientCareModePromise;
+
     state.patientCareMode = 'resolving';
-    try {
-      const [requestsResult, careTeamResult] = await Promise.all([
-        supabase.from('professional_connection_requests')
-          .select('id')
-          .eq('patient_id', patientId)
-          .in('status', ['accepted', 'active'])
-          .limit(1),
-        supabase.from('patient_care_team')
-          .select('id')
-          .eq('patient_id', patientId)
-          .eq('status', 'active')
-          .limit(1)
-      ]);
-      if (requestsResult.error) throw requestsResult.error;
-      if (careTeamResult.error) throw careTeamResult.error;
+    state.patientCareModePromise = (async () => {
+      try {
+        const [requestsResult, careTeamResult] = await Promise.all([
+          supabase.from('professional_connection_requests')
+            .select('id')
+            .eq('patient_id', patientId)
+            .in('status', ['accepted', 'active'])
+            .limit(1),
+          supabase.from('patient_care_team')
+            .select('id')
+            .eq('patient_id', patientId)
+            .eq('status', 'active')
+            .limit(1)
+        ]);
+        if (requestsResult.error) throw requestsResult.error;
+        if (careTeamResult.error) throw careTeamResult.error;
 
-      const linked = Boolean((requestsResult.data || []).length || (careTeamResult.data || []).length);
-      setPatientCareView(linked ? 'linked' : 'unlinked');
+        const linked = Boolean((requestsResult.data || []).length || (careTeamResult.data || []).length);
+        setPatientCareView(linked ? 'linked' : 'unlinked');
 
-      if (linked) {
-        await loadProfessionalAgreementStatus();
-        await loadCareAgreementPanel();
-        mountProfessionalAppointments();
-        await loadSharedHealthHistory();
-      } else {
-        await loadPatientLegacyFinance();
+        if (linked) {
+          await loadProfessionalAgreementStatus();
+          await loadCareAgreementPanel();
+          mountProfessionalAppointments();
+          await loadSharedHealthHistory();
+        } else {
+          await loadPatientLegacyFinance();
+        }
+      } catch (error) {
+        console.error('Patient care mode resolution failed:', error);
+        state.patientCareMode = 'error';
+        const linkedView = $('patientLinkedCareView');
+        const financeView = $('patientLegacyFinanceView');
+        const sharedHealthSection = $('professionalSharedHealthSection');
+        if (linkedView) linkedView.hidden = true;
+        if (financeView) financeView.hidden = false;
+        if (sharedHealthSection) sharedHealthSection.hidden = true;
+        const financeError = $('patientFinanceError');
+        if (financeError) {
+          financeError.hidden = false;
+          financeError.textContent = 'تعذر تحديد حالة ارتباط المريض؛ أعد فتح هذا التبويب أو حدّث الصفحة.';
+        }
+      } finally {
+        state.patientCareModePromise = null;
       }
-    } catch (error) {
-      console.error('Patient care mode resolution failed:', error);
-      state.patientCareMode = 'error';
-      const sharedHealthSection = $('professionalSharedHealthSection');
-      if (sharedHealthSection) sharedHealthSection.hidden = true;
-      const financeError = $('patientFinanceError');
-      if (financeError) {
-        financeError.hidden = false;
-        financeError.textContent = 'تعذر تحديد حالة ارتباط المريض؛ تم إيقاف عرض البيانات المالية مؤقتًا لحماية البيانات.';
-      }
-    }
+    })();
+    return state.patientCareModePromise;
   }
-
   function formatFinanceAmount(value) {
     if (value === null || value === undefined || value === '') return '—';
     return Number(value).toLocaleString('ar-EG', { maximumFractionDigits: 2 }) + ' جنيه';
@@ -1454,6 +1466,7 @@
       void loadNutritionPlans({ autoOpenLatest: true });
     }
     if (moduleName === 'nutrition-support') loadNutritionSupportFrame();
+    if (moduleName === 'patient-care') void loadPatientCareMode();
   }
 
   function loadNutritionSupportFrame() {
