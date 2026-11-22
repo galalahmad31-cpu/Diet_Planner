@@ -123,6 +123,9 @@
           'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
       }
     }
+    if (state.patientCareMode === 'unlinked') {
+      setPatientFinanceEditing(state.patientFinanceEditing);
+    }
   }
 
   function canWrite() {
@@ -1098,6 +1101,10 @@
     const financeView = $('patientLegacyFinanceView');
     if (linkedView) linkedView.hidden = !linked;
     if (financeView) financeView.hidden = linked;
+    const subtitle = $('patientCareSubtitle');
+    if (subtitle) subtitle.textContent = linked
+      ? 'الاتفاق الحالي وسجل المواعيد والزيارات'
+      : 'بيانات الاشتراك والسداد والمتابعة';
     state.patientCareMode = mode;
   }
 
@@ -1171,8 +1178,7 @@
         const day = start.getDate();
         start.setDate(1);
         start.setMonth(start.getMonth() + months);
-        start.setDate(Math.min(day, new Date(start.getFullYear(), start.getMonth(), 0).getDate()));
-        start.setDate(start.getDate() - 1);
+        start.setDate(Math.min(day, new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate()));
         end.textContent = start.toLocaleDateString('ar-EG');
       }
     }
