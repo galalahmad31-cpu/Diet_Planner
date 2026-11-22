@@ -281,9 +281,6 @@ body{
 }
 #feedbackList>article [data-delete-feedback]{border-color:var(--dp-danger);color:var(--dp-danger)}
 #feedbackEmpty{padding:1.5rem;border:1px dashed var(--dp-border);border-radius:1rem;background:var(--dp-surface-2);text-align:center;color:var(--dp-text-2)}
-  position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;
-  background:rgba(15,23,42,.55);backdrop-filter:blur(2px)
-}
 #loadingScreen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--dp-bg)}
 #loadingScreen .spinner{width:30px;height:30px;border:3px solid var(--dp-border);border-top-color:var(--dp-accent);border-radius:50%;animation:feedback-spin .8s linear infinite}
 #loadingScreen .flex{display:flex;flex-direction:column;align-items:center;gap:.75rem}
