@@ -855,20 +855,15 @@
     $('diagnosisInput').value = patient.diagnosis || '';
     $('complaintsInput').value = patient.complaints || '';
     $('notesInput').value = patient.clinical_notes || '';
+    renderSharedHealthInProfessionalProfile();
   }
 
-  const patientFieldIds = [
-    'nameInput',
-    'phoneInput',
-    'genderInput',
-    'birthDateInput',
-    'ageInput',
-    'heightInput',
-    'diagnosisInput',
-    'complaintsInput',
-    'notesInput'
+  const sharedHealthFieldIds = [
+    'genderInput', 'birthDateInput', 'heightInput', 'diagnosisInput', 'complaintsInput'
   ];
-
+  const patientFieldIds = [
+    'nameInput', 'phoneInput', 'ageInput', 'notesInput'
+  ];
   const patientFinanceFieldIds = [
     'pfInputStart', 'pfInputMonths', 'pfInputAmount', 'pfInputDiscount',
     'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollowUp'
@@ -877,16 +872,16 @@
   function setEditing(enabled) {
     state.isEditing = Boolean(enabled);
     const canEdit = state.isEditing && canWrite() && !state.isSaving;
-    [...patientFieldIds, ...patientFinanceFieldIds].forEach((id) => {
+    [...patientFieldIds, ...sharedHealthFieldIds, ...patientFinanceFieldIds].forEach((id) => {
       const field = $(id);
       if (field) field.disabled = !canEdit;
     });
     updatePatientFinanceWriteAccess();
-
     const saveArea = $('saveArea');
     const editButton = $('editButton');
     if (saveArea) saveArea.hidden = !enabled;
     if (editButton) editButton.hidden = enabled;
+    updateSharedHealthWriteState();
   }
 
   async function enableEditing() {
@@ -894,18 +889,12 @@
       alert('تعديل بيانات المريض والاشتراك متاح أثناء الاشتراك المدفوع فقط.');
       return;
     }
-
-    const details = $('patientDataDetails');
-    const financeDetails = $('patientFinanceDetails');
-    
-
-    // Load finance before opening its disclosure to avoid a duplicate toggle-triggered request.
     const financeReady = await loadPatientFinance();
     if (!financeReady) {
       alert('تعذر تحميل بيانات الاشتراك. لم يتم تفعيل التعديل لتجنب استبدال بيانات محفوظة.');
       return;
     }
-
+    const financeDetails = $('patientFinanceDetails');
     if (financeDetails) financeDetails.open = true;
     setEditing(true);
   }
@@ -914,9 +903,7 @@
     setEditing(false);
     fillPatientData();
     void loadPatientFinance(true);
-    const details = $('patientDataDetails');
     const financeDetails = $('patientFinanceDetails');
-    
     if (financeDetails) financeDetails.open = false;
   }
 
@@ -926,12 +913,6 @@
     const payload = {
       name: $('nameInput').value.trim() || 'مريض',
       phone: $('phoneInput').value.trim() || null,
-      gender: $('genderInput').value || null,
-      birth_date: $('birthDateInput').value || null,
-      age: $('ageInput').value !== '' ? Number($('ageInput').value) : null,
-      height: $('heightInput').value !== '' ? Number($('heightInput').value) : null,
-      diagnosis: $('diagnosisInput').value.trim() || null,
-      complaints: $('complaintsInput').value.trim() || null,
       clinical_notes: $('notesInput').value.trim() || null
     };
 
@@ -943,15 +924,127 @@
       .single();
 
     if (error) {
-      console.error('Save patient failed:', error);
-      alert('تعذر حفظ تعديلات المريض. لم يتم إغلاق وضع التعديل.');
+      console.error('Save patient contact/admin fields failed:', error);
+      alert('تعذر حفظ بيانات الاتصال والملاحظات الإدارية.');
       return false;
     }
 
-    state.patient = data;
+    state.patient = { ...state.patient, ...data };
     return true;
   }
 
+  const sharedHealthState = { loaded: false, loading: false, saving: false, history: [] };
+  const sharedHealthLabels = {
+    gender: 'النوع', birth_date: 'تاريخ الميلاد', height: 'الطول',
+    diagnosis: 'التشخيص', complaints: 'الشكوى'
+  };
+
+  function updateSharedHealthWriteState() {
+    const host = $('professionalSharedHealthStatus');
+    const button = $('savePatientButton');
+    const fields = sharedHealthFieldIds.map(id => $(id)).filter(Boolean);
+    const expired = sharedHealthState.expired === true;
+    fields.forEach(field => {
+      field.disabled = !state.isEditing || !canWrite() || state.isSaving || expired;
+    });
+    if (host) {
+      host.textContent = expired
+        ? 'انتهت مدة اتفاق المتابعة؛ البيانات متاحة للعرض فقط.'
+        : 'هذه البيانات مشتركة مع المريض، ويُسجّل النظام مصدر كل تعديل ووقته.';
+    }
+    if (button) button.disabled = state.isSaving || sharedHealthState.saving;
+  }
+
+  function renderSharedHealthInProfessionalProfile() {
+    const patient = state.patient;
+    if (!patient) return;
+    const root = $('professionalSharedHealthHistory');
+    if (!root) return;
+    if (!sharedHealthState.history.length) {
+      root.textContent = sharedHealthState.loaded ? 'لا توجد تعديلات مسجلة حتى الآن.' : 'جاري تحميل سجل التعديلات...';
+      return;
+    }
+    root.replaceChildren();
+    sharedHealthState.history.forEach(item => {
+      const article = document.createElement('article');
+      article.className = 'professional-health-audit-item';
+      const heading = document.createElement('div');
+      const actor = document.createElement('strong');
+      actor.textContent = item.actor_id === state.user?.id
+        ? 'أنت (المختص)'
+        : item.actor_role === 'patient' ? 'المريض'
+        : item.actor_role === 'admin' ? 'إدارة المنصة' : 'مستخدم مخوّل';
+      const time = document.createElement('time');
+      time.dateTime = item.created_at;
+      time.textContent = new Date(item.created_at).toLocaleString('ar-EG');
+      heading.append(actor, time);
+      const detail = document.createElement('p');
+      const fields = (item.changed_fields || []).map(key => sharedHealthLabels[key] || key).join('، ');
+      detail.textContent = (item.operation === 'UPDATE' ? 'تحديث البيانات الصحية' : 'إنشاء السجل') + (fields ? ' · ' + fields : '');
+      article.append(heading, detail);
+      root.append(article);
+    });
+  }
+
+  async function loadSharedHealthHistory() {
+    if (!patientId || !supabase || sharedHealthState.loading) return;
+    sharedHealthState.loading = true;
+    const root = $('professionalSharedHealthHistory');
+    if (root) root.textContent = 'جاري تحميل سجل التعديلات...';
+    try {
+      const { data, error } = await supabase.from('patient_health_audit')
+        .select('id,actor_id,actor_role,operation,changed_fields,created_at')
+        .eq('patient_id', patientId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      sharedHealthState.history = data || [];
+      sharedHealthState.loaded = true;
+      renderSharedHealthInProfessionalProfile();
+    } catch (error) {
+      console.error('Professional shared health audit load failed:', error);
+      if (root) root.textContent = 'تعذر تحميل سجل التعديلات. تحقق من صلاحيات القراءة.';
+    } finally {
+      sharedHealthState.loading = false;
+    }
+  }
+
+  async function updateSharedHealthFromProfessional() {
+    if (!canWrite() || !state.isEditing || sharedHealthState.saving) return false;
+    sharedHealthState.saving = true;
+    updateSharedHealthWriteState();
+    const rawHeight = $('heightInput')?.value.trim() ?? '';
+    const height = rawHeight === '' ? null : Number(rawHeight);
+    if (height !== null && (!Number.isFinite(height) || height < 30 || height > 260)) {
+      alert('الطول يجب أن يكون بين 30 و260 سم.');
+      sharedHealthState.saving = false;
+      updateSharedHealthWriteState();
+      return false;
+    }
+    try {
+      const { data, error } = await supabase.rpc('update_shared_patient_health_profile', {
+        p_patient_id: patientId,
+        p_gender: $('genderInput')?.value || null,
+        p_birth_date: $('birthDateInput')?.value || null,
+        p_height: height,
+        p_diagnosis: $('diagnosisInput')?.value.trim() || null,
+        p_complaints: $('complaintsInput')?.value.trim() || null
+      });
+      if (error) throw error;
+      state.patient = { ...state.patient, ...data };
+      return true;
+    } catch (error) {
+      console.error('Professional shared health save failed:', error);
+      const message = error.message === 'care_agreement_expired_read_only'
+        ? 'انتهت مدة اتفاق المتابعة. يمكنك الاطلاع على البيانات دون تعديلها.'
+        : error.message || 'تعذر حفظ البيانات الصحية المشتركة.';
+      alert(message);
+      return false;
+    } finally {
+      sharedHealthState.saving = false;
+      updateSharedHealthWriteState();
+    }
+  }
   const patientFinanceState = { loaded: false, loading: false, recordId: null };
 
   function calculateSubscriptionEndDate(startValue, monthsValue) {
