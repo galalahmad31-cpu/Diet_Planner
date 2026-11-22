@@ -215,7 +215,7 @@
 .portal-insulin-result span{font-size:10px;color:var(--dp-muted);font-weight:800}
 .portal-insulin-result strong{font-size:16px;color:var(--dp-primary);font-weight:900;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .portal-insulin-message{margin:10px 0 0;padding:10px 12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text-2);font-size:10px;line-height:1.8}
-.portal-insulin-message[data-state="warning"]{border-color:#d97757;background:color-mix(in srgb,#d97757 10%,var(--dp-surface));color:var(--dp-text)}
+.portal-insulin-message[data-state="warning"]{border-color:var(--dp-border);background:var(--dp-surface-2);color:var(--dp-text-2)}
 @media(max-width:760px){.portal-insulin-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-insulin-result{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.portal-insulin-fields{gap:9px}.portal-insulin-result{gap:6px}.portal-insulin-result>div{padding:9px;min-height:68px}.portal-insulin-result span{font-size:9px}.portal-insulin-result strong{font-size:14px}}
 
