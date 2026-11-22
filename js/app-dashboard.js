@@ -333,7 +333,6 @@
 
   async function initializeDashboard() {
     hideLoading();
-    bindAnnouncementDialog();
 
     const access =
       window.DietPlannerAccess;
