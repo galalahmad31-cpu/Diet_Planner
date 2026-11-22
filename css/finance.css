@@ -1,25 +1,67 @@
-*{box-sizing:border-box}body{margin:0;font-family:Cairo,sans-serif;background:radial-gradient(circle at 90% 0%,rgba(23,143,132,.10),transparent 28%),radial-gradient(circle at 5% 95%,rgba(23,143,132,.07),transparent 25%),#f7fafb;color:#17252a}.glass{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(226,232,240,.9)}.card{transition:.2s}.card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(15,71,67,.10)}.modal{background:rgba(15,23,42,.68);backdrop-filter:blur(7px)}.loading{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:#f7fafb}.spinner{width:36px;height:36px;border:3px solid #d9efec;border-top-color:#178f84;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}input[type=date]{direction:rtl}.toast{animation:in .2s}@keyframes in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
-
-
+/* Patient subscriptions page — layout only; colors follow the central design tokens. */
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:var(--dp-font);
+ background:
+  radial-gradient(circle at 90% 0%,color-mix(in srgb,var(--dp-primary) 10%,transparent),transparent 28%),
+  radial-gradient(circle at 5% 95%,color-mix(in srgb,var(--dp-primary) 7%,transparent),transparent 25%),
+  var(--dp-bg);
+ color:var(--dp-text);
+}
+.glass{
+ background:color-mix(in srgb,var(--dp-surface) 92%,transparent);
+ backdrop-filter:blur(14px);
+ -webkit-backdrop-filter:blur(14px);
+ border:1px solid var(--dp-border);
+}
+.card{transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 38px var(--dp-shadow)}
+.modal{background:color-mix(in srgb,var(--dp-bg) 72%,transparent);backdrop-filter:blur(7px)}
+.loading{
+ position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+ background:var(--dp-bg);color:var(--dp-text)
+}
+.spinner{
+ width:36px;height:36px;border:3px solid var(--dp-border);border-top-color:var(--dp-accent);
+ border-radius:50%;animation:spin .8s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+input[type=date]{direction:rtl}
+.toast{animation:in .2s}
+@keyframes in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 
 /* Subscription finance dashboard */
-.finance-summary{padding:18px;border:1px solid #e1ebe9;border-radius:22px;background:rgba(255,255,255,.9);box-shadow:0 6px 20px rgba(15,71,67,.045)}
+.finance-summary{
+ padding:18px;border:1px solid var(--dp-border);border-radius:22px;
+ background:var(--dp-surface);box-shadow:0 6px 20px var(--dp-shadow)
+}
 .finance-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.finance-summary-head h2{margin:0;color:#233b3b;font-size:16px;font-weight:900}
-.finance-summary-head select,.finance-filters select{min-width:0;height:42px;padding:0 12px;border:1px solid #dce8e5;border-radius:12px;background:#fff;color:#344b4b;font:700 12px Cairo,sans-serif;outline:none}
+.finance-summary-head h2{margin:0;color:var(--dp-text);font-size:16px;font-weight:900}
+.finance-summary-head select,.finance-filters select{
+ min-width:0;height:42px;padding:0 12px;border:1px solid var(--dp-input-border);
+ border-radius:12px;background:var(--dp-input);color:var(--dp-text);
+ font:700 12px var(--dp-font);outline:none
+}
 .finance-custom-range{display:flex;gap:10px;margin:0 0 13px}
 .finance-custom-range[hidden]{display:none}
-.finance-custom-range label{display:grid;flex:1;gap:5px;color:#718281;font-size:11px;font-weight:700}
-.finance-custom-range input{width:100%;height:40px;min-width:0;padding:0 9px;border:1px solid #dce8e5;border-radius:10px;background:#fff;font:600 12px Cairo,sans-serif}
+.finance-custom-range label{display:grid;flex:1;gap:5px;color:var(--dp-text-2);font-size:11px;font-weight:700}
+.finance-custom-range input{
+ width:100%;height:40px;min-width:0;padding:0 9px;border:1px solid var(--dp-input-border);
+ border-radius:10px;background:var(--dp-input);color:var(--dp-text);font:600 12px var(--dp-font)
+}
 .finance-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.finance-metric{display:flex;flex-direction:column;justify-content:space-between;gap:12px;min-width:0;padding:14px;border:1px solid #e8efed;border-radius:15px;background:#f9fbfa}
-.finance-metric span{color:#718281;font-size:11px;font-weight:700;line-height:1.6}
-.finance-metric strong{color:#1c635b;font-size:clamp(16px,2vw,21px);font-weight:900;overflow-wrap:anywhere}
-.finance-metric:nth-child(3) strong{color:#b7791f}
-.finance-summary-note{margin:11px 2px 0;color:#8a9997;font-size:10px;line-height:1.7}
+.finance-metric{
+ display:flex;flex-direction:column;justify-content:space-between;gap:12px;min-width:0;
+ padding:14px;border:1px solid var(--dp-border);border-radius:15px;background:var(--dp-surface-2)
+}
+.finance-metric span{color:var(--dp-text-2);font-size:11px;font-weight:700;line-height:1.6}
+.finance-metric strong{color:var(--dp-primary);font-size:clamp(16px,2vw,21px);font-weight:900;overflow-wrap:anywhere}
+.finance-metric:nth-child(3) strong{color:var(--dp-warning)}
+.finance-summary-note{margin:11px 2px 0;color:var(--dp-muted);font-size:10px;line-height:1.7}
 .finance-filters{display:flex;align-items:center;gap:9px}
 .finance-filters select{flex:0 0 auto}
-.card:focus-visible{outline:3px solid rgba(23,143,132,.35);outline-offset:2px}
+.card:focus-visible{outline:3px solid color-mix(in srgb,var(--dp-accent) 35%,transparent);outline-offset:2px}
 @media(max-width:760px){
  .finance-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
  .finance-metric{padding:12px}
