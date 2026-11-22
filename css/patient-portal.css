@@ -232,3 +232,19 @@
 .portal-care-agreement__actions{display:flex;gap:8px;flex-wrap:wrap}
 .portal-care-agreement__notice{padding-top:8px;border-top:1px solid var(--dp-border);font-size:9px!important;color:var(--dp-muted)!important}
 @media(max-width:520px){.portal-care-agreement{padding:12px}.portal-care-agreement__details{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-care-steps{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Shared health record */
+.portal-shared-health-form{display:grid;gap:14px}
+.portal-shared-health-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.portal-shared-health-grid label{display:grid;gap:6px;font-size:11px;font-weight:800;color:var(--dp-text)}
+.portal-shared-health-grid input,.portal-shared-health-grid textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--dp-border);border-radius:9px;padding:10px;background:var(--dp-surface);color:var(--dp-text);font:12px Cairo,sans-serif}
+.portal-shared-health-grid input[readonly]{opacity:.72;background:var(--dp-surface-2)}
+.portal-shared-health-grid .is-wide{grid-column:1/-1}
+.portal-health-audit-list{display:grid;gap:8px}
+.portal-health-audit-item{padding:11px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface)}
+.portal-health-audit-item>div{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.portal-health-audit-item strong{font-size:11px;color:var(--dp-text)}
+.portal-health-audit-item time,.portal-health-audit-item p{font-size:10px;color:var(--dp-muted)}
+.portal-health-audit-item p{margin:6px 0 0}
+@media(max-width:520px){.portal-shared-health-grid{grid-template-columns:minmax(0,1fr)}.portal-shared-health-grid .is-wide{grid-column:auto}}
