@@ -2,6 +2,7 @@ const db = window.DietPlannerAccess?.supabaseClient;
 
 const state = {
   isAdmin: false,
+  activeTab: "patient",
   sections: [],
   deletingId: null,
   linkEditorId: null,
@@ -148,6 +149,13 @@ function toolbarHtml(id) {
 function editorHtml(section) {
   return `<article class="section-card glass rounded-3xl p-5 sm:p-6" data-section-id="${section.id}">
     ${toolbarHtml(section.id)}
+    <label class="block mb-3 text-xs font-bold text-slate-600">يظهر في
+      <select data-field="audience" data-id="${section.id}" class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-700">
+        <option value="patient" ${section.audience === "patient" ? "selected" : ""}>مساحة المريض</option>
+        <option value="professional" ${section.audience === "professional" ? "selected" : ""}>مساحة المختص</option>
+        <option value="both" ${!section.audience || section.audience === "both" ? "selected" : ""}>المساحتان</option>
+      </select>
+    </label>
     <input data-field="title" data-id="${section.id}"
       value="${escapeHtml(section.title)}"
       placeholder="عنوان المربع"
@@ -164,10 +172,26 @@ function editorHtml(section) {
   </article>`;
 }
 
+function getVisibleSections() {
+  return state.sections.filter(section =>
+    !section.audience || section.audience === "both" || section.audience === state.activeTab
+  );
+}
+
+function updateTabs() {
+  document.querySelectorAll("[data-audience].about-tab").forEach(tab => {
+    const active = tab.dataset.audience === state.activeTab;
+    tab.classList.toggle("is-active", active);
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+  });
+}
+
 function viewHtml(section) {
-  const index = state.sections.findIndex(item => item.id === section.id);
+  const visibleSections = getVisibleSections();
+  const index = visibleSections.findIndex(item => item.id === section.id);
   const canMoveUp = index > 0;
-  const canMoveDown = index >= 0 && index < state.sections.length - 1;
+  const canMoveDown = index >= 0 && index < visibleSections.length - 1;
 
   return `<article class="section-card glass rounded-3xl p-5 sm:p-6" data-section-id="${section.id}">
     ${section.title ? `<h3 class="text-lg font-black text-slate-800">${escapeHtml(section.title)}</h3>` : ""}
@@ -200,18 +224,20 @@ function render() {
   const empty = $("emptyState");
   if (!container) return;
 
-  container.innerHTML = state.sections.map(section =>
+  const visibleSections = getVisibleSections();
+  container.innerHTML = visibleSections.map(section =>
     section._editing ? editorHtml(section) : viewHtml(section)
   ).join("");
 
   container.querySelectorAll(".editor").forEach(autoGrow);
+  updateTabs();
 
   if (empty) {
-    empty.classList.toggle("hidden", state.sections.length > 0);
-    if (!state.sections.length) {
+    empty.classList.toggle("hidden", visibleSections.length > 0);
+    if (!visibleSections.length) {
       $("emptyHint").textContent = state.isAdmin
-        ? "اضغط «إضافة مربع» لإضافة محتوى جديد."
-        : "سيظهر المحتوى هنا عند إضافته.";
+        ? "لا توجد مربعات في هذا القسم. اضغط «إضافة مربع» لإضافة محتوى هنا."
+        : "لا يوجد محتوى مضاف لهذا القسم حتى الآن.";
     }
   }
 }
@@ -235,7 +261,7 @@ async function initializeUser() {
 async function loadSections() {
   const { data, error } = await db
     .from("about_sections")
-    .select("id,title,content,display_order,created_at,updated_at")
+    .select("id,title,content,audience,display_order,created_at,updated_at")
     .order("display_order", { ascending: true })
     .order("created_at", { ascending: true });
 
@@ -247,15 +273,15 @@ async function loadSections() {
 async function moveSection(id, direction) {
   if (!state.isAdmin) return;
 
-  const currentIndex = state.sections.findIndex(item => item.id === id);
+  const visibleSections = getVisibleSections();
+  const currentIndex = visibleSections.findIndex(item => item.id === id);
   if (currentIndex < 0) return;
 
-  // Move exactly one position: swap only this section with its immediate neighbor.
   const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-  if (targetIndex < 0 || targetIndex >= state.sections.length) return;
+  if (targetIndex < 0 || targetIndex >= visibleSections.length) return;
 
-  const current = state.sections[currentIndex];
-  const target = state.sections[targetIndex];
+  const current = visibleSections[currentIndex];
+  const target = visibleSections[targetIndex];
   const currentOrder = Number(current.display_order);
   const targetOrder = Number(target.display_order);
   if (!Number.isFinite(currentOrder) || !Number.isFinite(targetOrder)) return;
@@ -311,6 +337,7 @@ function addSection() {
     id: crypto.randomUUID(),
     title: "",
     content: "",
+    audience: state.activeTab,
     display_order: nextOrder,
     _new: true,
     _editing: true
@@ -353,9 +380,11 @@ async function saveSection(id) {
     return;
   }
 
+  const audience = $( "sectionsContainer" )?.querySelector(`[data-field="audience"][data-id="${id}"]`)?.value;
   const payload = {
     title,
     content,
+    audience: ["patient", "professional", "both"].includes(audience) ? audience : (section.audience || "both"),
     display_order: Number(section.display_order) || 0
   };
 
@@ -366,7 +395,7 @@ async function saveSection(id) {
   }
 
   const request = section._new
-    ? db.from("about_sections").insert(payload).select("id,title,content,display_order,created_at,updated_at").single()
+    ? db.from("about_sections").insert(payload).select("id,title,content,audience,display_order,created_at,updated_at").single()
     : db.from("about_sections").update(payload).eq("id", id).select("id,title,content,display_order,created_at,updated_at").single();
 
   const { data, error } = await request;
@@ -435,6 +464,14 @@ function runCommand(command, id) {
   document.execCommand(command, false, null);
   autoGrow(editor);
 }
+
+document.querySelectorAll(".about-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    if (state.activeTab === tab.dataset.audience) return;
+    state.activeTab = tab.dataset.audience;
+    render();
+  });
+});
 
 $("addSectionBtn")?.addEventListener("click", addSection);
 $("cancelDeleteBtn")?.addEventListener("click", closeDeleteModal);
