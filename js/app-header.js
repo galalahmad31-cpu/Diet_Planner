@@ -100,7 +100,7 @@
   function setCollapsed(header, trigger, collapsed, persist = true) {
     header.classList.toggle("is-collapsed", collapsed);
     trigger.setAttribute("aria-expanded", String(!collapsed));
-    trigger.setAttribute("aria-label", collapsed ? "فتح الهيدر والتنقل" : "طي الهيدر والتنقل");
+    trigger.setAttribute("aria-label", collapsed ? "فتح بقية روابط الهيدر" : "طي بقية روابط الهيدر");
     if (persist) {
       try { localStorage.setItem(HEADER_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
       catch (error) { console.warn("Could not save header display preference:", error); }
@@ -171,9 +171,9 @@
       setCollapsed(header, collapseTrigger, collapseTrigger.getAttribute("aria-expanded") === "true");
     });
     header.addEventListener("click", event => {
-      if (event.target === header) {
-        setCollapsed(header, collapseTrigger, !header.classList.contains("is-collapsed"));
-      }
+      // Any non-control green surface toggles the header. Links and controls keep their own actions.
+      if (event.target.closest("a, button, input, select, textarea, [role=\'button\'], .dp-app-header__link")) return;
+      setCollapsed(header, collapseTrigger, !header.classList.contains("is-collapsed"));
     });
     setCollapsed(header, collapseTrigger, getSavedCollapsedState(), false);
     track.addEventListener("click", event => {
