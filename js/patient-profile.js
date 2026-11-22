@@ -1102,7 +1102,7 @@
     root.replaceChildren(); const card=document.createElement('div'); card.className='patient-care-agreement-card';
     values.forEach(([label,value])=>{const item=document.createElement('div');item.className='patient-care-value';const l=document.createElement('small');l.textContent=label;const v=document.createElement('strong');v.textContent=value;item.append(l,v);card.append(item);});
     root.append(card);
-    if(rows.length>1){const history=document.createElement('details');history.className='patient-care-history';const summary=document.createElement('summary');summary.textContent='سجل الاتفاقات السابقة ('+(rows.length-1)+')';history.append(summary);rows.slice(1).forEach(x=>{const line=document.createElement('p');line.textContent=(x.agreement_service_title||'اتفاق متابعة')+' · '+(agreementStatusLabels[x.status]||x.status)+' · '+formatProfileDate(x.agreement_start_date)+' — '+formatProfileDate(x.agreement_end_date);history.append(line);});root.append(history);}
+    if(rows.length>1){const history=document.createElement('details');history.className='patient-care-history';const summary=document.createElement('summary');summary.textContent='سجل الاتفاقات السابقة ('+(rows.length-1)+')';history.append(summary);rows.filter(x=>x.id!==row.id).forEach(x=>{const line=document.createElement('p');line.textContent=(x.agreement_service_title||'اتفاق متابعة')+' · '+(agreementStatusLabels[x.status]||x.status)+' · '+formatProfileDate(x.agreement_start_date)+' — '+formatProfileDate(x.agreement_end_date);history.append(line);});root.append(history);}
   }
   async function loadCareAgreementPanel() {
     if(!patientId||!state.user?.id||careAgreementState.loading||careAgreementState.loaded)return;
