@@ -100,9 +100,9 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel", "portalCareManagementPanel"];
+    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel", "portalCareManagementPanel", "portalSharedHealthPanel"];
     if (!allowed.includes(panelId)) return;
-    if (!state.hasActiveCareTeam && !["portalCommunicationPanel", "portalCareManagementPanel"].includes(panelId)) return;
+    if (!state.hasActiveCareTeam && !["portalCommunicationPanel", "portalCareManagementPanel", "portalSharedHealthPanel"].includes(panelId)) return;
 
     // Keep the selected panel's ancestors visible. Tabs live outside portalContent,
     // so a hidden parent would otherwise leave an active tab with a completely blank body.
@@ -129,7 +129,8 @@
       portalMeasurementsPanel: loadMeasurements,
       portalAppointmentsPanel: loadSubscriptionFollowUp,
       portalCommunicationPanel: loadProfessionalRequests,
-      portalCareManagementPanel: loadProfessionalCareManagement
+      portalCareManagementPanel: loadProfessionalCareManagement,
+      portalSharedHealthPanel: loadSharedHealthRecord
     };
     const loader = loaders[panelId];
     if (!loader) return;
@@ -145,7 +146,8 @@
           portalMeasurementsPanel: "portalMeasurementsError",
           portalAppointmentsPanel: "portalFollowUpError",
           portalCommunicationPanel: "patientProfessionalRequests",
-          portalCareManagementPanel: "patientCareManagementContent"
+          portalCareManagementPanel: "patientCareManagementContent",
+          portalSharedHealthPanel: "patientSharedHealthStatus"
         };
         const target = $(targets[panelId]);
         if (target) {
@@ -176,7 +178,7 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel","portalCareManagementPanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel","portalCareManagementPanel","portalSharedHealthPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
@@ -222,7 +224,7 @@
   async function loadPatient() {
     const { data, error } = await supabase
       .from("patients")
-      .select("id,name,gender,birth_date,age,height,diagnosis")
+      .select("id,name,gender,birth_date,age,height,diagnosis,complaints")
       .eq("id", state.patientId)
       .maybeSingle();
     if (error) throw error;
@@ -535,6 +537,69 @@
       '<ol class="portal-care-steps"><li class="' + (item.patient_agreement_at ? 'is-done' : '') + '">موافقة المريض</li><li class="' + (item.professional_agreement_at ? 'is-done' : '') + '">موافقة المختص</li><li class="' + (sent ? 'is-done' : '') + '">تأكيد إرسال المبلغ</li><li class="' + (received ? 'is-done' : '') + '">تأكيد استلام المبلغ وبدء المتابعة</li></ol>' :
       '<p>لم يرسل المختص اتفاقًا بعد. ستظهر تفاصيل الخدمة والسعر والمدة هنا قبل أي التزام مالي.</p>') +
       '<div class="portal-care-agreement__actions">' + actions + '</div><p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p></article>';
+  }
+
+
+  function renderSharedHealthForm() {
+    const patient = state.patient || {};
+    $("sharedHealthName").value = patient.name || "";
+    $("sharedHealthGender").value = patient.gender || "";
+    $("sharedHealthBirthDate").value = patient.birth_date || "";
+    $("sharedHealthHeight").value = patient.height ?? "";
+    $("sharedHealthDiagnosis").value = patient.diagnosis || "";
+    $("sharedHealthComplaints").value = patient.complaints || "";
+  }
+
+  async function loadSharedHealthRecord() {
+    const status = $("patientSharedHealthStatus");
+    const history = $("patientHealthAuditList");
+    status.textContent = "جاري تحميل البيانات الصحية...";
+    renderSharedHealthForm();
+    const { data, error } = await supabase.from("patient_health_audit")
+      .select("id,actor_id,actor_role,operation,changed_fields,created_at")
+      .eq("patient_id", state.patientId).order("created_at", { ascending: false }).limit(30);
+    if (error) throw error;
+    status.textContent = "يمكنك مراجعة بياناتك الأساسية وتحديثها. يحتفظ النظام بسجل لمن قام بالتعديل ووقته.";
+    if (!data?.length) { history.textContent = "لا توجد تعديلات مسجلة حتى الآن."; return; }
+    const labels = {gender:"النوع",birth_date:"تاريخ الميلاد",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
+    history.innerHTML = data.map(item => {
+      const actor = item.actor_id === state.user.id ? "أنت" : item.actor_role === "professional" ? "المختص" : item.actor_role === "admin" ? "إدارة المنصة" : "مستخدم مخوّل";
+      const fields = (item.changed_fields || []).map(field => escapeHtml(labels[field] || field)).join("، ");
+      const date = new Date(item.created_at).toLocaleString("ar-EG");
+      return '<article class="portal-health-audit-item"><div><strong>' + escapeHtml(actor) + '</strong><time>' + escapeHtml(date) + '</time></div><p>' + escapeHtml(item.operation === "UPDATE" ? "تحديث البيانات الصحية" : "إنشاء سجل") + (fields ? " · " + fields : "") + '</p></article>';
+    }).join("");
+  }
+
+  async function saveSharedHealthRecord(event) {
+    event.preventDefault();
+    const form = $("patientSharedHealthForm");
+    const button = form.querySelector('button[type="submit"]');
+    const raw = $("sharedHealthHeight").value.trim();
+    const height = raw === "" ? null : Number(raw);
+    if (height !== null && (!Number.isFinite(height) || height < 30 || height > 260)) {
+      setMessage("patientSharedHealthStatus", "الطول يجب أن يكون بين 30 و260 سم.", "error"); return;
+    }
+    button.disabled = true;
+    setMessage("patientSharedHealthStatus", "جاري حفظ البيانات...");
+    try {
+      const { data, error } = await supabase.rpc("update_shared_patient_health_profile", {
+        p_patient_id: state.patientId,
+        p_gender: $("sharedHealthGender").value.trim() || null,
+        p_birth_date: $("sharedHealthBirthDate").value || null,
+        p_height: height,
+        p_diagnosis: $("sharedHealthDiagnosis").value.trim() || null,
+        p_complaints: $("sharedHealthComplaints").value.trim() || null
+      });
+      if (error) throw error;
+      state.patient = { ...state.patient, ...data };
+      renderSharedHealthForm();
+      await loadSharedHealthRecord();
+      setMessage("patientSharedHealthStatus", "تم حفظ البيانات الصحية وتسجيل التعديل.", "success");
+    } catch (error) {
+      console.error("Shared health profile save failed:", error);
+      const message = error.message === "care_agreement_expired_read_only" ? "انتهت مدة المتابعة. يمكنك الاطلاع على البيانات دون تعديلها." : (error.message || "تعذر حفظ البيانات.");
+      setMessage("patientSharedHealthStatus", message, "error");
+    } finally { button.disabled = false; }
   }
 
   async function loadProfessionalCareManagement() {
@@ -952,7 +1017,7 @@
       activateHealthTab("portalPlansPanel");
     } else {
       document.querySelectorAll("[data-health-tab]").forEach(tab => {
-        tab.hidden = !["portalCommunicationPanel", "portalCareManagementPanel"].includes(tab.dataset.healthTab);
+        tab.hidden = !["portalCommunicationPanel", "portalCareManagementPanel", "portalSharedHealthPanel"].includes(tab.dataset.healthTab);
       });
       ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel"].forEach(id => {
         const panel = $(id);
@@ -1129,7 +1194,8 @@
         "portalMeasurementsPanel",
         "portalAppointmentsPanel",
         "portalCommunicationPanel",
-        "portalCareManagementPanel"
+        "portalCareManagementPanel",
+        "portalSharedHealthPanel"
       ];
       const destination = id === "portalTools" ? "portalToolsPanel" : id;
 
