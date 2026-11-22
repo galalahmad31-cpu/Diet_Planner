@@ -502,47 +502,24 @@
   function careAgreementMarkup(item) {
     const hasAgreement = Boolean(item.agreement_service_title);
     const agreed = Boolean(item.patient_agreement_at && item.professional_agreement_at);
-    const sent = Boolean(item.payment_sent_at);
-    const received = Boolean(item.payment_received_at);
+    const sent = Boolean(item.payment_sent_at), received = Boolean(item.payment_received_at);
     const expired = item.agreement_end_date && item.agreement_end_date < localToday();
     const money = item.agreement_amount == null ? "—" : Number(item.agreement_amount).toLocaleString("ar-EG") + " " + (item.agreement_currency || "EGP");
-    const statusLabels = {
-      pending: "طلب المحادثة قيد الانتظار",
-      accepted: "بانتظار استكمال الاتفاق",
-      active: "المتابعة نشطة",
-      ended: "انتهت المتابعة",
-      declined: "لم يتم قبول الطلب",
-      cancelled: "تم إلغاء الطلب"
-    };
-    const status = expired && item.status === "active"
-      ? "انتهت مدة الاتفاق — قراءة فقط"
-      : statusLabels[item.status] || "حالة الطلب غير محددة";
+    const statusLabels = { pending:"طلب المحادثة قيد الانتظار", accepted:"بانتظار استكمال الاتفاق", active:"المتابعة نشطة", ended:"انتهت المتابعة", declined:"لم يتم قبول الطلب", cancelled:"تم إلغاء الطلب" };
+    const status = expired && item.status === "active" ? "انتهت مدة الاتفاق — قراءة فقط" : statusLabels[item.status] || "حالة الطلب غير محددة";
     let actions = "";
-    if (hasAgreement && item.status === "accepted" && !item.patient_agreement_at) {
-      actions += '<button type="button" class="portal-primary-button" data-care-confirm="agreement" data-request-id="' + escapeHtml(item.request_id) + '">الموافقة على الاتفاق</button>';
-    }
-    if (agreed && item.status === "accepted" && !sent) {
-      actions += '<button type="button" class="portal-primary-button" data-care-confirm="payment_sent" data-request-id="' + escapeHtml(item.request_id) + '">تأكيد إرسال المبلغ</button>';
-    }
-    if (item.status === "pending") {
-      actions += '<button type="button" class="portal-secondary-button" data-cancel-professional-request="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button>';
-    }
-    const agreementDetails = hasAgreement
-      ? '<div class="portal-care-agreement__details"><div><small>الخدمة</small><strong>' + escapeHtml(item.agreement_service_title) +
-        '</strong></div><div><small>القيمة</small><strong>' + escapeHtml(money) +
-        '</strong></div><div><small>المدة</small><strong>' + escapeHtml(item.agreement_duration_days) + ' يوم</strong></div><div><small>من</small><strong>' + escapeHtml(formatDate(item.agreement_start_date)) +
-        '</strong></div><div><small>إلى</small><strong>' + escapeHtml(formatDate(item.agreement_end_date)) +
-        '</strong></div></div>' +
+    if (hasAgreement && item.status === "accepted" && !item.patient_agreement_at) actions += '<button type="button" class="portal-primary-button" data-care-confirm="agreement" data-request-id="' + escapeHtml(item.request_id) + '">الموافقة على الاتفاق</button>';
+    if (agreed && item.status === "accepted" && !sent) actions += '<button type="button" class="portal-primary-button" data-care-confirm="payment_sent" data-request-id="' + escapeHtml(item.request_id) + '">تأكيد إرسال المبلغ</button>';
+    if (item.status === "pending") actions += '<button type="button" class="portal-secondary-button" data-cancel-professional-request="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button>';
+    const details = hasAgreement
+      ? '<div class="portal-care-agreement__details"><div><small>الخدمة</small><strong>' + escapeHtml(item.agreement_service_title) + '</strong></div><div><small>القيمة</small><strong>' + escapeHtml(money) + '</strong></div><div><small>المدة</small><strong>' + escapeHtml(item.agreement_duration_days) + ' يوم</strong></div><div><small>من</small><strong>' + escapeHtml(formatDate(item.agreement_start_date)) + '</strong></div><div><small>إلى</small><strong>' + escapeHtml(formatDate(item.agreement_end_date)) + '</strong></div></div>' +
         (item.agreement_service_description ? '<p>' + escapeHtml(item.agreement_service_description) + '</p>' : '') +
         (item.agreement_terms ? '<p>' + escapeHtml(item.agreement_terms) + '</p>' : '') +
         '<ol class="portal-care-steps"><li class="' + (item.patient_agreement_at ? 'is-done' : '') + '">موافقة المريض</li><li class="' + (item.professional_agreement_at ? 'is-done' : '') + '">موافقة المختص</li><li class="' + (sent ? 'is-done' : '') + '">إرسال المبلغ</li><li class="' + (received ? 'is-done' : '') + '">استلام المبلغ وبدء المتابعة</li></ol>'
       : '<p>لم يرسل المختص تفاصيل الاتفاق بعد. ستظهر الخدمة والسعر والمدة هنا قبل أي التزام مالي.</p>';
-    return '<article class="portal-care-agreement" data-care-request-id="' + escapeHtml(item.request_id) + '"><header><div><strong>' + escapeHtml(item.professional_name || "المختص") +
-      '</strong><small>' + escapeHtml(item.professional_title || "") + '</small></div><span>' + escapeHtml(status) +
-      '</span></header>' + agreementDetails +
-      '<div class="portal-care-agreement__actions">' + actions + '</div>' +
-      (hasAgreement ? '<p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p>' : '') +
-      '</article>';
+    const label = item.agreement_service_title || (item.status === "pending" ? "طلب محادثة جديد" : "طلب متابعة");
+    return '<details class="portal-care-agreement" data-care-request-id="' + escapeHtml(item.request_id) + '"><summary><span><strong>' + escapeHtml(label) + '</strong><small>' + escapeHtml(status) + '</small></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary><div class="portal-care-agreement__body"><div class="portal-care-agreement__details-wrap">' + details + '</div><div class="portal-care-agreement__actions">' + actions + '</div>' +
+      (hasAgreement ? '<p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p>' : '') + '</div></details>';
   }
 
   function renderSharedHealthForm() {
@@ -634,7 +611,16 @@
       return;
     }
 
-    root.innerHTML = requests.map(careAgreementMarkup).join("");
+    const groups = new Map();
+    requests.forEach(item => {
+      const key = item.professional_id || ("name:" + (item.professional_name || item.request_id));
+      if (!groups.has(key)) groups.set(key, { name: item.professional_name || "المختص", title: item.professional_title || "", items: [] });
+      groups.get(key).items.push(item);
+    });
+    root.innerHTML = [...groups.values()].map(group =>
+      '<details class="portal-care-professional"><summary><span><strong>' + escapeHtml(group.name) + '</strong><small>' + escapeHtml(group.title || (group.items.length.toLocaleString("ar-EG") + " اتفاق / طلب")) + '</small></span><span class="portal-care-count">' + group.items.length.toLocaleString("ar-EG") + '</span></summary><div class="portal-care-professional__agreements">' +
+      group.items.map(careAgreementMarkup).join("") + '</div></details>'
+    ).join("");
     root.querySelectorAll("[data-care-confirm]").forEach(button => button.addEventListener("click", async () => {
       if (button.disabled) return;
       const step = button.dataset.careConfirm;
