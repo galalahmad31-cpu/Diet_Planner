@@ -1103,6 +1103,7 @@
 
   async function loadPatientCareMode() {
     if (!patientId || !state.user?.id || !state.patient || state.patientCareMode) return;
+    state.patientCareMode = 'resolving';
     const root = $('patientCareDetails');
     try {
       const [requestsResult, careTeamResult] = await Promise.all([
@@ -1132,6 +1133,7 @@
       }
     } catch (error) {
       console.error('Patient care mode resolution failed:', error);
+      state.patientCareMode = 'error';
       if (root) root.hidden = true;
       const financeError = $('patientFinanceError');
       if (financeError) {
