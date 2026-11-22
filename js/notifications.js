@@ -52,8 +52,9 @@ const todayKey = window.DPDate.todayKey;
 const daysUntil = window.DPDate.daysUntil;
 
 function addMonthsToDateKey(baseDate, months) {
-  const key = dateKey(baseDate);
-  if (!key || !Number.isInteger(Number(months))) return '';
+  if (!Number.isInteger(Number(months))) return '';
+  return window.DPDate.addMonths(baseDate, months);
+}
 
   const [year, month, day] = key.split('-').map(Number);
   const date = new Date(year, month - 1, day);
