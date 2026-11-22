@@ -55,5 +55,11 @@
     });
   }
 
-  window.DPConfirm = Object.freeze({ ask });
+  function close() { if (pending) finish(false); }
+
+  window.DPConfirm = Object.freeze({ ask, close });
+  window.DietPlannerConfirm = Object.freeze({ ask(title, message, action) {
+    if (typeof action !== "function") return;
+    void ask({ title, message }).then(confirmed => { if (confirmed) return action(); });
+  } });
 })();
