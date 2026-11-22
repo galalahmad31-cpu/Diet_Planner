@@ -100,9 +100,9 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel"];
+    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalAppointmentsPanel", "portalCommunicationPanel", "portalCareManagementPanel"];
     if (!allowed.includes(panelId)) return;
-    if (!state.hasActiveCareTeam && panelId !== "portalCommunicationPanel") return;
+    if (!state.hasActiveCareTeam && !["portalCommunicationPanel", "portalCareManagementPanel"].includes(panelId)) return;
 
     // Keep the selected panel's ancestors visible. Tabs live outside portalContent,
     // so a hidden parent would otherwise leave an active tab with a completely blank body.
@@ -128,7 +128,8 @@
       portalPlansPanel: loadPlans,
       portalMeasurementsPanel: loadMeasurements,
       portalAppointmentsPanel: loadSubscriptionFollowUp,
-      portalCommunicationPanel: loadProfessionalRequests
+      portalCommunicationPanel: loadProfessionalRequests,
+      portalCareManagementPanel: loadProfessionalCareManagement
     };
     const loader = loaders[panelId];
     if (!loader) return;
@@ -143,7 +144,8 @@
           portalPlansPanel: "portalPlansLoading",
           portalMeasurementsPanel: "portalMeasurementsError",
           portalAppointmentsPanel: "portalFollowUpError",
-          portalCommunicationPanel: "patientProfessionalRequests"
+          portalCommunicationPanel: "patientProfessionalRequests",
+          portalCareManagementPanel: "patientCareManagementContent"
         };
         const target = $(targets[panelId]);
         if (target) {
@@ -174,7 +176,7 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalAppointmentsPanel","portalCommunicationPanel","portalCareManagementPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
@@ -501,6 +503,69 @@
     } finally {
       loading.hidden = true;
     }
+  }
+
+
+  function careAgreementMarkup(item) {
+    const hasAgreement = Boolean(item.agreement_service_title);
+    const agreed = Boolean(item.patient_agreement_at && item.professional_agreement_at);
+    const sent = Boolean(item.payment_sent_at);
+    const received = Boolean(item.payment_received_at);
+    const expired = item.agreement_end_date && item.agreement_end_date < localToday();
+    const money = item.agreement_amount == null ? "—" : Number(item.agreement_amount).toLocaleString("ar-EG") + " " + (item.agreement_currency || "EGP");
+    const status = item.status === "ended" ? "انتهت المتابعة — الملف محفوظ" :
+      expired ? "انتهت مدة الاتفاق — وضع القراءة فقط للمختص" :
+      item.status === "active" ? "المتابعة نشطة" : "بانتظار استكمال الاتفاق";
+    let actions = "";
+    if (hasAgreement && item.status === "accepted" && !item.patient_agreement_at) {
+      actions += '<button type="button" class="portal-primary-button" data-care-confirm="agreement" data-request-id="' + escapeHtml(item.request_id) + '">أوافق على الاتفاق</button>';
+    }
+    if (agreed && item.status === "accepted" && !sent) {
+      actions += '<button type="button" class="portal-primary-button" data-care-confirm="payment_sent" data-request-id="' + escapeHtml(item.request_id) + '">تأكيد إرسال المبلغ للمختص</button>';
+    }
+    return '<article class="portal-care-agreement"><header><div><strong>' + escapeHtml(item.professional_name || "المختص") +
+      '</strong><small>' + escapeHtml(item.professional_title || "") + '</small></div><span>' + escapeHtml(status) +
+      '</span></header>' + (hasAgreement ?
+      '<div class="portal-care-agreement__details"><div><small>الخدمة</small><strong>' + escapeHtml(item.agreement_service_title) +
+      '</strong></div><div><small>القيمة</small><strong>' + escapeHtml(money) +
+      '</strong></div><div><small>المدة</small><strong>' + escapeHtml(item.agreement_duration_days) + ' يوم</strong></div><div><small>من</small><strong>' + escapeHtml(formatDate(item.agreement_start_date)) +
+      '</strong></div><div><small>إلى</small><strong>' + escapeHtml(formatDate(item.agreement_end_date)) +
+      '</strong></div></div>' + (item.agreement_service_description ? '<p>' + escapeHtml(item.agreement_service_description) + '</p>' : '') +
+      (item.agreement_terms ? '<p>' + escapeHtml(item.agreement_terms) + '</p>' : '') +
+      '<ol class="portal-care-steps"><li class="' + (item.patient_agreement_at ? 'is-done' : '') + '">موافقة المريض</li><li class="' + (item.professional_agreement_at ? 'is-done' : '') + '">موافقة المختص</li><li class="' + (sent ? 'is-done' : '') + '">تأكيد إرسال المبلغ</li><li class="' + (received ? 'is-done' : '') + '">تأكيد استلام المبلغ وبدء المتابعة</li></ol>' :
+      '<p>لم يرسل المختص اتفاقًا بعد. ستظهر تفاصيل الخدمة والسعر والمدة هنا قبل أي التزام مالي.</p>') +
+      '<div class="portal-care-agreement__actions">' + actions + '</div><p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p></article>';
+  }
+
+  async function loadProfessionalCareManagement() {
+    const root = $("patientCareManagementContent");
+    if (!root) return;
+    root.textContent = "جاري تحميل الاتفاقات...";
+    const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
+    if (error) throw error;
+    const rows = data || [];
+    const relevant = rows.filter(item => ["accepted", "active", "ended"].includes(item.status));
+    if (!relevant.length) {
+      root.textContent = "لا توجد اتفاقات متابعة حتى الآن. يمكنك إرسال طلب محادثة من دليل المختصين.";
+      return;
+    }
+    root.innerHTML = relevant.map(careAgreementMarkup).join("");
+    root.querySelectorAll("[data-care-confirm]").forEach(button => button.addEventListener("click", async () => {
+      if (button.disabled) return;
+      const step = button.dataset.careConfirm;
+      const message = step === "agreement" ? "بتأكيدك، أنت توافق على الخدمة والسعر والمدة والشروط الموضحة." : "هل تؤكد أنك أرسلت المبلغ مباشرة إلى المختص؟";
+      const ok = await window.DPConfirm?.ask({title: step === "agreement" ? "تأكيد الاتفاق" : "تأكيد الدفع",message,confirmText:"تأكيد"});
+      if (!ok) return;
+      button.disabled = true;
+      const { error: rpcError } = await supabase.rpc("confirm_professional_connection_step", {p_request_id:button.dataset.requestId,p_step:step});
+      if (rpcError) {
+        button.disabled = false;
+        button.insertAdjacentText("afterend", " تعذر التأكيد: " + rpcError.message);
+        return;
+      }
+      state.loadedPanels.delete("portalCareManagementPanel");
+      await loadProfessionalCareManagement();
+    }));
   }
 
   async function loadProfessionalRequests(rootId = "patientProfessionalRequests") {
