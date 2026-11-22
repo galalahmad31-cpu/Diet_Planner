@@ -779,7 +779,9 @@
     Object.values(outputs).forEach(node => show(node, "—"));
     if (!message) return;
 
-    if (icrInput !== "" && Number.isFinite(manualIcr) && manualIcr > 0 && manualIcr <= 200) {
+    if (icrInput === "") {
+      delete insulinMealIcrOverrides[mealKey];
+    } else if (Number.isFinite(manualIcr) && manualIcr > 0 && manualIcr <= 200) {
       insulinMealIcrOverrides[mealKey] = manualIcr;
     }
     const validTdd = tddInput !== "" && Number.isFinite(tdd) && tdd > 0 && tdd <= 500;
