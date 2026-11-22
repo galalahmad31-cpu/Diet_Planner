@@ -639,6 +639,41 @@
     }
   }
 
+  async function redeemProfessionalInvitation(event) {
+    event.preventDefault();
+    const form = $("patientProfessionalCodeForm");
+    const input = $("patientProfessionalCode");
+    const button = form?.querySelector('button[type="submit"]');
+    const token = String(input?.value || "").trim();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token)) {
+      setMessage("patientProfessionalCodeStatus", "كود الربط غير صحيح. أدخل الكود كاملًا كما أرسله المختص.", "error");
+      return;
+    }
+    if (!button || button.disabled) return;
+    button.disabled = true;
+    setMessage("patientProfessionalCodeStatus", "جاري التحقق من الكود وإرسال طلب المتابعة...");
+    try {
+      const { error } = await supabase.rpc("redeem_patient_professional_invitation", { p_token: token });
+      if (error) throw error;
+      input.value = "";
+      setMessage("patientProfessionalCodeStatus", "تم التحقق من الكود وإرسال طلب المتابعة للمختص. ستظهر حالته هنا.", "success");
+      state.loadedPanels.delete("portalCareManagementPanel");
+      await loadProfessionalCareManagement();
+    } catch (error) {
+      console.error("Professional invitation redemption failed:", error);
+      const messages = {
+        invitation_invalid_expired_or_used: "الكود غير صحيح أو انتهت صلاحيته أو سبق استخدامه.",
+        invitation_already_used: "تم استخدام هذا الكود من قبل.",
+        active_patient_account_required: "يلزم تسجيل الدخول بحساب مريض نشط لاستخدام كود الربط.",
+        already_in_care_team: "أنت مرتبط بالفعل بهذا المختص.",
+        connection_request_already_open_or_processed: "يوجد طلب أو متابعة سابقة مع هذا المختص بالفعل."
+      };
+      setMessage("patientProfessionalCodeStatus", messages[error?.message] || "تعذر استخدام الكود. راجع صلاحيته أو تواصل مع المختص.", "error");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
   async function loadProfessionalCareManagement() {
     const root = $("patientCareManagementContent");
     if (!root) return;
@@ -1185,6 +1220,7 @@
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
     $("patientSharedHealthForm")?.addEventListener("submit", saveSharedHealthRecord);
+    $("patientProfessionalCodeForm")?.addEventListener("submit", redeemProfessionalInvitation);
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab(tab.dataset.planTab)));
     const initialSection = window.location.hash.slice(1);
