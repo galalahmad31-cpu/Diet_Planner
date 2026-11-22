@@ -794,14 +794,14 @@
     show(outputs.tdd, tdd.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " وحدة");
     show(outputs.icr, "1 وحدة لكل " + icr.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " جم");
     show(outputs.isf, "1 وحدة لكل " + isf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " mg/dL");
-    show(message, `تقدير تعليمي أولي لمريض السكري ${diabetesType === "type1" ? "النوع الأول" : "النوع الثاني"} باستخدام نظام القاعدي مع إنسولين الوجبات. القواعد تقديرية ولا تستبدل المعامل المعتمد من الطبيب.`);
+    show(message, "تم حساب المعاملات بصورة استرشادية.");
     setState(message, "notice");
 
     if (currentInput === "" || targetInput === "") return;
     if (!Number.isFinite(current) || !Number.isFinite(target) || current < 20 || current > 600 || target < 70 || target > 250) {
       show(outputs.difference, "قيمة غير صالحة");
       show(outputs.correction, "—");
-      show(message, "تحقق من القيم: قياس السكر بين 20 و600، والهدف بين 70 و250 mg/dL.");
+      show(message, "يرجى مراجعة قيم السكر المدخلة؛ تأكد من أن القياس والهدف ضمن النطاقات المحددة.");
       setState(message, "warning");
       return;
     }
@@ -811,7 +811,7 @@
     if (difference <= 0) {
       show(outputs.correction, difference < 0 ? "لا يُحسب تصحيح موجب" : "0 وحدة");
       if (difference < 0) {
-        show(message, "القراءة أقل من الهدف؛ لا تستخدم هذه الأداة لحساب جرعة تصحيح. اتبع خطة التعامل مع انخفاض السكر أو تعليمات فريقك المعالج.");
+        show(message, "قراءة السكر أقل من الهدف. يُرجى الرجوع إلى خطة المتابعة المتفق عليها مع فريق الرعاية.");
         setState(message, "warning");
       }
       return;
@@ -819,7 +819,7 @@
 
     const theoreticalUnits = difference / isf;
     show(outputs.correction, theoreticalUnits.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " وحدة (نظريًا)");
-    show(message, "ناتج حسابي تعليمي فقط من فرق السكر ÷ ISF التقديري، وليس جرعة للحقن. لا يخصم IOB ولا يراعي العوامل السريرية الفردية؛ اتبع خطة التصحيح المعتمدة من الطبيب.");
+    show(message, "تم حساب الفرق والناتج الاسترشادي باستخدام معامل التصحيح التقديري.");
     setState(message, "warning");
   }
 
