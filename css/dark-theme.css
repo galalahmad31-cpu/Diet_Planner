@@ -1003,8 +1003,6 @@ html[data-theme="dark"] .calc-result-bmr{
 }
 html[data-theme="dark"] .assessment-section :is(h2,h3,h4,strong,label),
 html[data-theme="dark"] .module-card :is(h2,h3,h4,strong){color:var(--dp-text)!important}
-html[data-theme="dark"] .assessment-section :is(p,small,span),
-html[data-theme="dark"] .module-card :is(p,small,span){color:var(--dp-text-2)!important}
 
 /* Weight and measurement history */
 html[data-theme="dark"] body:has(#weightTab) .glass,
