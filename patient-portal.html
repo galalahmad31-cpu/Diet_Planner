@@ -159,7 +159,7 @@
         <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalAppointmentsPanel" data-health-tab="portalAppointmentsPanel">الاشتراك والمتابعة</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalCommunicationPanel" data-health-tab="portalCommunicationPanel">التواصل مع المختص</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalCareManagementPanel" data-health-tab="portalCareManagementPanel">إدارة المتابعة</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalCareManagementPanel" data-health-tab="portalCareManagementPanel">إدارة المتابعة</button>\n        <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">البيانات الصحية</button>
       </nav>
 
     <section id="portalLoading" class="portal-state-card">
@@ -213,6 +213,24 @@
       </div>
 
       <div id="portalCareManagementPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="patientCareManagementTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">CARE AGREEMENT</span><h2 id="patientCareManagementTitle">إدارة المتابعة</h2><p>راجع الاتفاق ووافق عليه وتابع تأكيدات الدفع ومدة المتابعة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-handshake"></i></span></div><div id="patientCareManagementContent" class="portal-care-management-list">جاري تحميل الاتفاقات...</div></section></div>
+
+      <div id="portalSharedHealthPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
+        <section class="portal-section" aria-labelledby="patientSharedHealthTitle">
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية المشتركة</h2><p>بيانات أساسية يمكن للمريض والمختص المخوّل مراجعتها وتحديثها أثناء المتابعة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
+          <form id="patientSharedHealthForm" class="portal-shared-health-form">
+            <div class="portal-shared-health-grid">
+              <label>اسم المريض<input id="sharedHealthName" type="text" readonly></label>
+              <label>النوع<input id="sharedHealthGender" type="text" maxlength="30" placeholder="ذكر / أنثى"></label>
+              <label>تاريخ الميلاد<input id="sharedHealthBirthDate" type="date"></label>
+              <label>الطول (سم)<input id="sharedHealthHeight" type="number" min="30" max="260" step="0.1"></label>
+              <label class="is-wide">التشخيص<input id="sharedHealthDiagnosis" type="text" maxlength="4000"></label>
+              <label class="is-wide">الشكوى أو سبب المتابعة<textarea id="sharedHealthComplaints" rows="3" maxlength="4000"></textarea></label>
+            </div>
+            <div class="portal-form-footer"><p id="patientSharedHealthStatus" class="portal-inline-message" role="status"></p><button type="submit" class="portal-primary-button">حفظ البيانات الصحية</button></div>
+          </form>
+        </section>
+        <section class="portal-section" aria-labelledby="patientHealthAuditTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">CHANGE HISTORY</span><h3 id="patientHealthAuditTitle">سجل التعديلات</h3><p>من قام بالتعديل ومتى.</p></div></div><div id="patientHealthAuditList" class="portal-health-audit-list">جاري تحميل السجل...</div></section>
+      </div>
 
       <div id="portalAppointmentsPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
         <section class="portal-section" aria-labelledby="portalAppointmentsTitle">
