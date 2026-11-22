@@ -559,34 +559,37 @@ body.support-delete-modal-open{overflow:hidden}
 }
 #patientEnergyPanel #calcTab .macro-item{
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:center;
-  gap:6px 3px;
+  gap:5px 4px;
   min-width:0;
-  padding:8px 6px;
+  padding:7px 5px;
   border:1px solid var(--dp-border,var(--dp-border));
   border-radius:9px;
   background:var(--dp-bg,var(--dp-surface-2));
   box-shadow:none;
 }
 #patientEnergyPanel #calcTab .macro-name{
-  display:grid;
-  grid-template-columns:7px minmax(0,1fr);
+  display:flex;
+  grid-column:1/-1;
   align-items:center;
+  justify-content:center;
   min-width:0;
   gap:4px;
   color:var(--dp-text,var(--dp-text));
   font-size:9px;
   font-weight:900;
+  white-space:nowrap;
 }
 #patientEnergyPanel #calcTab .macro-label{
   display:block;
   min-width:0;
   max-width:100%;
-  white-space:normal;
-  overflow-wrap:anywhere;
-  line-height:1.25;
-  text-align:right;
+  white-space:nowrap;
+  word-break:keep-all;
+  overflow-wrap:normal;
+  line-height:1.3;
+  text-align:center;
 }
 #patientEnergyPanel #calcTab .macro-dot{
   width:7px;
@@ -612,7 +615,9 @@ body.support-delete-modal-open{overflow:hidden}
 #patientEnergyPanel #calcTab .macro-item.fats .macro-dot{background:var(--dp-warning)}
 #patientEnergyPanel #calcTab .macro-percent{
   display:flex;
+  grid-column:1;
   align-items:center;
+  justify-content:center;
   gap:2px;
   color:var(--dp-muted,var(--dp-muted));
   font-size:9px;
@@ -633,22 +638,24 @@ body.support-delete-modal-open{overflow:hidden}
 }
 #patientEnergyPanel #calcTab .macro-grams{
   display:flex;
-  grid-column:1/-1;
+  grid-column:2;
   align-items:baseline;
   justify-content:center;
-  gap:4px;
+  gap:3px;
   min-width:0;
-  padding-top:5px;
-  border-top:1px solid var(--dp-border,var(--dp-border));
+  padding:0;
+  border:0;
+  white-space:nowrap;
 }
 #patientEnergyPanel #calcTab .macro-grams strong{
   color:var(--dp-text,var(--dp-text));
-  font-size:17px;
+  font-size:15px;
+  line-height:1.2;
   font-weight:900;
 }
 #patientEnergyPanel #calcTab .macro-grams small{
   color:var(--dp-muted,var(--dp-muted));
-  font-size:8px;
+  font-size:7px;
 }
 #patientEnergyPanel #calcTab .macro-alert{
   margin-top:6px;
@@ -711,7 +718,10 @@ body.support-delete-modal-open{overflow:hidden}
   #patientEnergyPanel #calcTab .activity-row button{padding-inline:8px;font-size:9px}
   #patientEnergyPanel #calcTab .energy-results{gap:5px}
   #patientEnergyPanel #calcTab .energy-results>div{padding:7px}
-  #patientEnergyPanel #calcTab .macro-item{padding:8px 5px}
+  #patientEnergyPanel #calcTab .macro-item{padding:7px 4px;gap:5px 2px}
+  #patientEnergyPanel #calcTab .macro-name{font-size:8.5px}
+  #patientEnergyPanel #calcTab .macro-percent input{width:35px;height:29px}
+  #patientEnergyPanel #calcTab .macro-grams strong{font-size:14px}
 }
 @media(max-width:380px){
   #patientEnergyPanel #calcTab .workspace-heading{align-items:flex-start;flex-direction:column}
@@ -724,9 +734,10 @@ body.support-delete-modal-open{overflow:hidden}
   #patientEnergyPanel #calcTab .activity-row select{grid-column:1}
   #patientEnergyPanel #calcTab .activity-row button{grid-column:2}
   #patientEnergyPanel #calcTab .macro-name{font-size:8px}
-  #patientEnergyPanel #calcTab .macro-label{line-height:1.2}
-  #patientEnergyPanel #calcTab .macro-percent input{width:35px}
-  #patientEnergyPanel #calcTab .macro-grams strong{font-size:15px}
+  #patientEnergyPanel #calcTab .macro-label{line-height:1.25}
+  #patientEnergyPanel #calcTab .macro-percent input{width:33px}
+  #patientEnergyPanel #calcTab .macro-grams{gap:2px}
+  #patientEnergyPanel #calcTab .macro-grams strong{font-size:13px}
 }
 
 /* Patient measurement summary: three compact cards above the history table. */
