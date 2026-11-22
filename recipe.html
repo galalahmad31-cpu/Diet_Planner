@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v4">
+<link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
     <script src="js/theme.js?v=20261121-header-only-v15"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
@@ -229,25 +230,10 @@
         </div>
     </div>
 
-    <div id="deleteModal" class="recipe-modal fixed inset-0 z-[70] hidden items-center justify-center p-4">
-        <div class="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
-            <div class="flex items-center gap-3">
-                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-50 text-red-600"><i class="fa-solid fa-trash"></i></div>
-                <div>
-                    <h3 class="font-extrabold text-slate-800">تأكيد حذف الوصفة</h3>
-                    <p id="deleteText" class="mt-1 text-xs text-slate-500">هل تريد حذف هذه الوصفة؟</p>
-                </div>
-            </div>
-            <div class="mt-5 flex gap-2">
-                <button id="confirmDelete" type="button" class="flex-1 rounded-xl bg-red-600 px-4 py-3 text-xs font-extrabold text-white">حذف الوصفة</button>
-                <button id="cancelDelete" type="button" class="rounded-xl bg-slate-100 px-4 py-3 text-xs font-bold text-slate-600">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
     <div id="toast" class="fixed bottom-5 left-5 z-[120] hidden rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1"></script>
     <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
     <script src="js/recipe.js?v=20261120-subscription-gate-v1"></script>
 </body>
