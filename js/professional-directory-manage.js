@@ -1,32 +1,25 @@
 (()=> {
 "use strict";
 const db=window.DietPlannerAccess?.supabaseClient,$=id=>document.getElementById(id);
-let user=null,profileStatus="draft",offers=[];
+let user=null,profileStatus="draft",profileExists=false,offers=[];
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const val=id=>$(id).value.trim();
 const setStatus=t=>$("professionalProfileStatus").textContent=t;
 function setEditorLocked(locked){
- $("professionalProfileForm").querySelectorAll("input,textarea,button").forEach(el=>el.disabled=locked);
+ const form=$("professionalProfileForm");
+ form.querySelectorAll("input,textarea,select").forEach(el=>el.disabled=locked);
  $("addProfessionalOffer").disabled=locked;
  $("professionalOffersList").querySelectorAll("input,textarea,button").forEach(el=>el.disabled=locked);
- $("submitForReview").disabled=locked;
 }
-function setProfileView(saved){
- $("professionalProfileSavedView").hidden=!saved;
- $("professionalProfileForm").hidden=saved;
- $("cancelProfessionalProfileEdit").hidden=saved;
-}
-function renderProfileSummary(data){
- const modes={online:"أونلاين",in_person:"حضوري"};
- const items=[["الاسم الظاهر",data.display_name],["المسمى المهني",data.professional_title],["التخصصات",(data.specialties||[]).join("، ")||"—"],["سنوات الخبرة",data.experience_years==null?"—":data.experience_years+" سنة"],["المحافظة",data.governorate],["المدينة",data.city],["الصورة الشخصية",data.photo_url?"رابط صورة مضاف":"لم تُضف صورة"],["طرق تقديم الخدمة",(data.service_modes||[]).map(x=>modes[x]||x).join("، ")||"—"],["النبذة المهنية",data.bio||"—"]];
- $("professionalProfileSummary").innerHTML=items.map(([label,value])=>'<div class="professional-profile-summary-item"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong></div>').join("");
+function updateProfileActions(){
  const editable=["draft","rejected"].includes(profileStatus);
- $("editProfessionalProfile").hidden=!editable;
- $("deleteProfessionalProfile").hidden=!editable;
- $("submitForReview").hidden=!editable;
+ const form=$("professionalProfileForm");
+ form.querySelector('button[type="submit"]').hidden=!editable;
+ $("saveAndSubmitForReview").hidden=!editable;
+ $("deleteProfessionalProfile").hidden=!(editable&&profileExists);
  const withdrawButton=$("withdrawDirectoryProfile");
  withdrawButton.hidden=![ "pending_review","published" ].includes(profileStatus);
- withdrawButton.textContent=profileStatus==="pending_review"?"إلغاء الإرسال":"حذف الملف من الدليل";
+ withdrawButton.textContent=profileStatus==="pending_review"?"إلغاء الإرسال":"إيقاف الظهور في الدليل";
 }
 function renderOfferRows(){
  const root=$("professionalOffersList");
@@ -85,6 +78,7 @@ async function save(){
  const result=existing?await db.from("professional_directory_profiles").update(profile).eq("user_id",user.id):await db.from("professional_directory_profiles").insert(profile);
  if(result.error){setStatus("تعذر حفظ البيانات المهنية: "+result.error.message);return false;}
  if(!await saveOffers())return false;
+ profileExists=true;
  setStatus("تم حفظ الملف المهني والخدمات والأسعار.");
  return true;
 }
@@ -93,17 +87,19 @@ async function load(){
  const {data,error}=await db.from("professional_directory_profiles").select("*").eq("user_id",user.id).maybeSingle();
  if(error){setStatus("تعذر تحميل الملف: "+error.message);return;}
  if(data){
+  profileExists=true;
   $("professionalDisplayName").value=data.display_name||"";$("professionalTitle").value=data.professional_title||"";$("professionalBio").value=data.bio||"";
   $("professionalSpecialties").value=(data.specialties||[]).join("، ");$("professionalGovernorate").value=data.governorate||"";$("professionalCity").value=data.city||"";
   $("professionalExperience").value=data.experience_years??"";$("professionalPhoto").value=data.photo_url||"";
   document.querySelectorAll("[name=serviceMode]").forEach(x=>x.checked=(data.service_modes||[]).includes(x.value));
   profileStatus=data.listing_status||"draft";
   setStatus("حالة الملف: "+({draft:"مسودة",pending_review:"قيد المراجعة — لا يمكن التعديل حتى انتهاء المراجعة",published:"منشور ومعتمد — أوقف الظهور أولًا قبل التعديل",rejected:"يحتاج إلى تعديل",suspended:"موقوف — تواصل مع إدارة المنصة"}[profileStatus]||profileStatus)+(data.moderation_note?" — ملاحظة: "+data.moderation_note:""));
-  await loadOffers();renderProfileSummary(data);setProfileView(true);
+  await loadOffers();
   setEditorLocked(["pending_review","published","suspended"].includes(profileStatus));
+  updateProfileActions();
  }else{
-  profileStatus="draft";offers=[];renderOfferRows();setStatus("لم تنشئ ملفًا مهنيًا بعد. الظهور اختياري.");
-  setProfileView(false);setEditorLocked(false);
+  profileExists=false;profileStatus="draft";offers=[];renderOfferRows();setStatus("لم تنشئ ملفًا مهنيًا بعد. الظهور اختياري.");
+  setEditorLocked(false);updateProfileActions();
  }
 }
 document.addEventListener("DOMContentLoaded",()=>{
@@ -128,33 +124,17 @@ document.addEventListener("DOMContentLoaded",()=>{
    button.disabled=false;
   }
  });
- $("editProfessionalProfile").addEventListener("click",()=>{
-  if(!["draft","rejected"].includes(profileStatus))return;
-  setProfileView(false);setEditorLocked(false);$("professionalProfileForm").scrollIntoView({behavior:"smooth",block:"start"});
- });
- $("cancelProfessionalProfileEdit").addEventListener("click",load);
  $("deleteProfessionalProfile").addEventListener("click",async()=>{
   if(!confirm("سيتم حذف الملف المهني وخدماته وأسعاره نهائيًا. لن يتم حذف حسابك أو بيانات المرضى. هل تريد المتابعة؟"))return;
   const button=$("deleteProfessionalProfile");button.disabled=true;setStatus("جارٍ حذف الملف المهني...");
   try{
    const {error}=await db.rpc("delete_my_professional_directory_profile");if(error)throw error;
-   offers=[];profileStatus="draft";$("professionalProfileForm").reset();$("professionalOffersList").innerHTML="";
-   setProfileView(false);setEditorLocked(false);setStatus("تم حذف الملف المهني وخدماته.");
+   offers=[];profileExists=false;profileStatus="draft";$("professionalProfileForm").reset();renderOfferRows();
+   setEditorLocked(false);updateProfileActions();setStatus("تم حذف الملف المهني وخدماته.");
   }catch(error){
    const messages={profile_must_be_withdrawn_before_delete:"أوقف ظهور الملف أولًا قبل حذفه.",profile_has_connection_history:"لا يمكن حذف الملف لوجود سجل طلبات تواصل مرتبط به. يمكنك إيقاف ظهوره بدلًا من ذلك.",profile_has_patient_relationships:"لا يمكن حذف الملف لوجود علاقات متابعة مع مرضى. يمكنك إيقاف ظهوره بدلًا من ذلك.",profile_not_found:"الملف المهني غير موجود."};
    setStatus(messages[error.message]||"تعذر حذف الملف: "+(error.message||"حدث خطأ غير متوقع."));
   }finally{button.disabled=false;}
- });
- $("submitForReview").addEventListener("click",async()=>{
-  const button=$("submitForReview");button.disabled=true;
-  try{
-   const {error}=await db.rpc("submit_professional_directory_profile");
-   if(error){setStatus("تعذر إرسال الملف: "+error.message);return;}
-   await load();
-   setStatus("تم إرسال الملف للمراجعة. لن يظهر للعامة حتى تعتمد إدارة المنصة الملف.");
-  }finally{
-   button.disabled=false;
-  }
  });
  $("withdrawDirectoryProfile").addEventListener("click",async()=>{
   const isPending=profileStatus==="pending_review";
