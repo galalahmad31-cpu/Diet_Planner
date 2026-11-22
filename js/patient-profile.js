@@ -74,7 +74,6 @@
     const editButton = $('editButton');
     const addPlanButton = $('addPlanButton');
     const addExchangePlanButton = $('addExchangePlanButton');
-    updateMeasurementWriteAccess();
     updatePatientFinanceWriteAccess();
 
     if (editButton) {
@@ -191,17 +190,6 @@
   // Inline patient measurements: reuse the existing weight_logs schema and the
   // same subscription/admin write gate without navigating away from this profile.
   const measurementState = { logs: [], loaded: false, loading: false };
-
-  function updateMeasurementWriteAccess() {
-    const status = $('measurementAccessStatus');
-    if (status) {
-      status.textContent = state.isAdmin
-        ? 'وضع المدير: يمكنك إضافة القياسات وإدارتها.'
-        : state.hasActiveSubscription
-          ? 'الاشتراك فعال — يمكنك إضافة قياس جديد.'
-          : 'يمكنك عرض السجل الحالي؛ إضافة قياس جديد متاحة أثناء الاشتراك المدفوع.';
-    }
-  }
 
   function formatMeasurementDelta(value) {
     if (!Number.isFinite(value)) return { value: '—', note: 'لا توجد بيانات كافية', trend: 'neutral' };
