@@ -363,7 +363,12 @@
   }
 
   function openPatient(id) {
-    if (!id) return;
+    const validId = typeof id === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+    if (!validId) {
+      window.alert("تعذر فتح ملف المريض لأن معرّف الملف غير صالح. حدّث قائمة المرضى وحاول مرة أخرى.");
+      return;
+    }
     window.location.href = `patient-profile.html?id=${encodeURIComponent(id)}`;
   }
 
