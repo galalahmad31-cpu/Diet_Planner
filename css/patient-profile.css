@@ -895,3 +895,6 @@ body.patient-conversation-open{overflow:hidden}
 .patient-finance-action[hidden]{display:none!important}
 .patient-finance-error.is-success{border-color:color-mix(in srgb,var(--dp-success) 28%,var(--dp-border));background:color-mix(in srgb,var(--dp-success) 10%,var(--dp-surface));color:var(--dp-success)}
 #patientLinkedCareView[hidden],#patientLegacyFinanceView[hidden]{display:none!important}
+
+
+#professionalSharedHealthSection[hidden]{display:none!important}
