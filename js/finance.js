@@ -267,10 +267,10 @@ function updateFinancialSummary() {
         if (row.finance.is_paid) paid += amount;
         else unpaid += amount;
     });
-    $('periodTotal').textContent = formatMoney(knownAmounts ? total : null);
-    $('periodPaid').textContent = formatMoney(knownAmounts ? paid : null);
-    $('periodUnpaid').textContent = formatMoney(knownAmounts ? unpaid : null);
-    $('periodCount').textContent = String(periodRows.length);
+    $('periodTotal').textContent = validRange && knownAmounts ? formatMoney(total) : '—';
+    $('periodPaid').textContent = validRange && knownAmounts ? formatMoney(paid) : '—';
+    $('periodUnpaid').textContent = validRange && knownAmounts ? formatMoney(unpaid) : '—';
+    $('periodCount').textContent = validRange ? String(periodRows.length) : '—';
     $('financeCustomRange').hidden = !custom;
     const invalid = custom && range.from && range.to && range.from > range.to;
     $('periodTotal').title = invalid ? 'تاريخ البداية يجب أن يسبق تاريخ النهاية.' : '';
@@ -312,7 +312,7 @@ function renderPatients() {
         if (expired) expiredCount++; else if (finance.subscription_end_date) activeCount++;
     });
     $('totalCount').textContent = rows.length;
-    $('paidCount').textContent = activeCount;
+    $('activeCount').textContent = activeCount;
     $('unpaidCount').textContent = unpaidCount;
     $('expiredCount').textContent = expiredCount;
     updateFinancialSummary();
