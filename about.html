@@ -65,6 +65,14 @@
         </div>
 
       <section>
+        <div class="about-tabs" role="tablist" aria-label="أقسام شرح المنصة">
+          <button type="button" class="about-tab is-active" id="patientTab" role="tab" aria-selected="true" aria-controls="sectionsContainer" data-audience="patient">
+            <i class="fa-solid fa-user"></i><span>مساحة المريض</span>
+          </button>
+          <button type="button" class="about-tab" id="professionalTab" role="tab" aria-selected="false" aria-controls="sectionsContainer" data-audience="professional">
+            <i class="fa-solid fa-user-doctor"></i><span>مساحة المختص</span>
+          </button>
+        </div>
         <div id="sectionsContainer" class="about-sections-grid"></div>
 
         <div id="emptyState" class="hidden rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
@@ -116,7 +124,7 @@
   </div>
 
   <script src="js/auth-access.js?v=20261118-subscription-gate-v2"></script>
-  <script src="js/about.js?v=20261120-about-editable-content-v2"></script>
+  <script src="js/about.js?v=20261122-about-audience-tabs-v1"></script>
   
 </body>
 </html>
