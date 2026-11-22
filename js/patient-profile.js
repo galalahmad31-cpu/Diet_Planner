@@ -1043,9 +1043,13 @@
         .select('id,actor_id,actor_role,operation,changed_fields,created_at')
         .eq('patient_id', patientId)
         .order('created_at', { ascending: false })
-        .limit(30);
+        .limit(100);
       if (error) throw error;
-      sharedHealthState.history = data || [];
+      sharedHealthState.history = (data || [])
+        .filter(item => (item.changed_fields || []).some(field =>
+          Object.prototype.hasOwnProperty.call(sharedHealthLabels, field)
+        ))
+        .slice(0, 30);
       sharedHealthState.loaded = true;
       renderSharedHealthInProfessionalProfile();
     } catch (error) {
