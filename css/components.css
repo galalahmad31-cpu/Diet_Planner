@@ -38,11 +38,11 @@ a{ -webkit-tap-highlight-color:transparent }
 }
 :where(input,select,textarea):focus-visible{
   border-color:var(--dp-primary);
-  outline:2px solid rgba(8,127,107,.16);
+  outline:2px solid var(--dp-focus-ring);
   outline-offset:1px;
 }
 :where(button,a,[role="button"]):focus-visible{
-  outline:2px solid rgba(8,127,107,.35);
+  outline:2px solid var(--dp-focus-ring-strong);
   outline-offset:2px;
 }
 
@@ -98,7 +98,7 @@ table tbody tr.dp-themed-table-row > td:is(.text-slate-800,.text-slate-700,.text
 .food-page-header,
 .recipe-page-header,
 .support-header{
-  background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
+  background:var(--dp-brand-gradient);
   color:#fff;
 }
 .patient-profile-page-header :where(h1,h2,h3),
@@ -139,7 +139,7 @@ body:has(.dashboard-services-section) header.glass .brand-sub,
 body:has(.product-modern) main>.mx-auto>header p,
 body:has(#sub-content-quick-calc) .page-header p,
 header.header .brand-sub{
-  color:#F4FBF8!important;
+  color:var(--dp-brand-subtle)!important;
 }
 
 /* White utility controls retain a dark, legible icon on the branded header. */
