@@ -7,3 +7,10 @@
 html[data-theme="dark"] .followup-day-publish{border-color:#3b5550;background:#203a36;color:#b6c9c1}
 html[data-theme="dark"] .followup-day-publish.is-published{border-color:#356f60;background:#1c493f;color:#9ce0ca}
 @media(max-width:640px){.followup-day-row{min-width:260px;max-width:285px}.followup-day-publish{min-width:80px;padding:5px 6px}}
+
+.patient-portal-copy-code{background:#e8f3ef;color:#176c62}
+.patient-portal-invite-actions{flex-wrap:wrap}
+.patient-portal-invite-actions button{min-width:100px}
+html[data-theme="dark"] .patient-portal-copy-code{background:#24453e;color:#b9e5d6}
+html[data-theme="dark"] .patient-portal-invite-dialog label{color:var(--dp-muted,#a9bcb7)}
+html[data-theme="dark"] .patient-portal-invite-dialog input{border-color:var(--dp-border,#3b5550);background:var(--dp-surface-2,#203a36);color:var(--dp-text,#e6f0ec)}
