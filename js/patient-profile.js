@@ -1277,6 +1277,9 @@
     }
 
     try {
+      const sharedHealthSaved = await updateSharedHealthFromProfessional();
+      if (!sharedHealthSaved) return;
+
       const patientSaved = await savePatientSection();
       if (!patientSaved) return;
 
@@ -1284,6 +1287,7 @@
       if (!financeSaved) return;
 
       fillPatientData();
+      await loadSharedHealthHistory();
       setEditing(false);
       showPatientFinanceSuccess();
     } catch (error) {
@@ -1459,6 +1463,7 @@
     });
     $('editButton')?.addEventListener('click', enableEditing);
     $('savePatientButton')?.addEventListener('click', saveAllPatientData);
+    void loadSharedHealthHistory();
     $('cancelEditButton')?.addEventListener('click', cancelEditing);
     setEditing(false);
     window.addEventListener('dp-exchange-plan-deleted', () => {
