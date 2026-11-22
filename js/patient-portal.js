@@ -372,7 +372,6 @@
 
   function activatePlanTab(tab) {
     if (!["self", "professional"].includes(tab)) return;
-    if (tab === "professional" && !state.hasActiveCareTeam) return;
     state.activePlanTab = tab;
     document.querySelectorAll("[data-plan-tab]").forEach(button => {
       const active = button.dataset.planTab === tab;
@@ -383,6 +382,17 @@
     const professionalPanel = $("portalPlansProfessionalPanel");
     if (selfPanel) selfPanel.hidden = tab !== "self";
     if (professionalPanel) professionalPanel.hidden = tab !== "professional";
+    const unavailable = $("portalProfessionalPlanUnavailable");
+    if (unavailable) unavailable.hidden = state.hasActiveCareTeam || tab !== "professional";
+    const loading = $("portalPlansLoading");
+    const empty = $("portalPlansEmpty");
+    const list = $("portalPlansList");
+    if (!state.hasActiveCareTeam && tab === "professional") {
+      if (loading) loading.hidden = true;
+      if (empty) empty.hidden = true;
+      if (list) list.replaceChildren();
+      return;
+    }
     if (tab === "professional") {
       state.loadedPanels.delete("portalPlansPanel");
       void ensureHealthPanelLoaded("portalPlansPanel");
@@ -395,6 +405,8 @@
     const list = $("portalPlansList");
     if (!loading || !empty || !list || !state.patientId) return;
 
+    const unavailable = $("portalProfessionalPlanUnavailable");
+    if (unavailable) unavailable.hidden = true;
     loading.hidden = false;
     empty.hidden = true;
     list.replaceChildren();
@@ -1017,10 +1029,10 @@
     await loadPatient();
     document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
     const professionalPlanTab = document.querySelector('[data-plan-tab="professional"]');
-    if (professionalPlanTab) professionalPlanTab.hidden = !state.hasActiveCareTeam;
+    if (professionalPlanTab) professionalPlanTab.hidden = false;
 
     showOnly("portalContent");
-    activatePlanTab(state.hasActiveCareTeam ? "professional" : "self");
+    activatePlanTab("self");
     activateHealthTab("portalPlansPanel");
 
     if (state.messagesMountedFor !== state.patientId) {
