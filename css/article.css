@@ -54,11 +54,11 @@ body{margin:0;font-family:var(--dp-font);background:var(--dp-bg);color:var(--dp-
 #backToArticles{border-color:var(--dp-border);background:var(--dp-surface);color:var(--dp-text-2)}
 .article-modal{padding:clamp(10px,3vw,32px)!important}
 .article-modal>div{align-items:flex-start!important;padding:2vh 0}
-#editModal>div>div,#confirmModal>div>div{overflow:hidden;border:1px solid var(--dp-border);border-radius:var(--dp-radius-lg);background:var(--dp-surface);color:var(--dp-text);box-shadow:0 24px 70px var(--dp-shadow)}
+#editModal>div>div{overflow:hidden;border:1px solid var(--dp-border);border-radius:var(--dp-radius-lg);background:var(--dp-surface);color:var(--dp-text);box-shadow:0 24px 70px var(--dp-shadow)}
 #editModal>div>div>div:first-child{border-color:var(--dp-border)}
-#editModal #modalTitle,#confirmModal h3{color:var(--dp-text)}
+#editModal #modalTitle{color:var(--dp-text)}
 #editModal :is(label,span,.font-extrabold){color:var(--dp-text)}
-#editModal .text-slate-500,#editModal .text-slate-400,#confirmModal p{color:var(--dp-muted)}
+#editModal .text-slate-500,#editModal .text-slate-400{color:var(--dp-muted)}
 #editModal input:not([type=color]):not([type=checkbox]),#editModal select{background:var(--dp-input);border-color:var(--dp-input-border);color:var(--dp-text)}
 #editModal input::placeholder{color:var(--dp-muted)}
 #editModal #pubDate,#editModal #updDate,#editModal #state{color:var(--dp-text)}
@@ -79,10 +79,6 @@ body{margin:0;font-family:var(--dp-font);background:var(--dp-bg);color:var(--dp-
 #editor table :is(td,th),.content table :is(td,th){min-width:60px;padding:8px 10px;border:1px solid var(--dp-border);vertical-align:middle}
 #editor table th,.content table th{background:var(--dp-surface-3);font-weight:800}
 #editor table td:focus,#editor table th:focus,#editor table .selected-cell{outline:2px solid var(--dp-primary);outline-offset:-2px}
-#confirmModal .bg-red-50{background:color-mix(in srgb,var(--dp-danger) 12%,var(--dp-surface))}
-#confirmModal .text-red-600{color:var(--dp-danger)}
-#confirmModal #confirmCancel{border-color:var(--dp-border);background:var(--dp-surface-2);color:var(--dp-text-2)}
-#confirmModal #confirmDelete{background:var(--dp-danger);color:#fff}
 #toast{box-shadow:0 10px 30px var(--dp-shadow)}
 .articles-header-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .articles-add-btn{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:6px 11px;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:#fff;color:var(--dp-primary-dark);font:800 10px var(--dp-font);white-space:nowrap}
