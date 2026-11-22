@@ -63,22 +63,7 @@ function formatISODate(date) {
     return `${y}-${m}-${d}`;
 }
 
-function addMonths(dateValue, months) {
-    if (!dateValue || !months) return null;
-
-    const [y, m, d] = String(dateValue).slice(0, 10).split('-').map(Number);
-    if (![y, m, d].every(Number.isFinite)) return null;
-
-    const date = new Date(y, m - 1, d);
-    date.setMonth(date.getMonth() + Number(months));
-
-    // Preserve end-of-month behavior.
-    if (date.getDate() !== d) {
-        date.setDate(0);
-    }
-
-    return formatISODate(date);
-}
+const addMonths = window.DPDate.addMonths;
 
 function fmt(value) {
     if (!value) return '—';
