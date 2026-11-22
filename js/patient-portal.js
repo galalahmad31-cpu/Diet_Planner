@@ -753,7 +753,6 @@
   }
 
   function calculateInsulinEstimate() {
-    const diabetesType = $("portalDiabetesType")?.value || "type1";
     const regimen = $("portalInsulinRegimen")?.value || "basal_bolus";
     const kind = $("portalInsulinKind")?.value || "rapid";
     const tddInput = $("portalInsulinTdd")?.value ?? "";
