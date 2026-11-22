@@ -230,7 +230,6 @@
   async function canAddPatient(userId) {
     if (!userId) return false;
     const role = await getUserRole(userId);
-    if (role === "admin") return true;
     if (await getUserAccountType(userId) !== "professional") return false;
 
     const { data, error } = await supabaseClient.rpc(
@@ -297,7 +296,7 @@
     }
 
     const role = await getUserRole(user.id);
-    const accountType = role === "admin" ? "admin" : await getUserAccountType(user.id);
+    const accountType = await getUserAccountType(user.id);
     const activeSubscription = role === "admin"
       ? true
       : accountType === "professional"
