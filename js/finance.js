@@ -178,15 +178,26 @@ async function loadData() {
 
     if (patientsError) throw patientsError;
 
-    const { data: connections, error: connectionsError } = await supabase
-        .from('professional_connection_requests')
-        .select('patient_id,status')
-        .eq('professional_id', user.id)
-        .in('status', ['accepted', 'active']);
+    const [connectionsResult, careTeamResult] = await Promise.all([
+        supabase
+            .from('professional_connection_requests')
+            .select('patient_id')
+            .eq('professional_id', user.id)
+            .in('status', ['accepted', 'active']),
+        supabase
+            .from('patient_care_team')
+            .select('patient_id')
+            .eq('professional_id', user.id)
+            .eq('status', 'active')
+    ]);
 
-    if (connectionsError) throw connectionsError;
+    if (connectionsResult.error) throw connectionsResult.error;
+    if (careTeamResult.error) throw careTeamResult.error;
 
-    const linkedPatientIds = new Set((connections || []).map(item => item.patient_id).filter(Boolean));
+    const linkedPatientIds = new Set([
+        ...(connectionsResult.data || []).map(item => item.patient_id),
+        ...(careTeamResult.data || []).map(item => item.patient_id)
+    ].filter(Boolean));
     const unlinkedPatients = (patients || []).filter(patient => !linkedPatientIds.has(patient.id));
     const unlinkedPatientIds = unlinkedPatients.map(patient => patient.id);
 
