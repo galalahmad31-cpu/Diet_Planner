@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/app-header.css?v=20261121-header-persist-six-v2">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-insulin-clean-v2">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-insulin-meal-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-conversation-flow-v1">
@@ -67,15 +67,26 @@
             <div><label for="portalCurrentGlucose">قياس السكر الحالي (mg/dL)</label><input id="portalCurrentGlucose" type="number" min="20" max="600" step="1" inputmode="numeric" placeholder="مثال: 250"></div>
             <div><label for="portalTargetGlucose">السكر المستهدف (mg/dL)</label><input id="portalTargetGlucose" type="number" min="70" max="250" step="1" inputmode="numeric" placeholder="يحدده الطبيب"></div>
           </div>
+          <div class="portal-insulin-meal">
+            <h4>حساب إنسولين الوجبة</h4>
+            <div class="portal-insulin-fields">
+              <div><label for="portalInsulinMeal">الوجبة</label><select id="portalInsulinMeal"><option value="breakfast">الإفطار</option><option value="lunch">الغداء</option><option value="dinner">العشاء</option><option value="snack">وجبة خفيفة</option></select></div>
+              <div><label for="portalMealCarbs">إجمالي الكربوهيدرات (جم)</label><input id="portalMealCarbs" type="number" min="0" max="500" step="1" inputmode="decimal" placeholder="مثال: 60"></div>
+              <div><label for="portalMealIcr">معامل الوجبة (جم/وحدة)</label><input id="portalMealIcr" type="number" min="0.1" max="200" step="0.1" inputmode="decimal" placeholder="يُستخدم المعامل الابتدائي"></div>
+            </div>
+            <div class="portal-insulin-result portal-insulin-meal-result" aria-live="polite">
+              <div><span>المعامل الابتدائي ICR</span><strong id="portalInsulinIcrResult">—</strong></div>
+              <div><span>تقدير إنسولين الوجبة</span><strong id="portalMealInsulinEstimate">—</strong></div>
+            </div>
+          </div>
           <div class="portal-insulin-result" aria-live="polite">
             <div><span>إجمالي الجرعة اليومية TDD</span><strong id="portalInsulinTddResult">—</strong></div>
-            <div><span>معامل الوجبة ICR</span><strong id="portalInsulinIcrResult">—</strong></div>
             <div><span>معامل التصحيح ISF</span><strong id="portalInsulinIsfResult">—</strong></div>
             <div><span>فرق السكر عن الهدف</span><strong id="portalGlucoseDifference">—</strong></div>
             <div><span>ناتج التصحيح الحسابي النظري</span><strong id="portalCorrectionEstimate">—</strong></div>
           </div>
-          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل إجمالي الإنسولين اليومي وقياس السكر والهدف لعرض التقدير الحسابي.</p>
-          <p class="portal-tool-footnote">النتائج تقديرات حسابية استرشادية، وقد تختلف الاحتياجات من شخص لآخر. يُرجى مراجعة الطبيب أو فريق الرعاية قبل إجراء أي تعديل على جرعات الإنسولين.</p>
+          <p id="portalInsulinMessage" class="portal-insulin-message" role="status">أدخل إجمالي الإنسولين اليومي لعرض المعاملات الابتدائية.</p>
+          <p class="portal-tool-footnote">النتائج تقديرات حسابية استرشادية وليست جرعات موصى بها للحقن. يمكن للمختص مراجعة معامل كل وجبة؛ ولا تُجرى تغييرات علاجية إلا وفق الخطة المعتمدة.</p>
         </section>
       </section>
 
