@@ -24,15 +24,7 @@
 
   const $ = (id) => document.getElementById(id);
 
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[char]));
-  }
+  const escapeHtml = window.DPUtils.escapeHtml;
 
   function showStatus(message, type = 'error') {
     const box = $('statusBox');
