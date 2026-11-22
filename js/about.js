@@ -435,10 +435,12 @@ async function confirmDelete() {
   const { error } = await db.from("about_sections").delete().eq("id", id);
   if (error) {
     console.error("Delete about section failed:", error);
+    state.deletingId = null;
     alert("تعذر حذف المربع: " + error.message);
     return;
   }
 
+  state.deletingId = null;
   state.sections = state.sections.filter(item => item.id !== id);
   render();
 }
