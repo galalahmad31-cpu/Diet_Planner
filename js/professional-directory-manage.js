@@ -24,7 +24,9 @@ function renderProfileSummary(data){
  $("editProfessionalProfile").hidden=!editable;
  $("deleteProfessionalProfile").hidden=!editable;
  $("submitForReview").hidden=!editable;
- $("withdrawDirectoryProfile").hidden=![ "pending_review","published" ].includes(profileStatus);
+ const withdrawButton=$("withdrawDirectoryProfile");
+ withdrawButton.hidden=![ "pending_review","published" ].includes(profileStatus);
+ withdrawButton.textContent=profileStatus==="pending_review"?"إلغاء الإرسال":"حذف الملف من الدليل";
 }
 function renderOfferRows(){
  const root=$("professionalOffersList");
@@ -155,10 +157,20 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
  });
  $("withdrawDirectoryProfile").addEventListener("click",async()=>{
-  if(!confirm("سيختفي ملفك من الدليل، لكن علاقات الرعاية الحالية لن تُحذف. هل تريد المتابعة؟"))return;
-  const {error}=await db.rpc("withdraw_professional_directory_profile");
-  if(error){setStatus("تعذر إيقاف الظهور: "+error.message);return;}
-  setStatus("تم إيقاف ظهور الملف. يمكنك تعديله وحفظه كمسودة.");await load();
+  const isPending=profileStatus==="pending_review";
+  const message=isPending
+   ?"سيتم إلغاء إرسال الملف وإعادته إلى مسودة. ستظل بيانات الملف والخدمات محفوظة. هل تريد المتابعة؟"
+   :"سيتم إلغاء نشر الملف وإخفاؤه من دليل الأطباء. ستظل بيانات الملف وسجلات التواصل والمتابعة محفوظة، ولن تُحذف بيانات المرضى. هل تريد المتابعة؟";
+  if(!confirm(message))return;
+  const button=$("withdrawDirectoryProfile");button.disabled=true;
+  try{
+   const {error}=await db.rpc("withdraw_professional_directory_profile");
+   if(error)throw error;
+   await load();
+   setStatus(isPending?"تم إلغاء الإرسال وإعادة الملف إلى المسودات.":"تم إلغاء النشر وإخفاء الملف من الدليل. يمكنك تعديله أو حذفه إذا لم توجد سجلات مرتبطة به.");
+  }catch(error){
+   setStatus((isPending?"تعذر إلغاء الإرسال: ":"تعذر إلغاء النشر: ")+(error.message||"حدث خطأ غير متوقع."));
+  }finally{button.disabled=false;}
  });
  load();
 });
