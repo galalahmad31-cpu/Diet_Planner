@@ -25,7 +25,8 @@ function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').
 function askConfirm(title,text,action){
  if(typeof action!=="function"||!window.DPConfirm)return;
  const message=String(text??"").replace(/<br\s*\/?\s*>/gi,"\n").replace(/<[^>]*>/g,"");
- void window.DPConfirm.ask({title,message,confirmText:"تأكيد"}).then(confirmed=>{if(confirmed)return action();});
+ const variant=/حذف|رفض|إيقاف/.test(String(title||""))?"danger":"default";
+ void window.DPConfirm.ask({title,message,confirmText:"تأكيد",variant}).then(confirmed=>{if(confirmed)return action();});
 }
 window.DietPlannerConfirm=Object.freeze({ask(title,message,action){askConfirm(title,message,action)}});
 
