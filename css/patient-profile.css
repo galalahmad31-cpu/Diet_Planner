@@ -218,11 +218,16 @@ body.support-delete-modal-open{overflow:hidden}
 
 /* Patient follow-up days and the embedded visit workspace. */
 .followup-days-card{padding:10px;border:1px solid #e3ece8;border-radius:13px;background:#fff}
-.followup-days-toolbar{display:flex;flex-direction:row;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;direction:rtl}
-.followup-days-details{display:block;flex:1 1 auto;width:0;min-width:0}
-.followup-days-heading{display:flex;align-items:center;min-height:29px;padding:0 2px}
-.followup-days-heading strong{color:#52645b;font-size:10px;font-weight:800}
-.followup-add-button{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-height:29px;margin-top:0;padding:0 10px;border:0;border-radius:8px;background:#26765a;color:#fff;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
+.followup-days-toolbar{display:block;min-width:0;direction:rtl}
+.followup-days-details{display:block;width:100%;min-width:0}
+.followup-days-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;min-height:36px;padding:0 2px 7px}
+.followup-days-heading>strong{color:#354d43;font-size:12px;font-weight:900}
+.followup-plan-actions{display:flex;align-items:center;gap:7px;min-width:0}
+.followup-add-button{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:36px;padding:0 12px;border:0;border-radius:9px;background:#26765a;color:#fff;font:800 10px Cairo,sans-serif;cursor:pointer;white-space:nowrap}
+.followup-add-button:hover:not(:disabled){background:#1d6249}
+.followup-add-button:disabled{opacity:.5;cursor:not-allowed}
+.followup-add-exchange-button{background:#6d45a8;color:#fff}
+.followup-add-exchange-button:hover:not(:disabled){background:#59368f}
 .followup-add-button:hover:not(:disabled){background:#1d6249}
 .followup-add-button:disabled{opacity:.5;cursor:not-allowed}
 .followup-state{padding:8px;text-align:center;color:#8a9891;font-size:9px;font-weight:700}
@@ -250,15 +255,21 @@ body.support-delete-modal-open{overflow:hidden}
 .followup-day-delete:focus-visible{outline:2px solid #f3c4c7;outline-offset:2px}
 .followup-day-delete:active{transform:scale(.96)}
 @media(max-width:640px){
-  .followup-days-card{padding:8px}
-  .followup-days-toolbar{gap:7px}
-  .followup-days-heading{min-height:28px}
+  .followup-days-card{padding:10px}
+  .followup-days-heading{align-items:stretch;flex-direction:column;gap:8px;padding:0 1px 9px}
+  .followup-days-heading>strong{font-size:12px}
+  .followup-plan-actions{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .followup-plan-actions .followup-add-button{width:100%;min-height:40px;padding:7px 6px;font-size:10px;white-space:normal;line-height:1.4}
   .followup-days-list{gap:5px;padding-bottom:6px}
   .followup-day-row{min-width:105px;max-width:165px;padding:5px 6px;gap:5px}
   .followup-day-open{max-width:125px;gap:4px}
   .followup-day-title{font-size:9px}
   .followup-day-delete{width:22px;height:22px;flex-basis:22px}
-  .followup-add-button{min-height:28px;padding:0 8px;font-size:9px}
+  .patient-plan-workspace-panel .visit-main-shell{padding:0}
+  #planWorkspace .embedded-diet-plan>.visit-diet-inner{gap:9px!important}
+  #planWorkspace .embedded-diet-plan>.visit-diet-inner>section:first-child{padding:10px!important;border-radius:12px!important}
+  #planWorkspace .visit-diet-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
+  #planWorkspace .visit-diet-action-button{width:100%;min-height:42px;padding:8px 6px;font-size:11px;white-space:normal}
 }
 .patient-plan-workspace-panel{margin-top:13px;border:0;border-radius:0;background:transparent;overflow:visible}
 .patient-plan-workspace-panel[hidden]{display:none!important}
@@ -759,16 +770,7 @@ body.support-delete-modal-open{overflow:hidden}
 }
 
 
-/* Patient profile: exchange-plan action pair shares the existing compact toolbar. */
-.followup-plan-actions{display:flex;align-items:center;gap:7px;flex:0 0 auto}
-.followup-plan-actions .followup-add-button{white-space:nowrap}
-.followup-plan-actions .followup-add-exchange-button{background:#6d45a8;color:#fff;border-color:#6d45a8}
-.followup-plan-actions .followup-add-exchange-button:hover{background:#59368f}
 #exchangePlanContent{min-width:0}
-@media(max-width:600px){
- .followup-plan-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
- .followup-plan-actions .followup-add-button{width:100%;padding-inline:8px;font-size:10px}
-}
 
 /* Exchange plan uses the shared semantic palette in both themes. */
 #exchangePlanContent .exchange-plan-panel{background:var(--dp-surface)!important;border:1px solid var(--dp-border)!important;box-shadow:none!important}

@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v14">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v14">
   <link rel="stylesheet" href="css/diet-plan.css?v=20261121">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261122-mobile-layout-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261122-plan-mobile-layout-v2">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/patient-portal-link.css?v=20261121-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-compact-status-v3">
@@ -214,12 +214,15 @@
             <div id="followupDaysDetails" class="followup-days-details">
               <div class="followup-days-heading">
                 <strong id="followupDaysTitle">الخطط الغذائية</strong>
+                <div class="followup-plan-actions">
+                  <button type="button" id="addPlanButton" class="followup-add-button">＋ خطة بالجرامات</button>
+                  <button type="button" id="addExchangePlanButton" class="followup-add-button followup-add-exchange-button">＋ خطة بالبدائل</button>
+                </div>
               </div>
               <div id="visitsLoading" class="followup-state">جاري تحميل الخطط الغذائية...</div>
               <div id="visitsEmpty" class="followup-state" hidden>لا توجد خطط غذائية مسجلة لهذا المريض.</div>
               <div id="visitsList" class="followup-days-list" aria-live="polite"></div>
             </div>
-            <div class="followup-plan-actions"><button type="button" id="addPlanButton" class="followup-add-button">＋ خطة بالجرامات</button><button type="button" id="addExchangePlanButton" class="followup-add-button followup-add-exchange-button">＋ خطة بالبدائل</button></div>
           </div>
         </section>
         <section id="planWorkspacePanel" class="patient-plan-workspace-panel" aria-label="محرر الخطة الغذائية المحددة" hidden>
@@ -228,9 +231,7 @@
                             <div class="embedded-diet-plan">
                                 <div class="visit-diet-inner w-full space-y-5">
                                     <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-                                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
-                                            <div class="visit-diet-actions no-print">
+                                        <div class="visit-diet-actions no-print">
                                                 <button type="button" data-action="dietPlan.addNewDay" class="visit-diet-action-button visit-diet-add-button">
                                                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
                                                     <span>إضافة يوم جديد</span>
@@ -239,7 +240,6 @@
                                                     <i class="fa-solid fa-print" aria-hidden="true"></i>
                                                     <span>طباعة</span>
                                                 </button>
-                                            </div>
                                         </div>
                                     </section>
                                     <section id="planTab" class="space-y-5">
