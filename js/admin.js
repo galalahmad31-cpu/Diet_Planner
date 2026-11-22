@@ -3,8 +3,8 @@
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
 const PAGE_SIZE=20;
-const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0};
-let confirmAction=null,requestSearchTimer=null,doctorSearchTimer=null;
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0,professionalReviewFilter:'pending_review',professionalReviewSearch:'',professionalReviewPage:0,professionalReviewTotal:0,professionalReviewProfiles:[]};
+let confirmAction=null,requestSearchTimer=null,doctorSearchTimer=null,professionalReviewSearchTimer=null;
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
@@ -462,11 +462,58 @@ async function savePrivacyPolicy(){
  }
 }
 
+
+async function loadProfessionalReviewCounts(){
+ const statuses=['pending_review','published','suspended'];
+ const results=await Promise.all(statuses.map(status=>sb.from('professional_directory_profiles').select('user_id',{count:'exact',head:true}).eq('listing_status',status)));
+ results.forEach(result=>{if(result.error)throw result.error});
+ const counts=Object.fromEntries(statuses.map((status,index)=>[status,results[index].count||0]));
+ $('professionalReviewPendingCount').textContent=counts.pending_review;$('professionalReviewPendingStat').textContent=counts.pending_review;$('professionalReviewPublishedStat').textContent=counts.published;$('professionalReviewSuspendedStat').textContent=counts.suspended;
+}
+function renderProfessionalReviewPager(){
+ const host=$('professionalReviewPager'),page=state.professionalReviewPage,total=state.professionalReviewTotal;host.replaceChildren();
+ const pages=Math.max(1,Math.ceil(total/PAGE_SIZE)),info=document.createElement('span');info.textContent='صفحة '+(page+1)+' من '+pages+' — '+total+' ملف';
+ const prev=document.createElement('button');prev.type='button';prev.className='btn btn-outline';prev.textContent='السابق';prev.disabled=page===0;prev.onclick=()=>loadProfessionalReviewPage(page-1);
+ const next=document.createElement('button');next.type='button';next.className='btn btn-outline';next.textContent='عرض 20 التالية';next.disabled=(page+1)*PAGE_SIZE>=total;next.onclick=()=>loadProfessionalReviewPage(page+1);host.append(prev,info,next);
+}
+async function loadProfessionalReviewPage(page=0){
+ state.professionalReviewPage=Math.max(0,page);const status=$('professionalReviewState'),list=$('professionalReviewList');status.style.display='block';status.textContent='جاري تحميل الملفات المهنية...';list.replaceChildren();
+ try{
+  await loadProfessionalReviewCounts();const from=state.professionalReviewPage*PAGE_SIZE,to=from+PAGE_SIZE-1;
+  let query=sb.from('professional_directory_profiles').select('user_id,display_name,professional_title,bio,specialties,city,governorate,experience_years,service_modes,photo_url,submitted_at,listing_status,moderation_note',{count:'exact'}).in('listing_status',['pending_review','published','suspended']).order('submitted_at',{ascending:false,nullsFirst:false});
+  if(state.professionalReviewFilter!=='all')query=query.eq('listing_status',state.professionalReviewFilter);
+  const term=state.professionalReviewSearch.trim().replace(/[,%()]/g,' ');
+  if(term)query=query.or('display_name.ilike.%'+term+'%,professional_title.ilike.%'+term+'%,city.ilike.%'+term+'%,governorate.ilike.%'+term+'%');
+  const result=await query.range(from,to);if(result.error)throw result.error;state.professionalReviewTotal=result.count||0;
+  const profiles=result.data||[],ids=profiles.map(profile=>profile.user_id);
+  const accountResult=ids.length?await sb.from('profiles').select('id,full_name,email,phone').in('id',ids):{data:[],error:null};if(accountResult.error)throw accountResult.error;
+  state.professionalReviewProfiles=profiles;const accounts=new Map((accountResult.data||[]).map(account=>[account.id,account]));
+  if(!profiles.length){status.textContent=term?'لا توجد ملفات تطابق البحث.':state.professionalReviewFilter==='pending_review'?'لا توجد ملفات تنتظر الاعتماد حاليًا.':'لا توجد ملفات في هذا القسم.';renderProfessionalReviewPager();return}
+  list.innerHTML=profiles.map(profile=>{
+   const account=accounts.get(profile.user_id)||{},pending=profile.listing_status==='pending_review',published=profile.listing_status==='published',label=pending?'قيد المراجعة':published?'منشور ومعتمد':'موقوف';
+   const modes=(profile.service_modes||[]).map(mode=>({online:'أونلاين',in_person:'حضوري',online_and_in_person:'أونلاين وحضوري'}[mode]||mode)).join('، ')||'—',specialties=(profile.specialties||[]).join('، ')||'—';
+   const photo=profile.photo_url?'<img class="professional-review-photo" src="'+esc(profile.photo_url)+'" alt="الصورة الشخصية" loading="lazy" referrerpolicy="no-referrer">':'<div class="professional-review-avatar"><i class="fa-solid fa-user-doctor"></i></div>';
+   const actions=pending?'<button class="btn btn-primary" type="button" data-professional-decision="published" data-user="'+esc(profile.user_id)+'">اعتماد ونشر</button><button class="btn btn-danger" type="button" data-professional-decision="rejected" data-user="'+esc(profile.user_id)+'">رفض وإعادة للتعديل</button>':published?'<button class="btn btn-warning" type="button" data-professional-decision="suspended" data-user="'+esc(profile.user_id)+'">إيقاف النشر</button>':'<span class="professional-review-note">الملف موقوف. لا يتاح إعادة نشره من هذه الحالة حاليًا.</span>';
+   return '<article class="professional-review-card"><div class="professional-review-card-head">'+photo+'<div class="professional-review-identity"><h3>'+esc(profile.display_name)+'</h3><strong>'+esc(profile.professional_title)+'</strong><span>'+esc(account.email||'')+'</span><span class="professional-review-status '+(pending?'pending':published?'published':'suspended')+'">'+label+'</span></div></div><div class="professional-review-details"><div><small>التخصصات</small><p>'+esc(specialties)+'</p></div><div><small>الموقع</small><p>'+esc([profile.city,profile.governorate].filter(Boolean).join('، ')||'—')+'</p></div><div><small>سنوات الخبرة</small><p>'+esc(profile.experience_years??'—')+'</p></div><div><small>طرق تقديم الخدمة</small><p>'+esc(modes)+'</p></div><div class="full"><small>النبذة المهنية</small><p>'+esc(profile.bio||'—')+'</p></div>'+(profile.moderation_note?'<div class="full"><small>ملاحظة الإدارة السابقة</small><p>'+esc(profile.moderation_note)+'</p></div>':'')+'</div><div class="professional-review-card-foot"><span>تاريخ الإرسال: '+esc(dateTime(profile.submitted_at))+'</span><div class="professional-review-actions">'+actions+'</div></div></article>';
+  }).join('');status.style.display='none';renderProfessionalReviewPager();
+ }catch(error){console.error('Professional directory review load failed:',error);status.textContent='تعذر تحميل الملفات المهنية: '+(error.message||'خطأ غير معروف');renderProfessionalReviewPager()}
+}
+async function moderateProfessionalProfile(button){
+ const userId=button.dataset.user,decision=button.dataset.professionalDecision,profile=state.professionalReviewProfiles.find(item=>item.user_id===userId);if(!profile)return;
+ let note='';if(decision==='rejected'||decision==='suspended'){note=prompt(decision==='rejected'?'اكتب سبب الرفض والملاحظات التي يحتاج المختص لتعديلها:':'اكتب سبب إيقاف النشر:','')??'';if(!note.trim()){toast('يجب كتابة سبب الإجراء.');return}}
+ askConfirm(decision==='published'?'اعتماد ونشر الملف':'تأكيد الإجراء','هل تريد تنفيذ هذا الإجراء على ملف '+esc(profile.display_name)+'؟',async()=>{
+  button.disabled=true;const {error}=await sb.rpc('moderate_professional_directory_profile',{p_user_id:userId,p_decision:decision,p_note:note});
+  if(error){toast(error.message||'تعذر تحديث حالة الملف.');button.disabled=false;return}
+  toast(decision==='published'?'تم اعتماد الملف ونشره.':decision==='rejected'?'تم رفض الملف وإعادته للمختص للتعديل.':'تم إيقاف نشر الملف.');await loadProfessionalReviewPage(state.professionalReviewPage);
+ });
+}
+
 function switchTab(tab){
   state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  ['requests','plans','doctors','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
+  ['requests','plans','doctors','professional-review','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
   if(tab==='requests')loadRequestsPage();
   if(tab==='doctors')loadDoctorsPage();
+  if(tab==='professional-review')loadProfessionalReviewPage(0);
   if(tab==='announcements')loadAnnouncements();
   if(tab==='privacy')loadPrivacyPolicy();
 }
@@ -475,6 +522,11 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.t
 $('newPlanBtn').onclick=()=>openPlan(null);
  $('refreshBtn').onclick=()=>loadRequestsPage(0);
  $('refreshDoctorsBtn').onclick=()=>loadDoctorsPage(0);
+ $('professionalReviewRefresh').onclick=()=>loadProfessionalReviewPage(0);
+ $('professionalReviewSearch').oninput=()=>{clearTimeout(professionalReviewSearchTimer);professionalReviewSearchTimer=setTimeout(()=>{state.professionalReviewSearch=$('professionalReviewSearch').value.trim();loadProfessionalReviewPage(0)},300)};
+ document.querySelectorAll('[data-professional-review-filter]').forEach(button=>button.onclick=()=>{state.professionalReviewFilter=button.dataset.professionalReviewFilter;document.querySelectorAll('[data-professional-review-filter]').forEach(item=>{const active=item===button;item.classList.toggle('selected',active);item.setAttribute('aria-pressed',String(active))});loadProfessionalReviewPage(0)});
+ $('professionalReviewList').onclick=event=>{const button=event.target.closest('[data-professional-decision]');if(button)moderateProfessionalProfile(button)};
+ if(location.hash==='#professional-review')switchTab('professional-review');
  $('doctorSearch').oninput=()=>{clearTimeout(doctorSearchTimer);doctorSearchTimer=setTimeout(()=>{state.doctorSearch=$('doctorSearch').value.trim();state.doctorPage=0;loadDoctorsPage(0)},300)};
 $('refreshPrivacyPolicyBtn').onclick=()=>loadPrivacyPolicy();$('savePrivacyPolicyBtn').onclick=savePrivacyPolicy;
 $('newAnnouncementBtn').onclick=()=>openAnnouncementForm();$('refreshAnnouncementsBtn').onclick=()=>loadAnnouncements();
