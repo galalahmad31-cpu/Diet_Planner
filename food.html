@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/design-tokens.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
+<link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
   <script src="js/theme.js?v=20261121-header-only-v15"></script>
   <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
@@ -189,27 +190,6 @@
 </div>
 </div>
 
-<!-- Delete confirmation -->
-<div id="deleteConfirmModal" class="modal-bg fixed inset-0 z-[140] hidden items-center justify-center p-4">
-  <div class="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
-    <div class="flex items-center gap-3">
-      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-        <i class="fa-solid fa-trash"></i>
-      </div>
-      <div>
-        <h3 class="font-extrabold text-slate-800">تأكيد حذف الصنف</h3>
-        <p id="deleteConfirmText" class="mt-1 text-xs text-slate-500">هل أنت متأكد من حذف هذا الصنف؟ لا يمكن التراجع عن الحذف.</p>
-      </div>
-    </div>
-    <div class="mt-5 flex gap-2">
-      <button id="confirmDeleteBtn" class="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-red-700">
-        <i class="fa-solid fa-trash ml-1"></i> حذف الصنف
-      </button>
-      <button id="cancelDeleteBtn" class="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-200">إلغاء</button>
-    </div>
-  </div>
-</div>
-
 <div id="foodActionModal" class="modal-bg fixed inset-0 z-[135] hidden items-center justify-center p-4">
  <div class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
   <h3 id="foodActionTitle" class="text-lg font-extrabold text-slate-800">إجراء على الصنف</h3>
@@ -231,6 +211,7 @@
 <div id="toast" class="fixed bottom-5 left-5 z-[120] hidden max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/dp-confirm.js?v=20261122-simple-confirm-v1"></script>
 <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
 <script src="js/food.js?v=20261120-subscription-gate-v1"></script>
   
