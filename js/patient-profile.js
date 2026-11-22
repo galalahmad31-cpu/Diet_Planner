@@ -1062,8 +1062,16 @@
     updateSharedHealthWriteState();
     const rawHeight = $('heightInput')?.value.trim() ?? '';
     const height = rawHeight === '' ? null : Number(rawHeight);
+    const birthDate = $('birthDateInput')?.value || null;
+    const today = new Date().toISOString().slice(0, 10);
     if (height !== null && (!Number.isFinite(height) || height < 30 || height > 260)) {
       alert('الطول يجب أن يكون بين 30 و260 سم.');
+      sharedHealthState.saving = false;
+      updateSharedHealthWriteState();
+      return false;
+    }
+    if (birthDate && birthDate > today) {
+      alert('تاريخ الميلاد لا يمكن أن يكون في المستقبل.');
       sharedHealthState.saving = false;
       updateSharedHealthWriteState();
       return false;
@@ -1072,7 +1080,7 @@
       const { data, error } = await supabase.rpc('update_shared_patient_health_profile', {
         p_patient_id: patientId,
         p_gender: $('genderInput')?.value || null,
-        p_birth_date: $('birthDateInput')?.value || null,
+        p_birth_date: birthDate,
         p_height: height,
         p_diagnosis: $('diagnosisInput')?.value.trim() || null,
         p_complaints: $('complaintsInput')?.value.trim() || null
@@ -1082,9 +1090,16 @@
       return true;
     } catch (error) {
       console.error('Professional shared health save failed:', error);
-      const message = error.message === 'care_agreement_expired_read_only'
-        ? 'انتهت مدة اتفاق المتابعة. يمكنك الاطلاع على البيانات دون تعديلها.'
-        : error.message || 'تعذر حفظ البيانات الصحية المشتركة.';
+      const messages = {
+        care_agreement_expired_read_only: 'انتهت مدة اتفاق المتابعة. يمكنك الاطلاع على البيانات دون تعديلها.',
+        patient_workspace_access_denied: 'ليس لديك صلاحية تعديل السجل الصحي لهذا المريض.',
+        invalid_gender_value: 'قيمة النوع غير صحيحة.',
+        birth_date_in_future: 'تاريخ الميلاد لا يمكن أن يكون في المستقبل.',
+        height_out_of_range: 'الطول يجب أن يكون بين 30 و260 سم.',
+        diagnosis_too_long: 'التشخيص أطول من الحد المسموح.',
+        complaints_too_long: 'الشكوى أطول من الحد المسموح.'
+      };
+      const message = messages[error.message] || error.message || 'تعذر حفظ البيانات الصحية المشتركة.';
       alert(message);
       return false;
     } finally {
