@@ -1402,14 +1402,13 @@ function renderSupportDays(){
   });
 }
 function showDeleteConfirm(dayText){
-  return new Promise(resolve=>{
-    const message='هل أنت متأكد من حذف يوم '+dayText+'؟\\nسيتم حذف جميع بيانات Enteral و Parenteral المحفوظة لهذا اليوم نهائيًا.';
-
-    if (document.documentElement.classList.contains('nsp-embedded') && window.parent !== window) {
+  const message='هل تريد حذف يوم '+dayText+'؟ سيتم حذف جميع بيانات Enteral و Parenteral المحفوظة لهذا اليوم نهائيًا.';
+  if (document.documentElement.classList.contains('nsp-embedded') && window.parent !== window) {
+    return new Promise(resolve=>{
       const requestId = 'delete-day-' + Date.now() + '-' + Math.random().toString(36).slice(2);
       const onResult = event => {
         if (event.origin !== window.location.origin || event.source !== window.parent) return;
-        if (event.data?.type !== 'dp-nsp-delete-modal-result') return;
+        if (event.data?.type !== 'dp-nsp-delete-modal-result' || event.data?.requestId !== requestId) return;
         window.removeEventListener('message', onResult);
         resolve(event.data.approved === true);
       };
@@ -1419,31 +1418,9 @@ function showDeleteConfirm(dayText){
         window.removeEventListener('message', onResult);
         resolve(false);
       }, 120000);
-      return;
-    }
-
-    const overlay=$('deleteConfirmOverlay');
-    const text=$('deleteConfirmText');
-    const ok=$('deleteConfirmOk');
-    const cancel=$('deleteConfirmCancel');
-    if(!overlay||!text||!ok||!cancel){resolve(false);return;}
-
-    text.textContent=message;
-    overlay.classList.add('show');
-
-    const close=value=>{
-      overlay.classList.remove('show');
-      ok.onclick=null;
-      cancel.onclick=null;
-      overlay.onclick=null;
-      resolve(value);
-    };
-
-    ok.onclick=()=>close(true);
-    cancel.onclick=()=>close(false);
-    overlay.onclick=e=>{if(e.target===overlay)close(false);};
-    cancel.focus();
-  });
+    });
+  }
+  return window.DPConfirm?.ask({title:'حذف يوم الدعم الغذائي؟',message,confirmText:'حذف',variant:'danger'}) ?? Promise.resolve(false);
 }
 
 function canWriteSupportDays() {
