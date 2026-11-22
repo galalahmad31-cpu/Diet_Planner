@@ -23,9 +23,7 @@
   let reloadQueued = false;
   let jobs = [];
 
-  const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  })[char]);
+  const escapeHtml = window.DPUtils.escapeHtml;
 
   function formatDate(value) {
     if (!value) return "";
