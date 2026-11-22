@@ -15,9 +15,7 @@
     user: null,
     accountType: null,
     isAdmin: false,
-    hasActiveSubscription: false,
     canAddPatient: false,
-    activeSubscriptionId: null,
     accessReady: false,
     accessPromise: null,
     openingAddModal: false
@@ -66,9 +64,7 @@
 
       if (!state.user) {
         state.isAdmin = false;
-        state.hasActiveSubscription = false;
         state.canAddPatient = false;
-        state.activeSubscriptionId = null;
         updateWriteControls();
         return;
       }
@@ -85,24 +81,6 @@
         return;
       }
 
-      state.hasActiveSubscription =
-        (await access?.hasActiveSubscription?.(state.user.id)) === true;
-      state.activeSubscriptionId = null;
-      if (state.hasActiveSubscription) {
-        const today = new Date().toISOString().slice(0, 10);
-        const { data: activeSub, error: subError } = await supabase
-          .from('subscriptions')
-          .select('id')
-          .eq('user_id', state.user.id)
-          .eq('status', 'paid')
-          .lte('start_date', today)
-          .gte('expiry_date', today)
-          .order('start_date', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (subError) throw subError;
-        state.activeSubscriptionId = activeSub?.id || null;
-      }
       state.canAddPatient =
         (await access?.canAddPatient?.(state.user.id)) === true;
 
@@ -474,25 +452,13 @@
       const user = state.user;
       if (!user) throw new Error('No authenticated user.');
 
-      const { data, error } = await supabase
-        .from('patients')
-        .insert({
-          user_id: user.id,
-          name,
-          phone: null,
-          gender: null,
-          birth_date: null,
-          age: null,
-          height: null,
-          diagnosis: null,
-          complaints: null,
-          clinical_notes: null,
-          subscription_id: state.activeSubscriptionId
-        })
-        .select('id')
-        .single();
+      const { data: patientId, error } = await supabase.rpc(
+        'create_professional_patient',
+        { p_name: name }
+      );
 
       if (error) throw error;
+      if (!patientId) throw new Error('Patient creation returned no record ID.');
 
       closeAddPatientModal();
       await loadPatients();
