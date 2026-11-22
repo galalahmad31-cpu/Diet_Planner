@@ -489,7 +489,7 @@ function initFoodSearchInteraction(){
  input.dataset.bound='1';
 }
 
-function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+const escapeHtml = window.DPUtils.escapeHtml;
 
 function confirmAddFoodItem(){
  const foodId=document.getElementById('selectedFoodId').value,grams=parseFloat(document.getElementById('foodGramsInput').value);
