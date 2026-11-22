@@ -229,7 +229,6 @@
 
   async function canAddPatient(userId) {
     if (!userId) return false;
-    const role = await getUserRole(userId);
     if (await getUserAccountType(userId) !== "professional") return false;
 
     const { data, error } = await supabaseClient.rpc(
