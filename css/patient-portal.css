@@ -215,24 +215,30 @@
 @media(max-width:760px){.portal-insulin-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-insulin-result{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.portal-insulin-fields{gap:9px}.portal-insulin-result{gap:6px}.portal-insulin-result>div{padding:9px;min-height:68px}.portal-insulin-result span{font-size:9px}.portal-insulin-result strong{font-size:14px}}\n
 
-/* Care management agreement cards */
+/* Patient care management: one request/one agreement card, with messages kept separate. */
+#portalCareManagementPanel>.portal-section{display:grid;gap:16px}
+#portalCareManagementPanel .portal-section-heading{margin-bottom:2px}
 .portal-care-management-list{display:grid;gap:12px}
-.portal-care-agreement{display:grid;gap:12px;padding:16px;border:1px solid var(--dp-border);border-radius:14px;background:var(--dp-surface)}
-.portal-care-agreement>header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.portal-care-agreement>header>div{display:grid;gap:3px}
-.portal-care-agreement>header strong{font-size:14px;color:var(--dp-text)}
-.portal-care-agreement>header small,.portal-care-agreement>header>span{font-size:10px;color:var(--dp-muted)}
+.portal-care-agreement{display:grid;gap:12px;min-width:0;padding:16px;border:1px solid var(--dp-border);border-radius:14px;background:var(--dp-surface)}
+.portal-care-agreement>header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--dp-border)}
+.portal-care-agreement>header>div{display:grid;gap:3px;min-width:0}
+.portal-care-agreement>header strong{font-size:14px;color:var(--dp-text);overflow-wrap:anywhere}
+.portal-care-agreement>header small{font-size:10px;color:var(--dp-muted)}
+.portal-care-agreement>header>span{flex:0 0 auto;max-width:52%;padding:5px 9px;border-radius:999px;background:var(--dp-surface-2);font-size:10px;font-weight:800;color:var(--dp-primary);text-align:center}
 .portal-care-agreement__details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.portal-care-agreement__details>div{display:grid;gap:4px;padding:9px;border-radius:9px;background:var(--dp-surface-2);min-width:0}
+.portal-care-agreement__details>div{display:grid;gap:4px;min-width:0;padding:10px;border-radius:9px;background:var(--dp-surface-2)}
 .portal-care-agreement__details small{font-size:9px;color:var(--dp-muted)}
 .portal-care-agreement__details strong{font-size:11px;color:var(--dp-text);overflow-wrap:anywhere}
-.portal-care-agreement p{margin:0;font-size:11px;line-height:1.8;color:var(--dp-text-2);white-space:pre-wrap}
-.portal-care-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0;padding:0;list-style:none;counter-reset:care-step}
-.portal-care-steps li{padding:8px;border-radius:8px;background:var(--dp-surface-2);font-size:10px;color:var(--dp-muted)}
+.portal-care-agreement p{margin:0;font-size:11px;line-height:1.8;color:var(--dp-text-2);white-space:pre-wrap;overflow-wrap:anywhere}
+.portal-care-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0;padding:0;list-style:none}
+.portal-care-steps li{padding:9px;border-radius:8px;background:var(--dp-surface-2);font-size:10px;color:var(--dp-muted)}
 .portal-care-steps li.is-done{color:var(--dp-primary);font-weight:800}
 .portal-care-agreement__actions{display:flex;gap:8px;flex-wrap:wrap}
-.portal-care-agreement__notice{padding-top:8px;border-top:1px solid var(--dp-border);font-size:9px!important;color:var(--dp-muted)!important}
-@media(max-width:520px){.portal-care-agreement{padding:12px}.portal-care-agreement__details{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-care-steps{grid-template-columns:minmax(0,1fr)}}
+.portal-care-agreement__actions:empty{display:none}
+.portal-care-agreement__actions button{min-height:40px}
+.portal-care-agreement__notice{padding-top:9px;border-top:1px solid var(--dp-border);font-size:9px!important;color:var(--dp-muted)!important}
+@media(max-width:620px){.portal-care-agreement{padding:12px}.portal-care-agreement__details{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-care-steps{grid-template-columns:minmax(0,1fr)}.portal-care-agreement>header{align-items:flex-start}.portal-care-agreement>header>span{max-width:58%}}
+@media(max-width:360px){.portal-care-agreement__details{grid-template-columns:minmax(0,1fr)}}
 
 
 /* Shared health record */
