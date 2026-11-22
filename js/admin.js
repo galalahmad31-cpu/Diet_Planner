@@ -3,7 +3,7 @@
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
 const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
 const PAGE_SIZE=20;
-const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,requestsLoaded:false,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0,doctorsLoaded:false};
+const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0};
 let confirmAction=null,requestSearchTimer=null,doctorSearchTimer=null;
 
 const $=id=>document.getElementById(id);
@@ -62,9 +62,9 @@ async function loadRequestsPage(page=0){
   if(q){filters.push(`full_name.ilike.%${q}%`);if(profileIds.length)filters.push(`user_id.in.(${profileIds.join(',')})`);if(planIds.length)filters.push(`plan_id.in.(${planIds.join(',')})`)}
   let query=sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot',{count:'exact'}).order('created_at',{ascending:false});
   if(state.requestStatus!=='all')query=query.eq('status',state.requestStatus);
-  if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;state.requestAllTotal=allCount.count||0;state.requestsLoaded=true;$('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;renderRequests();return}query=query.or(filters.join(','))}
+  if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;state.requestAllTotal=allCount.count||0;$('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;renderRequests();return}query=query.or(filters.join(','))}
   const result=await query.range(from,to);if(result.error)throw result.error;
-  state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;state.requestsLoaded=true;
+  state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;
   const ids=[...new Set(state.subs.map(s=>s.user_id).filter(Boolean))];
   if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=p.data||[]}else state.profiles=[];
   $('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;$('totalCount').textContent=allCount.count||0;
@@ -99,7 +99,7 @@ async function loadDoctorsPage(page=0){
     return {user_id:profile.id,count};
    });
   }else{state.subs=[];state.patients=[]}
-  state.doctorActiveTotal=activeResult.count||0;state.doctorsLoaded=true;renderDoctors();
+  state.doctorActiveTotal=activeResult.count||0;renderDoctors();
  }catch(error){console.error('Admin doctors page load failed:',error);setState('doctor',error.message||'تعذر تحميل المستخدمين.')}
 }
 function renderRequests(){
