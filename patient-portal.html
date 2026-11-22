@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-unified-health-save-v1">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261122-health-field-order-v1">
   <link rel="stylesheet" href="css/announcements.css?v=20261122-shared-announcements-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
@@ -219,13 +219,13 @@
         <section class="portal-section" aria-labelledby="patientSharedHealthTitle">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية المشتركة</h2><p>بيانات أساسية يمكن للمريض والمختص المخوّل مراجعتها وتحديثها أثناء المتابعة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
           <form id="patientSharedHealthForm" class="portal-shared-health-form">
-            <div class="portal-shared-health-name-row"><label for="sharedHealthName">اسم المريض</label><input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" required></div>
             <div class="portal-shared-health-grid">
+              <label for="sharedHealthName">اسم المريض<input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" required></label>
               <label for="sharedHealthGender">النوع (اختياري)<select id="sharedHealthGender"><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></label>
               <label>تاريخ الميلاد<input id="sharedHealthBirthDate" type="date"></label>
               <label>الطول (سم)<input id="sharedHealthHeight" type="number" min="30" max="260" step="0.1"></label>
               <label class="is-wide">التشخيص<input id="sharedHealthDiagnosis" type="text" maxlength="4000"></label>
-              <label class="is-wide">الشكوى أو سبب المتابعة<textarea id="sharedHealthComplaints" rows="3" maxlength="4000"></textarea></label>
+              <label class="is-wide">الشكوى<textarea id="sharedHealthComplaints" rows="3" maxlength="4000"></textarea></label>
             </div>
             <div class="portal-form-footer"><p id="patientSharedHealthStatus" class="portal-inline-message" role="status"></p><button type="submit" class="portal-primary-button">حفظ البيانات الصحية</button></div>
           </form>
