@@ -243,6 +243,12 @@
 
 /* Shared health record */
 .portal-shared-health-form{display:grid;gap:14px}
+.portal-shared-health-name-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 12px;align-items:end;margin-bottom:14px}
+.portal-shared-health-name-row>label{font-size:11px;font-weight:800;color:var(--dp-text)}
+.portal-shared-health-name-row>div{display:flex;gap:8px;min-width:0}
+.portal-shared-health-name-row input{flex:1;min-width:0;box-sizing:border-box;border:1px solid var(--dp-border);border-radius:9px;padding:10px;background:var(--dp-surface);color:var(--dp-text);font:12px Cairo,sans-serif}
+.portal-shared-health-name-row .portal-inline-message{grid-column:1/-1;margin:0}
+@media(max-width:520px){.portal-shared-health-name-row{grid-template-columns:1fr}.portal-shared-health-name-row>div{width:100%}.portal-shared-health-name-row button{white-space:nowrap}}
 .portal-shared-health-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .portal-shared-health-grid label{display:grid;gap:6px;font-size:11px;font-weight:800;color:var(--dp-text)}
 .portal-shared-health-grid input,.portal-shared-health-grid select,.portal-shared-health-grid textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--dp-border);border-radius:9px;padding:10px;background:var(--dp-surface);color:var(--dp-text);font:12px Cairo,sans-serif}
