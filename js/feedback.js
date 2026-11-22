@@ -41,9 +41,6 @@
     elements.stars = document.querySelectorAll("[data-rating]");
     elements.list = document.getElementById("feedbackList");
     elements.empty = document.getElementById("feedbackEmpty");
-    elements.deleteModal = document.getElementById("feedbackDeleteModal");
-    elements.cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-    elements.confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
   }
 
   function hideLoading() {
@@ -374,24 +371,15 @@
     }
   }
 
-  function openDeleteModal(feedbackId = state.editingId) {
+  async function openDeleteModal(feedbackId = state.editingId) {
     if (!feedbackId) return;
-    state.pendingDeleteId = feedbackId;
-    elements.deleteModal?.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-    elements.cancelDeleteBtn?.focus();
-  }
-
-  function closeDeleteModal() {
-    state.pendingDeleteId = null;
-    elements.deleteModal?.classList.add("hidden");
-    document.body.classList.remove("overflow-hidden");
-  }
-
-  function confirmDelete() {
-    const feedbackId = state.pendingDeleteId;
-    closeDeleteModal();
-    performDeleteFeedback(feedbackId);
+    const confirmed = await window.DPConfirm?.ask({
+      title: "حذف التقييم؟",
+      message: "هل أنت متأكد أنك تريد حذف التقييم نهائيًا؟",
+      confirmText: "حذف",
+      variant: "danger"
+    });
+    if (confirmed) await performDeleteFeedback(feedbackId);
   }
 
   async function performDeleteFeedback(feedbackId) {
@@ -453,18 +441,7 @@
   function bindEvents() {
     elements.form?.addEventListener("submit", saveFeedback);
     elements.deleteBtn?.addEventListener("click", () => openDeleteModal());
-    elements.cancelDeleteBtn?.addEventListener("click", closeDeleteModal);
-    elements.confirmDeleteBtn?.addEventListener("click", confirmDelete);
-    elements.deleteModal?.addEventListener("click", (event) => {
-      if (event.target === elements.deleteModal) closeDeleteModal();
-    });
     elements.list?.addEventListener("click", handleFeedbackListClick);
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !elements.deleteModal?.classList.contains("hidden")) {
-        closeDeleteModal();
-      }
-    });
 
     elements.stars.forEach((star) => {
       star.addEventListener("click", () => setRating(star.dataset.rating));
