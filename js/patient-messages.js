@@ -47,13 +47,6 @@
           <label for="patientMessageRecipient">المختص</label>
           <select id="patientMessageRecipient" data-message-recipient></select>
         </div>
-        <section class="patient-messages-quick-actions" data-message-quick-actions hidden aria-label="مراحل الاتفاق والدفع">
-          <div class="patient-messages-quick-actions-heading">
-            <strong data-message-stage>حالة الاتفاق</strong>
-            <small data-message-stage-note></small>
-          </div>
-          <div class="patient-messages-quick-actions-buttons" data-message-confirmation-buttons></div>
-        </section>
         <div class="patient-messages-list" data-message-list aria-live="polite">
           <div class="patient-messages-empty">جاري تحميل المحادثة...</div>
         </div>
@@ -64,20 +57,7 @@
             <button type="submit" data-message-send><i class="fa-solid fa-paper-plane"></i> إرسال</button>
           </div>
         </form>
-        <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية. تأكيد الدفع إقرار من صاحبه، وليس تحققًا بنكيًا من المنصة.</p>
-        <dialog class="patient-confirm-dialog" data-confirm-dialog aria-labelledby="patientConfirmTitle" aria-describedby="patientConfirmDescription">
-          <div class="patient-confirm-dialog__content">
-            <span class="patient-confirm-dialog__icon" aria-hidden="true"><i class="fa-solid fa-shield-heart"></i></span>
-            <small class="patient-confirm-dialog__eyebrow" data-confirm-kicker>تأكيد خطوة المتابعة</small>
-            <h3 id="patientConfirmTitle" data-confirm-title>تأكيد الإجراء</h3>
-            <p id="patientConfirmDescription" data-confirm-description></p>
-            <div class="patient-confirm-dialog__notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span data-confirm-note></span></div>
-            <div class="patient-confirm-dialog__actions">
-              <button type="button" class="patient-confirm-dialog__cancel" data-confirm-cancel>رجوع للمحادثة</button>
-              <button type="button" class="patient-confirm-dialog__accept" data-confirm-accept>تأكيد</button>
-            </div>
-          </div>
-        </dialog>
+        <p class="patient-messages-disclaimer">هذه المحادثة مخصصة للتواصل والمتابعة الغذائية، ولا تُعد وسيلة للطوارئ الطبية.</p>
       </div>`;
 
     const user = await access.getCurrentUser();
@@ -93,54 +73,12 @@
     const refreshButton = root.querySelector("[data-message-refresh]");
     const recipientWrap = root.querySelector("[data-message-contact]");
     const recipientSelect = root.querySelector("[data-message-recipient]");
-    const quickActions = root.querySelector("[data-message-quick-actions]");
-    const confirmationDialog = root.querySelector("[data-confirm-dialog]");
     let recipientId = null;
     let requestId = options.requestId || null;
     let requestState = null;
     let busy = false;
     let loading = false;
     let counterpartLabel = role === "patient" ? "المختص" : "المريض";
-
-    function askStepConfirmation(copy) {
-      return new Promise(resolve => {
-        const kicker = confirmationDialog.querySelector("[data-confirm-kicker]");
-        const title = confirmationDialog.querySelector("[data-confirm-title]");
-        const description = confirmationDialog.querySelector("[data-confirm-description]");
-        const note = confirmationDialog.querySelector("[data-confirm-note]");
-        const cancelButton = confirmationDialog.querySelector("[data-confirm-cancel]");
-        const acceptButton = confirmationDialog.querySelector("[data-confirm-accept]");
-        const previousFocus = document.activeElement;
-        let settled = false;
-        const finish = confirmed => {
-          if (settled) return;
-          settled = true;
-          cancelButton.removeEventListener("click", onCancel);
-          acceptButton.removeEventListener("click", onAccept);
-          confirmationDialog.removeEventListener("cancel", onNativeCancel);
-          confirmationDialog.removeEventListener("click", onBackdropClick);
-          if (confirmationDialog.open) confirmationDialog.close();
-          if (previousFocus?.isConnected) previousFocus.focus();
-          resolve(confirmed);
-        };
-        const onCancel = () => finish(false);
-        const onAccept = () => finish(true);
-        const onNativeCancel = event => { event.preventDefault(); finish(false); };
-        const onBackdropClick = event => { if (event.target === confirmationDialog) finish(false); };
-
-        kicker.textContent = copy.kicker;
-        title.textContent = copy.title;
-        description.textContent = copy.description;
-        note.textContent = copy.note;
-        acceptButton.textContent = copy.action;
-        cancelButton.addEventListener("click", onCancel);
-        acceptButton.addEventListener("click", onAccept);
-        confirmationDialog.addEventListener("cancel", onNativeCancel);
-        confirmationDialog.addEventListener("click", onBackdropClick);
-        confirmationDialog.showModal();
-        acceptButton.focus();
-      });
-    }
 
     try {
       if (role === "patient") {
@@ -253,69 +191,13 @@
 
     async function loadRequestState() {
       requestState = null;
-      if (!requestId) { quickActions.hidden = true; return; }
+      if (!requestId) { form.hidden = false; return; }
       const { data, error } = await supabase.from("professional_connection_requests")
-        .select("id,status,patient_agreement_at,professional_agreement_at,payment_sent_at,payment_received_at")
+        .select("id,status")
         .eq("id", requestId).maybeSingle();
       if (error) throw error;
       requestState = data || null;
-      renderQuickActions();
-    }
-
-    function renderQuickActions() {
-      const stage = root.querySelector("[data-message-stage]");
-      const note = root.querySelector("[data-message-stage-note]");
-      const buttons = root.querySelector("[data-message-confirmation-buttons]");
-      if (!requestState || !["accepted", "active", "ended"].includes(requestState.status)) {
-        quickActions.hidden = true;
-        return;
-      }
-      quickActions.hidden = false;
-      buttons.replaceChildren();
-      const isPatient = role === "patient";
-      if (requestState.status === "ended") {
-        stage.textContent = "انتهت المتابعة";
-        note.textContent = "تم إنهاء المتابعة. يمكنك الاطلاع على سجل المحادثة، لكن لا يمكن إرسال رسائل جديدة.";
-        form.hidden = true;
-        return;
-      }
-      form.hidden = false;
-      const patientAgreed = Boolean(requestState.patient_agreement_at);
-      const professionalAgreed = Boolean(requestState.professional_agreement_at);
-      const makeButton = (step, label) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.dataset.messageConfirm = step;
-        button.textContent = label;
-        buttons.appendChild(button);
-      };
-
-      if (requestState.status === "active" || requestState.payment_received_at) {
-        stage.textContent = "المتابعة نشطة";
-        note.textContent = "تم تأكيد استلام المبلغ وبدء المتابعة.";
-      } else if (!patientAgreed || !professionalAgreed) {
-        stage.textContent = "المرحلة 1 من 3 · تأكيد الاتفاق";
-        const ownConfirmed = isPatient ? patientAgreed : professionalAgreed;
-        const otherConfirmed = isPatient ? professionalAgreed : patientAgreed;
-        if (!ownConfirmed) makeButton("agreement", "أؤكد الاتفاق");
-        note.textContent = ownConfirmed
-          ? "تم تأكيد موافقتك. ننتظر تأكيد الطرف الآخر."
-          : otherConfirmed
-            ? "الطرف الآخر أكد الاتفاق. راجع تفاصيل الخدمة والسعر والمدة ثم أكد موافقتك."
-            : "بعد الاتفاق على الخدمة والسعر والمدة، يؤكد كل طرف موافقته.";
-      } else if (!requestState.payment_sent_at) {
-        stage.textContent = "المرحلة 2 من 3 · تأكيد الدفع";
-        if (isPatient) makeButton("payment_sent", "تأكيد إرسال المبلغ");
-        note.textContent = isPatient
-          ? "أرسل المبلغ بالطريقة التي اتفقتما عليها، ثم أكد الإرسال."
-          : "تم تأكيد الاتفاق من الطرفين. ننتظر تأكيد المريض إرسال المبلغ.";
-      } else {
-        stage.textContent = "المرحلة 3 من 3 · تأكيد الاستلام";
-        if (!isPatient) makeButton("payment_received", "تأكيد استلام المبلغ");
-        note.textContent = isPatient
-          ? "تم تسجيل تأكيد الإرسال. ننتظر تأكيد المختص استلام المبلغ."
-          : "لا تؤكد الاستلام إلا بعد التحقق بنفسك من وصول المبلغ.";
-      }
+      form.hidden = requestState?.status === "ended";
     }
 
     async function loadMessages() {
@@ -338,7 +220,12 @@
           .order("created_at", { ascending: false })
           .limit(200);
         if (error) throw error;
-        const messages = (data || []).reverse();
+        const legacyMilestoneMessages = new Set([
+          "تأكيد الاتفاق: أوافق على تفاصيل الخدمة والسعر والمدة المسجلة في اتفاق المتابعة.",
+          "تأكيد إرسال المبلغ: أؤكد أنني أرسلت المبلغ المتفق عليه للمختص.",
+          "تأكيد استلام المبلغ: أؤكد أنني استلمت المبلغ المتفق عليه من المريض. بدأت المتابعة."
+        ]);
+        const messages = (data || []).filter(message => !legacyMilestoneMessages.has(message.body)).reverse();
         if (!messages.length) {
           list.innerHTML = '<div class="patient-messages-empty">لا توجد رسائل بعد. يمكنك بدء المحادثة برسالة قصيرة.</div>';
           return;
@@ -368,7 +255,6 @@
 
       busy = true;
       sendButton.disabled = true;
-      root.querySelectorAll("[data-message-confirm]").forEach(button => { button.disabled = true; });
       setStatus(root, "جاري إرسال الرسالة...");
 
       try {
@@ -391,67 +277,12 @@
       } finally {
         busy = false;
         sendButton.disabled = false;
-        root.querySelectorAll("[data-message-confirm]").forEach(button => { button.disabled = false; });
       }
     }
 
     form.addEventListener("submit", event => {
       event.preventDefault();
       void sendMessage(input.value.trim(), { clearInput: true });
-    });
-
-    quickActions.addEventListener("click", async event => {
-      const button = event.target.closest("[data-message-confirm]");
-      if (!button || !requestId || busy) return;
-      const step = button.dataset.messageConfirm;
-      const confirmationCopy = {
-        agreement: {
-          kicker: "المرحلة الأولى · الاتفاق",
-          title: "تأكيد الموافقة على الاتفاق",
-          description: "هل راجعت تفاصيل الخدمة والسعر والمدة المتفق عليها، وتؤكد موافقتك عليها؟",
-          note: "سيُسجّل تأكيدك للطرفين، ولن تنتقل الخطوة التالية إلا بعد تأكيد الطرف الآخر أيضًا.",
-          action: "أؤكد الاتفاق"
-        },
-        payment_sent: {
-          kicker: "المرحلة الثانية · الدفع",
-          title: "تأكيد إرسال المبلغ",
-          description: "هل أرسلت المبلغ المتفق عليه بالفعل إلى المختص بالطريقة التي اتفقتما عليها؟",
-          note: "لا تضغط تأكيد قبل إتمام التحويل أو الدفع فعليًا. هذا الإجراء ليس تحققًا بنكيًا من المنصة.",
-          action: "نعم، أرسلت المبلغ"
-        },
-        payment_received: {
-          kicker: "المرحلة الثالثة · استلام المبلغ",
-          title: "تأكيد استلام المبلغ",
-          description: "هل تحققت بنفسك من وصول المبلغ المتفق عليه إلى حسابك؟",
-          note: "لا تؤكد الاستلام اعتمادًا على صورة إيصال أو رسالة من الطرف الآخر فقط؛ تحقق من وصول المبلغ فعليًا.",
-          action: "نعم، استلمت المبلغ"
-        }
-      };
-      const copy = confirmationCopy[step];
-      if (!copy || !await askStepConfirmation(copy)) return;
-      busy = true;
-      sendButton.disabled = true;
-      button.disabled = true;
-      setStatus(root, "جاري تسجيل التأكيد...");
-      try {
-        const { error } = await supabase.rpc("confirm_professional_connection_step", {
-          p_request_id: requestId, p_step: step
-        });
-        if (error) throw error;
-        setStatus(root, "تم تسجيل التأكيد بنجاح.", "success");
-        await loadRequestState();
-        await loadMessages();
-        if (requestState?.status === "active") window.location.reload();
-      } catch (error) {
-        console.error("Connection confirmation failed:", error);
-        setStatus(root, error.message || "تعذر تسجيل التأكيد.", "error");
-        try { await loadRequestState(); } catch (refreshError) {
-          console.error("Conversation state refresh failed:", refreshError);
-        }
-      } finally {
-        busy = false;
-        sendButton.disabled = false;
-      }
     });
 
     refreshButton.addEventListener("click", () => {
