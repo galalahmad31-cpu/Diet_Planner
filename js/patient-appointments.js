@@ -55,7 +55,7 @@
             </div>
             <div class="patient-appointment-form-footer"><span data-appointment-status class="patient-appointments-status" role="status"></span><button type="submit" data-appointment-submit><i class="fa-regular fa-calendar-plus"></i> إرسال طلب الموعد</button></div>
           </form>
-        ` : \`<form class="patient-appointment-form" data-professional-appointment-form>
+        ` : `<form class="patient-appointment-form" data-professional-appointment-form>
           <div class="patient-appointment-fields">
             <div><label for="professionalAppointmentDate">التاريخ والوقت المتفق عليهما</label><input id="professionalAppointmentDate" data-professional-appointment-date type="datetime-local" required></div>
             <div><label for="professionalAppointmentDuration">المدة</label><select id="professionalAppointmentDuration" data-professional-appointment-duration><option value="30">30 دقيقة</option><option value="45">45 دقيقة</option><option value="60">60 دقيقة</option><option value="90">90 دقيقة</option></select></div>
@@ -63,7 +63,7 @@
             <div class="patient-appointment-note"><label for="professionalAppointmentNote">ملاحظات (اختياري)</label><textarea id="professionalAppointmentNote" data-professional-appointment-note maxlength="1000" rows="2" placeholder="ملاحظات الموعد أو ما تم الاتفاق عليه"></textarea></div>
           </div>
           <div class="patient-appointment-form-footer"><span data-appointment-status class="patient-appointments-status" role="status"></span><button type="submit" data-professional-appointment-submit><i class="fa-regular fa-calendar-plus"></i> تسجيل موعد متفق عليه</button></div>
-        </form>\`
+        </form>`}
         <div class="patient-appointments-list" data-appointment-list><div class="patient-appointments-empty">جاري تحميل المواعيد...</div></div>
         <p class="patient-appointments-disclaimer">المواعيد هنا طلبات متابعة وليست خدمة طوارئ. لا يتم تحصيل أي مدفوعات من خلال هذه المرحلة.</p>
       </div>`;
