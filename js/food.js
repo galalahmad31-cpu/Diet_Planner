@@ -160,32 +160,19 @@ $('foodRows').addEventListener('click',async e=>{
   }
 });
 
-let deleteTarget=null;
-function closeDeleteConfirm(){
-  deleteTarget=null;
-  $('deleteConfirmModal').classList.add('hidden');
-  $('deleteConfirmModal').classList.remove('flex');
-}
-function openDeleteConfirm(food){
-  deleteTarget=food;
-  $('deleteConfirmText').textContent=`هل تريد حذف الصنف "${food.name_ar}"؟ لا يمكن التراجع عن الحذف.`;
-  $('deleteConfirmModal').classList.remove('hidden');
-  $('deleteConfirmModal').classList.add('flex');
-}
-$('cancelDeleteBtn').onclick=closeDeleteConfirm;
-$('confirmDeleteBtn').onclick=async()=>{
-  const f=deleteTarget;
-  if(!f || !(isAdmin||(f.is_custom&&f.created_by===user.id)))return;
-  const btn=$('confirmDeleteBtn');
-  btn.disabled=true;
-  btn.innerHTML='جاري الحذف...';
-  const {error}=await supabase.from('foods').delete().eq('id',f.id);
-  btn.disabled=false;
-  btn.innerHTML='<i class="fa-solid fa-trash ml-1"></i> حذف الصنف';
-  closeDeleteConfirm();
+async function openDeleteConfirm(food){
+  if(!food || !(isAdmin||(food.is_custom&&food.created_by===user.id)))return;
+  const confirmed=await window.DPConfirm?.ask({
+    title:"حذف الصنف؟",
+    message:`هل تريد حذف الصنف "${food.name_ar}"؟ لا يمكن التراجع عن الحذف.`,
+    confirmText:"حذف",
+    variant:"danger"
+  });
+  if(!confirmed)return;
+  const {error}=await supabase.from('foods').delete().eq('id',food.id);
   if(error){toast('فشل حذف الصنف: '+error.message,false);return;}
   toast('تم حذف الصنف');await loadFoods();
-};
+}
 
 $('foodForm').onsubmit=async e=>{
   e.preventDefault();$('saveBtn').disabled=true;$('saveBtn').textContent='جاري الحفظ...';
