@@ -57,14 +57,7 @@ function addMonthsToDateKey(baseDate, months) {
 }
 
 
-function formatDate(value) {
-  const key = dateKey(value);
-  if (!key) return '—';
-
-  const [year, month, day] = key.split('-');
-  return `${day}/${month}/${year}`;
-}
-
+const formatDate = window.DPDate.formatDMY;
 function addNotification(list, row, details) {
   list.push({
     patientName: row.patients?.name || 'المريض',
