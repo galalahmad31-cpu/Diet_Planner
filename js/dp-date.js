@@ -18,6 +18,14 @@
     ].join("-");
   }
 
+  function formatDMY(value, fallback = "—") {
+    const key = dateKey(value);
+    if (!key) return fallback;
+
+    const [year, month, day] = key.split("-");
+    return `${day}/${month}/${year}`;
+  }
+
   function daysUntil(targetDate, referenceDate) {
     const target = dateKey(targetDate);
     const reference = dateKey(referenceDate);
@@ -51,5 +59,5 @@
     ].join("-");
   }
 
-  window.DPDate = Object.freeze({ dateKey, todayKey, daysUntil, addMonths });
+  window.DPDate = Object.freeze({ dateKey, todayKey, daysUntil, addMonths, formatDMY });
 })();
