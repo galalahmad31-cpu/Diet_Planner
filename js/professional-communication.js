@@ -90,7 +90,8 @@ function renderConversationHistory(requests){
 
  root.querySelectorAll("[data-agreement-form]").forEach(form=>form.addEventListener("submit",event=>{event.preventDefault();void submitAgreementForm(form);}));
  root.querySelectorAll("[data-care-step]").forEach(button=>button.addEventListener("click",()=>void confirmCareStep(button)));
-\n root.querySelectorAll("[data-request-chat]").forEach(node=>{
+
+ root.querySelectorAll("[data-request-chat]").forEach(node=>{
   void window.DietPlannerPatientMessages?.mount(node,{
    patientId:node.dataset.patientId,requestId:node.dataset.requestId,role:"professional"
   });
