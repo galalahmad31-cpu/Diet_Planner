@@ -84,7 +84,7 @@
         return path === "patient-portal.html" &&
           (location.hash === "#" + fragment || (!location.hash && fragment === "portalHome"));
       }
-      return role === "professional" && path === target && (location.hash === "#" + fragment || (fragment === "communication" && location.hash === "#requests"));
+      return role === "professional" && path === target && location.hash === "#" + fragment;
     }
     if (path === target) {
       return true;
