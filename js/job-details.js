@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id);
 const SPECIALTIES={medicine:"الطب",pharmacy:"الصيدلة",nursing:"التمريض",clinical_nutrition:"التغذية العلاجية",laboratory:"المعامل والتحاليل",radiology:"الأشعة",dentistry:"طب الأسنان",physiotherapy:"العلاج الطبيعي",healthcare_management:"الإدارة الصحية",other:"تخصصات صحية أخرى"};
 const EMPLOYMENT={full_time:"دوام كامل",part_time:"دوام جزئي",contract:"تعاقد",temporary:"مؤقت",internship:"تدريب",freelance:"عمل حر"};
 const WORKPLACE={on_site:"من مقر العمل",hybrid:"هجين",remote:"عن بُعد"};
-const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const escapeHtml=window.DPUtils.escapeHtml;
 function formatDate(value){if(!value)return"";const d=new Date(value);return Number.isNaN(d.getTime())?"":new Intl.DateTimeFormat("ar-EG",{dateStyle:"long"}).format(d);}
 function paragraphs(value){return String(value??"").trim().split(/\n{2,}/).filter(Boolean).map(p=>"<p>"+escapeHtml(p).replace(/\n/g,"<br>")+"</p>").join("");}
 function showState(message){$("jobDetailCard").hidden=true;$("jobDetailState").hidden=false;$("jobDetailState").innerHTML='<i class="fa-solid fa-circle-exclamation"></i><p>'+escapeHtml(message)+'</p>';}
