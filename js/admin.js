@@ -456,8 +456,8 @@ async function savePrivacyPolicy(){
 function switchTab(tab){
   state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   ['requests','plans','doctors','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
-  if(tab==='requests'&&!state.requestsLoaded)loadRequestsPage();
-  if(tab==='doctors'&&!state.doctorsLoaded)loadDoctorsPage();
+  if(tab==='requests')loadRequestsPage();
+  if(tab==='doctors')loadDoctorsPage();
   if(tab==='announcements')loadAnnouncements();
   if(tab==='privacy')loadPrivacyPolicy();
 }
