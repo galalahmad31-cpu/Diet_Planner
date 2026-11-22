@@ -97,10 +97,10 @@
     return false;
   }
 
-  function setCollapsed(header, trigger, collapsed, persist = true) {
+  function setCollapsed(header, collapsed, persist = true) {
     header.classList.toggle("is-collapsed", collapsed);
-    trigger.setAttribute("aria-expanded", String(!collapsed));
-    trigger.setAttribute("aria-label", collapsed ? "فتح بقية روابط الهيدر" : "طي بقية روابط الهيدر");
+    const hint = header.querySelector(".dp-app-header__collapse-hint span");
+    if (hint) hint.textContent = collapsed ? "اضغط لعرض باقي التبويبات" : "اضغط لطي القائمة";
     if (persist) {
       try { localStorage.setItem(HEADER_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
       catch (error) { console.warn("Could not save header display preference:", error); }
@@ -146,9 +146,9 @@
           <a class="dp-app-header__logo-link" href="${base + homeHref}" aria-label="Diet Planner - الرئيسية">
             <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
           </a>
-          <button class="dp-app-header__brand-copy" type="button" aria-controls="dp-app-header-nav" aria-expanded="true">
+          <div class="dp-app-header__brand-copy">
             <strong>Diet Planner</strong><small>${subtitle}</small>
-          </button>
+          </div>
         </div>
         <div class="dp-app-header__account">
           <a class="dp-app-header__account-link dp-app-header__login" href="${base}login.html">تسجيل الدخول</a>
@@ -161,21 +161,22 @@
       <nav class="dp-app-header__nav" id="dp-app-header-nav" aria-label="التنقل الرئيسي">
         <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
+      <div class="dp-app-header__collapse-hint" aria-hidden="true"><i class="fa-solid fa-grip-lines"></i><span>اضغط لطي القائمة</span></div>
       <div class="dp-app-header__page-title"></div>
       <div class="dp-app-header__context" hidden></div>`;
     const track = header.querySelector(".dp-app-header__track");
-    const collapseTrigger = header.querySelector(".dp-app-header__brand-copy");
     const items = role === "patient" ? patientPages : role === "professional" ? (isAdmin ? [...professionalPages, adminPage] : professionalPages) : publicPages;
     items.forEach(item => track.append(makeLink(item, role)));
-    collapseTrigger.addEventListener("click", () => {
-      setCollapsed(header, collapseTrigger, collapseTrigger.getAttribute("aria-expanded") === "true");
-    });
     header.addEventListener("click", event => {
-      // Any non-control green surface toggles the header. Links and controls keep their own actions.
-      if (event.target.closest("a, button, input, select, textarea, [role=\'button\'], .dp-app-header__link")) return;
-      setCollapsed(header, collapseTrigger, !header.classList.contains("is-collapsed"));
+      if (event.target.closest("a, button, input, select, textarea, [role=button], .dp-app-header__link, .dp-app-header__brand-copy")) return;
+      setCollapsed(header, !header.classList.contains("is-collapsed"));
     });
-    setCollapsed(header, collapseTrigger, getSavedCollapsedState(), false);
+    header.addEventListener("keydown", event => {
+      if (event.target !== header || (event.key !== "Enter" && event.key !== " ")) return;
+      event.preventDefault();
+      setCollapsed(header, !header.classList.contains("is-collapsed"));
+    });
+    setCollapsed(header, getSavedCollapsedState(), false);
     track.addEventListener("click", event => {
       const link = event.target.closest(".dp-app-header__link");
       if (!link) return;
