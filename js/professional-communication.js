@@ -14,9 +14,14 @@ function renderIncomingRequests(requests){
  root.querySelectorAll("[data-answer]").forEach(button=>button.addEventListener("click",async()=>{
   if(button.disabled)return;
   button.disabled=true;
-  const {error}=await db.rpc("respond_professional_connection_request",{p_request_id:button.dataset.id,p_decision:button.dataset.answer});
-  if(error){setCommunicationStatus("تعذر تنفيذ الطلب: "+error.message);button.disabled=false;return;}
-  await loadRequests();
+  try{
+   const {error}=await db.rpc("respond_professional_connection_request",{p_request_id:button.dataset.id,p_decision:button.dataset.answer});
+   if(error)throw error;
+   await loadRequests();
+  }catch(error){
+   setCommunicationStatus("تعذر تنفيذ الطلب: "+(error.message||"حدث خطأ غير متوقع."));
+   button.disabled=false;
+  }
  }));
 }
 function renderConversationHistory(requests){
@@ -57,44 +62,45 @@ async function endFollowup(){
  if(!requestId||confirmButton?.disabled)return;
  confirmButton.disabled=true;
  $("endProfessionalFollowupStatus").textContent="جارٍ إنهاء المتابعة...";
- const {error}=await db.rpc("end_professional_followup",{
-  p_request_id:requestId,
-  p_reason:$("endProfessionalFollowupReason").value.trim()||null
- });
- if(error){
-  $("endProfessionalFollowupStatus").textContent="تعذر إنهاء المتابعة: "+error.message;
+ try{
+  const {error}=await db.rpc("end_professional_followup",{
+   p_request_id:requestId,
+   p_reason:$("endProfessionalFollowupReason").value.trim()||null
+  });
+  if(error)throw error;
+  dialog.close();
+  setCommunicationStatus("تم إنهاء المتابعة. تم الاحتفاظ بملف المريض وسجل المحادثة.");
+  await loadRequests();
+ }catch(error){
+  $("endProfessionalFollowupStatus").textContent="تعذر إنهاء المتابعة: "+(error.message||"حدث خطأ غير متوقع.");
+ }finally{
   confirmButton.disabled=false;
-  return;
  }
- dialog.close();
- setCommunicationStatus("تم إنهاء المتابعة. تم الاحتفاظ بملف المريض وسجل المحادثة.");
- await loadRequests();
 }
 async function loadRequests(){
  if(loading)return;
  loading=true;
  const incomingRoot=$("professionalConnectionRequests");
  const historyRoot=$("professionalConversationHistory");
- const {data,error}=await db.rpc("list_professional_connection_requests");
- if(error){
+ try{
+  const {data,error}=await db.rpc("list_professional_connection_requests");
+  if(error)throw error;
+  const requests=data||[];
+  renderIncomingRequests(requests);
+  renderConversationHistory(requests);
+  const requestedId=new URLSearchParams(location.search).get("request");
+  if(requestedId){
+   const target=document.getElementById("connection-request-"+requestedId);
+   if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+ }catch(error){
   incomingRoot.textContent="تعذر تحميل طلبات المحادثة.";
   historyRoot.textContent="تعذر تحميل سجل المحادثات.";
   console.error("Professional communication data load failed:",error);
+ }finally{
   loading=false;
-  return;
  }
- const requests=data||[];
- renderIncomingRequests(requests);
- renderConversationHistory(requests);
- const requestedId=new URLSearchParams(location.search).get("request");
- if(requestedId){
-  const target=document.getElementById("connection-request-"+requestedId);
-  if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
- }
- loading=false;
 }
-
-
 async function init(){
  if(!db||typeof access?.getCurrentUser!=="function"){setCommunicationStatus("تعذر تهيئة نظام الحساب.");return;}
  try{const user=await access.getCurrentUser();if(!user){location.href="login.html";return;}await loadRequests();}
