@@ -1,6 +1,6 @@
 .dp-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(12,35,33,.56);opacity:1;transition:opacity .16s ease}
 .dp-confirm-backdrop[hidden]{display:none!important}
-.dp-confirm-dialog{width:min(100%,380px);padding:22px 20px 18px;border:1px solid var(--dp-border,#e1eae7);border-radius:20px;background:var(--dp-surface,#fff);color:var(--dp-text,#203b37);box-shadow:0 18px 55px rgba(12,35,33,.2);font-family:Cairo,sans-serif;direction:rtl}
+.dp-confirm-dialog{box-sizing:border-box;width:min(100%,380px);padding:22px 20px 18px;border:1px solid var(--dp-border,#e1eae7);border-radius:20px;background:var(--dp-surface,#fff);color:var(--dp-text,#203b37);box-shadow:0 18px 55px rgba(12,35,33,.2);font-family:Cairo,sans-serif;direction:rtl}
 .dp-confirm-dialog h2{margin:0 0 9px;font-size:17px;font-weight:800;line-height:1.6}
 .dp-confirm-dialog p{margin:0;color:var(--dp-muted,#71817d);font-size:13px;font-weight:500;line-height:1.9;overflow-wrap:anywhere}
 .dp-confirm-actions{display:flex;gap:9px;margin-top:20px}
