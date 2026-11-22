@@ -329,12 +329,20 @@ async function loadPageData(){
   await loadDiets();
 }
 
-let deleteTarget=null,confirmAction=null;
-function closeDeleteConfirm(){deleteTarget=null;confirmAction=null;$('deleteConfirmModal').classList.add('hidden');$('deleteConfirmModal').classList.remove('flex')}
-function openConfirm(title,message,action){$('confirmTitle').textContent=title;$('confirmMessage').textContent=message;$('confirmDeleteBtn').innerHTML='تأكيد';deleteTarget=null;confirmAction=action;$('deleteConfirmModal').classList.remove('hidden');$('deleteConfirmModal').classList.add('flex')}
-function openDeleteConfirm(diet){deleteTarget=diet;confirmAction=null;$('confirmTitle').textContent='تأكيد حذف الدايت';$('confirmMessage').textContent='هل أنت متأكد من حذف هذا الدايت؟ لا يمكن التراجع عن الحذف.';$('confirmDeleteBtn').innerHTML='<i class="fa-solid fa-trash ml-1"></i> حذف الدايت';$('deleteConfirmModal').classList.remove('hidden');$('deleteConfirmModal').classList.add('flex')}
-$('cancelDeleteBtn').onclick=closeDeleteConfirm;
-$('confirmDeleteBtn').onclick=async()=>{const bt=$('confirmDeleteBtn');bt.disabled=true;bt.textContent='جاري التنفيذ...';try{if(confirmAction){const fn=confirmAction;confirmAction=null;fn()}else{const x=deleteTarget;if(!x)return;const {error}=await supabase.from('diet_templates').delete().eq('id',x.id);if(error)throw error;clearCache('diets');await loadDiets(true);toast('تم حذف الدايت')}}catch(error){toast('فشل التنفيذ: '+(error.message||error),false)}finally{bt.disabled=false;closeDeleteConfirm()}};
+function openConfirm(title,message,action){
+ if(typeof action!=="function")return;
+ void window.DPConfirm?.ask({title,message,confirmText:"تأكيد",variant:"danger"}).then(confirmed=>{if(confirmed)return action();});
+}
+async function openDeleteConfirm(diet){
+ if(!diet)return;
+ const confirmed=await window.DPConfirm?.ask({title:"حذف الدايت؟",message:"هل أنت متأكد من حذف هذا الدايت؟ لا يمكن التراجع عن الحذف.",confirmText:"حذف",variant:"danger"});
+ if(!confirmed)return;
+ try{
+  const {error}=await supabase.from('diet_templates').delete().eq('id',diet.id);
+  if(error)throw error;
+  clearCache('diets');await loadDiets(true);toast('تم حذف الدايت');
+ }catch(error){toast('فشل التنفيذ: '+(error.message||error),false)}
+}
 $('dietGrid').onclick=async e=>{const o=e.target.closest('[data-open]'),d=e.target.closest('[data-del]'),cp=e.target.closest('[data-duplicate]');if(o){await openDiet(o.dataset.open);return}if(d){const x=diets.find(a=>a.id===d.dataset.del);if(x)openDeleteConfirm(x);return}if(cp)await duplicateDiet(cp.dataset.duplicate)};
 async function duplicateDiet(id){const source=diets.find(x=>x.id===id);if(!source)return;try{await loadFoods();const {data:dr,error:de}=await supabase.from('diet_template_days').select('id,day_number,day_name').eq('diet_id',id).order('day_number',{ascending:true}).limit(1);if(de)throw de;const drow=dr&&dr[0];let meals=[];if(drow){const {data:mr,error:me}=await supabase.from('diet_template_meals').select('id,meal_name,meal_order,frequency').eq('day_id',drow.id).order('meal_order',{ascending:true});if(me)throw me;const mids=(mr||[]).map(x=>x.id);let ir=[];if(mids.length){const r=await supabase.from('diet_template_items').select('meal_id,food_id,quantity_g,household_measure,frequency,notes,item_order').in('meal_id',mids).order('item_order',{ascending:true});if(r.error)throw r.error;ir=r.data||[]}meals=(mr||[]).map(m=>({name:m.meal_name||'وجبة',items:ir.filter(i=>i.meal_id===m.id).map(i=>({food_id:String(i.food_id),quantity_g:num(i.quantity_g),household_measure:i.household_measure||'',frequency:i.frequency||'',notes:i.notes||'',includeInCalculation:true}))}))}editingId=null;$('editorTitle').textContent='إنشاء نسخة من الدايت';$('dietName').value=(source.name||'دايت')+' - نسخة';$('description').value=source.description||'';$('notes').value=source.notes||'';$('visibility').value='private';setDietAccess('');syncAccessControl();day={day_number:1,day_name:'اليوم',meals};setReadOnly(false);renderDay();toggleEditor(true);toast('تم إنشاء نسخة قابلة للتعديل — اضغط حفظ لحفظها')}catch(error){toast('تعذر نسخ الدايت: '+(error.message||error),false)}}
 function buildDietPayload(visibility, totals){
