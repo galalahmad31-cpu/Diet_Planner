@@ -459,6 +459,7 @@
         if (!deleteTarget) return;
 
         const { error } = await supabase.from('recipes').delete().eq('id', deleteTarget.id);
+        deleteTarget = null;
 
         if (error) {
             showToast('تعذر حذف الوصفة: ' + error.message, false);
