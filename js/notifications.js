@@ -47,26 +47,9 @@ const TAB_INFO = {
 
 const esc = window.DPUtils.escapeHtml;
 
-/*
- * PostgreSQL date fields are handled as calendar dates.
- * We deliberately avoid new Date('YYYY-MM-DD') because it can
- * introduce timezone-related off-by-one errors.
- */
-function dateKey(value) {
-  const key = String(value ?? '').slice(0, 10);
-  return /^\d{4}-\d{2}-\d{2}$/.test(key) ? key : '';
-}
-
-function todayKey() {
-  const now = new Date();
-
-  return [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, '0'),
-    String(now.getDate()).padStart(2, '0')
-  ].join('-');
-}
-
+const dateKey = window.DPDate.dateKey;
+const todayKey = window.DPDate.todayKey;
+const daysUntil = window.DPDate.daysUntil;
 
 function addMonthsToDateKey(baseDate, months) {
   const key = dateKey(baseDate);
