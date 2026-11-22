@@ -557,12 +557,15 @@
     renderSharedHealthForm();
     const { data, error } = await supabase.from("patient_health_audit")
       .select("id,actor_id,actor_role,operation,changed_fields,created_at")
-      .eq("patient_id", state.patientId).order("created_at", { ascending: false }).limit(30);
+      .eq("patient_id", state.patientId).order("created_at", { ascending: false }).limit(100);
     if (error) throw error;
     status.textContent = "يمكنك مراجعة بياناتك الأساسية وتحديثها. يحتفظ النظام بسجل لمن قام بالتعديل ووقته.";
-    if (!data?.length) { history.textContent = "لا توجد تعديلات مسجلة حتى الآن."; return; }
-    const labels = {gender:"النوع",birth_date:"تاريخ الميلاد",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
-    history.innerHTML = data.map(item => {
+    const labels = {gender:"النوع",birth_date:"تاريخ الميلاد",age:"العمر",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
+    const healthEvents = (data || []).filter(item =>
+      (item.changed_fields || []).some(field => Object.prototype.hasOwnProperty.call(labels, field))
+    ).slice(0, 30);
+    if (!healthEvents.length) { history.textContent = "لا توجد تعديلات صحية مسجلة حتى الآن."; return; }
+    history.innerHTML = healthEvents.map(item => {
       const actor = item.actor_id === state.user.id ? "أنت" : item.actor_role === "professional" ? "المختص" : item.actor_role === "admin" ? "إدارة المنصة" : "مستخدم مخوّل";
       const fields = (item.changed_fields || []).map(field => escapeHtml(labels[field] || field)).join("، ");
       const date = new Date(item.created_at).toLocaleString("ar-EG");
