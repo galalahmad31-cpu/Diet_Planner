@@ -102,8 +102,11 @@
     nav.classList.toggle("is-collapsed", collapsed);
     nav.classList.toggle("is-expanded", !collapsed);
     toggle.setAttribute("aria-expanded", String(!collapsed));
-    toggle.setAttribute("aria-label", collapsed ? "إظهار باقي التابات" : "طي باقي التابات");
-    toggle.title = collapsed ? "إظهار باقي التابات" : "طي باقي التابات";
+    const actionLabel = collapsed ? "إظهار باقي التابات" : "طي باقي التابات";
+    toggle.setAttribute("aria-label", actionLabel);
+    toggle.title = actionLabel;
+    const toggleText = toggle.querySelector("span");
+    if (toggleText) toggleText.textContent = actionLabel;
     if (persist) {
       try { localStorage.setItem(NAV_STATE_KEY, collapsed ? "collapsed" : "expanded"); }
       catch (error) { console.warn("Could not save header navigation preference:", error); }
@@ -149,6 +152,9 @@
           <span class="dp-app-header__logo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
           <span class="dp-app-header__brand-copy"><strong>Diet Planner</strong><small>${subtitle}</small></span>
         </a>
+        <button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-app-header-track" aria-label="إظهار باقي التابات" title="إظهار باقي التابات">
+          <i class="fa-solid fa-chevron-down" aria-hidden="true"></i><span>إظهار باقي التابات</span>
+        </button>
         <div class="dp-app-header__account">
           <a class="dp-app-header__account-link dp-app-header__login" href="${base}login.html">تسجيل الدخول</a>
           <a class="dp-app-header__account-link dp-app-header__register" href="${base}login.html#register">إنشاء حساب</a>
@@ -158,7 +164,6 @@
         </div>
       </div>
       <nav class="dp-app-header__nav is-collapsed" aria-label="التنقل الرئيسي">
-        <div class="dp-app-header__nav-top"><button class="dp-app-header__toggle" type="button" aria-expanded="false" aria-controls="dp-app-header-track" aria-label="إظهار باقي التابات" title="إظهار باقي التابات"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button></div>
         <div class="dp-app-header__track" id="dp-app-header-track"></div>
       </nav>
       <div class="dp-app-header__page-title"></div>
