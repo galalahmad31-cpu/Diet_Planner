@@ -52,8 +52,8 @@
     requests.hidden=state.tab!=="requests";conversations.hidden=state.tab!=="conversations";
     const a=$("communicationsTabConversations"),b=$("communicationsTabRequests");
     a.setAttribute("aria-selected",String(state.tab==="conversations"));b.setAttribute("aria-selected",String(state.tab==="requests"));
-    a.className=state.tab==="conversations"?"rounded-xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white":"rounded-xl border border-slate-200 px-4 py-3 text-sm font-extrabold text-slate-700";
-    b.className=state.tab==="requests"?"rounded-xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white":"rounded-xl border border-slate-200 px-4 py-3 text-sm font-extrabold text-slate-700";
+    a.classList.toggle("is-active",state.tab==="conversations");
+    b.classList.toggle("is-active",state.tab==="requests");
     bindRows(requests);bindRows(conversations);
   }
   async function act(button,decision){
