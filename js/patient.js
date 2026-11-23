@@ -165,7 +165,6 @@
       state.patients.push(...rows.map(patient => ({
         ...patient,
         isLinked: Boolean(patient.is_linked),
-        nextAppointmentAt: null,
         finance: financeByPatient.get(patient.id) || null
       })));
 
