@@ -283,7 +283,7 @@
       if (!user?.id) throw new Error("يجب تسجيل الدخول لعرض المحادثات.");
 
       const { data: patient, error } = await supabase.from("patients")
-        .select("id,user_id")
+        .select("id,user_id,archived_at")
         .eq("id", patientId)
         .maybeSingle();
       if (error) throw error;
@@ -303,13 +303,17 @@
       if (root.dataset.patientId !== String(patientId)) return;
 
       const contacts = new Map();
-      contacts.set(patient.user_id, {
-        id: patient.user_id,
-        name: owner?.full_name || "المختص المسؤول",
-        subtitle: owner?.profession || "المختص المسؤول عن الملف",
-        status: "accepted",
-        owner: true
-      });
+      const archived = Boolean(patient.archived_at);
+      const ownerRequest = (requests || []).find(item => item.professional_id === patient.user_id);
+      if (!archived || ownerRequest?.status === "accepted") {
+        contacts.set(patient.user_id, {
+          id: patient.user_id,
+          name: owner?.full_name || "المختص المسؤول",
+          subtitle: owner?.profession || "المختص المسؤول عن الملف",
+          status: "accepted",
+          owner: true
+        });
+      }
       (requests || []).filter(item => item.status === "accepted").forEach(item => {
         if (!contacts.has(item.professional_id)) contacts.set(item.professional_id, {
           id: item.professional_id,
@@ -322,16 +326,20 @@
 
       const pending = (requests || []).filter(item => item.status === "pending");
       const rows = [...contacts.values()];
-      const pendingMarkup = pending.map(item =>
-        '<article class="dp-chat-contact-row dp-conversation-request">' +
+      const pendingMarkup = pending.map(item => {
+        const restoringOwnerContact = archived && item.professional_id === patient.user_id;
+        return '<article class="dp-chat-contact-row dp-conversation-request">' +
           '<div class="dp-chat-contact">' +
             '<span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span>' +
-            '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(item.professional_name || "المختص") + '</strong><small>تم إرسال طلب المحادثة، في انتظار موافقة المختص</small></span>' +
+            '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(item.professional_name || "المختص") + '</strong><small>' + (restoringOwnerContact ? 'طلب استعادة التواصل مع الملف المؤرشف، في انتظار موافقة المختص' : 'تم إرسال طلب المحادثة، في انتظار موافقة المختص') + '</small></span>' +
             '<span class="dp-chat-contact-status">قيد الانتظار</span>' +
           '</div>' +
           '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-cancel" data-chat-cancel="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button></div>' +
-        '</article>'
-      ).join("");
+        '</article>';
+      }).join("");
+      const restoreButtonMarkup = archived && !ownerRequest
+        ? '<article class="dp-chat-contact-row dp-conversation-request"><div class="dp-chat-contact"><span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span><span class="dp-chat-contact-copy"><strong>' + escapeHtml(owner?.full_name || "المختص المسؤول") + '</strong><small>الملف مؤرشف. أرسل طلبًا لاستعادة التواصل مع المختص.</small></span></div><div class="dp-conversation-actions"><button type="button" class="dp-conversation-cancel" data-chat-restore-contact>طلب استعادة التواصل</button></div></article>'
+        : "";
       const contactsMarkup = rows.map(contact =>
         '<div class="dp-chat-contact-row">' +
           '<button type="button" class="dp-chat-contact" data-chat-open="' + escapeHtml(contact.id) + '">' +
@@ -341,8 +349,31 @@
             '<i class="fa-solid fa-chevron-left"></i>' +
           '</button></div>'
       ).join("");
-      list.innerHTML = pendingMarkup + contactsMarkup ||
+      list.innerHTML = restoreButtonMarkup + pendingMarkup + contactsMarkup ||
         '<div class="patient-messages-empty">لا توجد جهات تواصل مرتبطة بهذا الملف.</div>';
+
+      list.querySelector("[data-chat-restore-contact]")?.addEventListener("click", async buttonEvent => {
+        const button = buttonEvent.currentTarget;
+        if (button.disabled) return;
+        button.disabled = true;
+        button.textContent = "جاري إرسال الطلب...";
+        try {
+          const { error: restoreError } = await supabase.rpc("request_archived_patient_contact", {
+            p_patient_id: patientId
+          });
+          if (restoreError) throw restoreError;
+          root.dataset.inboxMounted = "false";
+          await mountInbox(root, options);
+        } catch (restoreError) {
+          console.error("Archived patient contact restoration request failed:", restoreError);
+          button.disabled = false;
+          button.textContent = "طلب استعادة التواصل";
+          const status = document.createElement("small");
+          status.className = "patient-messages-status is-error";
+          status.textContent = restoreError.message || "تعذر إرسال طلب استعادة التواصل.";
+          button.parentElement.appendChild(status);
+        }
+      });
 
       list.querySelectorAll("[data-chat-cancel]").forEach(button => {
         button.addEventListener("click", async () => {
