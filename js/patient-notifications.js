@@ -322,7 +322,7 @@
 
     const reminderButton = event.target.closest("[data-open-patient-reminder]");
     if (reminderButton && !busy) {
-      await window.DietPlannerPatientPortal?.navigateToSection(reminderButton.dataset.openPatientReminder);
+      window.location.assign("patient-health.html#portalFinancePanel");
       return;
     }
 
