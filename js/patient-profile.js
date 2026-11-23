@@ -126,6 +126,14 @@
     return state.isAdmin || state.hasActiveSubscription;
   }
 
+  function canEditSharedHealth() {
+    return state.patientCareMode === 'linked' && !sharedHealthState.expired;
+  }
+
+  function canEditPatientPrivateFields() {
+    return state.patientCareMode !== 'linked' && canWrite();
+  }
+
   async function loadPatient() {
     if (!supabase) {
       showError('تعذر الاتصال بقاعدة البيانات.');
@@ -878,13 +886,21 @@
   ];
   function setEditing(enabled) {
     state.isEditing = Boolean(enabled);
-    const canEdit = state.isEditing && canWrite() && !state.isSaving;
-    [...patientFieldIds, ...sharedHealthFieldIds].forEach(id => { const field = $(id); if (field) field.disabled = !canEdit; });
+    const canEditPrivate = state.isEditing && canEditPatientPrivateFields() && !state.isSaving;
+    const canEditShared = state.isEditing && canEditSharedHealth() && !state.isSaving;
+    patientFieldIds.forEach(id => { const field = $(id); if (field) field.disabled = !canEditPrivate; });
+    sharedHealthFieldIds.forEach(id => { const field = $(id); if (field) field.disabled = !canEditShared; });
     if ($('saveArea')) $('saveArea').hidden = !enabled;
     if ($('editButton')) $('editButton').hidden = enabled;
     updateSharedHealthWriteState();
   }
-  function enableEditing() { if (!canWrite()) { alert('تعديل بيانات المريض متاح أثناء الاشتراك المدفوع فقط.'); return; } setEditing(true); }
+  function enableEditing() {
+    if (!canEditPatientPrivateFields() && !canEditSharedHealth()) {
+      alert('لا توجد صلاحية تعديل لهذا الملف حاليًا.');
+      return;
+    }
+    setEditing(true);
+  }
   function cancelEditing() { setEditing(false); fillPatientData(); }
 
   async function savePatientSection() {
@@ -931,7 +947,7 @@
     const fields = sharedHealthFieldIds.map(id => $(id)).filter(Boolean);
     const expired = sharedHealthState.expired === true;
     fields.forEach(field => {
-      field.disabled = !state.isEditing || !canWrite() || state.isSaving || expired;
+      field.disabled = !state.isEditing || !canEditSharedHealth() || state.isSaving;
     });
     if (host) {
       host.textContent = expired
@@ -942,8 +958,8 @@
   }
 
   async function loadProfessionalAgreementStatus() {
-    if (!state.user?.id || state.isAdmin || !patientId || !supabase) {
-      sharedHealthState.expired = false;
+    if (!state.user?.id || !patientId || !supabase) {
+      sharedHealthState.expired = true;
       updateSharedHealthWriteState();
       return;
     }
@@ -1034,7 +1050,7 @@
   }
 
   async function updateSharedHealthFromProfessional() {
-    if (!canWrite() || !state.isEditing || sharedHealthState.saving) return false;
+    if (!canEditSharedHealth() || !state.isEditing || sharedHealthState.saving) return false;
     sharedHealthState.saving = true;
     updateSharedHealthWriteState();
     const rawHeight = $('heightInput')?.value.trim() ?? '';
@@ -1112,11 +1128,13 @@
           supabase.from('professional_connection_requests')
             .select('id')
             .eq('patient_id', patientId)
+            .eq('professional_id', state.user.id)
             .in('status', ['accepted', 'active'])
             .limit(1),
           supabase.from('patient_care_team')
             .select('id')
             .eq('patient_id', patientId)
+            .eq('professional_id', state.user.id)
             .eq('status', 'active')
             .limit(1)
         ]);
@@ -1387,8 +1405,10 @@
       const sharedHealthSaved = await updateSharedHealthFromProfessional();
       if (!sharedHealthSaved) return;
 
-      const patientSaved = await savePatientSection();
-      if (!patientSaved) return;
+      if (state.patientCareMode !== 'linked') {
+        const patientSaved = await savePatientSection();
+        if (!patientSaved) return;
+      }
 
       fillPatientData();
       if (state.patientCareMode === 'linked') await loadSharedHealthHistory();
