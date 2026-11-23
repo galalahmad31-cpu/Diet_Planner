@@ -213,7 +213,7 @@ function render() {
             </div>
             <p class="mt-1 text-sm leading-6 notification-copy">${esc(notification.body)}</p>
             <div class="mt-2 text-xs notification-date">${esc(date)}</div>
-            <button type="button" class="notification-open-button" data-notification-open="${esc(notification.id)}" data-patient-id="${esc(notification.patient_id)}">
+            <button type="button" class="notification-open-button" data-notification-open="${esc(notification.id)}" data-patient-id="${esc(notification.patient_id)}" data-actor-id="${esc(notification.actor_id)}" data-event-type="${esc(notification.event_type)}">
               ${currentAccountType === 'professional' ? 'فتح الطلب أو المحادثة' : 'فتح بوابة المريض'}
               <i class="fa-solid fa-arrow-left mr-1"></i>
             </button>
@@ -322,7 +322,7 @@ async function loadNotifications() {
 
   const { data: events, error: eventError } = await supabase
     .from('notifications')
-    .select('id,event_type,title,body,created_at,read_at,patient_id')
+    .select('id,event_type,title,body,created_at,read_at,patient_id,actor_id')
     .eq('recipient_id', user.id)
     .order('created_at', { ascending: false })
     .limit(100);
@@ -378,8 +378,18 @@ document.addEventListener('click', async (event) => {
       return;
     }
     const patientId = openButton.dataset.patientId;
-    if (currentAccountType === "professional" && patientId) {
-      location.href = `patient-profile.html?id=${encodeURIComponent(patientId)}`;
+    const actorId = openButton.dataset.actorId;
+    const eventType = openButton.dataset.eventType;
+    if (currentAccountType === "professional") {
+      if (eventType === "message_received") {
+        location.href = actorId
+          ? `communications.html?patient_id=${encodeURIComponent(actorId)}`
+          : "communications.html";
+      } else if (patientId) {
+        location.href = `patient-profile.html?id=${encodeURIComponent(patientId)}`;
+      } else {
+        location.href = "communications.html";
+      }
     } else {
       location.href = "patient-portal.html";
     }
