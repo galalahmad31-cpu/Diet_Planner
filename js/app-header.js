@@ -20,7 +20,7 @@
   // Internal portal sections remain in patient-portal.html; standalone destinations keep their own pages.
   const patientPages = [
     ["patient-portal.html#portalHome", "الرئيسية", "fa-house"],
-    ["patient-portal.html#portalContent", "الملف الصحي", "fa-heart-pulse"],
+    ["patient-health.html", "الملف الصحي", "fa-heart-pulse"],
     ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
     ["article.html", "المقالات", "fa-newspaper"],
     ["books.html", "مكتبة الكتب", "fa-book-open"],
@@ -52,7 +52,7 @@
   const adminPage = ["admin.html", "الإدارة", "fa-shield-halved"];
   const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
   const titles = {
-    "patient-profile.html":"ملف المريض", "visit.html":"الخطة الغذائية",
+    "patient-profile.html":"ملف المريض", "patient-health.html":"الملف الصحي", "visit.html":"الخطة الغذائية",
     "nutritionsupport-patient.html":"الدعم الغذائي", "admin.html":"لوحة الإدارة",
     "article-view.html":"المقال", "privacy.html":"سياسة الخصوصية", "job.html":"تفاصيل الوظيفة"
   };
@@ -71,7 +71,7 @@
       document.documentElement.classList.contains("nsp-embedded")) return;
 
   const access = () => window.DietPlannerAccess;
-  const isPatientRoute = () => path === "patient-portal.html" || path === "professional-directory.html";
+  const isPatientRoute = () => path === "patient-portal.html" || path === "patient-health.html" || path === "professional-directory.html";
   const isPublicRoute = () => publicPaths.has(path) ||
     document.querySelector('[data-dp-app-header][data-dp-header-variant="public"]');
 
