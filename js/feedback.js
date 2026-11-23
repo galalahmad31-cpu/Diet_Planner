@@ -252,9 +252,7 @@
     renderFeedbackList(state.feedbacks);
 
     let own = null;
-    if (state.user?.id && state.isAdmin) {
-      own = state.feedbacks.find((item) => item.user_id === state.user.id) || null;
-    } else if (state.user?.id) {
+    if (state.user?.id) {
       const { data: ownData, error: ownError } = await supabase
         .from("app_feedback")
         .select("id,user_id,rating,comment,display_name,created_at,updated_at")
