@@ -9,3 +9,11 @@
 .dpn-ring-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(5px,1.5vw,16px);width:100%}.dpn-ring-card{display:grid;justify-items:center;align-content:start;gap:7px;min-width:0;padding:10px 5px;border:1px solid var(--dp-border,#e2e8f0);border-radius:12px;background:var(--dp-surface,#fff)}.dpn-ring-label{font-size:clamp(9px,1vw,12px);font-weight:900;white-space:nowrap}.dpn-ring{display:grid;place-items:center;width:clamp(54px,8vw,96px);aspect-ratio:1;padding:6px;border-radius:50%;background:conic-gradient(var(--dpn-color,var(--dp-accent,#398f83)) var(--dpn-progress,0%),var(--dp-surface-3,#e2e8f0) 0)}.dpn-ring>div{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;border:1px solid var(--dp-border,#e2e8f0);border-radius:50%;background:var(--dp-surface-2,#f8fafc);overflow:hidden}.dpn-ring>div b{font-size:clamp(12px,1.55vw,19px);font-weight:900;line-height:1.15}.dpn-ring>div small{font-size:clamp(7px,.8vw,9px);font-weight:800;color:var(--dp-muted,#64748b)}.dpn-ring-meta{display:grid;justify-items:center;gap:2px;text-align:center}.dpn-ring-meta strong{font-size:12px;font-weight:900;color:var(--dpn-color,var(--dp-primary,#0d9488))}.dpn-ring-meta small{font-size:clamp(7px,.8vw,9px);color:var(--dp-muted,#64748b)}.dpn-ring-meta small b{font-size:12px;color:var(--dp-text,#1e293b)}
 @media(max-width:640px){.dpn-summary{padding:11px;gap:10px}.dpn-total-grid,.dpn-ring-grid{gap:6px}.dpn-total-card{padding:9px 4px}.dpn-micros{gap:5px}.dpn-micros span{padding:4px 6px;font-size:8px}}
 @media print{.dpn-summary{break-inside:avoid}}
+
+/* Diet library and patient plan: enforce the shared summary layout against page-level utility styles. */
+#dailySummary .dpn-summary{display:grid;width:100%;min-width:0;box-sizing:border-box;}
+#dailySummary .dpn-total-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;min-width:0;}
+#dailySummary .dpn-total-card{display:grid;min-width:0;box-sizing:border-box;}
+#dailySummary .dpn-total-card>strong{white-space:normal;}
+#dailySummary .dpn-micros{display:flex;width:100%;min-width:0;}
+@media(max-width:640px){#dailySummary .dpn-total-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
