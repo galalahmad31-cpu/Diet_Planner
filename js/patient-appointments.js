@@ -102,17 +102,26 @@
         if (teamError) throw teamError;
         const { data: agreements, error: agreementError } = await supabase
           .from("professional_connection_requests")
-          .select("professional_id,agreement_end_date")
+          .select("professional_id,status,agreement_end_date")
           .eq("patient_id", patientId)
-          .eq("requested_by", user.id)
-          .eq("status", "active");
+          .eq("requested_by", user.id);
         if (agreementError) throw agreementError;
         const today = new Date().toISOString().slice(0, 10);
-        const expiredProfessionalIds = new Set((agreements || [])
-          .filter(item => item.agreement_end_date && item.agreement_end_date < today)
-          .map(item => item.professional_id));
+        const requestsByProfessional = new Map();
+        (agreements || []).forEach(item => {
+          const rows = requestsByProfessional.get(item.professional_id) || [];
+          rows.push(item);
+          requestsByProfessional.set(item.professional_id, rows);
+        });
         const sorted = (team || [])
-          .filter(item => !expiredProfessionalIds.has(item.professional_id))
+          .filter(item => {
+            const history = requestsByProfessional.get(item.professional_id) || [];
+            if (!history.length) return true;
+            return history.some(request =>
+              request.status === "active" &&
+              (!request.agreement_end_date || request.agreement_end_date >= today)
+            );
+          })
           .slice()
           .sort((a,b) =>
             (a.relationship_role === "primary" ? 0 : 1) - (b.relationship_role === "primary" ? 0 : 1)
