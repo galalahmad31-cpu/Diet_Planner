@@ -642,24 +642,24 @@
         const summaryScript = document.createElement('script');
         summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v2';
         summaryScript.onload = () => {
-        const pickerScript = document.createElement('script');
-        pickerScript.src = 'js/food-picker.js?v=20261123-central-food-picker-v1';
-        pickerScript.onload = () => {
-          const planScript = document.createElement('script');
-          planScript.src = 'js/visit-diet-plan.js?v=20261123-central-summary-v2';
-          planScript.async = true;
-          planScript.onload = () => {
-          if (typeof window.dietPlan?.openPlan !== 'function') {
-            reject(new Error(window.__dpDietPlanLoadError || 'تعذر تهيئة محرر الخطة الغذائية.'));
-            return;
-          }
-          resolve(true);
+          const pickerScript = document.createElement('script');
+          pickerScript.src = 'js/food-picker.js?v=20261123-central-food-picker-v2';
+          pickerScript.onload = () => {
+            const planScript = document.createElement('script');
+            planScript.src = 'js/visit-diet-plan.js?v=20261123-central-food-picker-v2';
+            planScript.async = true;
+            planScript.onload = () => {
+              if (typeof window.dietPlan?.openPlan !== 'function') {
+                reject(new Error(window.__dpDietPlanLoadError || 'تعذر تهيئة محرر الخطة الغذائية.'));
+                return;
+              }
+              resolve(true);
+            };
+            planScript.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
+            document.head.appendChild(planScript);
           };
-          planScript.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
-          document.head.appendChild(planScript);
-        };
-        pickerScript.onerror = () => reject(new Error('تعذر تحميل مكوّن اختيار الأغذية.'));
-        document.head.appendChild(pickerScript);
+          pickerScript.onerror = () => reject(new Error('تعذر تحميل مكوّن اختيار الأغذية.'));
+          document.head.appendChild(pickerScript);
         };
         summaryScript.onerror = () => reject(new Error('تعذر تحميل ملخص القيم الغذائية.'));
         document.head.appendChild(summaryScript);
