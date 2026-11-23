@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
   <script src="js/app-header.js?v=20261123-remove-approval-workflow-v1" defer></script>
   <link rel="stylesheet" href="css/diet-builder.css?v=20261123-central-meal-builder-v1">
-        <link rel="stylesheet" href="css/nutrition-summary.css?v=20261123-central-summary-v1">
+        <link rel="stylesheet" href="css/nutrition-summary.css?v=20261123-central-summary-v2">
 </head>
     <body>
         <div id="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#f7fafb]">
@@ -125,18 +125,7 @@
                     </section>
                     <section class="mt-5 glass rounded-3xl overflow-hidden">
                         <div class="border-b border-slate-100 bg-white p-5">
-                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <h3 class="font-extrabold text-slate-800 flex items-center gap-2">
-                                        <i class="fa-solid fa-chart-pie text-brand-600"></i>مجمل أرقام اليوم
-                                    </h3>
-                                    <p class="mt-1 text-[11px] text-slate-400">
-                                        يتم الحساب تلقائيًا من الأصناف والكميات المدرجة في اليوم.
-                                    </p>
-                                </div>
-                            </div>
-                            <div id="dailySummary" class="mt-4">
-                            </div>
+                            <div id="dailySummary"></div>
                         </div>
                         <div class="p-4 sm:p-5 bg-slate-50/60">
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -221,10 +210,10 @@
         </script>
         <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1"></script>
         <script src="js/diet-builder.js?v=20261123-central-meal-builder-v1"></script>
-        <script src="js/nutrition-summary.js?v=20261123-central-summary-v1"></script>
+        <script src="js/nutrition-summary.js?v=20261123-central-summary-v2"></script>
         <script src="js/auth-access.js?v=20261123-unrestricted-features-v1">
         </script>
-        <script src="js/diet.js?v=20261123-central-summary-v1">
+        <script src="js/diet.js?v=20261123-central-summary-v2">
         </script>
     </body>
 </html>
