@@ -68,7 +68,7 @@
     const refresh=$("professionalConversationsRefresh");if(refresh)refresh.disabled=true;
     empty($("professionalConversationRequests"),"جاري تحميل الطلبات...");empty($("professionalConversationList"),"جاري تحميل المحادثات...");
     try{const {data,error}=await db.rpc(isPatient()?"list_my_professional_connection_requests":"list_professional_connection_requests");if(error)throw error;state.rows=Array.isArray(data)?data:[];render();}
-    catch(error){console.error("Communications load failed:",error);empty($("professionalConversationRequests"),error.message||"تعذر تحميل الطلبات.");empty($("professionalConversationList"),"تعذر تحميل المحادثات.");}
+    catch(error){console.error("Communications load failed:",error);empty($("professionalConversationRequests"),error.message||"تعذر تحميل الطلبات.");empty($("professionalConversationList"),error.message||"تعذر تحميل المحادثات.");}
     finally{if(refresh)refresh.disabled=false;}
   }
   async function initialize(){
