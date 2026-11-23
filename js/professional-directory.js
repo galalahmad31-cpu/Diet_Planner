@@ -74,12 +74,13 @@ function renderRequestPanel(){
  cancel.hidden=true;cancel.disabled=false;button.hidden=false;
  section.hidden=false;
  if(!state.user){select.innerHTML='<option value="">سجّل الدخول أولًا</option>';select.disabled=true;button.disabled=false;button.textContent="تسجيل الدخول لطلب المحادثة";status.textContent="سجّل الدخول بحساب المريض لطلب محادثة.";status.className="directory-modal-status is-error";return;}
+ const previousPatientId=select.value;
  select.disabled=false;
  select.innerHTML=state.patientFiles.length
   ? state.patientFiles.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.name)+'</option>').join("")
   : '<option value="">لا توجد ملفات صحية مرتبطة</option>';
  if(!state.patientFiles.length){select.disabled=true;button.disabled=true;status.textContent="اربط ملفًا صحيًا بحسابك أولًا من صفحة الملف الصحي، ثم يمكنك طلب المحادثة.";status.className="directory-modal-status";return;}
- const selected=select.value||state.patientFiles[0].id;
+ const selected=state.patientFiles.some(file=>file.id===previousPatientId)?previousPatientId:state.patientFiles[0].id;
  select.value=selected;
  const request=state.requests.get(requestKey(selected,state.selectedProfileId));
  if(request?.status==="accepted"){button.hidden=true;button.disabled=true;cancel.hidden=true;status.textContent="تم قبول طلب المحادثة. يمكنك بدء التواصل من تبويب التواصل داخل الملف الصحي.";status.className="directory-modal-status is-success";return;}
