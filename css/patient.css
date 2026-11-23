@@ -46,6 +46,7 @@ main>section>div:first-child{padding:18px!important}
   .patient-toolbar #searchInput{height:44px;padding:0 11px;font-size:11px}
 }
 
+.patient-stats[hidden]{display:none}
 .patient-stats{
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
