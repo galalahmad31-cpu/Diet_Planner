@@ -131,7 +131,7 @@ async function cancelConversationRequest(){
  try{
   const {error}=await db.rpc("cancel_professional_connection_request",{p_request_id:request.id});
   if(error)throw error;
-  state.requests.set(requestKey(null,professionalId),{...request,status:"cancelled"});
+  state.requests.set(requestKey(professionalId),{...request,status:"cancelled"});
   renderRequestPanel();
   $("directoryModalStatus").textContent="تم إلغاء طلب المحادثة. يمكنك إرسال طلب جديد لاحقًا.";
   $("directoryModalStatus").className="directory-modal-status is-success";
