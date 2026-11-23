@@ -340,7 +340,7 @@
   }
 
   function editMeasurementEntry(index) {
-    if (!canWrite()) { showMeasurementError('تعديل القياسات متاح أثناء الاشتراك المدفوع فقط.'); return; }
+    if (!canManagePatientCare()) { showMeasurementError('تعديل القياسات يتطلب ارتباط متابعة نشطًا أو صلاحية مالك الملف.'); return; }
     const log = measurementState.logs[index];
     const body = $('weightTableBody');
     const currentRow = body?.querySelectorAll('tr')[index];
