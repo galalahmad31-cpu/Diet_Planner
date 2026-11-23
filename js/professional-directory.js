@@ -67,7 +67,7 @@ async function loadProfiles(){
  }catch(error){console.error("[Professional Directory] Load failed:",error);$("directoryStatus").textContent="تعذر تحميل المتخصصين. أعد المحاولة بعد التحقق من الاتصال.";more.hidden=state.profiles.length===0;}
  finally{state.loading=false;more.disabled=false;}
 }
-function requestKey(patientId,professionalId){return String(patientId)+":"+String(professionalId);}
+function requestKey(professionalId){return String(professionalId);}
 function currentRequest(professionalId){
  const matches=[...state.requests.values()].filter(item=>item.professional_id===professionalId);
  return matches.find(item=>item.status==="accepted")||matches.find(item=>item.status==="pending")||matches.find(item=>item.status==="restore_pending")||matches.find(item=>item.status==="blocked")||matches[0]||null;
@@ -98,7 +98,7 @@ async function loadPatientContext(){
   const {data,error}=await db.from("professional_connection_requests")
    .select("id,professional_id,status").eq("requested_by",state.user.id);
   if(error)throw error;
-  (data||[]).forEach(r=>state.requests.set(requestKey(null,r.professional_id),{...r,request_id:r.id}));
+  (data||[]).forEach(r=>state.requests.set(requestKey(r.professional_id),{...r,request_id:r.id}));
  }catch(error){console.error("[Professional Directory] Conversation context failed:",error);}
 }
 async function requestConversation(){
@@ -111,7 +111,7 @@ async function requestConversation(){
  try{
   const {data,error}=await db.rpc("request_professional_connection",{p_professional_id:professionalId,p_message:message});
   if(error)throw error;
-  state.requests.set(requestKey(null,professionalId),{id:data,request_id:data,patient_id:null,professional_id:professionalId,status:restoring?"restore_pending":"pending"});
+  state.requests.set(requestKey(professionalId),{id:data,request_id:data,professional_id:professionalId,status:restoring?"restore_pending":"pending"});
   renderRequestPanel();
   $("directoryModalStatus").textContent=restoring?"تم إرسال طلب استعادة التواصل، في انتظار موافقة المختص.":"تم إرسال طلب المحادثة، في انتظار موافقة المختص. يمكنك إلغاء الطلب قبل قبوله.";
   $("directoryModalStatus").className="directory-modal-status is-success";
