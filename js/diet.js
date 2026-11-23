@@ -24,14 +24,9 @@ async function getSession(){
   const access=window.DietPlannerAccess;
   if(!supabase||!access?.getCurrentUser){$('statusStat').textContent='تعذر تهيئة الاتصال';toast('تعذر تهيئة الاتصال بالتطبيق',false);return false;}
   user=await withTimeout(access.getCurrentUser(),5000,'التحقق من الجلسة');
-  if(!user){window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'مكتبة الدايت متاحة للمشتركين فقط. سجّل الدخول ثم اشترك للوصول إليها.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});$('loading')&&( $('loading').style.display='none');return false;}
+  if(!user){window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'مكتبة الدايت تتطلب تسجيل الدخول.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});$('loading')&&( $('loading').style.display='none');return false;}
   const accessStatus=await withTimeout(access.getAccessStatus(),5000,'التحقق من الاشتراك');
   if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return false;}
-  if(accessStatus.isAdmin!==true && accessStatus.hasActiveSubscription!==true){
-    window.DietPlannerAccess?.showAccessPrompt?.({title:'هذه الصفحة للمشتركين',message:'مكتبة الدايت متاحة باشتراك نشط فقط. يمكنك مراجعة خطط الاشتراك من صفحتك الشخصية.',actionLabel:'عرض خطط الاشتراك',actionHref:'profile.html'});
-    $('loading')&&($('loading').style.display='none');
-    return false;
-  }
   isAdmin=accessStatus.isAdmin===true;
   return true;
 }
@@ -71,7 +66,7 @@ async function loadFoods(force=false){
   return true;
 }
 async function fetchDietTemplates(){
-  const columns='id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,required_feature,created_by,publisher_name,created_at,updated_at';
+  const columns='id,name,description,notes,target_calories,target_protein,target_carb,target_fat,target_fluid,goal,visibility,created_by,publisher_name,created_at,updated_at';
   const pageSize=50;
   const rows=[];
   for(let from=0; ; from+=pageSize){
@@ -351,19 +346,11 @@ function buildDietPayload(visibility, totals){
     ?(currentDiet?.publisher_name||authors[currentDiet?.created_by]||authors[user.id]||user.user_metadata?.full_name||user.user_metadata?.name||'')
     :null;
 
-  const requiredFeature=
-    isAdmin &&
-    visibility==='public' &&
-    $('dietAccess')?.value==='diet'
-      ?'diet'
-      :null;
-
   return {
     name:$('dietName').value.trim(),
     description:$('description').value.trim()||null,
     notes:$('notes').value.trim()||null,
     visibility,
-    required_feature:requiredFeature,
     publisher_name:publisherName,
     target_calories:totals.kcal,
     target_protein:totals.protein,
@@ -462,7 +449,6 @@ async function save(){
       target_fluid:payload.target_fluid,
       goal:payload.goal,
       visibility:payload.visibility,
-      required_feature:payload.required_feature,
       created_by:existingDiet?.created_by||user.id,
       publisher_name:payload.publisher_name,
       updated_at:new Date().toISOString(),
