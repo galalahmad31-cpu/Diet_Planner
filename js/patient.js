@@ -199,7 +199,6 @@
   const localDateKey = window.DPDate.todayKey;
 
   function getPatientSubscriptionStatus(patient) {
-    if (patient.isLinked) return 'linked';
     const expiryDate = String(patient.finance?.subscription_end_date || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(expiryDate)) return 'unknown';
     return expiryDate >= localDateKey() ? 'active' : 'expired';
@@ -219,7 +218,7 @@
   }
 
   function updatePatientStats() {
-    const counts = { all: state.patients.length, active: 0, expired: 0, unknown: 0, linked: 0 };
+    const counts = { all: state.patients.length, active: 0, expired: 0, unknown: 0, linked: state.patients.filter(patient => patient.isLinked).length };
 
     state.patients.forEach((patient) => {
       counts[getPatientSubscriptionStatus(patient)] += 1;
@@ -276,7 +275,6 @@
       active: 'نشط',
       expired: 'منتهي',
       unknown: 'غير محدد',
-      linked: 'مرتبط'
     };
 
     box.innerHTML = filtered.map((patient) => {
@@ -284,10 +282,8 @@
       const diagnosis = patient.diagnosis
         ? escapeHtml(patient.diagnosis)
         : 'التشخيص غير مسجل';
-      const followUp = patient.isLinked
-        ? (patient.nextAppointmentAt ? formatPatientDate(patient.nextAppointmentAt) : 'لا يوجد موعد مؤكد')
-        : formatPatientDate(patient.finance?.next_follow_up_date);
-      const followUpLabel = patient.isLinked ? 'الموعد القادم' : 'المتابعة';
+      const followUp = formatPatientDate(patient.finance?.next_follow_up_date);
+      const followUpLabel = 'المتابعة القادمة';
 
       return `
         <article class="patient-row" role="link" tabindex="0"
