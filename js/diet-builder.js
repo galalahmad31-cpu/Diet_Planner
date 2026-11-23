@@ -8,10 +8,10 @@ function renderTable(rows,{editable=true,caption='أصناف الوجبة'}={}){
   const key=esc(row.key??index);
   return '<tr class="dpb-row" data-dpb-key="'+key+'">'+
    '<td class="dpb-food">'+esc(row.name||'صنف غير موجود')+'</td>'+
-   '<td class="dpb-grams">'+(editable?'<input type="number" min="0" step="1" data-dpb-field="grams" value="'+esc(row.grams??0)+'" aria-label="الكمية بالجرام"><span>جم</span>':esc(row.grams??0)+' جم')+'</td>'+
+   '<td class="dpb-grams">'+(editable?'<input type="number" min="0" step="1" data-dpb-field="grams" value="'+esc(row.grams??0)+'" aria-label="الكمية بالجرام" '+(row.gramsChange||'')+'><span>جم</span>':esc(row.grams??0)+' جم')+'</td>'+
    '<td class="dpb-household">'+esc(row.household||'—')+'</td>'+
-   '<td class="dpb-notes">'+(editable?'<input type="text" data-dpb-field="notes" value="'+esc(row.notes||'')+'" placeholder="ملاحظة الصنف" aria-label="ملاحظة الصنف">':esc(row.notes||'—'))+'</td>'+
-   (editable?'<td class="dpb-actions no-print"><button type="button" data-dpb-delete aria-label="حذف الصنف" title="حذف الصنف">حذف</button></td>':'')+
+   '<td class="dpb-notes">'+(editable?'<input type="text" data-dpb-field="notes" value="'+esc(row.notes||'')+'" placeholder="ملاحظة الصنف" aria-label="ملاحظة الصنف" '+(row.notesChange||'')+'>':esc(row.notes||'—'))+'</td>'+
+   (editable?'<td class="dpb-actions no-print"><button type="button" data-dpb-delete '+(row.deleteAction||'')+' aria-label="حذف الصنف" title="حذف الصنف">حذف</button></td>':'')+
   '</tr>';
  }).join('');
  return '<div class="dpb-table-wrap"><table class="dpb-table"><caption class="dpb-caption">'+esc(caption)+'</caption><thead><tr><th>الصنف</th><th>الكمية</th><th>المقياس المنزلي</th><th>ملاحظة</th>'+(editable?'<th class="no-print">إجراء</th>':'')+'</tr></thead><tbody>'+(body||'<tr><td colspan="'+(editable?5:4)+'" class="dpb-empty">لا توجد أصناف مضافة لهذه الوجبة بعد</td></tr>')+'</tbody></table></div>';
