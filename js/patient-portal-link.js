@@ -24,16 +24,13 @@
     dialog.innerHTML = `
       <section class="patient-portal-invite-dialog" role="dialog" aria-modal="true" aria-labelledby="patientPortalInviteTitle">
         <button type="button" class="patient-portal-invite-close" aria-label="إغلاق">×</button>
-        <span class="patient-portal-invite-icon"><i class="fa-solid fa-link"></i></span>
-        <h3 id="patientPortalInviteTitle">دعوة المريض لربط حسابه</h3>
-        <p class="patient-portal-invite-description">أرسل الرابط أو كود الربط للمريض. عند إدخال الكود في بوابة المريض، يرتبط حسابه بهذا الملف مباشرة إذا لم يكن الملف مرتبطًا بحساب آخر. الكود صالح لمرة واحدة خلال 24 ساعة.</p>
-        <label for="patientPortalInviteUrl">رابط الدعوة</label>
-        <input id="patientPortalInviteUrl" type="text" readonly dir="ltr">
+        <span class="patient-portal-invite-icon"><i class="fa-solid fa-key"></i></span>
+        <h3 id="patientPortalInviteTitle">إنشاء كود ربط حساب المريض</h3>
+        <p class="patient-portal-invite-description">أنشئ كود الربط وأرسله للمريض. يُدخل المريض الكود داخل بوابة المريض لربط حسابه بهذا الملف، إذا لم يكن مرتبطًا بحساب آخر. الكود صالح لمرة واحدة خلال 24 ساعة.</p>
         <label for="patientPortalInviteCode">كود الربط (يمكن إدخاله داخل بوابة المريض)</label>
         <input id="patientPortalInviteCode" type="text" readonly dir="ltr">
         <div class="patient-portal-invite-actions">
           <button type="button" class="patient-portal-copy-code"><i class="fa-regular fa-copy"></i> نسخ الكود</button>
-          <button type="button" class="patient-portal-copy-link"><i class="fa-regular fa-copy"></i> نسخ الرابط</button>
           <button type="button" class="patient-portal-invite-done">إغلاق</button>
         </div>
         <p class="patient-portal-invite-status" role="status"></p>
@@ -55,18 +52,6 @@
         status.textContent = "تعذر النسخ التلقائي. حدّد الكود وانسخه يدويًا.";
       }
     });
-    dialog.querySelector(".patient-portal-copy-link").addEventListener("click", async () => {
-      const input = dialog.querySelector("#patientPortalInviteUrl");
-      const status = dialog.querySelector(".patient-portal-invite-status");
-      try {
-        await navigator.clipboard.writeText(input.value);
-        status.textContent = "تم نسخ الرابط. أرسله للمريض عبر وسيلة التواصل المناسبة.";
-      } catch {
-        input.focus();
-        input.select();
-        status.textContent = "تعذر النسخ التلقائي. حدّد الرابط وانسخه يدويًا.";
-      }
-    });
     return dialog;
   }
 
@@ -80,12 +65,9 @@
       if (error) throw error;
       const token = typeof data === "string" ? data : data?.token;
       if (!token) throw new Error("لم يتم استلام رمز الدعوة من الخادم.");
-      const url = new URL("patient-health.html", window.location.href);
-      url.searchParams.set("invite", token);
       const modal = ensureDialog();
-      modal.querySelector("#patientPortalInviteUrl").value = url.toString();
       modal.querySelector("#patientPortalInviteCode").value = token;
-      modal.querySelector(".patient-portal-invite-status").textContent = "الرابط صالح لمدة 24 ساعة ولمرة واحدة فقط.";
+      modal.querySelector(".patient-portal-invite-status").textContent = "الكود صالح لمدة 24 ساعة ولمرة واحدة فقط.";
       modal.hidden = false;
     } catch (error) {
       console.error("Patient invitation creation failed:", error);
