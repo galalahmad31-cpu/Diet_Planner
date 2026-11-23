@@ -21,15 +21,17 @@
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261122-central-floating-chat-v2">
+  <link rel="stylesheet" href="css/patient-appointments.css?v=20261122-agreement-appointments-source-v2">
   <link rel="stylesheet" href="css/patient-notifications.css?v=20261122-patient-notifications-v1">
   <script src="js/theme.js?v=20261122-theme-token-aliases-v1" defer></script>
   <script src="js/app-header.js?v=20261122-remove-duplicate-patient-diet-tab-v3" defer></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
   <script src="js/patient-messages.js?v=20261122-central-floating-chat-v2" defer></script>
+  <script src="js/patient-appointments.js?v=20261123-expiry-aware-v3" defer></script>
   <script src="js/patient-notifications.js?v=20261122-patient-notifications-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261123-published-plans-history-v2" defer></script>
+  <script src="js/patient-portal.js?v=20261123-published-plans-history-v3" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -223,6 +225,10 @@
         <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>المحادثات والرسائل في مكان واحد، دون تكرار بيانات الاتفاق.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
           <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
+        </section>
+        <section class="portal-section" aria-labelledby="patientPortalAppointmentsTitle">
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">APPOINTMENTS</span><h2 id="patientPortalAppointmentsTitle">المواعيد والزيارات</h2><p>اطلب موعدًا مع مختصك، وتابع حالة الطلب والمواعيد المؤكدة والسابقة.</p></div><span class="portal-section-icon"><i class="fa-regular fa-calendar-check"></i></span></div>
+          <div id="patientPortalAppointments" data-patient-appointments data-patient-role="patient"></div>
         </section>
       </div>
 
