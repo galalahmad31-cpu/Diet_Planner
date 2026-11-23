@@ -40,8 +40,9 @@
     const requests=$("professionalConversationRequests"),conversations=$("professionalConversationList");if(!requests||!conversations)return;
     const active=filtered(state.rows.filter(r=>r.status==="accepted"));
     const pending=filtered(state.rows.filter(r=>["pending","restore_pending","blocked","declined"].includes(r.status)));
-    $("communicationsRequestCount").textContent=String(state.rows.filter(r=>["pending","restore_pending","blocked","declined"].includes(r.status)).length);
-    $("communicationsConversationCount").textContent=String(active.length);
+    const requestCount=$("communicationsRequestCount"),conversationCount=$("communicationsConversationCount");
+    if(requestCount)requestCount.textContent=String(state.rows.filter(r=>["pending","restore_pending","blocked","declined"].includes(r.status)).length);
+    if(conversationCount)conversationCount.textContent=String(active.length);
     requests.innerHTML=pending.length?pending.map(renderRow).join(""):'<p class="patient-messages-empty">'+(state.search?"لا توجد نتائج مطابقة.":"لا توجد طلبات أو محادثات موقوفة.")+'</p>';
     conversations.innerHTML=active.length?active.map(renderRow).join(""):'<p class="patient-messages-empty">'+(state.search?"لا توجد نتائج مطابقة.":"لا توجد محادثات نشطة حتى الآن.")+'</p>';
     requests.hidden=state.tab!=="requests";conversations.hidden=state.tab!=="conversations";
@@ -79,7 +80,7 @@
       $("communicationsEyebrow").textContent=isPatient()?"PROFESSIONAL COMMUNICATIONS":"PATIENT COMMUNICATIONS";
       $("communicationsDescription").textContent=isPatient()?"تابع محادثاتك وطلبات التواصل مع المختصين من مكان واحد.":"إدارة محادثات المرضى وطلبات التواصل والاستعادة من مكان واحد.";
       $("communicationsSearch").placeholder=isPatient()?"ابحث باسم المختص...":"ابحث باسم المريض...";
-      $("communicationsTabRequests").textContent=isPatient()?"الطلبات والموقوفة":"طلبات التواصل";
+      $("communicationsRequestLabel").textContent=isPatient()?"الطلبات والموقوفة":"طلبات التواصل";
       await load();
     }catch(error){console.error("Communications initialization failed:",error);empty($("professionalConversationList"),"تعذر تهيئة صفحة التواصل.");}
   }
