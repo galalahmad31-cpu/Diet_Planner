@@ -1333,7 +1333,10 @@
       if (panel) panel.hidden = !active;
     });
 
-    if (moduleName === 'measurements') {\n      void loadMeasurements();\n      void window.DietPlannerLabResults?.init({container: $('patientLabResults'), patientId, canEdit: canManagePatientCare});\n    }
+    if (moduleName === 'measurements') {
+      void loadMeasurements();
+      void window.DietPlannerLabResults?.init({container: $('patientLabResults'), patientId, canEdit: canManagePatientCare});
+    }
     if (moduleName === 'energy') {
       if (typeof window.initCalculator === 'function') void window.initCalculator();
       else {
