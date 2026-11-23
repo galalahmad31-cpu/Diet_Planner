@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, portalLoadSequence: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }] };
+  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, portalLoadSequence: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }] };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -529,7 +529,7 @@
       const { data, error } = await supabase.from("foods").select(FOOD_COLUMNS).order("name_ar", { ascending: true });
       if (error) throw error;
       state.foods = Array.isArray(data) ? data : [];
-      state.foodSearchIndex = state.foods.map(food => ({ food, searchText: normalizeFoodSearch((food.name_ar || "") + " " + (food.name_en || "")) }));
+
       return state.foods;
     })();
     try { return await state.foodsPromise; }
@@ -546,7 +546,7 @@
   }
 
   const TOOL_CONFIG = {
-    carb: { meals: "carbMeals", total: "portalCarbDayTotal", search: "portalCarbSearchResults", nutrient: "carb", label: "الكربوهيدرات", unit: "جم", addAttr: "data-add-carb-food", itemAttr: "data-carb-item", quantityAttr: "data-carb-grams", removeAttr: "data-remove-carb-item" },
+    carb: { meals: "carbMeals", total: "portalCarbDayTotal", nutrient: "carb", label: "الكربوهيدرات", unit: "جم", addAttr: "data-add-carb-food", itemAttr: "data-carb-item", quantityAttr: "data-carb-grams", removeAttr: "data-remove-carb-item" },
     renal: { meals: "renalMeals", total: "portalRenalDayTotals", search: "portalCarbSearchResults", nutrients: ["potassium", "phosphorus", "sodium"], labels: { potassium: "البوتاسيوم", phosphorus: "الفسفور", sodium: "الصوديوم" }, unit: "مجم", addAttr: "data-add-renal-food", itemAttr: "data-renal-item", quantityAttr: "data-renal-grams", removeAttr: "data-remove-renal-item" }
   };
 
@@ -674,7 +674,7 @@
       renderToolMeals(tool);
     }
     else if (tab) activateToolsTab(tab.dataset.toolsTab);
-    else if (event.target === $("portalCarbPicker")) closeFoodPicker();
+
   }
 
   function handleToolQuantity(event) {
