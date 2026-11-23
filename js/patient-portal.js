@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
+  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -127,6 +127,8 @@
   }
 
   async function ensureHealthPanelLoaded(panelId) {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
     if (state.loadedPanels.has(panelId)) return;
     if (state.loadingPanels.has(panelId)) return state.loadingPanels.get(panelId);
     const loaders = {
@@ -140,16 +142,12 @@
     const task = (async () => {
       try {
         await loader();
-        state.loadedPanels.add(panelId);
+        if (contextVersion === state.contextVersion && patientId === state.patientId) state.loadedPanels.add(panelId);
       } catch (error) {
+        if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
         console.error("Patient portal panel load failed:", panelId, error);
         const message = error?.message || "تعذر تحميل هذا القسم.";
-        const targets = {
-          portalPlansPanel: "portalPlansLoading",
-          portalMeasurementsPanel: "portalMeasurementsError",
-          portalCareManagementPanel: "patientFinanceSummary",
-          portalSharedHealthPanel: "patientSharedHealthStatus"
-        };
+        const targets = {portalPlansPanel:"portalPlansLoading",portalMeasurementsPanel:"portalMeasurementsError",portalCareManagementPanel:"patientFinanceSummary",portalSharedHealthPanel:"patientSharedHealthStatus"};
         const target = $(targets[panelId]);
         if (target) {
           target.textContent = message;
@@ -160,15 +158,12 @@
             retry.id = "portalMeasurementsRetry";
             retry.className = "portal-primary-button";
             retry.textContent = "إعادة تحميل القياسات";
-            retry.addEventListener("click", () => {
-              state.loadedPanels.delete("portalMeasurementsPanel");
-              void ensureHealthPanelLoaded("portalMeasurementsPanel");
-            });
+            retry.addEventListener("click", () => { state.loadedPanels.delete("portalMeasurementsPanel"); void ensureHealthPanelLoaded("portalMeasurementsPanel"); });
             target.append(" ", retry);
           }
         }
       } finally {
-        state.loadingPanels.delete(panelId);
+        if (state.loadingPanels.get(panelId) === task) state.loadingPanels.delete(panelId);
       }
     })();
     state.loadingPanels.set(panelId, task);
@@ -286,24 +281,25 @@
   }
 
   async function loadMeasurements() {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
     const loading = $("portalMeasurementsLoading");
     const errorBox = $("portalMeasurementsError");
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
-
-    // Render the shared table immediately; database latency must not leave this panel blank.
     renderMeasurements();
     if (loading) loading.hidden = false;
     try {
       const { data, error } = await supabase.from("weight_logs")
-      .select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by")
-      .eq("patient_id", state.patientId)
-      .order("measurement_date", { ascending: true })
-      .order("created_at", { ascending: true });
+        .select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by")
+        .eq("patient_id", patientId)
+        .order("measurement_date", { ascending: true })
+        .order("created_at", { ascending: true });
       if (error) throw error;
+      if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
       state.logs = data || [];
       renderMeasurements();
     } finally {
-      if (loading) loading.hidden = true;
+      if (contextVersion === state.contextVersion && loading) loading.hidden = true;
     }
   }
 
@@ -318,102 +314,46 @@
   }
 
   async function loadPlans() {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
     const loading = $("portalPlansLoading");
     const empty = $("portalPlansEmpty");
     const list = $("portalPlansList");
-    if (!loading || !empty || !list || !state.patientId) return;
-
+    if (!loading || !empty || !list || !patientId) return;
     loading.hidden = false;
     empty.hidden = true;
     list.replaceChildren();
-
     try {
-      // The SECURITY DEFINER RPC checks the active patient account once and
-      // assembles the published plan tree without triggering per-row plan_items RLS joins.
-      const { data, error } = await supabase.rpc(
-        "get_patient_published_nutrition_plans",
-        { p_patient_id: state.patientId }
-      );
+      const { data, error } = await supabase.rpc("get_patient_published_nutrition_plans", { p_patient_id: patientId });
       if (error) throw error;
-
+      if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
       const orderedPlans = Array.isArray(data) ? data : [];
-
-      if (!orderedPlans.length) {
-        empty.hidden = false;
-        return;
-      }
-
+      if (!orderedPlans.length) { empty.hidden = false; return; }
       list.innerHTML = orderedPlans.map(plan => {
-        const planDays = Array.isArray(plan.days) ? plan.days.slice().sort(
-          (a, b) => Number(a.day_number || 0) - Number(b.day_number || 0)
-        ) : [];
-        const planDate = plan.start_date
-          ? "تاريخ البداية: " + escapeHtml(formatDate(plan.start_date))
-          : "تمت مشاركتها معك";
-
+        const planDays = Array.isArray(plan.days) ? plan.days.slice().sort((a,b)=>Number(a.day_number||0)-Number(b.day_number||0)) : [];
+        const planDate = plan.start_date ? "تاريخ البداية: " + escapeHtml(formatDate(plan.start_date)) : "تمت مشاركتها معك";
         const dayMarkup = planDays.map(day => {
-          const dayMeals = Array.isArray(day.meals) ? day.meals.slice().sort(
-            (a, b) => Number(a.meal_order || 0) - Number(b.meal_order || 0)
-          ) : [];
+          const dayMeals = Array.isArray(day.meals) ? day.meals.slice().sort((a,b)=>Number(a.meal_order||0)-Number(b.meal_order||0)) : [];
           const mealsMarkup = dayMeals.map(meal => {
             const mealItems = Array.isArray(meal.items) ? meal.items : [];
             const foodMarkup = mealItems.length ? mealItems.map(item => {
               const itemName = item.item_name || item.food?.name_ar || "صنف غذائي";
-              return `<div class="portal-food-row">
-                <span class="portal-food-name">${escapeHtml(itemName)}${item.notes ? '<small>' + escapeHtml(item.notes) + '</small>' : ''}</span>
-                <span class="portal-food-quantity">${escapeHtml(optionalNumber(item.quantity_g, " جم"))}</span>
-                <span class="portal-food-household">${escapeHtml(item.household_measure || "—")}</span>
-              </div>`;
+              return `<div class="portal-food-row"><span class="portal-food-name">${escapeHtml(itemName)}${item.notes ? '<small>' + escapeHtml(item.notes) + '</small>' : ''}</span><span class="portal-food-quantity">${escapeHtml(optionalNumber(item.quantity_g, " جم"))}</span><span class="portal-food-household">${escapeHtml(item.household_measure || "—")}</span></div>`;
             }).join("") : '<p class="portal-plan-empty-meal">لا توجد أصناف مسجلة لهذه الوجبة.</p>';
-
-            return `<section class="portal-meal">
-              <h4 class="portal-meal-title">${escapeHtml(meal.meal_name || "وجبة")}${meal.frequency ? '<small>' + escapeHtml(meal.frequency) + '</small>' : ''}</h4>
-              <div class="portal-food-table" role="table" aria-label="أصناف ${escapeHtml(meal.meal_name || "الوجبة")}">
-                <div class="portal-food-row portal-food-row-head" role="row"><span role="columnheader">الصنف</span><span role="columnheader">الكمية</span><span role="columnheader">المقياس المنزلي</span></div>
-                ${foodMarkup}
-              </div>
-            </section>`;
+            return `<section class="portal-meal"><h4 class="portal-meal-title">${escapeHtml(meal.meal_name || "وجبة")}${meal.frequency ? '<small>' + escapeHtml(meal.frequency) + '</small>' : ''}</h4><div class="portal-food-table" role="table" aria-label="أصناف ${escapeHtml(meal.meal_name || "الوجبة")}"><div class="portal-food-row portal-food-row-head" role="row"><span role="columnheader">الصنف</span><span role="columnheader">الكمية</span><span role="columnheader">المقياس المنزلي</span></div>${foodMarkup}</div></section>`;
           }).join("");
-
-          return `<section class="portal-plan-day">
-            <h3>${escapeHtml(day.day_name || ("اليوم " + day.day_number))}</h3>
-            ${day.notes ? '<p class="portal-plan-day-note">' + escapeHtml(day.notes) + '</p>' : ""}
-            ${mealsMarkup || '<p class="portal-plan-empty-meal">لا توجد وجبات مسجلة لهذا اليوم.</p>'}
-          </section>`;
+          return `<section class="portal-plan-day"><h3>${escapeHtml(day.day_name || ("اليوم " + day.day_number))}</h3>${day.notes ? '<p class="portal-plan-day-note">' + escapeHtml(day.notes) + '</p>' : ""}${mealsMarkup || '<p class="portal-plan-empty-meal">لا توجد وجبات مسجلة لهذا اليوم.</p>'}</section>`;
         }).join("");
-
-        const fallbackNotes = plan.notes
-          ? '<p class="portal-plan-note">' + escapeHtml(plan.notes).replace(/\\n/g, "<br>") + '</p>'
-          : "";
-        const content = planDays.length
-          ? dayMarkup
-          : '<p class="portal-plan-empty-meal">لا توجد أيام مسجلة في هذه الخطة.</p>';
-
-        return `<details class="portal-plan-card">
-          <summary class="portal-plan-summary">
-            <span class="portal-plan-summary-copy">
-              <strong>${escapeHtml(plan.plan_name || "الخطة الغذائية")}</strong>
-              <small>${planDate}</small>
-            </span>
-            <span class="portal-plan-summary-meta">
-              <span class="portal-plan-status">منشورة</span>
-              <span class="portal-plan-toggle" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
-            </span>
-          </summary>
-          <div class="portal-plan-content">
-            ${fallbackNotes}
-            ${content}
-          </div>
-        </details>`;
+        const fallbackNotes = plan.notes ? '<p class="portal-plan-note">' + escapeHtml(plan.notes).replace(/\\n/g, "<br>") + '</p>' : "";
+        const content = planDays.length ? dayMarkup : '<p class="portal-plan-empty-meal">لا توجد أيام مسجلة في هذه الخطة.</p>';
+        return `<details class="portal-plan-card"><summary class="portal-plan-summary"><span class="portal-plan-summary-copy"><strong>${escapeHtml(plan.plan_name || "الخطة الغذائية")}</strong><small>${planDate}</small></span><span class="portal-plan-summary-meta"><span class="portal-plan-status">منشورة</span><span class="portal-plan-toggle" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span></span></summary><div class="portal-plan-content">${fallbackNotes}${content}</div></details>`;
       }).join("");
     } catch (error) {
-      list.replaceChildren();
-      throw error;
+      if (contextVersion === state.contextVersion && patientId === state.patientId) { list.replaceChildren(); throw error; }
     } finally {
-      loading.hidden = true;
+      if (contextVersion === state.contextVersion && loading) loading.hidden = true;
     }
   }
-
 
   function renderSharedHealthForm() {
     const patient = state.patient || {};
@@ -426,9 +366,11 @@
   }
 
   async function loadSharedHealthRecord() {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
     const status = $("patientSharedHealthStatus");
     const history = $("patientHealthAuditList");
-    if (!isValidPatientId(state.patientId)) {
+    if (!isValidPatientId(patientId)) {
       const message = "تعذر تحديد ملفك الصحي المرتبط. أعد تحميل الصفحة، وإذا استمرت المشكلة تواصل مع الدعم.";
       if (status) setMessage("patientSharedHealthStatus", message, "error");
       if (history) history.textContent = message;
@@ -438,13 +380,12 @@
     renderSharedHealthForm();
     const { data, error } = await supabase.from("patient_health_audit")
       .select("id,actor_id,actor_role,operation,changed_fields,created_at")
-      .eq("patient_id", state.patientId).order("created_at", { ascending: false }).limit(100);
+      .eq("patient_id", patientId).order("created_at", { ascending: false }).limit(100);
     if (error) throw error;
+    if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
     status.textContent = "هذه البيانات للعرض فقط. لطلب تحديثها، تواصل مع المختص المسؤول عن هذا الملف.";
     const labels = {name:"اسم المريض",gender:"النوع",birth_date:"تاريخ الميلاد",age:"العمر",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
-    const healthEvents = (data || []).filter(item =>
-      (item.changed_fields || []).some(field => Object.prototype.hasOwnProperty.call(labels, field))
-    ).slice(0, 30);
+    const healthEvents = (data || []).filter(item => (item.changed_fields || []).some(field => Object.prototype.hasOwnProperty.call(labels, field))).slice(0,30);
     if (!healthEvents.length) { history.textContent = "لا توجد تعديلات صحية مسجلة حتى الآن."; return; }
     history.innerHTML = healthEvents.map(item => {
       const actor = item.actor_id === state.user.id ? "أنت" : item.actor_role === "professional" ? "المختص" : item.actor_role === "admin" ? "إدارة المنصة" : "مستخدم مخوّل";
@@ -464,12 +405,8 @@
     button.disabled = true;
     setMessage("patientProfessionalCodeStatus", "جاري ربط الملف...");
     try {
-      const linkedPatientId = await acceptInvitation(token);
-      state.patientId = linkedPatientId;
-      state.patient = null; state.logs = []; state.loadedPanels.clear(); state.loadingPanels.clear(); state.messagesMountedFor = null;
+      state.preferredPatientId = await acceptInvitation(token);
       input.value = "";
-      state.loadedPanels.clear();
-      state.loadingPanels.clear();
       setMessage("patientProfessionalCodeStatus", "تم ربط الملف بنجاح. يمكنك اختياره من قائمة الملفات.", "success");
       await loadPortal();
     } catch (error) {
@@ -486,18 +423,17 @@
   }
 
   async function loadPatientFinanceSummary() {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
     const root = $("patientFinanceSummary");
-    if (!root || !state.patientId) return;
+    if (!root || !patientId) return;
     root.textContent = "جاري تحميل بيانات الاشتراك والمتابعة...";
     const { data, error } = await supabase.from("patient_finances")
       .select("subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discounted_amount,is_paid,last_visit_date,next_follow_up_date")
-      .eq("patient_id", state.patientId)
-      .maybeSingle();
+      .eq("patient_id", patientId).maybeSingle();
     if (error) throw error;
-    if (!data) {
-      root.textContent = "لم يسجل المختص بيانات الاشتراك والمتابعة لهذا الملف بعد.";
-      return;
-    }
+    if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
+    if (!data) { root.textContent = "لم يسجل المختص بيانات الاشتراك والمتابعة لهذا الملف بعد."; return; }
     const amount = data.discounted_amount ?? data.subscription_amount;
     const rows = [
       ["بداية الاشتراك", formatDate(data.subscription_start_date)],
@@ -508,9 +444,7 @@
       ["آخر زيارة", formatDate(data.last_visit_date)],
       ["المتابعة القادمة", formatDate(data.next_follow_up_date)]
     ];
-    root.innerHTML = '<div class="portal-finance-summary-grid">' + rows.map(([label,value]) =>
-      '<div class="portal-finance-summary-item"><small>' + escapeHtml(label) + '</small><strong>' + escapeHtml(value) + '</strong></div>'
-    ).join("") + '</div>';
+    root.innerHTML = '<div class="portal-finance-summary-grid">' + rows.map(([label,value]) => '<div class="portal-finance-summary-item"><small>' + escapeHtml(label) + '</small><strong>' + escapeHtml(value) + '</strong></div>').join("") + '</div>';
   }
 
   const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
@@ -853,52 +787,48 @@
         setMessage("patientProfessionalCodeStatus", error.message || "تعذر ربط الملف.", "error");
       }
     }
-
     const accounts = await getPatientAccount();
-    if (!accounts.length) {
-      showOnly("portalUnlinked");
-      return;
-    }
-
+    if (!accounts.length) { showOnly("portalUnlinked"); return; }
     const ids = accounts.map(item => item.patient_id).filter(isValidPatientId);
     if (!ids.length) throw new Error("لا توجد ملفات صحية صالحة مرتبطة بهذا الحساب.");
-    const { data: patientRows, error: patientError } = await supabase.from("patients")
-      .select("id,name")
-      .in("id", ids)
-      .order("name");
+    const { data: patientRows, error: patientError } = await supabase.from("patients").select("id,name").in("id", ids).order("name");
     if (patientError) throw patientError;
-
-    state.patientAccounts = (patientRows || []).map(patient => ({
-      patient_id: patient.id,
-      name: patient.name || "ملف صحي"
-    }));
+    state.patientAccounts = (patientRows || []).map(patient => ({patient_id:patient.id,name:patient.name || "ملف صحي"}));
     if (!state.patientAccounts.length) throw new Error("تعذر تحميل الملفات الصحية المرتبطة بهذا الحساب.");
 
     const previousPatientId = state.patientId;
-    const selectedId = newlyLinkedPatientId && ids.includes(newlyLinkedPatientId)
-      ? newlyLinkedPatientId
+    const preferredPatientId = newlyLinkedPatientId || state.preferredPatientId;
+    const selectedId = state.patientAccounts.some(item => item.patient_id === preferredPatientId)
+      ? preferredPatientId
       : state.patientAccounts.some(item => item.patient_id === previousPatientId)
         ? previousPatientId
         : state.patientAccounts[0].patient_id;
 
     if (previousPatientId !== selectedId) {
+      state.contextVersion += 1;
       state.loadedPanels.clear();
       state.loadingPanels.clear();
       state.logs = [];
       state.patient = null;
       state.messagesMountedFor = null;
+      const messagesRoot = $("patientPortalMessages");
+      if (messagesRoot) {
+        messagesRoot.dataset.inboxMounted = "false";
+        messagesRoot.dataset.patientId = selectedId;
+        messagesRoot.replaceChildren();
+      }
     }
     state.patientId = selectedId;
+    state.preferredPatientId = selectedId;
 
     const selector = $("portalPatientSelector");
+    const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
     if (selector) {
-      selector.innerHTML = state.patientAccounts.map(item =>
-        '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.name) + '</option>'
-      ).join("");
+      selector.innerHTML = state.patientAccounts.map(item => '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.name) + '</option>').join("");
       selector.value = selectedId;
-      selector.hidden = false;
+      selector.hidden = state.patientAccounts.length < 2;
+      if (selectorLabel) selectorLabel.hidden = state.patientAccounts.length < 2;
     }
-
     await loadPatient();
     document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
     showOnly("portalContent");
@@ -909,12 +839,10 @@
     const messagesRoot = $("patientPortalMessages");
     if (messagesRoot && state.messagesMountedFor !== state.patientId) {
       messagesRoot.dataset.inboxMounted = "false";
+      messagesRoot.dataset.patientId = state.patientId;
       messagesRoot.replaceChildren();
       state.messagesMountedFor = state.patientId;
-      void window.DietPlannerPatientMessages?.mountInbox(messagesRoot, {
-        patientId: state.patientId,
-        role: "patient"
-      });
+      void window.DietPlannerPatientMessages?.mountInbox(messagesRoot, {patientId:state.patientId,role:"patient"});
     }
   }
 
@@ -927,12 +855,7 @@
     button.disabled = true;
     setMessage("portalInviteMessage", "جاري التحقق من كود الربط...");
     try {
-      state.patientId = await acceptInvitation(token);
-      state.patient = null;
-      state.logs = [];
-      state.loadedPanels.clear();
-      state.loadingPanels.clear();
-      state.messagesMountedFor = null;
+      state.preferredPatientId = await acceptInvitation(token);
       input.value = "";
       setMessage("portalInviteMessage", "تم ربط الملف بحسابك بنجاح.", "success");
       await loadPortal();
@@ -1016,7 +939,7 @@
     $("patientProfessionalCodeForm")?.addEventListener("submit", redeemProfessionalInvitation);
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab()));
-    $("portalPatientSelector")?.addEventListener("change", () => { state.patientId = $("portalPatientSelector").value; state.loadedPanels.clear(); state.loadingPanels.clear(); state.logs = []; state.patient = null; state.messagesMountedFor = null; void loadPortal().catch(error => fail(error.message || "تعذر تبديل الملف.")); });
+    $("portalPatientSelector")?.addEventListener("change", () => { state.preferredPatientId = $("portalPatientSelector").value; void loadPortal().catch(error => fail(error.message || "تعذر تبديل الملف.")); });
     const initialSection = window.location.hash.slice(1);
     const patientSections = new Set([
       "portalHome",
