@@ -127,6 +127,7 @@
     }
 
     state.isLoadingPatients = true;
+    document.querySelectorAll('[data-record-view]').forEach((button) => { button.disabled = true; });
     if (moreButton) {
       moreButton.disabled = true;
       moreButton.textContent = 'جاري التحميل...';
@@ -179,6 +180,7 @@
       else showStatus('تعذر تحميل الدفعة التالية من المرضى.');
     } finally {
       state.isLoadingPatients = false;
+      document.querySelectorAll('[data-record-view]').forEach((button) => { button.disabled = false; });
       updatePatientsPagination();
     }
   }
