@@ -32,6 +32,8 @@
     if ($("portalPatientSelector")) $("portalPatientSelector").hidden = id === "portalNoFiles" || !state.patientAccounts.length;
     const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
     if (selectorLabel) selectorLabel.hidden = id === "portalNoFiles" || !state.patientAccounts.length;
+    const healthTabs = document.querySelector(".portal-health-tabs");
+    if (healthTabs) healthTabs.hidden = id !== "portalContent";
     if ($("portalContent")) $("portalContent").hidden = id !== "portalContent";
   }
 
