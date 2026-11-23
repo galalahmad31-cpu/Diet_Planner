@@ -206,7 +206,7 @@
   function showPortalDestination(id) {
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
-    if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
+    if (home) home.hidden = !["portalHome", "portalDietBuilder", "portalNotifications"].includes(id) || toolsOpen;
     if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalSharedHealthPanel","portalPlansPanel","portalFinancePanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
@@ -223,7 +223,7 @@
       $(id)?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    const target = id === "portalContent" ? health : id === "portalProfileArea" ? profile : $(id);
+    const target = id === "portalContent" ? health : id === "portalProfileArea" ? profile : id === "portalNotifications" ? $("patientNotifications") : $(id);
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -1060,6 +1060,7 @@
     const initialSection = window.location.hash.slice(1);
     const patientSections = new Set([
       "portalHome",
+      "portalNotifications",
       "portalContent",
       "portalDietBuilder",
             "portalTools",
