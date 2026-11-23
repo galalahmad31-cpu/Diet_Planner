@@ -146,7 +146,7 @@
   }
 
   function canEditPatientPrivateFields() {
-    return state.patientCareMode === 'owner' && canWrite();
+    return (!state.patientCareMode || state.patientCareMode === 'owner') && canWrite();
   }
 
   async function loadPatient() {
