@@ -1003,8 +1003,7 @@
         .eq('user_id', state.user.id)
         .maybeSingle();
       if (error) throw error;
-      const now = new Date();
-      const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      const today = new Date().toISOString().slice(0, 10);
       sharedHealthState.expired = !data?.subscription_end_date || data.subscription_end_date < today;
     } catch (error) {
       sharedHealthState.expired = null;
