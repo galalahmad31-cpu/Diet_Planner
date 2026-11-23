@@ -1317,6 +1317,7 @@ const gender=v=>v==='male'?'ذكر':v==='female'?'أنثى':v||'—';
 let supportPatientId=null;
 let supportUserId=null;
 let supportIsAdmin=false;
+let supportPatientCanManage=false;
 let supportDays=[];
 let currentSupportDayId=null;
 let dayDefaults=null;
@@ -1424,6 +1425,7 @@ function showDeleteConfirm(dayText){
 }
 
 function canWriteSupportDays() {
+  if (!supportPatientCanManage) return false;
   if (supportIsAdmin) return true;
   const a = window.__dpNutritionSupportDayAccess || {};
   return a.hasActiveSubscription === true && a.hasFeature === true;
@@ -1607,14 +1609,23 @@ async function loadPatientData(){
       sessionStorage.getItem('dpNutritionSupportPatientId');
     if(!id) throw new Error('لم يصل معرّف المريض إلى صفحة الدعم الغذائي. افتح الصفحة من داخل ملف المريض ثم أعد المحاولة.');
 
-    // RLS is the access boundary: owners see their own patients; admins see patients
-    // permitted by the existing patients_select_admin_or_owner policy.
+    // RLS is the access boundary. The embedded patient profile also confirms
+    // that this user owns the workspace or has an active care relationship.
     const {data:p,error:pe}=await supabaseClient.from('patients')
       .select('id,user_id,name,gender,birth_date,age,height,diagnosis,complaints,clinical_notes')
       .eq('id',id).maybeSingle();
     if(pe) throw new Error('استعلام patients فشل: '+pe.message);
     if(!p) throw new Error('المريض غير موجود أو لا تملك صلاحية الوصول إليه.');
-    supportUserId=p.user_id;
+    const parentCareAccess = (() => {
+      try {
+        return window.parent !== window &&
+          window.parent.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true;
+      } catch (_) {
+        return false;
+      }
+    })();
+    supportPatientCanManage = p.user_id === sessionUser.id || parentCareAccess;
+    supportUserId=sessionUser.id;
     sessionStorage.removeItem('dpNutritionSupportPatientId');
 
     $('selectedPatientName').textContent=p.name||'—';
@@ -1626,7 +1637,7 @@ async function loadPatientData(){
     set('clinical-diagnosis',p.diagnosis||'');
     set('nutritional-diagnosis',p.complaints||'');
     await refreshSupportDayAccess(sessionUser.id);
-    await initSupportDays(p.id,p.user_id);
+    await initSupportDays(p.id,sessionUser.id);
   }catch(e){
     console.error('[Nutrition Support Patient] loadPatientData failed:',e);
     const notice=document.createElement('div');
