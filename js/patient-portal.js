@@ -130,7 +130,7 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalMessagesPanel", "portalSharedHealthPanel", "portalMeasurementsPanel", "portalPlansPanel"];
+    const allowed = ["portalMessagesPanel", "portalSharedHealthPanel", "portalMeasurementsPanel", "portalPlansPanel", "portalFinancePanel"];
     if (!allowed.includes(panelId)) return;
     if (!isValidPatientId(state.patientId) || !state.patient) {
       void loadPortal().then(() => {
@@ -166,7 +166,8 @@
       portalMessagesPanel: () => Promise.resolve(),
       portalSharedHealthPanel: loadSharedHealthRecord,
       portalMeasurementsPanel: loadMeasurements,
-      portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve()
+      portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
+      portalFinancePanel: loadPatientFinanceReadOnly
     };
     const loader = loaders[panelId];
     if (!loader) return;
@@ -178,7 +179,7 @@
         if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
         console.error("Patient portal panel load failed:", panelId, error);
         const message = error?.message || "تعذر تحميل هذا القسم.";
-        const targets = {portalPlansPanel:"portalPlansLoading",portalMeasurementsPanel:"portalMeasurementsError",portalSharedHealthPanel:"patientSharedHealthStatus"};
+        const targets = {portalPlansPanel:"portalPlansLoading",portalMeasurementsPanel:"portalMeasurementsError",portalSharedHealthPanel:"patientSharedHealthStatus",portalFinancePanel:"portalFinanceError"};
         const target = $(targets[panelId]);
         if (target) {
           target.textContent = message;
@@ -205,7 +206,7 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalSharedHealthPanel","portalMeasurementsPanel","portalPlansPanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalSharedHealthPanel","portalMeasurementsPanel","portalPlansPanel","portalFinancePanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
@@ -257,7 +258,7 @@
     }
     const { data, error } = await supabase
       .from("patients")
-      .select("id,name,gender,birth_date,age,height,diagnosis,complaints")
+      .select("id,name,phone,gender,birth_date,age,height,diagnosis,complaints,clinical_notes")
       .eq("id", patientId)
       .maybeSingle();
     if (error) throw error;
@@ -400,14 +401,80 @@
     }
   }
 
+  function formatPatientFinanceDate(value) {
+    if (!value) return "—";
+    const date = new Date(String(value).slice(0, 10) + "T00:00:00");
+    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString("ar-EG");
+  }
+
+  function formatPatientFinanceAmount(value) {
+    if (value === null || value === undefined || value === "") return "—";
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount.toLocaleString("ar-EG", {maximumFractionDigits: 2}) + " جنيه" : "—";
+  }
+
+  async function loadPatientFinanceReadOnly() {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
+    const loading = $("portalFinanceLoading");
+    const error = $("portalFinanceError");
+    const empty = $("portalFinanceEmpty");
+    const grid = $("portalFinanceReadOnly");
+    if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) {
+      if (grid) grid.hidden = true;
+      if (empty) empty.hidden = false;
+      if (empty) empty.textContent = "اختر ملفًا صحيًا مرتبطًا أولًا لعرض بيانات الاشتراك والمواعيد.";
+      return;
+    }
+    if (error) { error.hidden = true; error.textContent = ""; }
+    if (empty) empty.hidden = true;
+    if (grid) grid.hidden = true;
+    if (loading) loading.hidden = false;
+    try {
+      const {data, error: queryError} = await supabase.from("patient_finances")
+        .select("patient_id,subscription_start_date,subscription_months,subscription_end_date,is_paid,subscription_amount,discount_percent,discounted_amount,last_visit_date,next_follow_up_date")
+        .eq("patient_id", patientId)
+        .maybeSingle();
+      if (queryError) throw queryError;
+      if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
+      if (!data) {
+        if (empty) empty.hidden = false;
+        return;
+      }
+      const set = (id, value) => { const node = $(id); if (node) node.textContent = value ?? "—"; };
+      set("portalFinanceStart", formatPatientFinanceDate(data.subscription_start_date));
+      set("portalFinanceMonths", data.subscription_months ? String(data.subscription_months) + " شهر" : "—");
+      set("portalFinanceEnd", formatPatientFinanceDate(data.subscription_end_date));
+      set("portalFinanceAmount", formatPatientFinanceAmount(data.subscription_amount));
+      set("portalFinanceDiscount", data.discount_percent === null || data.discount_percent === undefined ? "—" : Number(data.discount_percent).toLocaleString("ar-EG") + "%");
+      set("portalFinanceDiscounted", formatPatientFinanceAmount(data.discounted_amount));
+      set("portalFinancePaid", data.is_paid ? "مسدد" : "غير مسدد");
+      set("portalFinanceLastVisit", formatPatientFinanceDate(data.last_visit_date));
+      set("portalFinanceNextFollowUp", formatPatientFinanceDate(data.next_follow_up_date));
+      if (grid) grid.hidden = false;
+    } catch (queryError) {
+      if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
+      console.error("Patient finance read-only load failed:", queryError);
+      if (error) {
+        error.textContent = "تعذر تحميل بيانات الاشتراك والمواعيد. حاول إعادة تحميل القسم.";
+        error.hidden = false;
+      }
+    } finally {
+      if (contextVersion === state.contextVersion && loading) loading.hidden = true;
+    }
+  }
+
   function renderSharedHealthForm() {
     const patient = state.patient || {};
     $("sharedHealthName").value = patient.name || ""; $("sharedHealthName").disabled = true;
+    $("sharedHealthPhone").value = patient.phone || ""; $("sharedHealthPhone").disabled = true;
     $("sharedHealthGender").value = ["male", "ذكر"].includes(patient.gender) ? "male" : ["female", "أنثى"].includes(patient.gender) ? "female" : ""; $("sharedHealthGender").disabled = true;
     $("sharedHealthBirthDate").value = patient.birth_date || ""; $("sharedHealthBirthDate").disabled = true;
+    $("sharedHealthAge").value = patient.age ?? ""; $("sharedHealthAge").disabled = true;
     $("sharedHealthHeight").value = patient.height ?? ""; $("sharedHealthHeight").disabled = true;
     $("sharedHealthDiagnosis").value = patient.diagnosis || ""; $("sharedHealthDiagnosis").disabled = true;
     $("sharedHealthComplaints").value = patient.complaints || ""; $("sharedHealthComplaints").disabled = true;
+    $("sharedHealthClinicalNotes").value = patient.clinical_notes || ""; $("sharedHealthClinicalNotes").disabled = true;
   }
 
   async function loadSharedHealthRecord() {
@@ -830,6 +897,10 @@
       $("patientHealthAuditList")?.replaceChildren();
       $("portalMeasurementsTable")?.replaceChildren();
       $("portalPlansList")?.replaceChildren();
+      $("portalFinanceReadOnly")?.querySelectorAll("strong").forEach(node => { node.textContent = "—"; });
+      $("portalFinanceReadOnly") && ($("portalFinanceReadOnly").hidden = true);
+      $("portalFinanceEmpty") && ($("portalFinanceEmpty").hidden = true);
+      $("portalFinanceError") && ($("portalFinanceError").hidden = true);
       $("portalPatientSelector")?.replaceChildren();
       showOnly("portalNoFiles");
       return;
