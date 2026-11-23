@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
+  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, portalLoadSequence: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -219,18 +219,22 @@
   }
 
   async function loadPatient() {
-    if (!isValidPatientId(state.patientId)) {
+    const patientId = state.patientId;
+    const contextVersion = state.contextVersion;
+    if (!isValidPatientId(patientId)) {
       throw new Error("معرّف الملف الصحي غير صالح. أعد تحميل بوابة المريض أو أعد ربط الحساب.");
     }
     const { data, error } = await supabase
       .from("patients")
       .select("id,name,gender,birth_date,age,height,diagnosis,complaints")
-      .eq("id", state.patientId)
+      .eq("id", patientId)
       .maybeSingle();
     if (error) throw error;
+    if (contextVersion !== state.contextVersion || patientId !== state.patientId) return false;
     if (!data) throw new Error("لم نتمكن من الوصول إلى ملفك الصحي المرتبط. تواصل مع مختصك.");
+    if (data.id !== patientId) throw new Error("تعذر التحقق من هوية الملف الصحي المطلوب.");
     state.patient = data;
-
+    return true;
   }
 
   function measurementDelta(value) {
@@ -769,15 +773,20 @@
   }
 
   async function loadPortal() {
+    const loadSequence = ++state.portalLoadSequence;
+    const isCurrentLoad = () => loadSequence === state.portalLoadSequence;
     showOnly("portalLoading");
     let newlyLinkedPatientId = null;
     const invitationToken = new URLSearchParams(window.location.search).get("invite");
     if (invitationToken) {
       try {
         newlyLinkedPatientId = await acceptInvitation(invitationToken);
+        if (!isCurrentLoad()) return;
       } catch (error) {
+        if (!isCurrentLoad()) return;
         console.error("Patient invitation linking failed:", error);
         const currentAccounts = await getPatientAccount();
+        if (!isCurrentLoad()) return;
         if (!currentAccounts.length) {
           showOnly("portalUnlinked");
           $("portalInviteToken").value = invitationToken;
@@ -788,21 +797,23 @@
       }
     }
     const accounts = await getPatientAccount();
+    if (!isCurrentLoad()) return;
     if (!accounts.length) { showOnly("portalUnlinked"); return; }
     const ids = accounts.map(item => item.patient_id).filter(isValidPatientId);
     if (!ids.length) throw new Error("لا توجد ملفات صحية صالحة مرتبطة بهذا الحساب.");
     const { data: patientRows, error: patientError } = await supabase.from("patients").select("id,name").in("id", ids).order("name");
+    if (!isCurrentLoad()) return;
     if (patientError) throw patientError;
-    state.patientAccounts = (patientRows || []).map(patient => ({patient_id:patient.id,name:patient.name || "ملف صحي"}));
-    if (!state.patientAccounts.length) throw new Error("تعذر تحميل الملفات الصحية المرتبطة بهذا الحساب.");
+    const nextPatientAccounts = (patientRows || []).map(patient => ({patient_id:patient.id,name:patient.name || "ملف صحي"}));
+    if (!nextPatientAccounts.length) throw new Error("تعذر تحميل الملفات الصحية المرتبطة بهذا الحساب.");
 
     const previousPatientId = state.patientId;
     const preferredPatientId = newlyLinkedPatientId || state.preferredPatientId;
-    const selectedId = state.patientAccounts.some(item => item.patient_id === preferredPatientId)
+    const selectedId = nextPatientAccounts.some(item => item.patient_id === preferredPatientId)
       ? preferredPatientId
-      : state.patientAccounts.some(item => item.patient_id === previousPatientId)
+      : nextPatientAccounts.some(item => item.patient_id === previousPatientId)
         ? previousPatientId
-        : state.patientAccounts[0].patient_id;
+        : nextPatientAccounts[0].patient_id;
 
     if (previousPatientId !== selectedId) {
       state.contextVersion += 1;
@@ -817,7 +828,14 @@
         messagesRoot.dataset.patientId = selectedId;
         messagesRoot.replaceChildren();
       }
+      $("patientFinanceSummary")?.replaceChildren();
+      $("patientSharedHealthStatus")?.replaceChildren();
+      $("patientHealthAuditList")?.replaceChildren();
+      $("portalMeasurementsTable")?.replaceChildren();
+      $("portalPlansList")?.replaceChildren();
     }
+    if (!isCurrentLoad()) return;
+    state.patientAccounts = nextPatientAccounts;
     state.patientId = selectedId;
     state.preferredPatientId = selectedId;
 
@@ -829,7 +847,9 @@
       selector.hidden = state.patientAccounts.length < 2;
       if (selectorLabel) selectorLabel.hidden = state.patientAccounts.length < 2;
     }
-    await loadPatient();
+    const loaded = await loadPatient();
+    if (!isCurrentLoad()) return;
+    if (!loaded) return;
     document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
     showOnly("portalContent");
     if ($("portalHealthArea")) $("portalHealthArea").hidden = false;
@@ -845,7 +865,6 @@
       void window.DietPlannerPatientMessages?.mountInbox(messagesRoot, {patientId:state.patientId,role:"patient"});
     }
   }
-
   async function handleInviteSubmit(event) {
     event.preventDefault();
     const input = $("portalInviteToken");
