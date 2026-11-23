@@ -31,8 +31,8 @@
       const row=state.rows.find(r=>counterpartId(r)===b.dataset.open&&r.status==="accepted");if(!row)return;
       const name=nameOf(row)||(isPatient()?"المختص":"المريض");
       window.DietPlannerPatientMessages?.openConversation({name,subtitle:"محادثة نشطة"},isPatient()
-        ?{patientId:null,role:"patient",professionalId:row.professional_id,counterpartName:name,allowStandalone:true}
-        :{patientId:null,role:"professional",patientUserId:row.patient_user_id,patientName:name,allowStandalone:true});
+        ?{role:"patient",professionalId:row.professional_id,counterpartName:name,allowStandalone:true}
+        :{role:"professional",patientUserId:row.patient_user_id,patientName:name,allowStandalone:true});
     }));
   }
   function render(){
@@ -59,7 +59,7 @@
     if(button.disabled)return;button.disabled=true;
     try{
       const row=state.rows.find(r=>r.request_id===button.dataset[restore?"restore":"cancel"]);
-      const result=restore?await db.rpc("request_professional_connection",{p_professional_id:row.professional_id,p_patient_id:null,p_message:null}):await db.rpc("cancel_professional_connection_request",{p_request_id:row.request_id});
+      const result=restore?await db.rpc("request_professional_connection",{p_professional_id:row.professional_id,p_message:null}):await db.rpc("cancel_professional_connection_request",{p_request_id:row.request_id});
       if(result.error)throw result.error;await load();
     }catch(error){console.error("Patient communication action failed:",error);button.disabled=false;window.alert(error.message||"تعذر تنفيذ الإجراء.");}
   }
