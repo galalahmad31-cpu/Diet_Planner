@@ -36,24 +36,8 @@ begin
       and private.is_patient_workspace_owner(p.id, v_uid)
   ) into v_is_owner;
 
-  select exists (
-    select 1
-    from public.profiles pr
-    join public.professional_connection_requests r on r.professional_id = pr.id
-    where pr.id = v_uid
-      and pr.account_type = 'professional'
-      and r.patient_id = p_patient_id
-      and r.status = 'active'
-      and (r.agreement_end_date is null or r.agreement_end_date >= current_date)
-  ) or exists (
-    select 1
-    from public.profiles pr
-    join public.patient_care_team ct on ct.professional_id = pr.id
-    where pr.id = v_uid
-      and pr.account_type = 'professional'
-      and ct.patient_id = p_patient_id
-      and ct.status = 'active'
-  ) into v_is_linked_professional;
+  v_is_linked_professional :=
+    private.is_active_patient_professional(p_patient_id, v_uid);
 
   if not (v_is_patient or v_is_owner or v_is_linked_professional) then
     raise exception 'patient_workspace_access_denied' using errcode = '42501';
