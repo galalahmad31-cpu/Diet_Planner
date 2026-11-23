@@ -130,7 +130,7 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalMessagesPanel", "portalPlansPanel", "portalMeasurementsPanel", "portalCareManagementPanel", "portalSharedHealthPanel"];
+    const allowed = ["portalMessagesPanel", "portalSharedHealthPanel", "portalMeasurementsPanel", "portalPlansPanel"];
     if (!allowed.includes(panelId)) return;
     if (!isValidPatientId(state.patientId) || !state.patient) {
       void loadPortal().then(() => {
@@ -153,7 +153,6 @@
       tab.setAttribute("aria-selected", String(active));
     });
     allowed.forEach(id => { const panel = $(id); if (panel) panel.hidden = id !== panelId; });
-    if (panelId === "portalCareManagementPanel") state.loadedPanels.delete(panelId);
     void ensureHealthPanelLoaded(panelId);
   }
 
@@ -165,10 +164,9 @@
     if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) return;
     const loaders = {
       portalMessagesPanel: () => Promise.resolve(),
-      portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
+      portalSharedHealthPanel: loadSharedHealthRecord,
       portalMeasurementsPanel: loadMeasurements,
-      portalCareManagementPanel: loadPatientFinanceSummary,
-      portalSharedHealthPanel: loadSharedHealthRecord
+      portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve()
     };
     const loader = loaders[panelId];
     if (!loader) return;
@@ -180,7 +178,7 @@
         if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
         console.error("Patient portal panel load failed:", panelId, error);
         const message = error?.message || "تعذر تحميل هذا القسم.";
-        const targets = {portalPlansPanel:"portalPlansLoading",portalMeasurementsPanel:"portalMeasurementsError",portalCareManagementPanel:"patientFinanceSummary",portalSharedHealthPanel:"patientSharedHealthStatus"};
+        const targets = {portalPlansPanel:"portalPlansLoading",portalMeasurementsPanel:"portalMeasurementsError",portalSharedHealthPanel:"patientSharedHealthStatus"};
         const target = $(targets[panelId]);
         if (target) {
           target.textContent = message;
@@ -207,7 +205,7 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalPlansPanel","portalMeasurementsPanel","portalCareManagementPanel","portalSharedHealthPanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalSharedHealthPanel","portalMeasurementsPanel","portalPlansPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
@@ -467,31 +465,6 @@
     } finally {
       button.disabled = false;
     }
-  }
-
-  async function loadPatientFinanceSummary() {
-    const patientId = state.patientId;
-    const contextVersion = state.contextVersion;
-    const root = $("patientFinanceSummary");
-    if (!root || !patientId) return;
-    root.textContent = "جاري تحميل بيانات الاشتراك والمتابعة...";
-    const { data, error } = await supabase.from("patient_finances")
-      .select("subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discounted_amount,is_paid,last_visit_date,next_follow_up_date")
-      .eq("patient_id", patientId).maybeSingle();
-    if (error) throw error;
-    if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
-    if (!data) { root.textContent = "لم يسجل المختص بيانات الاشتراك والمتابعة لهذا الملف بعد."; return; }
-    const amount = data.discounted_amount ?? data.subscription_amount;
-    const rows = [
-      ["بداية الاشتراك", formatDate(data.subscription_start_date)],
-      ["مدة الاشتراك", data.subscription_months ? optionalNumber(data.subscription_months, " شهر") : "—"],
-      ["نهاية الاشتراك", formatDate(data.subscription_end_date)],
-      ["قيمة الاشتراك", amount == null ? "—" : optionalNumber(amount, " جنيه")],
-      ["حالة السداد", data.is_paid ? "مسدد" : "غير مسدد"],
-      ["آخر زيارة", formatDate(data.last_visit_date)],
-      ["المتابعة القادمة", formatDate(data.next_follow_up_date)]
-    ];
-    root.innerHTML = '<div class="portal-finance-summary-grid">' + rows.map(([label,value]) => '<div class="portal-finance-summary-item"><small>' + escapeHtml(label) + '</small><strong>' + escapeHtml(value) + '</strong></div>').join("") + '</div>';
   }
 
   const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
@@ -852,7 +825,7 @@
       state.loadingPanels.clear();
       state.messagesMountedFor = null;
       $("patientPortalMessages")?.replaceChildren();
-      $("patientFinanceSummary")?.replaceChildren();
+
       $("patientSharedHealthStatus")?.replaceChildren();
       $("patientHealthAuditList")?.replaceChildren();
       $("portalMeasurementsTable")?.replaceChildren();
@@ -910,7 +883,7 @@
         messagesRoot.dataset.patientId = selectedId;
         messagesRoot.replaceChildren();
       }
-      $("patientFinanceSummary")?.replaceChildren();
+
       $("patientSharedHealthStatus")?.replaceChildren();
       $("patientHealthAuditList")?.replaceChildren();
       $("portalMeasurementsTable")?.replaceChildren();
@@ -1082,10 +1055,9 @@
       const healthSections = [
         "portalContent",
         "portalMessagesPanel",
-        "portalPlansPanel",
+        "portalSharedHealthPanel",
         "portalMeasurementsPanel",
-        "portalCareManagementPanel",
-        "portalSharedHealthPanel"
+        "portalPlansPanel"
       ];
       const destination = id === "portalTools" ? "portalToolsPanel" : id;
 
