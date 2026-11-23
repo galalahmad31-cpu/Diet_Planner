@@ -137,57 +137,24 @@
         throw new Error('Professional-only patient workspace access required.');
       }
 
-      if (reset) {
-        const { count, error: countError } = await supabase
-          .from('patients')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', state.user.id);
-        if (countError) throw countError;
-        state.totalPatients = count || 0;
-      }
-
       const from = state.patients.length;
-      const to = from + state.pageSize - 1;
-      const { data: patients, error: patientsError } = await supabase
-        .from('patients')
-        .select('id,user_id,name,diagnosis')
-        .eq('user_id', state.user.id)
-        .order('name', { ascending: true })
-        .order('id', { ascending: true })
-        .range(from, to);
+      const { data: pagePatients, error: patientsError } = await supabase.rpc(
+        'list_my_professional_patients',
+        { p_limit: state.pageSize, p_offset: from }
+      );
 
       if (patientsError) throw patientsError;
 
-      const pagePatients = patients || [];
-      const patientIds = pagePatients.map((patient) => patient.id).filter(Boolean);
-      const linkedPatientIds = new Set();
+      const rows = pagePatients || [];
+      if (reset) state.totalPatients = Number(rows[0]?.total_count || 0);
 
-      let careTeamPatientIds = new Set();
-      if (patientIds.length && state.user?.id) {
-        const [requestsResult, careTeamResult] = await Promise.all([
-          supabase
-            .from('professional_connection_requests')
-            .select('patient_id')
-            .eq('professional_id', state.user.id)
-            .in('status', ['accepted', 'active'])
-            .in('patient_id', patientIds),
-          supabase
-            .from('patient_care_team')
-            .select('patient_id')
-            .eq('professional_id', state.user.id)
-            .eq('status', 'active')
-            .in('patient_id', patientIds)
-        ]);
-
-        if (requestsResult.error) throw requestsResult.error;
-        if (careTeamResult.error) throw careTeamResult.error;
-
-        (requestsResult.data || []).forEach(item => linkedPatientIds.add(item.patient_id));
-        (careTeamResult.data || []).forEach(item => {
-          linkedPatientIds.add(item.patient_id);
-          careTeamPatientIds.add(item.patient_id);
-        });
-      }
+      const linkedPatientIds = new Set(
+        rows.filter(patient => patient.is_linked).map(patient => patient.id)
+      );
+      const careTeamPatientIds = new Set(
+        rows.filter(patient => patient.has_care_team).map(patient => patient.id)
+      );
+      const patientIds = rows.map(patient => patient.id).filter(Boolean);
 
       const unlinkedPatientIds = patientIds.filter(id => !linkedPatientIds.has(id));
       let financeRows = [];
@@ -233,7 +200,7 @@
         });
       }
 
-      state.patients.push(...pagePatients.map((patient) => ({
+      state.patients.push(...rows.map((patient) => ({
         ...patient,
         isLinked: linkedPatientIds.has(patient.id),
         nextAppointmentAt: nextAppointmentByPatient.get(patient.id) || null,
