@@ -18,20 +18,16 @@
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261123-multi-file-messaging-primary-v4">
   <link rel="stylesheet" href="css/announcements.css?v=20261122-shared-announcements-v1">
-  <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/home-shell.css?v=20261121-home-shell-v1">
-  <link rel="stylesheet" href="css/patient-messages.css?v=20261122-central-floating-chat-v2">
   
   <link rel="stylesheet" href="css/patient-notifications.css?v=20261122-patient-notifications-v1">
   <script src="js/theme.js?v=20261122-theme-token-aliases-v1" defer></script>
   <script src="js/app-header.js?v=20261123-patient-health-route-fix-v1" defer></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
-  <script src="js/patient-messages.js?v=20261123-direct-file-messaging-v2" defer></script>
   
   <script src="js/patient-notifications.js?v=20261123-remove-appointment-events-v1" defer></script>
-  <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261123-single-portal-visibility-router-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261123-dedicated-health-page-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -155,107 +151,7 @@
       </form>
       <p class="portal-home-note">يمكن تعديل بيانات الحساب ووسائل التواصل هنا. البيانات الطبية والخطة والقياسات تدار داخل الملف الصحي، ولا تتغير بتعديل الملف الشخصي.</p>
     </section>
-    <section id="portalHealthArea" class="portal-health-area" hidden>
-      <nav class="portal-health-tabs" role="tablist" aria-label="أقسام الملف الصحي">
-        <button type="button" role="tab" aria-selected="true" aria-controls="portalMessagesPanel" data-health-tab="portalMessagesPanel" class="is-active">التواصل مع المختص</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">البيانات الصحية</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel">الخطة الغذائية</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalCareManagementPanel" data-health-tab="portalCareManagementPanel">الاشتراك والمتابعة</button>
-      </nav>
-
-    <section id="portalLoading" class="portal-state-card">
-      <span class="portal-spinner"></span>
-      <p>جاري تحميل ملفك الصحي...</p>
-    </section>
-
-    <section id="portalError" class="portal-state-card portal-error" hidden>
-      <span class="portal-state-icon"><i class="fa-solid fa-circle-exclamation"></i></span>
-      <h1>تعذر تحميل البوابة</h1>
-      <p id="portalErrorText">حدث خطأ أثناء تحميل البيانات.</p>
-      <button type="button" id="portalRetry" class="portal-primary-button">إعادة المحاولة</button>
-    </section>
-
-    <section id="portalFileAccess" class="portal-file-switcher" aria-label="الملفات الصحية">
-      <p id="portalFileAccessMessage" class="portal-file-access-message" hidden>لا يوجد ملف صحي مرتبط بحسابك حتى الآن. أدخل كود الدعوة الذي أرسله لك المختص لعرض ملفه الصحي.</p>
-      <label for="portalPatientSelector" hidden>الملف الصحي المرتبط بحسابك</label>
-      <select id="portalPatientSelector" aria-label="اختيار الملف الصحي" hidden></select>
-      <form id="patientProfessionalCodeForm" class="portal-professional-code-form">
-        <label for="patientProfessionalCode">إضافة ملف صحي جديد بكود المختص</label>
-        <div class="portal-professional-code-form__row">
-          <input id="patientProfessionalCode" name="invitationCode" type="text" inputmode="text" autocomplete="off" maxlength="36" dir="ltr" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
-          <button type="submit" class="portal-primary-button">ربط الملف</button>
-        </div>
-        <p id="patientProfessionalCodeStatus" class="portal-inline-message" role="status" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <div id="portalContent" hidden>
-      <div id="portalMessagesPanel" class="portal-health-tab-panel" role="tabpanel">
-        <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>هذه هي قناة التواصل الأساسية مع المختص المسؤول عن الملف المحدد.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
-          <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
-        </section>
-      </div>
-
-      <div id="portalPlansPanel" class="portal-health-tab-panel" role="tabpanel">
-        <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المنشورة من المختص المسؤول عن هذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
-          <a class="portal-directory-link" href="professional-directory.html"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> استعراض دليل المختصين</a>
-          <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
-          <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
-          <div id="portalPlansList" class="portal-plans-list"></div>
-        </section>
-      </div>
-
-      <div id="portalCareManagementPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
-        <section class="portal-section" aria-labelledby="patientCareManagementTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">FINANCE & FOLLOW-UP</span><h2 id="patientCareManagementTitle">الاشتراك والمتابعة</h2><p>بيانات الاشتراك والمتابعة المسجلة في Finance لهذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-wallet"></i></span></div>
-          <div id="patientFinanceSummary" class="portal-finance-summary">جاري تحميل بيانات الاشتراك والمتابعة...</div>
-        </section>
-      </div>
-
-      <div id="portalSharedHealthPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
-        <section class="portal-section" aria-labelledby="patientSharedHealthTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية للملف</h2><p>بيانات الملف المسجلة بواسطة المختص، للعرض فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
-          <div id="patientSharedHealthForm" class="portal-shared-health-form">
-            <div class="portal-shared-health-grid">
-              <label for="sharedHealthName">اسم المريض<input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" disabled></label>
-              <label for="sharedHealthGender">النوع (اختياري)<select id="sharedHealthGender" disabled><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></label>
-              <label>تاريخ الميلاد<input id="sharedHealthBirthDate" type="date" disabled></label>
-              <label>الطول (سم)<input id="sharedHealthHeight" type="number" min="30" max="260" step="0.1" disabled></label>
-              <label class="is-wide">التشخيص<input id="sharedHealthDiagnosis" type="text" maxlength="4000" disabled></label>
-              <label class="is-wide">الشكوى<textarea id="sharedHealthComplaints" rows="3" maxlength="4000" disabled></textarea></label>
-            </div>
-            <div class="portal-form-footer"><p id="patientSharedHealthStatus" class="portal-inline-message" role="status">هذه البيانات للعرض فقط. لطلب تحديثها، تواصل مع المختص المسؤول عن هذا الملف.</p></div>
-          </div>
-        </section>
-        <section class="portal-section" aria-labelledby="patientHealthAuditTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">CHANGE HISTORY</span><h3 id="patientHealthAuditTitle">سجل التعديلات</h3><p>من قام بالتعديل ومتى.</p></div></div><div id="patientHealthAuditList" class="portal-health-audit-list">جاري تحميل السجل...</div></section>
-      </div>
-
-      <div id="portalMeasurementsPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalMeasurementsTitle">
-        <div class="portal-section-heading">
-          <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>استعرض القياسات التي سجلها المختص لهذا الملف.</p></div>
-          <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
-        </div>
-        <p id="portalMeasurementAccessStatus" class="measurements-access-status">القياسات للعرض فقط ولا يمكن تعديلها من بوابة المريض.</p>
-        <div id="portalMeasurementsLoading" class="portal-muted-state" hidden>جاري تحميل القياسات...</div>
-        <div id="portalMeasurementsError" class="portal-measurements-error" role="alert" hidden></div>
-        
-        <div class="portal-measurement-summary" aria-label="ملخص تغيرات الوزن ومؤشر كتلة الجسم">
-          <article><span>التغير من أول قياس</span><strong id="portalWeightChangeOverall" class="measurement-numeric-value">—</strong><small id="portalWeightChangeOverallNote">لا توجد بيانات كافية</small></article>
-          <article><span>التغير بين آخر وزنين</span><strong id="portalWeightChangeRecent" class="measurement-numeric-value">—</strong><small id="portalWeightChangeRecentNote">يلزم تسجيل قياسين</small></article>
-          <article><span>مؤشر كتلة الجسم (BMI)</span><strong id="portalLatestBmi" class="measurement-numeric-value">—</strong><small id="portalLatestBmiNote">يعتمد على آخر وزن والطول المسجل</small></article>
-        </div>
-        <div id="portalMeasurementsTable" class="measurements-table-container"></div>
-      </section></div>
-
-      <section class="portal-section portal-care-note">
-        <span><i class="fa-solid fa-shield-heart"></i></span>
-        <div><strong>خصوصيتك وسلامة بياناتك</strong><p>يمكنك عرض ملفاتك الصحية المرتبطة بحسابك. التعديل على البيانات والقياسات والخطط متاح للمختص صاحب الملف فقط.</p></div>
-      </section>
-    </div>
-    </section>
+    
   </main>
   <footer class="portal-footer">Diet Planner <span>•</span> بوابتك لمتابعة التغذية العلاجية</footer>
 </body>
