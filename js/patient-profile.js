@@ -777,8 +777,8 @@
   }
 
   async function deleteNutritionPlan(plan) {
-    if (!canWrite()) {
-      alert('حذف الخطط متاح أثناء الاشتراك المدفوع فقط.');
+    if (!canManagePatientCare()) {
+      alert('حذف الخطة يتطلب ارتباط متابعة نشطًا أو صلاحية مالك الملف.');
       return;
     }
     if (String(plan.plan_name || '').includes('البدائل')) {
