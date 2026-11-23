@@ -57,17 +57,12 @@
   }
 
   function openHealthArea() {
-    const navigate = window.DietPlannerPatientPortal?.navigateToSection;
-    if (typeof navigate === "function") {
-      void navigate("portalContent");
+    const page = window.location.pathname.split("/").pop();
+    if (page !== "patient-health.html") {
+      window.location.assign("patient-health.html" + window.location.search);
       return;
     }
-    // Safe fallback: expose the health destination before loading its data.
-    showPortalDestination("portalContent");
-    loadPortal().catch(error => {
-      console.error("Patient health area load failed:", error);
-      fail(error.message || "تعذر تحميل الملف الصحي.");
-    });
+    void window.DietPlannerPatientPortal?.navigateToSection("portalContent");
   }
 
   function fail(message) {
@@ -97,11 +92,11 @@
       .eq("id", state.user.id).maybeSingle();
     if (error) throw error;
     const profile = data || {};
-    $("selfProfileName").value = profile.full_name || state.user.user_metadata?.full_name || "";
-    $("selfProfilePhone").value = profile.phone || "";
-    $("selfProfileEmail").value = profile.email || state.user.email || "";
-    $("selfProfileType").value = profile.account_type === "patient" ? "مريض" : "حساب مريض";
-    $("portalWelcomeName") && ($("portalWelcomeName").textContent = profile.full_name || "مرحبًا بك");
+    if ($("selfProfileName")) $("selfProfileName").value = profile.full_name || state.user.user_metadata?.full_name || "";
+    if ($("selfProfilePhone")) $("selfProfilePhone").value = profile.phone || "";
+    if ($("selfProfileEmail")) $("selfProfileEmail").value = profile.email || state.user.email || "";
+    if ($("selfProfileType")) $("selfProfileType").value = profile.account_type === "patient" ? "مريض" : "حساب مريض";
+    if ($("portalWelcomeName")) $("portalWelcomeName").textContent = profile.full_name || "مرحبًا بك";
   }
 
   async function saveSelfProfile(event) {
@@ -1009,6 +1004,14 @@
       window.location.replace("login.html?next=" + encodeURIComponent(next));
       return;
     }
+    const currentPage = window.location.pathname.split("/").pop();
+    const query = new URLSearchParams(window.location.search);
+    if (currentPage === "patient-portal.html" &&
+        (query.has("invite") || window.location.hash === "#portalContent")) {
+      window.location.replace("patient-health.html" + window.location.search);
+      return;
+    }
+    const isHealthPage = currentPage === "patient-health.html";
     state.user = user;
     void window.DietPlannerPatientNotifications?.init($("patientNotifications"), user.id).catch(error => {
       console.error("Patient notifications initialization failed:", error);
@@ -1033,7 +1036,7 @@
             "portalTools",
       "portalProfileArea"
     ]);
-    if (initialSection !== "portalProfileArea") {
+    if (!isHealthPage && initialSection !== "portalProfileArea") {
       loadSelfProfile().catch(error => {
         console.error("Patient profile load failed:", error);
         setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
@@ -1066,7 +1069,9 @@
       }
     });
 
-    if (new URLSearchParams(window.location.search).has("invite")) {
+    if (isHealthPage) {
+      await window.DietPlannerPatientPortal.navigateToSection("portalContent");
+    } else if (query.has("invite")) {
       openHealthArea();
     } else if (patientSections.has(initialSection)) {
       await window.DietPlannerPatientPortal.navigateToSection(initialSection);
