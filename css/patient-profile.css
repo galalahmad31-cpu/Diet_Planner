@@ -114,7 +114,7 @@ main section.bg-white{border-color:var(--dp-line)!important;border-radius:16px!i
 .patient-save-actions button{border:0}
 .patient-save-actions #savePatientButton{background:#16834a;color:#fff}
 .patient-save-actions #cancelEditButton{background:#edf2f5;color:#53636d}
-.patient-data-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.patient-data-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .patient-data-fields>div{min-width:0}
 .patient-data-fields input,.patient-data-fields select,.patient-data-fields textarea{width:100%;min-width:0;box-sizing:border-box;min-height:37px;padding:7px 9px;background:#f8fbfc;border-color:#e0e9ed;font-size:11px}
 .patient-data-fields textarea{min-height:62px;resize:vertical}
