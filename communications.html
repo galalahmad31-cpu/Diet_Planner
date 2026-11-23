@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Diet Planner | التواصل مع المرضى</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/tailwind.css?v=20260923-1">
+  <link rel="stylesheet" href="css/design-tokens.css?v=20261122-responsive-foundation-v1">
+  <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/dark-theme.css?v=20261120-home-layout-v1">
+  <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
+  <link rel="stylesheet" href="css/app.css?v=20261122-central-header-card-v1">
+  <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
+  <link rel="stylesheet" href="css/patient-messages.css?v=20261123-conversation-requests-v2">
+  <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
+  <script src="js/app-header.js?v=20261123-communications-page-v1" defer></script>
+</head>
+<body class="min-h-screen">
+  <main class="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl">
+      <div data-dp-app-header data-page-title="التواصل مع المرضى"></div>
+      <section class="mt-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="communicationsTitle">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-black tracking-widest text-emerald-700">PATIENT COMMUNICATIONS</span>
+            <h1 id="communicationsTitle" class="mt-1 text-xl font-black text-slate-800 sm:text-2xl">التواصل مع المرضى</h1>
+            <p class="mt-1 text-sm text-slate-500">إدارة طلبات التواصل والمحادثات المقبولة من مكان واحد.</p>
+          </div>
+          <button id="professionalConversationsRefresh" type="button" class="rounded-xl border border-slate-200 px-4 py-2 text-xs font-extrabold text-slate-700">
+            <i class="fa-solid fa-rotate"></i> تحديث
+          </button>
+        </div>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="grid grid-cols-2 gap-2" role="tablist" aria-label="أقسام التواصل">
+            <button id="communicationsTabConversations" type="button" role="tab" aria-selected="true" aria-controls="professionalConversationList" class="rounded-xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white">
+              المحادثات <span id="communicationsConversationCount" class="mr-1 rounded-full bg-white/20 px-2 py-0.5 text-xs">0</span>
+            </button>
+            <button id="communicationsTabRequests" type="button" role="tab" aria-selected="false" aria-controls="professionalConversationRequests" class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-extrabold text-slate-700">
+              طلبات التواصل <span id="communicationsRequestCount" class="mr-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs">0</span>
+            </button>
+          </div>
+          <label class="relative block w-full sm:max-w-xs">
+            <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input id="communicationsSearch" type="search" placeholder="ابحث باسم المريض..." class="w-full rounded-xl border border-slate-200 py-3 pr-9 pl-3 text-sm outline-none focus:border-emerald-600">
+          </label>
+        </div>
+        <section id="professionalConversationList" role="tabpanel" aria-labelledby="communicationsTabConversations" class="dp-chat-contact-list mt-4">
+          <p class="patient-messages-empty">جاري تحميل المحادثات...</p>
+        </section>
+        <section id="professionalConversationRequests" role="tabpanel" aria-labelledby="communicationsTabRequests" class="dp-chat-contact-list mt-4" hidden>
+          <p class="patient-messages-empty">جاري تحميل الطلبات...</p>
+        </section>
+      </section>
+      <footer class="py-8 text-center">
+        <div class="text-sm font-semibold text-slate-500">Developed by <span class="text-brand-600">Dr. Ahmed Galal</span></div>
+        <div class="mt-1 text-xs text-slate-400">Diet Planner • Clinical Nutrition</div>
+      </footer>
+    </div>
+  </main>
+  <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
+  <script src="js/patient-messages.js?v=20261123-conversation-requests-v3"></script>
+  <script src="js/professional-messages.js?v=20261123-communications-tabs-v1"></script>
+</body>
+</html>
