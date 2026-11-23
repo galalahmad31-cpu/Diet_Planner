@@ -41,7 +41,7 @@
   
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
   <script src="js/app-header.js?v=20261123-remove-approval-workflow-v1" defer></script>
-</head>
+  <link rel="stylesheet" href="css/patient-messages.css?v=20261123-conversation-requests-v1">\n</head>
 
 <body class="min-h-screen">
 
@@ -92,6 +92,17 @@
                 </div>
             </section>
 
+            <section id="patient-communications" class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="professionalCommunicationsTitle">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div><span class="text-xs font-black tracking-widest text-emerald-700">PATIENT COMMUNICATIONS</span><h2 id="professionalCommunicationsTitle" class="mt-1 text-xl font-black text-slate-800">التواصل مع المرضى</h2><p class="mt-1 text-sm text-slate-500">طلبات المحادثة والمرضى الذين بدأت معهم التواصل.</p></div>
+                    <button id="professionalConversationsRefresh" type="button" class="rounded-xl border border-slate-200 px-4 py-2 text-xs font-extrabold text-slate-700"><i class="fa-solid fa-rotate"></i> تحديث</button>
+                </div>
+                <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+                    <section><h3 class="mb-3 text-sm font-black text-slate-800">طلبات المحادثة</h3><div id="professionalConversationRequests" class="dp-chat-contact-list"><p class="patient-messages-empty">جاري تحميل الطلبات...</p></div></section>
+                    <section><h3 class="mb-3 text-sm font-black text-slate-800">المحادثات المقبولة</h3><div id="professionalConversationList" class="dp-chat-contact-list"><p class="patient-messages-empty">جاري تحميل المحادثات...</p></div></section>
+                </div>
+            </section>
+
             <section id="dashboardAnnouncementsSection" class="portal-announcements mt-5" aria-labelledby="dashboardAnnouncementsTitle" hidden>
                 <div class="portal-announcements-heading">
                     <div>
@@ -121,7 +132,7 @@
     </main>
 
     <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
-    <script src="js/app-dashboard.js?v=20261122-admin-nav-cleanup-v1"></script>
+    <script src="js/patient-messages.js?v=20261123-conversation-requests-v1"></script>\n    <script src="js/professional-messages.js?v=20261123-conversation-requests-v1"></script>\n    <script src="js/app-dashboard.js?v=20261122-admin-nav-cleanup-v1"></script>
 
 </body>
 
