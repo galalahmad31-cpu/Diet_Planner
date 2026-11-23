@@ -896,7 +896,7 @@
         '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.name) + '</option>'
       ).join("");
       selector.value = selectedId;
-      selector.hidden = state.patientAccounts.length < 2;
+      selector.hidden = false;
     }
 
     await loadPatient();
@@ -923,17 +923,23 @@
     const input = $("portalInviteToken");
     const button = event.submitter || $("portalInviteForm").querySelector("button[type=submit]");
     const token = input.value.trim();
+    if (!button || button.disabled) return;
     button.disabled = true;
-    setMessage("portalInviteMessage", "جاري التحقق من الدعوة...");
+    setMessage("portalInviteMessage", "جاري التحقق من كود الربط...");
     try {
       state.patientId = await acceptInvitation(token);
-      state.patient = null; state.logs = []; state.loadedPanels.clear(); state.loadingPanels.clear(); state.messagesMountedFor = null;
+      state.patient = null;
+      state.logs = [];
+      state.loadedPanels.clear();
+      state.loadingPanels.clear();
+      state.messagesMountedFor = null;
       input.value = "";
-      setMessage("portalInviteMessage", "تم ربط حسابك بنجاح.", "success");
+      setMessage("portalInviteMessage", "تم ربط الملف بحسابك بنجاح.", "success");
       await loadPortal();
     } catch (error) {
       console.error("Invitation acceptance failed:", error);
-      setMessage("portalInviteMessage", error.message || "تعذر قبول الدعوة.", "error");
+      setMessage("portalInviteMessage", error.message || "تعذر قبول كود الربط.", "error");
+    } finally {
       button.disabled = false;
     }
   }
