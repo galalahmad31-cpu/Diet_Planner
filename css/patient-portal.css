@@ -308,3 +308,21 @@
 .portal-readonly-note{margin-top:14px;color:var(--portal-muted);font-size:11px;line-height:1.8;font-weight:700}
 @media(max-width:650px){.portal-finance-readonly-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.portal-finance-readonly-grid article{min-height:82px;padding:11px}.portal-finance-readonly-grid article strong{font-size:13px}}
 @media(max-width:360px){.portal-finance-readonly-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Patient health page: compact file switcher and four clear destinations. */
+.portal-file-switcher{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;margin:0 0 14px;padding:13px 15px}
+.portal-file-current{display:grid;gap:6px;min-width:0}
+.portal-file-current>label{font-size:11px;font-weight:900;color:var(--portal-ink)}
+.portal-file-current>select{width:100%;min-width:0;min-height:42px;padding:8px 11px;border:1px solid var(--portal-line);border-radius:10px;background:var(--portal-card);color:var(--portal-ink);font:inherit;font-size:12px}
+.portal-add-file{min-width:0;align-self:center}
+.portal-add-file>summary{cursor:pointer;list-style:none;color:var(--portal-accent);font-size:11px;font-weight:900;white-space:nowrap}
+.portal-add-file>summary::-webkit-details-marker{display:none}
+.portal-add-file[open]{grid-column:1/-1;width:100%;padding-top:10px;border-top:1px solid var(--portal-line)}
+.portal-add-file[open]>summary{margin-bottom:10px}
+.portal-add-file .portal-professional-code-form{margin:0;padding:0;border:0;background:transparent}
+.portal-add-file .portal-professional-code-form__row{display:flex;gap:8px;align-items:stretch}
+.portal-add-file .portal-professional-code-form__row input{flex:1;min-width:0}
+.portal-add-file .portal-file-access-message{margin:0}
+.portal-measurements-section{margin-top:14px}
+@media(max-width:640px){.portal-file-switcher{grid-template-columns:minmax(0,1fr);gap:10px;padding:12px}.portal-add-file{grid-column:1}.portal-add-file[open]{grid-column:1}.portal-add-file .portal-professional-code-form__row{flex-direction:column}.portal-add-file .portal-professional-code-form__row .portal-primary-button{width:100%}}
