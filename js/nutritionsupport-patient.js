@@ -1427,8 +1427,7 @@ function showDeleteConfirm(dayText){
 function canWriteSupportDays() {
   if (!supportPatientCanManage) return false;
   if (supportIsAdmin) return true;
-  const a = window.__dpNutritionSupportDayAccess || {};
-  return a.hasActiveSubscription === true && a.hasFeature === true;
+  return true;
 }
 
 function applySupportDayAccessUI() {
@@ -1436,9 +1435,7 @@ function applySupportDayAccessUI() {
   const writable = canWriteSupportDays();
   const note = $('supportAccessNotice');
   if (note) {
-    note.textContent = writable
-      ? ''
-      : 'الوضع للقراءة فقط: تعديل أو إضافة أيام الدعم والحاسبات يتطلب اشتراكًا فعالًا مع خاصية الدعم الغذائي.';
+    note.textContent = '';
     note.style.display = writable ? 'none' : 'block';
   }
   document.querySelectorAll('.day-delete').forEach(btn=>{
@@ -1452,24 +1449,13 @@ async function refreshSupportDayAccess(userId) {
   try {
     const role = await access?.getUserRole?.(userId);
     supportIsAdmin = role === 'admin';
-    const [hasActiveSubscription, hasFeature] = supportIsAdmin
-      ? [true, true]
-      : await Promise.all([
-          access?.hasActiveSubscription?.(userId),
-          access?.hasFeature?.(userId, 'nutrition_support')
-        ]);
-
-    window.__dpNutritionSupportDayAccess = {
-      hasActiveSubscription: hasActiveSubscription === true,
-      hasFeature: hasFeature === true
-    };
+    window.__dpNutritionSupportDayAccess = { unrestricted: true };
     applySupportDayAccessUI();
   } catch (error) {
     console.error('Nutrition support day access check failed:', error);
     supportIsAdmin = false;
     window.__dpNutritionSupportDayAccess = {
-      hasActiveSubscription: false,
-      hasFeature: false
+      unrestricted: true
     };
     applySupportDayAccessUI();
   }
@@ -1477,7 +1463,7 @@ async function refreshSupportDayAccess(userId) {
 
 async function deleteSupportDay(id){
   if (supportDayOperationBusy) return;
-  if (!canWriteSupportDays()) { alert('تعديل أيام الدعم الغذائي متاح أثناء الاشتراك المدفوع وخاصية التغذية الداعمة فقط.'); return; }
+  if (!canWriteSupportDays()) { alert('تعذر تعديل أيام الدعم الغذائي.'); return; }
   const d=supportDays.find(x=>x.id===id); if(!d)return;
   if(!(await showDeleteConfirm(formatDayDate(d.day_date))))return;
   supportDayOperationBusy=true;
@@ -1546,7 +1532,7 @@ async function selectSupportDay(id){
 }
 async function addSupportDay(){
   if (supportDayOperationBusy) return;
-  if (!canWriteSupportDays()) { alert('إضافة أيام الدعم الغذائي متاحة أثناء الاشتراك المدفوع وخاصية التغذية الداعمة فقط.'); return; }
+  if (!canWriteSupportDays()) { alert('تعذر إضافة أيام الدعم الغذائي.'); return; }
   const date=$('newDayDate')?.value;
   if(!date){alert('اختر تاريخ اليوم أولاً.');return;}
   if(!supportPatientId||!supportUserId){alert('لم يتم تحميل المريض بعد.');return;}
