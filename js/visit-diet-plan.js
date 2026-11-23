@@ -36,15 +36,6 @@ function showToast(msg,type='success'){
  t.innerHTML='<i class="fa-solid '+(type==='error'?'fa-circle-exclamation':'fa-circle-check')+'"></i> <span class="mr-2">'+escapeHtml(msg)+'</span>';
  c.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
-function ensureDietModalPortal(id){
- const modal=document.getElementById(id);
- if(!modal)return null;
- document.body.appendChild(modal);
- modal.classList.add('diet-modal-portal-layer');
- modal.setAttribute('role','dialog');
- modal.setAttribute('aria-modal','true');
- return modal;
-}
 function openConfirmModal(title,text,callback){
  if(typeof callback!=="function")return;
  void window.DPConfirm?.ask({title,message:text,confirmText:"تأكيد",variant:"danger"}).then(confirmed=>{if(confirmed)return callback();});
@@ -113,7 +104,6 @@ async function loadFoods(options={}){
    id:String(f.id),
    name:String(f.name_ar??'').trim(),
    household:f.household||'',
-   searchName:normalizeFoodSearch(f.name_ar??''),
    calories:Number(f.kcal||0),
    protein:Number(f.protein||0),
    carbs:Number(f.carb||0),
@@ -377,132 +367,31 @@ function closeAddMealModal(){
 function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
 function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
-function openFoodModal(did,mid){
- const modal=ensureDietModalPortal('foodModal');
- if(!modal)return;
- currentModalContext={dayId:did,mealId:mid};
- const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);
- document.getElementById('modalMealTitle').textContent=m?`إضافة صنف لـ (${m.name})`:'إضافة صنف للوجبة';
- document.getElementById('foodSearchInput').value='';
- document.getElementById('selectedFoodId').value='';
- document.getElementById('foodGramsInput').value='100';
- document.getElementById('foodModalHouseholdBox').classList.add('hidden');
-
- modal.classList.remove('hidden');
- const drop=document.getElementById('foodDropdownList');
- if(drop)drop.innerHTML=foodsFullyLoaded ? '' : '<div class="p-3 text-xs text-slate-400 text-center font-bold">جارٍ تحميل الأصناف...</div>';
- document.getElementById('foodSearchInput').focus({preventScroll:true});
- if(foodsFullyLoaded){filterFoodList();return;}
- const contextKey=`${did}|${mid}`;
- ensureAllFoods().then(ok=>{
-  if(!ok||document.getElementById('foodModal')?.classList.contains('hidden'))return;
-  if(`${currentModalContext.dayId}|${currentModalContext.mealId}`!==contextKey)return;
-  filterFoodList();
- }).catch(error=>{
-  console.error('Food picker load failed:',error);
-  if(`${currentModalContext.dayId}|${currentModalContext.mealId}`===contextKey&&drop)
-   drop.innerHTML='<div class="p-3 text-xs text-rose-500 text-center font-bold">تعذر تحميل الأصناف. حاول مرة أخرى.</div>';
+async function openFoodModal(dayId,mealId){
+ const day=daysData.find(item=>item.id===dayId),meal=day?.meals.find(item=>item.id===mealId);
+ if(!day||!meal||!isDayEditing(dayId))return;
+ if(!(await ensureAllFoods()))return;
+ const picker=window.DietPlannerFoodPicker;
+ if(!picker){showToast('مكوّن اختيار الأغذية غير متاح. أعد تحميل الصفحة.','error');return;}
+ currentModalContext={dayId,mealId};
+ picker.open({foods:foodDatabase,title:'إضافة صنف إلى '+(meal.name||'الوجبة'),confirmText:'إضافة للوجبة',grams:100,
+  onClose:()=>{currentModalContext={dayId:null,mealId:null};},
+  onConfirm:({normalizedFood,grams,notes})=>{
+   const context=currentModalContext,targetDay=daysData.find(item=>item.id===context.dayId),targetMeal=targetDay?.meals.find(item=>item.id===context.mealId);
+   if(!targetDay||!targetMeal||!isDayEditing(targetDay.id))return false;
+   targetMeal.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(normalizedFood.id),grams:Number(grams),notes:notes||''});
+   renderDays();showToast('تمت إضافة الصنف بنجاح');return true;
+  }
  });
 }
-function closeFoodModal(){
- const modal=document.getElementById('foodModal');
- if(modal){
-  modal.classList.add('hidden');
- }
- currentModalContext={dayId:null,mealId:null};
-}
-function updateFoodModalHousehold(){const f=foodById.get(String(document.getElementById('selectedFoodId').value)),g=parseFloat(document.getElementById('foodGramsInput').value),box=document.getElementById('foodModalHouseholdBox');if(f?.household&&Number.isFinite(g)){document.getElementById('foodModalHousehold').textContent=scaleHouseholdMeasure(f.household,g);box.classList.remove('hidden')}else box.classList.add('hidden');}
+function closeFoodModal(){window.DietPlannerFoodPicker?.close();currentModalContext={dayId:null,mealId:null};}
 function normalizeFoodSearch(value){
- return String(value??'')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'')
-  .replace(/[ًٌٍَُِّْـ]/g,'')
-  .replace(/[أإآٱ]/g,'ا')
-  .replace(/ى/g,'ي')
-  .replace(/ة/g,'ه')
-  .replace(/ؤ/g,'و')
-  .replace(/ئ/g,'ي')
-  .replace(/[ًٌٍَُِّْ]/g,'')
-  .toLocaleLowerCase('ar-EG')
-  .trim();
+ return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[ًٌٍَُِّْـ]/g,'')
+  .replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي')
+  .toLocaleLowerCase('ar-EG').trim();
 }
-
-function filterFoodList(){
- const input=document.getElementById('foodSearchInput');
- const drop=document.getElementById('foodDropdownList');
- if(!input||!drop)return;
-
- const q=normalizeFoodSearch(input.value);
- const selectedId=String(document.getElementById('selectedFoodId')?.value||'');
- const matches=q ? foodDatabase.filter(f=>(f.searchName||'').includes(q)) : foodDatabase;
- const list=matches.slice(0,40);
-
- if(!list.length){
-  drop.innerHTML='<div class="p-3 text-xs text-slate-400 text-center font-bold">لا توجد نتائج مطابقة</div>';
-  return;
- }
-
- drop.innerHTML=list.map(f=>{
-  const id=String(f.id),selected=id===selectedId;
-  return `<button type="button" class="food-result w-full text-right p-2.5 hover:bg-emerald-50 cursor-pointer flex justify-between items-center text-xs ${selected?'bg-emerald-100/70 border-r-4 border-emerald-600':''}" data-food-id="${escapeHtml(id)}">
-   <span>
-    <span class="font-extrabold text-slate-800 block">${escapeHtml(f.name)}</span>
-    <span class="text-[10px] text-slate-500 font-semibold">${num(f.calories)} kcal | بروتين ${num(f.protein)}g | كارب ${num(f.carbs)}g | دهون ${num(f.fat)}g | Na ${num(f.sodium)}mg | K ${num(f.potassium)}mg | P ${num(f.phosphorus)}mg</span>
-    ${f.household?`<span class="text-[10px] text-emerald-700 font-bold block mt-0.5">100 جم ≈ ${escapeHtml(f.household)}</span>`:''}
-   </span>
-   ${selected?'<i class="fa-solid fa-circle-check text-emerald-600"></i>':'<i class="fa-solid fa-plus text-slate-300"></i>'}
-  </button>`;
- }).join('');
-}
-function selectFoodForMeal(id){
- const selected=document.getElementById('selectedFoodId');
- if(!selected)return;
- const foodId=String(id);
- if(String(selected.value)===foodId){
-  selected.value='';
- }else{
-  const food=foodById.get(foodId);
-  if(!food)return;
-  selected.value=foodId;
- }
- updateFoodModalHousehold();
- filterFoodList();
-}
-function handleFoodSearchInput(){
- const selected=document.getElementById('selectedFoodId');
- if(selected)selected.value='';
- updateFoodModalHousehold();
- filterFoodList();
-}
-function initFoodSearchInteraction(){
- const input=document.getElementById('foodSearchInput');
- const drop=document.getElementById('foodDropdownList');
- if(!input||!drop||input.dataset.bound==='1')return;
-
- input.addEventListener('input',handleFoodSearchInput);
- input.addEventListener('focus',filterFoodList);
-
- drop.addEventListener('click',event=>{
-  const result=event.target.closest('.food-result');
-  if(!result||!drop.contains(result))return;
-  event.preventDefault();
-  event.stopPropagation();
-  selectFoodForMeal(result.dataset.foodId);
- });
- input.dataset.bound='1';
-}
-
 const escapeHtml = window.DPUtils.escapeHtml;
 
-function confirmAddFoodItem(){
- const foodId=document.getElementById('selectedFoodId').value,grams=parseFloat(document.getElementById('foodGramsInput').value);
- const notes=document.getElementById('foodNotesInput')?.value?.trim()||'';
- if(!foodId||!Number.isFinite(grams)||grams<=0){showToast('اختر صنفًا وأدخل كمية صحيحة','error');return;}
- const d=daysData.find(x=>x.id===currentModalContext.dayId),m=d?.meals.find(x=>x.id===currentModalContext.mealId);
- if(!d||!m||!isDayEditing(d.id))return;
- m.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(foodId),grams:Number(grams),notes});
- renderDays();closeFoodModal();showToast('تمت إضافة الصنف بنجاح');
-}
 function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Number(v)||0;renderDays();}}
 function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))it.notes=v;}
 function deleteFoodItemFromMeal(did,mid,iid){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){m.items=m.items.filter(x=>x.itemId!==iid);renderDays();}}
@@ -938,10 +827,7 @@ function init(){
 
  dietInitPromise=(async()=>{
    patientId=params.get('patient_id') || params.get('id') || window.currentPatientId || null;
-
-   initFoodSearchInteraction();
-
-   const ok=await loadPatient();
+const ok=await loadPatient();
    if(!ok){dietInitPromise=null;return false;}
 
    await loadPlan(false);
@@ -989,6 +875,6 @@ async function openPlan(planId=null, createNew=false){
  return init();
 }
 
-window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
+window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
 window.__dpDietPlanLoadError = null;
 })();
