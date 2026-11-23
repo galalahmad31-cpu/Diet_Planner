@@ -637,16 +637,22 @@
 
     dietPlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-diet-plan.js?v=20261123-publication-safe-edit-v1';
-      script.async = true;
+      script.src = 'js/diet-builder.js?v=20261123-central-meal-builder-v1';
       script.onload = () => {
+        const planScript = document.createElement('script');
+        planScript.src = 'js/visit-diet-plan.js?v=20261123-central-meal-builder-v1';
+        planScript.async = true;
+        planScript.onload = () => {
         if (typeof window.dietPlan?.openPlan !== 'function') {
           reject(new Error(window.__dpDietPlanLoadError || 'تعذر تهيئة محرر الخطة الغذائية.'));
           return;
         }
         resolve(true);
+        };
+        planScript.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
+        document.head.appendChild(planScript);
       };
-      script.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
+      script.onerror = () => reject(new Error('تعذر تحميل محرر بناء الوجبات.'));
       document.head.appendChild(script);
     }).catch(error => {
       dietPlanModulePromise = null;
