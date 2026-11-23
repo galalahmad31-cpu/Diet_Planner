@@ -76,7 +76,8 @@
   }
 
   function updateWriteControls() {
-    const canWrite = state.isAdmin || state.hasActiveSubscription;
+    const canWrite = canWritePatientPrivateData();
+    const canManageCare = canManagePatientCare();
 
     const editButton = $('editButton');
     const addPlanButton = $('addPlanButton');
@@ -94,10 +95,10 @@
 
     [addPlanButton, addExchangePlanButton].forEach(button => {
       if (!button) return;
-      button.disabled = !canWrite || state.isCreatingPlan;
+      button.disabled = !canManageCare || state.isCreatingPlan;
       button.classList.toggle('opacity-50', !canWrite);
       button.classList.toggle('cursor-not-allowed', !canWrite);
-      button.title = canWrite ? 'إضافة خطة غذائية' : 'إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط';
+      button.title = canManageCare ? 'إضافة خطة غذائية' : 'تتطلب إدارة الخطة ارتباط متابعة نشطًا أو ملكية الملف';
     });
 
     const accessBox = $('writeAccessStatus');
@@ -122,8 +123,16 @@
     }
   }
 
-  function canWrite() {
+  function canWritePatientPrivateData() {
     return state.isAdmin || state.hasActiveSubscription;
+  }
+
+  function canManagePatientCare() {
+    return canWritePatientPrivateData() || canEditSharedHealth();
+  }
+
+  function canWrite() {
+    return canWritePatientPrivateData();
   }
 
   function canEditSharedHealth() {
@@ -264,7 +273,7 @@
     tableRenderer.render({
       container: $("weightTableContainer"),
       logs: measurementState.logs,
-      addDisabled: !canWrite(),
+      addDisabled: !canManagePatientCare(),
       actionCell: (_log, index) => `
         <div class="measurement-row-actions">
           <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
@@ -320,7 +329,7 @@
   }
 
   function openMeasurementEntry() {
-    if (!canWrite()) { showMeasurementError('إضافة القياسات متاحة أثناء الاشتراك المدفوع فقط.'); return; }
+    if (!canManagePatientCare()) { showMeasurementError('إضافة القياسات تتطلب ارتباط متابعة نشطًا أو صلاحية مالك الملف.'); return; }
     if (!measurementState.loaded) { void loadMeasurements().then(() => { if (measurementState.loaded) openMeasurementEntry(); }); return; }
     const body = $('weightTableBody');
     if (!body || body.querySelector('[data-measurement-editor]')) return;
@@ -804,8 +813,8 @@
   }
 
   async function addNutritionPlan() {
-    if (!canWrite()) {
-      alert('إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط.');
+    if (!canManagePatientCare()) {
+      alert('إدارة خطط هذا المريض تتطلب ارتباط متابعة نشطًا أو صلاحية مالك الملف.');
       return;
     }
     if (state.isCreatingPlan || !patientId) return;
@@ -827,8 +836,8 @@
   }
 
   async function addExchangeNutritionPlan() {
-    if (!canWrite()) {
-      alert('إضافة الخطط متاحة أثناء الاشتراك المدفوع فقط.');
+    if (!canManagePatientCare()) {
+      alert('إدارة خطط هذا المريض تتطلب ارتباط متابعة نشطًا أو صلاحية مالك الملف.');
       return;
     }
     if (state.isCreatingPlan || !patientId) return;
