@@ -50,6 +50,8 @@
     if ($("portalPatientSelector")) $("portalPatientSelector").hidden = id === "portalNoFiles" || !state.patientAccounts.length;
     const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
     if (selectorLabel) selectorLabel.hidden = id === "portalNoFiles" || !state.patientAccounts.length;
+    const addFileDetails = $("portalAddFileDetails");
+    if (addFileDetails && id === "portalNoFiles") addFileDetails.open = true;
 
     const healthTabs = document.querySelector(".portal-health-tabs");
     if (healthTabs) healthTabs.hidden = id !== "portalContent";
@@ -130,7 +132,7 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalMessagesPanel", "portalSharedHealthPanel", "portalMeasurementsPanel", "portalPlansPanel", "portalFinancePanel"];
+    const allowed = ["portalMessagesPanel", "portalSharedHealthPanel", "portalPlansPanel", "portalFinancePanel"];
     if (!allowed.includes(panelId)) return;
     if (!isValidPatientId(state.patientId) || !state.patient) {
       void loadPortal().then(() => {
@@ -164,8 +166,7 @@
     if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) return;
     const loaders = {
       portalMessagesPanel: () => Promise.resolve(),
-      portalSharedHealthPanel: loadSharedHealthRecord,
-      portalMeasurementsPanel: loadMeasurements,
+      portalSharedHealthPanel: async () => { await Promise.all([loadSharedHealthRecord(), loadMeasurements()]); },
       portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
       portalFinancePanel: loadPatientFinanceReadOnly
     };
@@ -179,18 +180,18 @@
         if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
         console.error("Patient portal panel load failed:", panelId, error);
         const message = error?.message || "تعذر تحميل هذا القسم.";
-        const targets = {portalPlansPanel:"portalPlansLoading",portalMeasurementsPanel:"portalMeasurementsError",portalSharedHealthPanel:"patientSharedHealthStatus",portalFinancePanel:"portalFinanceError"};
+        const targets = {portalPlansPanel:"portalPlansLoading",portalSharedHealthPanel:"patientSharedHealthStatus",portalFinancePanel:"portalFinanceError"};
         const target = $(targets[panelId]);
         if (target) {
           target.textContent = message;
           target.hidden = false;
-          if (panelId === "portalMeasurementsPanel" && !target.querySelector("button")) {
+          if (panelId === "portalSharedHealthPanel" && !target.querySelector("button")) {
             const retry = document.createElement("button");
             retry.type = "button";
-            retry.id = "portalMeasurementsRetry";
+            retry.id = "portalHealthDataRetry";
             retry.className = "portal-primary-button";
-            retry.textContent = "إعادة تحميل القياسات";
-            retry.addEventListener("click", () => { state.loadedPanels.delete("portalMeasurementsPanel"); void ensureHealthPanelLoaded("portalMeasurementsPanel"); });
+            retry.textContent = "إعادة تحميل البيانات الصحية";
+            retry.addEventListener("click", () => { state.loadedPanels.delete("portalSharedHealthPanel"); void ensureHealthPanelLoaded("portalSharedHealthPanel"); });
             target.append(" ", retry);
           }
         }
@@ -206,7 +207,7 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalSharedHealthPanel","portalMeasurementsPanel","portalPlansPanel","portalFinancePanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalSharedHealthPanel","portalPlansPanel","portalFinancePanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
@@ -970,8 +971,10 @@
     if (selector) {
       selector.innerHTML = state.patientAccounts.map(item => '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.label || item.name) + '</option>').join("");
       selector.value = selectedId;
-      selector.hidden = state.patientAccounts.length < 2;
-      if (selectorLabel) selectorLabel.hidden = state.patientAccounts.length < 2;
+      selector.hidden = false;
+      if (selectorLabel) selectorLabel.hidden = false;
+      const addFileDetails = $("portalAddFileDetails");
+      if (addFileDetails && !addFileDetails.dataset.userToggled) addFileDetails.open = false;
     }
     const loaded = await loadPatient();
     if (!isCurrentLoad()) return;
@@ -1071,6 +1074,7 @@
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab()));
     $("portalPatientSelector")?.addEventListener("change", () => { state.preferredPatientId = $("portalPatientSelector").value; void loadPortal().catch(error => fail(error.message || "تعذر تبديل الملف.")); });
+    $("portalAddFileDetails")?.addEventListener("toggle", event => { event.currentTarget.dataset.userToggled = "true"; });
     const initialSection = window.location.hash.slice(1);
     const patientSections = new Set([
       "portalHome",
@@ -1127,7 +1131,7 @@
         "portalContent",
         "portalMessagesPanel",
         "portalSharedHealthPanel",
-        "portalMeasurementsPanel",
+        "portalFinancePanel",
         "portalPlansPanel"
       ];
       const destination = id === "portalTools" ? "portalToolsPanel" : id;
