@@ -103,17 +103,17 @@
 
     const accessBox = $('writeAccessStatus');
     if (accessBox) {
-      if (state.isAdmin) {
-        accessBox.textContent = 'وضع المدير: جميع صلاحيات التعديل متاحة.';
+      if (canEditSharedHealth()) {
+        accessBox.textContent = 'ارتباط المتابعة نشط — يمكنك إدارة بيانات الرعاية المشتركة.';
         accessBox.className =
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
-      } else if (state.hasActiveSubscription) {
-        accessBox.textContent = 'الاشتراك فعال — يمكنك تعديل الملف وإدارة الخطط الغذائية.';
+      } else if (canWritePatientPrivateData()) {
+        accessBox.textContent = 'الاشتراك فعال — يمكنك إدارة ملف المريض المملوك لحسابك.';
         accessBox.className =
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
       } else {
         accessBox.textContent =
-          'الاشتراك غير فعال — يمكنك عرض بيانات المريض والبيانات والخطط للعرض فقط. التعديل وإضافة الخطط غير متاحين.';
+          'لا توجد صلاحية تعديل حالية لهذا الملف. يمكنك الاطلاع وفق صلاحيات الوصول المتاحة.';
         accessBox.className =
           'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
       }
@@ -121,15 +121,16 @@
     if (state.patientCareMode === 'unlinked') {
       setPatientFinanceEditing(state.patientFinanceEditing);
     }
+    if (measurementState.loaded) renderMeasurements();
   }
 
   function canWritePatientPrivateData() {
-    return state.isAdmin || state.hasActiveSubscription;
+    const ownsWorkspace = Boolean(state.user?.id && state.patient?.user_id === state.user.id);
+    return ownsWorkspace && (state.isAdmin || state.hasActiveSubscription);
   }
 
   function canManagePatientCare() {
-    const ownsWorkspace = Boolean(state.user?.id && state.patient?.user_id === state.user.id);
-    return (ownsWorkspace && canWritePatientPrivateData()) || canEditSharedHealth();
+    return canWritePatientPrivateData() || canEditSharedHealth();
   }
 
   function canWrite() {
@@ -193,8 +194,8 @@
     }
 
     if (!data) {
-      // RLS intentionally returns no row when the signed-in account is not
-      // the owner and is not an administrator. Do not weaken the policy here.
+      // RLS returns no row unless the user owns the workspace, is the patient,
+      // or has an active/read-only care relationship. Do not weaken the policy here.
       showError('ملف المريض غير موجود أو لا تملك صلاحية الوصول إليه.');
       return;
     }
