@@ -640,10 +640,10 @@
       script.src = 'js/diet-builder.js?v=20261123-central-meal-builder-v1';
       script.onload = () => {
         const summaryScript = document.createElement('script');
-        summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v1';
+        summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v2';
         summaryScript.onload = () => {
         const planScript = document.createElement('script');
-        planScript.src = 'js/visit-diet-plan.js?v=20261123-central-summary-v1';
+        planScript.src = 'js/visit-diet-plan.js?v=20261123-central-summary-v2';
         planScript.async = true;
         planScript.onload = () => {
         if (typeof window.dietPlan?.openPlan !== 'function') {
