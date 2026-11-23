@@ -907,7 +907,6 @@
     $('diagnosisInput').value = patient.diagnosis || '';
     $('complaintsInput').value = patient.complaints || '';
     $('notesInput').value = patient.clinical_notes || '';
-    renderSharedHealthInProfessionalProfile();
   }
 
   const sharedHealthFieldIds = [
@@ -966,15 +965,8 @@
     loading: false,
     saving: false,
     expired: null,
-    history: []
-  };
-  const sharedHealthLabels = {
-    name: 'اسم المريض', gender: 'النوع', birth_date: 'تاريخ الميلاد', age: 'العمر', height: 'الطول',
-    diagnosis: 'التشخيص', complaints: 'الشكوى'
-  };
-
+    };
   function updateSharedHealthWriteState() {
-    const host = $('professionalSharedHealthStatus');
     const button = $('savePatientButton');
     const fields = sharedHealthFieldIds.map(id => $(id)).filter(Boolean);
     const expired = sharedHealthState.expired === true;
@@ -982,13 +974,6 @@
     fields.forEach(field => {
       field.disabled = !state.isEditing || !canEditSharedHealth() || state.isSaving;
     });
-    if (host) {
-      host.textContent = expired
-        ? 'انتهت مدة المتابعة المسجلة في Finance؛ الملف متاح للعرض فقط.'
-        : verified
-          ? 'يمكنك تعديل البيانات الصحية، ويُسجّل النظام مصدر كل تعديل ووقته.'
-          : 'جارٍ التحقق من صلاحية الاتفاق؛ التعديل متوقف مؤقتًا.';
-    }
     if (button) button.disabled = state.isSaving || sharedHealthState.saving;
   }
 
@@ -1013,66 +998,6 @@
     }
     updateSharedHealthWriteState();
     updateWriteControls();
-  }
-
-  function renderSharedHealthInProfessionalProfile() {
-    const patient = state.patient;
-    if (!patient) return;
-    const root = $('professionalSharedHealthHistory');
-    if (!root) return;
-    if (!sharedHealthState.history.length) {
-      root.textContent = sharedHealthState.loaded ? 'لا توجد تعديلات مسجلة حتى الآن.' : 'جاري تحميل سجل التعديلات...';
-      return;
-    }
-    root.replaceChildren();
-    sharedHealthState.history.forEach(item => {
-      const article = document.createElement('article');
-      article.className = 'professional-health-audit-item';
-      const heading = document.createElement('div');
-      const actor = document.createElement('strong');
-      const actorLabel = item.actor_role === 'patient'
-        ? 'المريض'
-        : item.actor_role === 'professional'
-          ? 'المختص'
-          : item.actor_role === 'admin' ? 'إدارة المنصة' : 'مستخدم مخوّل';
-      actor.textContent = item.actor_id === state.user?.id ? `أنت — ${actorLabel}` : actorLabel;
-      const time = document.createElement('time');
-      time.dateTime = item.created_at;
-      time.textContent = new Date(item.created_at).toLocaleString('ar-EG');
-      heading.append(actor, time);
-      const detail = document.createElement('p');
-      const fields = (item.changed_fields || []).map(key => sharedHealthLabels[key] || key).join('، ');
-      detail.textContent = (item.operation === 'UPDATE' ? 'تحديث البيانات الصحية' : 'إنشاء السجل') + (fields ? ' · ' + fields : '');
-      article.append(heading, detail);
-      root.append(article);
-    });
-  }
-
-  async function loadSharedHealthHistory() {
-    if (state.patientCareMode !== 'owner' || !patientId || !supabase || !state.user?.id || sharedHealthState.loading) return;
-    sharedHealthState.loading = true;
-    const root = $('professionalSharedHealthHistory');
-    if (root) root.textContent = 'جاري تحميل سجل التعديلات...';
-    try {
-      const { data, error } = await supabase.from('patient_health_audit')
-        .select('id,actor_id,actor_role,operation,changed_fields,created_at')
-        .eq('patient_id', patientId)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      sharedHealthState.history = (data || [])
-        .filter(item => (item.changed_fields || []).some(field =>
-          Object.prototype.hasOwnProperty.call(sharedHealthLabels, field)
-        ))
-        .slice(0, 30);
-      sharedHealthState.loaded = true;
-      renderSharedHealthInProfessionalProfile();
-    } catch (error) {
-      console.error('Professional shared health audit load failed:', error);
-      if (root) root.textContent = 'تعذر تحميل سجل التعديلات. تحقق من صلاحيات القراءة.';
-    } finally {
-      sharedHealthState.loading = false;
-    }
   }
 
   async function updateSharedHealthFromProfessional() {
@@ -1134,9 +1059,7 @@
   function setPatientCareView() {
     if (!state.user?.id || state.patient?.user_id !== state.user.id) return false;
     const financeView = $('patientFinanceView');
-    const sharedHealthSection = $('professionalSharedHealthSection');
     if (financeView) financeView.hidden = false;
-    if (sharedHealthSection) sharedHealthSection.hidden = false;
     state.patientCareMode = 'owner';
     updateWriteControls();
     return true;
@@ -1157,14 +1080,14 @@
       try {
         if (!setPatientCareView()) return;
         await loadPatientFinanceFollowUpStatus();
-        await Promise.all([loadPatientFinance(), loadSharedHealthHistory()]);
+        await loadPatientFinance();
       } catch (error) {
         console.error('Patient owner workspace load failed:', error);
         state.patientCareMode = 'error';
         const financeError = $('patientFinanceError');
         if (financeError) {
           financeError.hidden = false;
-          financeError.textContent = 'تعذر تحميل بيانات Finance أو سجل الملف الصحي.';
+          financeError.textContent = 'تعذر تحميل بيانات الاشتراك والمتابعة.';
         }
       } finally {
         state.patientCareModePromise = null;
@@ -1355,7 +1278,6 @@
       }
 
       fillPatientData();
-      if (saveSharedHealth) await loadSharedHealthHistory();
       setEditing(false);
       showPatientProfileSuccess();
     } catch (error) {
