@@ -12,7 +12,7 @@
     root.innerHTML = '<p class="patient-messages-empty">' + esc(message) + '</p>';
   }
 
-  function filtered(items, key) {
+  function filtered(items) {
     const term = state.search.trim().toLocaleLowerCase("ar");
     if (!term) return items;
     return items.filter(item => String(item.patient_name || "").toLocaleLowerCase("ar").includes(term));
