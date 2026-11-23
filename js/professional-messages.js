@@ -30,7 +30,8 @@
       '<span class="dp-chat-avatar"><i class="fa-solid fa-user"></i></span>' +
       '<span class="dp-chat-contact-copy"><strong>' + esc(item.patient_name || "مريض") + '</strong>' +
       '<small>' + esc(item.subtitle || "محادثة مقبولة") + '</small></span>' +
-      '<span class="dp-chat-contact-status">مفتوحة</span><i class="fa-solid fa-chevron-left"></i></button>';
+      '<span class="dp-chat-contact-status">متابعة نشطة</span><i class="fa-solid fa-chevron-left"></i></button>' +
+      '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-end" data-conversation-end="' + esc(item.request_id) + '">إنهاء المتابعة</button></div>';
   }
 
   async function load() {
@@ -88,7 +89,7 @@
       const activeRows = [...contacts.values()];
       conversationsRoot.innerHTML = activeRows.length
         ? activeRows.map(renderConversation).join("")
-        : '<p class="patient-messages-empty">ستظهر هنا أسماء المرضى بعد ربط حساباتهم أو قبول طلبات المحادثة.</p>';
+        : '<p class="patient-messages-empty">لا توجد متابعات نشطة حاليًا.</p>';
 
       requestsRoot.querySelectorAll("[data-conversation-accept],[data-conversation-decline]").forEach(button => {
         button.addEventListener("click", async () => {
@@ -106,6 +107,28 @@
             console.error("Conversation request response failed:", error);
             button.disabled = false;
             window.alert(error.message || "تعذر تنفيذ طلب المحادثة.");
+          }
+        });
+      });
+
+      conversationsRoot.querySelectorAll("[data-conversation-end]").forEach(button => {
+        button.addEventListener("click", async () => {
+          if (button.disabled) return;
+          const confirmed = window.confirm("هل تريد إنهاء المتابعة مع هذا المريض؟ ستتوقف المحادثة الجديدة، مع الاحتفاظ بسجل الرسائل والملف الصحي.");
+          if (!confirmed) return;
+          button.disabled = true;
+          button.textContent = "جاري إنهاء المتابعة...";
+          try {
+            const { error: endError } = await db.rpc("end_professional_connection", {
+              p_request_id: button.dataset.conversationEnd
+            });
+            if (endError) throw endError;
+            await load();
+          } catch (error) {
+            console.error("Professional connection end failed:", error);
+            button.disabled = false;
+            button.textContent = "إنهاء المتابعة";
+            window.alert(error.message || "تعذر إنهاء المتابعة.");
           }
         });
       });
