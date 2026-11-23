@@ -70,7 +70,7 @@ async function loadProfiles(){
 function requestKey(patientId,professionalId){return String(patientId)+":"+String(professionalId);}
 function currentRequest(professionalId){
  const matches=[...state.requests.values()].filter(item=>item.professional_id===professionalId);
- return matches.find(item=>item.status==="accepted")||matches.find(item=>item.status==="pending")||matches.find(item=>item.patient_id==null)||null;
+ return matches.find(item=>item.status==="accepted")||matches.find(item=>item.status==="pending")||matches.find(item=>item.status==="restore_pending")||matches.find(item=>item.status==="blocked")||matches[0]||null;
 }
 function renderRequestPanel(){
  const section=$("directoryRequestSection"),button=$("directoryRequestSubmit"),cancel=$("directoryRequestCancel"),status=$("directoryModalStatus");
@@ -81,6 +81,8 @@ function renderRequestPanel(){
  if(request?.status==="accepted"){
   button.textContent="فتح المحادثة";status.textContent="وافق المختص على طلبك. يمكنك بدء المحادثة الآن.";status.className="directory-modal-status is-success";return;
  }
+ if(request?.status==="blocked"){button.textContent="طلب استعادة التواصل";status.textContent="التواصل موقوف. يمكنك إرسال طلب استعادة للمختص.";status.className="directory-modal-status is-error";return;}
+ if(request?.status==="restore_pending"){button.textContent="طلب الاستعادة قيد الانتظار";button.disabled=true;status.textContent="تم إرسال طلب استعادة التواصل وينتظر موافقة المختص.";status.className="directory-modal-status";return;}
  if(request?.status==="pending"){
   button.textContent="تم إرسال طلب المحادثة";button.disabled=true;cancel.hidden=false;
   status.textContent="طلبك لدى المختص وفي انتظار الموافقة. يمكنك إلغاء الطلب قبل قبوله.";status.className="directory-modal-status";return;
@@ -160,7 +162,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   const request=currentRequest(state.selectedProfileId);
   if(request?.status==="accepted"){
    const profile=state.profiles.find(x=>x.user_id===state.selectedProfileId);
-   window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{patientId:request.patient_id??null,role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص"});
+   window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{patientId:null,role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص",allowStandalone:true});
    return;
   }
   void requestConversation();
