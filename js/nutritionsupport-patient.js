@@ -1425,9 +1425,7 @@ function showDeleteConfirm(dayText){
 }
 
 function canWriteSupportDays() {
-  if (!supportPatientCanManage) return false;
-  if (supportIsAdmin) return true;
-  return true;
+  return supportPatientCanManage;
 }
 
 function applySupportDayAccessUI() {
@@ -1445,20 +1443,8 @@ function applySupportDayAccessUI() {
   });
 }
 
-async function refreshSupportDayAccess(userId) {
-  try {
-    const role = await access?.getUserRole?.(userId);
-    supportIsAdmin = role === 'admin';
-    window.__dpNutritionSupportDayAccess = { unrestricted: true };
-    applySupportDayAccessUI();
-  } catch (error) {
-    console.error('Nutrition support day access check failed:', error);
-    supportIsAdmin = false;
-    window.__dpNutritionSupportDayAccess = {
-      unrestricted: true
-    };
-    applySupportDayAccessUI();
-  }
+async function refreshSupportDayAccess() {
+  applySupportDayAccessUI();
 }
 
 async function deleteSupportDay(id){
