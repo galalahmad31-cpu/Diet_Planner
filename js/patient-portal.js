@@ -25,13 +25,32 @@
   }
 
   function showOnly(id) {
-    ["portalLoading", "portalError"].forEach(key => { if ($(key)) $(key).hidden = key !== id; });
+    const isHealthState = ["portalLoading", "portalError", "portalNoFiles", "portalContent"].includes(id);
+    const home = $("portalHome");
+    const health = $("portalHealthArea");
+    const profile = $("portalProfileArea");
+    const tools = $("portalToolsPanel");
+
+    // One owner controls top-level portal visibility. Never leave the previous
+    // destination visible while a health file is loading, missing, or displayed.
+    if (isHealthState) {
+      if (home) home.hidden = true;
+      if (health) health.hidden = false;
+      if (profile) profile.hidden = true;
+      if (tools) tools.hidden = true;
+    }
+
+    ["portalLoading", "portalError"].forEach(key => {
+      if ($(key)) $(key).hidden = key !== id;
+    });
+
     const fileAccess = $("portalFileAccess");
     if (fileAccess) fileAccess.hidden = id === "portalLoading" || id === "portalError";
     if ($("portalFileAccessMessage")) $("portalFileAccessMessage").hidden = id !== "portalNoFiles";
     if ($("portalPatientSelector")) $("portalPatientSelector").hidden = id === "portalNoFiles" || !state.patientAccounts.length;
     const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
     if (selectorLabel) selectorLabel.hidden = id === "portalNoFiles" || !state.patientAccounts.length;
+
     const healthTabs = document.querySelector(".portal-health-tabs");
     if (healthTabs) healthTabs.hidden = id !== "portalContent";
     if ($("portalContent")) $("portalContent").hidden = id !== "portalContent";
@@ -1040,6 +1059,13 @@
     $("portalCarbPicker")?.addEventListener("keydown", event => { if (event.key === "Escape") closeFoodPicker(); });
     activateToolsTab("portalCarbPanel");
     calculateInsulinEstimate();
+    window.addEventListener("hashchange", () => {
+      const section = window.location.hash.slice(1);
+      if (patientSections.has(section)) {
+        void window.DietPlannerPatientPortal.navigateToSection(section);
+      }
+    });
+
     if (new URLSearchParams(window.location.search).has("invite")) {
       openHealthArea();
     } else if (patientSections.has(initialSection)) {
