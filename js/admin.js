@@ -531,12 +531,13 @@ async function moderateProfessionalProfile(button){
 
 function switchTab(tab){
   state.activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  ['requests','plans','doctors','professional-review','announcements','jobs','books','privacy'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
+  ['requests','plans','doctors','professional-review','announcements','jobs','books','privacy','contact'].forEach(x=>{$('tab-'+x).style.display=x===tab?'block':'none'});
   if(tab==='requests')loadRequestsPage();
   if(tab==='doctors')loadDoctorsPage();
   if(tab==='professional-review')loadProfessionalReviewPage(0);
   if(tab==='announcements')loadAnnouncements();
   if(tab==='privacy')loadPrivacyPolicy();
+  if(tab==='contact')window.DietPlannerAdminContact?.load?.();
 }
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
