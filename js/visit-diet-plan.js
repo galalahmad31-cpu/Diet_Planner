@@ -622,7 +622,6 @@ async function loadFixedDietDetails(dietId){
   id:dietId,
   meals:meals.map(m=>({
    name:m.meal_name||'وجبة',
-   frequency:m.frequency||'',
    items:items.filter(i=>i.meal_id===m.id).map(i=>({
     foodId:String(i.food_id),
     grams:Number(i.quantity_g)||0,
