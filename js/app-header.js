@@ -20,15 +20,14 @@
   // Internal portal sections remain in patient-portal.html; standalone destinations keep their own pages.
   const patientPages = [
     ["patient-portal.html#portalHome", "الرئيسية", "fa-house"],
-    ["patient-portal.html#portalNotifications", "الإشعارات", "fa-bell"],
     ["patient-health.html", "الملف الصحي", "fa-heart-pulse"],
-    ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
     ["communications.html", "التواصل مع المختص", "fa-comments"],
+    ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
     ["article.html", "المقالات", "fa-newspaper"],
     ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
-    ["patient-portal.html#portalProfileArea", "الملف الشخصي", "fa-user"],
-    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"]
+    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"],
+    ["patient-portal.html#portalProfileArea", "الصفحة الشخصية", "fa-user"]
   ];
   // Professional navigation is the single source of truth for all professional pages.
   // Keep the requested order; the shared six-column grid wraps naturally into rows of six.
