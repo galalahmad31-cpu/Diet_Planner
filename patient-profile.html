@@ -16,7 +16,7 @@
   <script src="js/patient-energy-calculator.js?v=20261123-shared-energy-rpc-v1" defer></script>
   <script src="js/weight-logs-table.js?v=20261122-clean-measurement-headings-v1" defer></script>
   <script src="js/dp-utils.js?v=20261122-central-utils-v1"></script>
-  <script src="js/patient-profile.js?v=20261123-finance-no-delete-v1" defer></script>
+  <script src="js/patient-profile.js?v=20261123-archive-contact-request-v1" defer></script>
   
   <script src="js/patient-portal-link.js?v=20261123-profile-relationship-actions-v1" defer></script>
   <script src="js/patient-messages.js?v=20261123-direct-file-messaging-v2" defer></script>
@@ -51,9 +51,6 @@
       <div class="patient-profile-identity">
         <h2 id="patientName" class="font-black text-slate-800 text-2xl"></h2>
         <div id="patientActionToolbar" class="patient-profile-actions" aria-label="إجراءات المريض">
-          <button type="button" id="endPatientFollowup" class="patient-profile-end-followup-button" hidden>
-            <i class="fa-solid fa-user-xmark" aria-hidden="true"></i><span>إنهاء المتابعة</span>
-          </button>
           <button type="button" id="openPatientConversation" class="patient-profile-contact-button" aria-haspopup="dialog" aria-controls="patientConversationDrawer" aria-expanded="false" hidden>
             <i class="fa-solid fa-comments" aria-hidden="true"></i><span>التواصل مع المريض</span>
           </button>
