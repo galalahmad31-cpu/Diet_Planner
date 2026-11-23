@@ -28,18 +28,15 @@
     ["portalLoading", "portalError"].forEach(key => { if ($(key)) $(key).hidden = key !== id; });
     const fileAccess = $("portalFileAccess");
     if (fileAccess) fileAccess.hidden = id === "portalLoading" || id === "portalError";
-    if ($("portalFileAccessMessage")) $("portalFileAccessMessage").hidden = id !== "portalUnlinked";
-    if ($("portalPatientSelector")) $("portalPatientSelector").hidden = id === "portalUnlinked" || !state.patientAccounts.length;
+    if ($("portalFileAccessMessage")) $("portalFileAccessMessage").hidden = id !== "portalNoFiles";
+    if ($("portalPatientSelector")) $("portalPatientSelector").hidden = id === "portalNoFiles" || !state.patientAccounts.length;
     const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
-    if (selectorLabel) selectorLabel.hidden = id === "portalUnlinked" || !state.patientAccounts.length;
+    if (selectorLabel) selectorLabel.hidden = id === "portalNoFiles" || !state.patientAccounts.length;
     if ($("portalContent")) $("portalContent").hidden = id !== "portalContent";
   }
 
   function openHealthArea() {
-    // Switch the top-level view before starting asynchronous data loading.
-    // This prevents the previously visible portal section from remaining on screen
-    // if the health file resolves to loading, unlinked, or error state.
-    showPortalDestination("portalContent");
+    showOnly("portalLoading");
     loadPortal().catch(error => {
       console.error("Patient health area load failed:", error);
       fail(error.message || "تعذر تحميل الملف الصحي.");
@@ -813,7 +810,7 @@
         const currentAccounts = await getPatientAccount();
         if (!isCurrentLoad()) return;
         if (!currentAccounts.length) {
-          showOnly("portalUnlinked");
+          showOnly("portalNoFiles");
           $("patientProfessionalCode").value = invitationToken;
           setMessage("patientProfessionalCodeStatus", error.message || "تعذر ربط الملف. تحقق من صلاحية الكود.", "error");
           return;
@@ -834,17 +831,41 @@
       state.loadingPanels.clear();
       state.messagesMountedFor = null;
       $("patientPortalMessages")?.replaceChildren();
+      $("patientFinanceSummary")?.replaceChildren();
+      $("patientSharedHealthStatus")?.replaceChildren();
+      $("patientHealthAuditList")?.replaceChildren();
       $("portalMeasurementsTable")?.replaceChildren();
       $("portalPlansList")?.replaceChildren();
-      showOnly("portalUnlinked");
+      $("portalPatientSelector")?.replaceChildren();
+      showOnly("portalNoFiles");
       return;
     }
     const ids = accounts.map(item => item.patient_id).filter(isValidPatientId);
     if (!ids.length) throw new Error("لا توجد ملفات صحية صالحة مرتبطة بهذا الحساب.");
-    const { data: patientRows, error: patientError } = await supabase.from("patients").select("id,name").in("id", ids).order("name");
+    const { data: patientRows, error: patientError } = await supabase.from("patients")
+      .select("id,name,user_id").in("id", ids).order("name");
     if (!isCurrentLoad()) return;
     if (patientError) throw patientError;
-    const nextPatientAccounts = (patientRows || []).map(patient => ({patient_id:patient.id,name:patient.name || "ملف صحي"}));
+    const professionalIds = [...new Set((patientRows || []).map(patient => patient.user_id).filter(isValidPatientId))];
+    const professionalNames = new Map();
+    if (professionalIds.length) {
+      const { data: professionalRows, error: professionalError } = await supabase.from("profiles")
+        .select("id,full_name,profession").in("id", professionalIds);
+      if (!isCurrentLoad()) return;
+      if (professionalError) throw professionalError;
+      (professionalRows || []).forEach(profile => professionalNames.set(profile.id, profile));
+    }
+    const nextPatientAccounts = (patientRows || []).map(patient => {
+      const professional = professionalNames.get(patient.user_id);
+      const professionalLabel = professional?.full_name || professional?.profession || "مختص";
+      const patientName = patient.name || "ملف صحي";
+      return {
+        patient_id: patient.id,
+        name: patientName,
+        professionalName: professionalLabel,
+        label: patientName + " — " + professionalLabel
+      };
+    });
     if (!nextPatientAccounts.length) throw new Error("تعذر تحميل الملفات الصحية المرتبطة بهذا الحساب.");
 
     const previousPatientId = state.patientId;
@@ -882,7 +903,7 @@
     const selector = $("portalPatientSelector");
     const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
     if (selector) {
-      selector.innerHTML = state.patientAccounts.map(item => '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.name) + '</option>').join("");
+      selector.innerHTML = state.patientAccounts.map(item => '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.label || item.name) + '</option>').join("");
       selector.value = selectedId;
       selector.hidden = state.patientAccounts.length < 2;
       if (selectorLabel) selectorLabel.hidden = state.patientAccounts.length < 2;
