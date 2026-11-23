@@ -31,7 +31,7 @@
       '<span class="dp-chat-contact-copy"><strong>' + esc(item.patient_name || "مريض") + '</strong>' +
       '<small>' + esc(item.subtitle || "محادثة مقبولة") + '</small></span>' +
       '<span class="dp-chat-contact-status">متابعة نشطة</span><i class="fa-solid fa-chevron-left"></i></button>' +
-      '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-end" data-conversation-end="' + esc(item.request_id) + '">إنهاء المتابعة</button></div>';
+      (item.request_id ? '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-end" data-conversation-end="' + esc(item.request_id) + '">إنهاء المتابعة</button></div>' : '');
   }
 
   async function load() {
