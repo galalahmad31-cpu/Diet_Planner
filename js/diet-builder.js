@@ -7,7 +7,7 @@ function renderTable(rows,{editable=true,caption='أصناف الوجبة'}={}){
  const body=list.map((row,index)=>{
   const key=esc(row.key??index);
   return '<tr class="dpb-row" data-dpb-key="'+key+'">'+
-   '<td class="dpb-food">'+esc(row.name||'صنف غير موجود')+'</td>'+
+   '<td class="dpb-food" '+(row.pickKey!==undefined?'data-pick="'+esc(row.pickKey)+'"':'')+'>'+esc(row.name||'صنف غير موجود')+'</td>'+
    '<td class="dpb-grams">'+(editable?'<input type="number" min="0" step="1" data-dpb-field="grams" value="'+esc(row.grams??0)+'" aria-label="الكمية بالجرام" '+(row.gramsChange||'')+'><span>جم</span>':esc(row.grams??0)+' جم')+'</td>'+
    '<td class="dpb-household">'+esc(row.household||'—')+'</td>'+
    '<td class="dpb-notes">'+(editable?'<input type="text" data-dpb-field="notes" value="'+esc(row.notes||'')+'" placeholder="ملاحظة الصنف" aria-label="ملاحظة الصنف" '+(row.notesChange||'')+'>':esc(row.notes||'—'))+'</td>'+
