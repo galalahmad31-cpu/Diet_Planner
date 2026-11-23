@@ -5,10 +5,7 @@ body{margin:0;font-family:var(--dp-font);background:var(--dp-bg);color:var(--dp-
 input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-shadow:0 0 0 3px rgba(23,143,132,.1)}
 .modal-bg{background:rgba(15,23,42,.64);backdrop-filter:blur(5px)}
 .spinner{width:30px;height:30px;border:3px solid #d9efec;border-top-color:#178f84;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-.food-row{border-bottom:1px solid #f0f3f5}.food-row:last-child{border-bottom:0}
-@media(max-width:760px){.diet-table{min-width:760px}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.food-name-cell{display:block!important;width:100%!important;color:var(--dp-text)!important;visibility:visible!important;opacity:1!important;font-weight:800;line-height:1.5;cursor:pointer;text-align:right}
-.food-name-en{display:block!important;color:var(--dp-muted)!important;font-size:9px!important;font-weight:400!important}
+@media(max-width:760px){.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 
 /* Compact, phone-first diet library */
@@ -106,13 +103,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
 #editor.is-viewing #mealsEditor>div{border:1px solid var(--dp-border,#e5edf0);border-radius:14px;margin-bottom:12px;box-shadow:none}
 #editor.is-viewing [data-meal-name]{border:0!important;background:transparent!important;padding:0!important;font-size:16px;font-weight:900;color:var(--dp-text)!important;opacity:1!important}
 #editor.is-viewing [data-meal-name]:disabled{cursor:default}
-#editor.is-viewing .diet-table{min-width:0!important}
-#editor.is-viewing .diet-table thead{background:var(--dp-surface-3,#f5f7f7)!important}
-#editor.is-viewing .diet-table th{font-size:10px;padding:10px 12px}
-#editor.is-viewing .diet-table td{padding:10px 12px}
-#editor.is-viewing [data-qty]{border:0!important;background:transparent!important;color:var(--dp-text)!important;font-weight:800;width:55px!important;padding:0!important;opacity:1!important}
-#editor.is-viewing .food-row{background:transparent}
-#editor.is-viewing .food-name-cell{cursor:default}
 #editor.is-viewing #dailySummary{gap:8px}
 @media(max-width:640px){
  #editor.is-viewing{padding:6px!important}
@@ -120,8 +110,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
  #editor.is-viewing>div>div:first-child{padding:10px 12px}
  #editor.is-viewing .p-4.sm\:p-6{padding:8px}
  #editor.is-viewing section.glass{padding:10px}
- #editor.is-viewing .diet-table th,#editor.is-viewing .diet-table td{padding:8px 6px}
- #editor.is-viewing .diet-table{font-size:11px}
 }
 
 /* Diet preview: one stylesheet source; colors inherit the central theme. */
