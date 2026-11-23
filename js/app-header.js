@@ -20,6 +20,7 @@
   // Internal portal sections remain in patient-portal.html; standalone destinations keep their own pages.
   const patientPages = [
     ["patient-portal.html#portalHome", "الرئيسية", "fa-house"],
+    ["patient-portal.html#portalNotifications", "الإشعارات", "fa-bell"],
     ["patient-health.html", "الملف الصحي", "fa-heart-pulse"],
     ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
     ["communications.html", "التواصل مع المختص", "fa-comments"],
