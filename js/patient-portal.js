@@ -122,6 +122,7 @@
       tab.setAttribute("aria-selected", String(active));
     });
     allowed.forEach(id => { const panel = $(id); if (panel) panel.hidden = id !== panelId; });
+    if (panelId === "portalCareManagementPanel") state.loadedPanels.delete(panelId);
     void ensureHealthPanelLoaded(panelId);
   }
 
