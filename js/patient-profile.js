@@ -133,6 +133,10 @@
     return canWritePatientPrivateData() || canEditSharedHealth();
   }
 
+  window.DietPlannerPatientProfileAccess = Object.freeze({
+    canManagePatientCare
+  });
+
   function canWrite() {
     return canWritePatientPrivateData();
   }
