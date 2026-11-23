@@ -6,7 +6,7 @@
    - One Supabase client for the whole application.
    - Login / Register / Google / Logout.
    - Session and role checks.
-   - Subscription and feature checks.
+   - Authentication, roles, and active-subscription checks.
    - Shared API for application pages.
 
    Important:
