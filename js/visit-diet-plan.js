@@ -822,7 +822,6 @@ function renderDayCard(d,di){
 
    <section class="day-meals-list" aria-label="وجبات اليوم">
     ${meals.map((m,mi)=>{
-     const foods=(m.items||[]).map(it=>({item:it,food:foodById.get(String(it.foodId))})).filter(x=>x.food);
      return `<article class="meal-card">
       <header class="meal-card-header">
        <div class="meal-title-wrap"><span class="meal-order">${String(mi+1).padStart(2,'0')}</span><input value="${escapeHtml(m.name||`وجبة ${mi+1}`)}" onchange="window.dietPlan.updateMealName('${escapeHtml(d.id)}','${escapeHtml(m.id)}',this.value)" aria-label="اسم الوجبة" class="meal-title-input"></div>
