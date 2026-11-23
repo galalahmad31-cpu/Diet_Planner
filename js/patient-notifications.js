@@ -182,10 +182,14 @@
 
     items.forEach(item => {
       const card = document.createElement("article");
-      card.className = "patient-notification-item" + (item.read_at ? "" : " is-unread");
+      const unread = !item.read_at;
+      card.className = "notification-card notification-event-card" + (unread ? " is-unread" : "");
 
-      const icon = document.createElement("span");
-      icon.className = "patient-notification-icon";
+      const row = document.createElement("div");
+      row.className = "notification-card-row";
+
+      const icon = document.createElement("div");
+      icon.className = "notification-event-icon";
       const glyph = document.createElement("i");
       glyph.className = "fa-solid " + (item.computed
         ? item.event_type === "follow_up_reminder" ? "fa-calendar-check" : "fa-credit-card"
@@ -193,32 +197,38 @@
       icon.append(glyph);
 
       const content = document.createElement("div");
-      content.className = "patient-notification-content";
+      content.className = "notification-card-content";
+
       const heading = document.createElement("div");
-      heading.className = "patient-notification-heading";
-      const title = document.createElement("strong");
+      heading.className = "notification-card-heading";
+      const title = document.createElement("h3");
+      title.className = "notification-card-title";
       title.textContent = item.title || "إشعار جديد";
       heading.append(title);
 
-      if (!item.read_at) {
+      if (unread) {
         const fresh = document.createElement("span");
-        fresh.className = "patient-notification-new";
+        fresh.className = "notification-unread-label";
         fresh.textContent = item.computed ? "تنبيه" : "جديد";
         heading.append(fresh);
       }
 
       const body = document.createElement("p");
+      body.className = "notification-copy";
       body.textContent = item.body || "";
+
       const time = document.createElement("time");
+      time.className = "notification-date";
       time.dateTime = item.computed ? item.reminder_date || "" : item.created_at || "";
       time.textContent = item.computed
         ? formatDate(item.reminder_date)
         : formatDateTime(item.created_at);
+
       content.append(heading, body, time);
 
       const open = document.createElement("button");
       open.type = "button";
-      open.className = "patient-notification-open";
+      open.className = "notification-open-button";
       if (item.computed) {
         open.dataset.openPatientReminder = item.destination;
         open.textContent = "عرض بيانات الاشتراك والمتابعة";
@@ -228,7 +238,8 @@
         open.textContent = "عرض التفاصيل";
       }
 
-      card.append(icon, content, open);
+      row.append(icon, content);
+      card.append(row, open);
       list.append(card);
     });
 
