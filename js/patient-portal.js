@@ -520,7 +520,7 @@
     }
   }
 
-  const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
+  const FOOD_COLUMNS = "id,name_ar,name_en,kcal,carb,protein,fat,potassium,phosphorus,sodium,household,preparation_method";
 
   async function ensurePatientFoods() {
     if (state.foods) return state.foods;
@@ -547,7 +547,7 @@
 
   const TOOL_CONFIG = {
     carb: { meals: "carbMeals", total: "portalCarbDayTotal", nutrient: "carb", label: "الكربوهيدرات", unit: "جم", addAttr: "data-add-carb-food", itemAttr: "data-carb-item", quantityAttr: "data-carb-grams", removeAttr: "data-remove-carb-item" },
-    renal: { meals: "renalMeals", total: "portalRenalDayTotals", search: "portalCarbSearchResults", nutrients: ["potassium", "phosphorus", "sodium"], labels: { potassium: "البوتاسيوم", phosphorus: "الفسفور", sodium: "الصوديوم" }, unit: "مجم", addAttr: "data-add-renal-food", itemAttr: "data-renal-item", quantityAttr: "data-renal-grams", removeAttr: "data-remove-renal-item" }
+    renal: { meals: "renalMeals", total: "portalRenalDayTotals", nutrients: ["potassium", "phosphorus", "sodium"], labels: { potassium: "البوتاسيوم", phosphorus: "الفسفور", sodium: "الصوديوم" }, unit: "مجم", addAttr: "data-add-renal-food", itemAttr: "data-renal-item", quantityAttr: "data-renal-grams", removeAttr: "data-remove-renal-item" }
   };
 
   function getToolMeals(tool) {
