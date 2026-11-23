@@ -3,9 +3,6 @@
 
   const EVENT_ICONS = {
     nutrition_plan_published: "fa-bowl-food",
-    appointment_confirmed: "fa-calendar-check",
-    appointment_declined: "fa-calendar-xmark",
-    appointment_cancelled: "fa-calendar-minus",
     message_received: "fa-comment-dots",
     followup_activated: "fa-circle-check",
     followup_ended: "fa-handshake-slash"
