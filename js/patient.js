@@ -79,7 +79,7 @@
         return;
       }
 
-      state.canCreatePatient = true;
+      state.canCreatePatient = state.isAdmin || accessStatus?.hasActiveSubscription === true;
 
       updateWriteControls();
     } catch (error) {
@@ -97,7 +97,7 @@
     const accessBox = $('accessStatus');
     const canAdd = state.accountType === 'professional' && state.canCreatePatient;
 
-    // Patient creation is available to every authenticated professional account.
+    // Patient creation requires an active subscription; admins bypass subscription checks.
     if (addButton) {
       addButton.disabled = !canAdd;
       addButton.classList.toggle('opacity-50', !canAdd);
