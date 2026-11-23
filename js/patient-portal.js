@@ -482,30 +482,15 @@
     const patientId = state.patientId;
     const contextVersion = state.contextVersion;
     const status = $("patientSharedHealthStatus");
-    const history = $("patientHealthAuditList");
     if (!isValidPatientId(patientId)) {
       const message = "تعذر تحديد ملفك الصحي المرتبط. أعد تحميل الصفحة، وإذا استمرت المشكلة تواصل مع الدعم.";
       if (status) setMessage("patientSharedHealthStatus", message, "error");
-      if (history) history.textContent = message;
       throw new Error("Invalid patient UUID in patient portal shared health loader.");
     }
     status.textContent = "جاري تحميل البيانات الصحية...";
     renderSharedHealthForm();
-    const { data, error } = await supabase.from("patient_health_audit")
-      .select("id,actor_id,actor_role,operation,changed_fields,created_at")
-      .eq("patient_id", patientId).order("created_at", { ascending: false }).limit(100);
-    if (error) throw error;
     if (contextVersion !== state.contextVersion || patientId !== state.patientId) return;
     status.textContent = "هذه البيانات للعرض فقط. لطلب تحديثها، تواصل مع المختص المسؤول عن هذا الملف.";
-    const labels = {name:"اسم المريض",gender:"النوع",birth_date:"تاريخ الميلاد",age:"العمر",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
-    const healthEvents = (data || []).filter(item => (item.changed_fields || []).some(field => Object.prototype.hasOwnProperty.call(labels, field))).slice(0,30);
-    if (!healthEvents.length) { history.textContent = "لا توجد تعديلات صحية مسجلة حتى الآن."; return; }
-    history.innerHTML = healthEvents.map(item => {
-      const actor = item.actor_id === state.user.id ? "أنت" : item.actor_role === "professional" ? "المختص" : item.actor_role === "admin" ? "إدارة المنصة" : "مستخدم مخوّل";
-      const fields = (item.changed_fields || []).map(field => escapeHtml(labels[field] || field)).join("، ");
-      const date = new Date(item.created_at).toLocaleString("ar-EG");
-      return '<article class="portal-health-audit-item"><div><strong>' + escapeHtml(actor) + '</strong><time>' + escapeHtml(date) + '</time></div><p>' + escapeHtml(item.operation === "UPDATE" ? "تحديث البيانات الصحية" : "إنشاء سجل") + (fields ? " · " + fields : "") + '</p></article>';
-    }).join("");
   }
 
   async function redeemProfessionalInvitation(event) {
@@ -895,7 +880,6 @@
       $("patientPortalMessages")?.replaceChildren();
 
       $("patientSharedHealthStatus")?.replaceChildren();
-      $("patientHealthAuditList")?.replaceChildren();
       $("portalMeasurementsTable")?.replaceChildren();
       $("portalPlansList")?.replaceChildren();
       $("portalFinanceReadOnly")?.querySelectorAll("strong").forEach(node => { node.textContent = "—"; });
@@ -957,7 +941,6 @@
       }
 
       $("patientSharedHealthStatus")?.replaceChildren();
-      $("patientHealthAuditList")?.replaceChildren();
       $("portalMeasurementsTable")?.replaceChildren();
       $("portalPlansList")?.replaceChildren();
     }
