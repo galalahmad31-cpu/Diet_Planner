@@ -85,7 +85,7 @@ async function loadFoods(options={}){
  }
 
  foodsLoadPromise=(async()=>{
-  let query=sb.from('foods').select('id,name_ar,household,kcal,protein,carb,fat,sodium,potassium,phosphorus').order('name_ar',{ascending:true});
+  let query=sb.from('foods').select('id,name_ar,name_en,is_custom,household,kcal,protein,carb,fat,sodium,potassium,phosphorus').order('name_ar',{ascending:true});
   if(ids?.length)query=query.in('id',ids);
   else if(ids){
    foodDatabase=[];
@@ -103,6 +103,8 @@ async function loadFoods(options={}){
   const mapped=rows.map(f=>({
    id:String(f.id),
    name:String(f.name_ar??'').trim(),
+   name_en:String(f.name_en??'').trim(),
+   is_custom:Boolean(f.is_custom),
    household:f.household||'',
    calories:Number(f.kcal||0),
    protein:Number(f.protein||0),
