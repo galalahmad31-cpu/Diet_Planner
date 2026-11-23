@@ -103,12 +103,13 @@
     const button = create("button", "patient-portal-invite-button");
     button.id = "createPatientPortalInvite";
     button.type = "button";
+    button.hidden = true;
     button.innerHTML = '<i class="fa-solid fa-link"></i><span>ربط حساب المريض</span>';
     button.addEventListener("click", () => createInvitation(button));
     const toolbar = section.querySelector("#patientActionToolbar");
     if (toolbar) {
       button.classList.add("patient-profile-link-button");
-      toolbar.prepend(button);
+      toolbar.insertBefore(button, toolbar.querySelector("#openPatientConversation"));
     } else {
       const heading = section.querySelector("#patientName");
       if (heading?.parentElement) {
