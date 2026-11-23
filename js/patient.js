@@ -151,9 +151,6 @@
       const linkedPatientIds = new Set(
         rows.filter(patient => patient.is_linked).map(patient => patient.id)
       );
-      const careTeamPatientIds = new Set(
-        rows.filter(patient => patient.has_care_team).map(patient => patient.id)
-      );
       const patientIds = rows.map(patient => patient.id).filter(Boolean);
 
       const unlinkedPatientIds = patientIds.filter(id => !linkedPatientIds.has(id));
