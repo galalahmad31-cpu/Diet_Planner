@@ -10,7 +10,7 @@ const state = {
     today: [],
     tomorrow: [],
     subscriptions: [],
-    requests: []
+    messages: []
   },
   activeTab: 'today'
 };
@@ -37,11 +37,11 @@ const TAB_INFO = {
     emptyTitle: 'لا توجد تنبيهات اشتراكات',
     emptyText: 'لا توجد اشتراكات تنتهي خلال يومين أو أسبوع.'
   },
-  requests: {
-    title: 'طلبات المحادثة والرسائل',
-    subtitle: 'آخر التحديثات المتعلقة بطلبات المحادثة والاتفاق والرسائل.',
+  messages: {
+    title: 'الرسائل والتنبيهات',
+    subtitle: 'الرسائل والخطط الغذائية التي تمت مشاركتها معك.',
     emptyTitle: 'لا توجد تنبيهات جديدة',
-    emptyText: 'ستظهر هنا طلبات المحادثة والرسائل وتحديثات المتابعة.'
+    emptyText: 'ستظهر هنا الرسائل والخطط الجديدة المرتبطة بملفاتك.'
   }
 };
 
@@ -195,7 +195,7 @@ function render() {
   $('notifications').innerHTML = '';
   $('empty').classList.toggle('hidden', list.length > 0);
 
-  if (state.activeTab === 'requests') {
+  if (state.activeTab === 'messages') {
     list.forEach((notification) => {
       const element = document.createElement('article');
       const unread = !notification.read_at;
@@ -213,7 +213,7 @@ function render() {
             </div>
             <p class="mt-1 text-sm leading-6 notification-copy">${esc(notification.body)}</p>
             <div class="mt-2 text-xs notification-date">${esc(date)}</div>
-            <button type="button" class="notification-open-button" data-notification-open="${esc(notification.id)}" data-request-id="${esc(notification.request_id)}">
+            <button type="button" class="notification-open-button" data-notification-open="${esc(notification.id)}" data-patient-id="${esc(notification.patient_id)}">
               ${currentAccountType === 'professional' ? 'فتح الطلب أو المحادثة' : 'فتح بوابة المريض'}
               <i class="fa-solid fa-arrow-left mr-1"></i>
             </button>
@@ -322,7 +322,7 @@ async function loadNotifications() {
 
   const { data: events, error: eventError } = await supabase
     .from('notifications')
-    .select('id,event_type,title,body,created_at,read_at,request_id')
+    .select('id,event_type,title,body,created_at,read_at,patient_id')
     .eq('recipient_id', user.id)
     .order('created_at', { ascending: false })
     .limit(100);
@@ -330,7 +330,7 @@ async function loadNotifications() {
 
   state.notifications = {
     ...buildNotifications(financeRows),
-    requests: (events || []).map(event => ({
+    messages: (events || []).map(event => ({
       ...event,
       icon: event.event_type === 'connection_request_received' ? 'fa-user-plus'
         : event.event_type === 'message_received' ? 'fa-comment-dots'
@@ -343,7 +343,7 @@ async function loadNotifications() {
   $('todayCount').textContent = state.notifications.today.length;
   $('tomorrowCount').textContent = state.notifications.tomorrow.length;
   $('subscriptionCount').textContent = state.notifications.subscriptions.length;
-  $('requestsCount').textContent = state.notifications.requests.filter(item => !item.read_at).length;
+  $('messagesCount').textContent = state.notifications.messages.filter(item => !item.read_at).length;
 
   updateTabButtons();
   render();
@@ -381,14 +381,11 @@ document.addEventListener('click', async (event) => {
       openButton.disabled = false;
       return;
     }
-    const requestId = openButton.dataset.requestId;
-    if (currentAccountType === 'professional') {
-      const target = requestId
-        ? `professional-communication.html?request=${encodeURIComponent(requestId)}`
-        : 'professional-communication.html';
-      location.href = target;
+    const patientId = openButton.dataset.patientId;
+    if (currentAccountType === "professional" && patientId) {
+      location.href = `patient-profile.html?id=${encodeURIComponent(patientId)}`;
     } else {
-      location.href = 'patient-portal.html';
+      location.href = "patient-portal.html";
     }
     return;
   }
