@@ -18,12 +18,10 @@
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261123-remove-health-audit-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
-  <link rel="stylesheet" href="css/patient-messages.css?v=20261123-request-cancel-v1">
   <script src="js/theme.js?v=20261122-theme-token-aliases-v1" defer></script>
   <script src="js/app-header.js?v=20261123-patient-health-page-v1" defer></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
-  <script src="js/patient-messages.js?v=20261123-archive-contact-restore-v1" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
   <script src="js/patient-portal.js?v=20261123-remove-health-audit-v1" defer></script>
 </head>
@@ -32,7 +30,7 @@
   <main class="portal-main portal-health-page-main">
     <section id="portalHealthArea" class="portal-health-area">
       <nav class="portal-health-tabs" role="tablist" aria-label="أقسام الملف الصحي">
-        <button type="button" role="tab" aria-selected="true" aria-controls="portalMessagesPanel" data-health-tab="portalMessagesPanel" class="is-active">التواصل</button>
+        
         <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">بياناتي الصحية</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel">خطتي الغذائية</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalFinancePanel" data-health-tab="portalFinancePanel">الاشتراك والمواعيد</button>
@@ -70,14 +68,7 @@
     </section>
 
     <div id="portalContent" hidden>
-      <div id="portalMessagesPanel" class="portal-health-tab-panel" role="tabpanel">
-        <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>هذه هي قناة التواصل الأساسية مع المختص المسؤول عن الملف المحدد.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
-          <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
-        </section>
-      </div>
-
-      <div id="portalPlansPanel" class="portal-health-tab-panel" role="tabpanel">
+            <div id="portalPlansPanel" class="portal-health-tab-panel" role="tabpanel">
         <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المنشورة من المختص المسؤول عن هذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
           <a class="portal-directory-link" href="professional-directory.html"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> استعراض دليل المختصين</a>
