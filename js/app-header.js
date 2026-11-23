@@ -186,14 +186,15 @@
       const link = event.target.closest(".dp-app-header__link");
       if (!link) return;
       const href = link.dataset.headerHref;
-      if (role === "patient" && href.includes("#") && path === "patient-portal.html") {
-        event.preventDefault();
+      if (href.includes("#") && path === "patient-portal.html") {
         const section = href.split("#")[1];
         const navigate = window.DietPlannerPatientPortal?.navigateToSection;
+        // Keep native hash navigation as a safe fallback until the portal router is ready.
         if (typeof navigate !== "function") {
-          console.error("Patient portal navigation is not ready.");
+          console.warn("Patient portal navigation is not ready; using the page route.");
           return;
         }
+        event.preventDefault();
         track.querySelectorAll(".dp-app-header__link").forEach(node => {
           const active = node === link;
           node.classList.toggle("is-active", active);
@@ -204,7 +205,8 @@
           await navigate(section);
           history.replaceState(null, "", location.pathname + location.search + "#" + section);
         } catch (error) {
-          console.error("Patient portal navigation failed:", error);
+          console.error("Patient portal navigation failed; falling back to page navigation:", error);
+          window.location.assign(link.href);
         }
       }
     });
