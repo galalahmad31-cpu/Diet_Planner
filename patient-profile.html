@@ -17,7 +17,7 @@
   <script src="js/weight-logs-table.js?v=20261122-clean-measurement-headings-v1" defer></script>
   <script src="js/dp-utils.js?v=20261122-central-utils-v1"></script>
   <script src="js/patient-profile.js?v=20261123-atomic-exchange-save-v2" defer></script>
-  <script src="js/patient-appointments.js?v=20261123-expiry-aware-v5" defer></script>
+  
   <script src="js/patient-portal-link.js?v=20261122-patient-code-redemption-v1" defer></script>
   <script src="js/patient-messages.js?v=20261123-expiry-readonly-v1" defer></script>
 
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
   <link rel="stylesheet" href="css/diet-plan.css?v=20261121">
   <link rel="stylesheet" href="css/patient-profile.css?v=20261122-legacy-finance-restored-v1">
-  <link rel="stylesheet" href="css/patient-appointments.css?v=20261122-agreement-appointments-source-v2">
+  
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261122-clean-measurement-headings-v1">
   <link rel="stylesheet" href="css/patient-portal-link.css?v=20261122-patient-code-redemption-v1">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261121-compact-status-v3">
@@ -84,7 +84,7 @@
               <div><label>ملاحظات سريرية</label><textarea id="notesInput" rows="2" disabled></textarea></div>
             </div>
 
-            <section id="professionalSharedHealthSection" class="professional-shared-health" aria-labelledby="professionalSharedHealthTitle" hidden>
+            <section id="professionalSharedHealthSection" class="professional-shared-health" aria-labelledby="professionalSharedHealthTitle">
               <div class="professional-shared-health-heading">
                 <div><strong id="professionalSharedHealthTitle">السجل الصحي المشترك</strong><small>البيانات التالية مشتركة مع المريض وتُحفظ عبر سجل التدقيق المركزي</small></div>
                 <span class="professional-shared-health-badge">مشترك</span>
@@ -111,23 +111,12 @@
       <button type="button" class="patient-module-tab" id="energyTab" role="tab" aria-selected="false" aria-controls="patientEnergyPanel" data-module="energy"><span class="patient-module-tab-copy"><strong>حساب الطاقة</strong></span></button>
       <button type="button" class="patient-module-tab" id="plansTab" role="tab" aria-selected="false" aria-controls="plansPanel" data-module="plans"><span class="patient-module-tab-copy"><strong>الخطة الغذائية</strong></span></button>
       <button type="button" class="patient-module-tab" id="nutritionSupportTab" role="tab" aria-selected="false" aria-controls="nutritionSupportPanel" data-module="nutrition-support"><span class="patient-module-tab-copy"><strong>الدعم الغذائي</strong></span></button>
-      <button type="button" class="patient-module-tab" id="patientCareTab" role="tab" aria-selected="false" aria-controls="patientCarePanel" data-module="patient-care"><span class="patient-module-tab-copy"><strong>اشتراك ومواعيد المريض</strong></span></button>
+      <button type="button" class="patient-module-tab" id="patientCareTab" role="tab" aria-selected="false" aria-controls="patientCarePanel" data-module="patient-care"><span class="patient-module-tab-copy"><strong>اشتراك ومتابعة المريض</strong></span></button>
     </div>
 
     <section id="patientCarePanel" class="patient-module-panel patient-care-module-panel" role="tabpanel" aria-labelledby="patientCareTab" hidden>
       <div class="patient-care-content">
-                <div id="patientLinkedCareView" hidden>
-                  <section class="patient-care-section">
-                    <h3>الاتفاق والاشتراك</h3>
-                    <div id="careAgreementSummary" aria-live="polite">جاري تحميل الاتفاق...</div>
-                  </section>
-                  <section class="patient-care-section">
-                    <h3>المواعيد والزيارات</h3>
-                    <div id="professionalAppointmentsRoot"></div>
-                  </section>
-                </div>
-
-                <div id="patientLegacyFinanceView" hidden>
+                <div id="patientLegacyFinanceView">
                   <div id="patientFinanceLoading" class="finance-state" hidden>جاري تحميل بيانات الاشتراك والمتابعة...</div>
                   <div id="patientFinanceEmpty" class="patient-finance-empty" hidden>لا توجد بيانات مالية محفوظة لهذا المريض. يمكنك إدخالها يدويًا.</div>
                   <div id="patientFinanceForm" class="patient-fields patient-finance-fields">
