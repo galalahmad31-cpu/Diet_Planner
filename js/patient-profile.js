@@ -1007,6 +1007,7 @@
     }
 
     updateSharedHealthWriteState();
+    updateWriteControls();
   }
 
   function renderSharedHealthInProfessionalProfile() {
