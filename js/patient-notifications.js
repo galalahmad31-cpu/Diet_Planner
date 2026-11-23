@@ -3,9 +3,7 @@
 
   const EVENT_ICONS = {
     nutrition_plan_published: "fa-bowl-food",
-    message_received: "fa-comment-dots",
-    followup_activated: "fa-circle-check",
-    followup_ended: "fa-handshake-slash"
+    message_received: "fa-comment-dots"
   };
 
   let client = null;
@@ -33,7 +31,6 @@
 
   function getDestination(type) {
     if (type === "nutrition_plan_published") return "portalPlansPanel";
-    if (type?.startsWith("appointment_")) return "portalAppointmentsPanel";
     return "portalCommunicationPanel";
   }
 
