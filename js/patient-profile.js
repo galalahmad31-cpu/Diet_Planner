@@ -1140,7 +1140,7 @@
             .select('id')
             .eq('patient_id', patientId)
             .eq('professional_id', state.user.id)
-            .in('status', ['accepted', 'active'])
+            .eq('status', 'active')
             .limit(1),
           supabase.from('patient_care_team')
             .select('id')
