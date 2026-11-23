@@ -33,6 +33,7 @@
   const professionalPages = [
     ["app.html", "الرئيسية", "fa-house"],
     ["patient.html", "قائمة المرضى", "fa-user-group"],
+    ["app.html#patient-communications", "التواصل مع المرضى", "fa-comments"],
     ["food.html", "مكتبة الأغذية", "fa-apple-whole"],
     ["diet.html", "مكتبة الدايت", "fa-layer-group"],
     ["products.html", "المنتجات الغذائية", "fa-box-open"],
