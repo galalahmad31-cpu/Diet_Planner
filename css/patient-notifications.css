@@ -1,32 +1,57 @@
-.patient-notifications{margin:18px 0 22px;padding:18px;border:1px solid var(--dp-border,rgba(18,60,67,.12));border-radius:20px;background:var(--dp-surface,#fff)}
-.patient-notifications-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+/* Patient notification center — same card structure and visual language as professional notifications. */
+.patient-notifications{
+  margin:18px 0 22px;
+  padding:18px;
+  border:1px solid var(--dp-border);
+  border-radius:24px;
+  background:var(--dp-surface);
+  box-shadow:0 8px 24px var(--dp-shadow);
+}
+.patient-notifications-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .patient-notifications-title{display:flex;align-items:center;gap:10px;min-width:0}
-.patient-notifications-title h2{margin:0;color:var(--dp-text,#173b40);font-size:1.05rem;font-weight:800}
-.patient-notifications-count{display:inline-flex;min-width:22px;height:22px;align-items:center;justify-content:center;padding:0 6px;border-radius:999px;background:var(--dp-accent,#087f6b);color:#fff;font-size:11px;font-weight:800}
-.patient-notifications-read-all,.patient-notification-open{border:0;background:transparent;color:var(--dp-primary,#087f6b);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.patient-notifications-title h2{margin:0;color:var(--dp-text);font-size:1.05rem;font-weight:900}
+.patient-notifications-count{display:inline-flex;min-width:24px;height:24px;align-items:center;justify-content:center;padding:0 7px;border:1px solid var(--dp-primary);border-radius:999px;background:var(--dp-primary);color:#fff;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
+.patient-notifications-read-all{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.patient-notifications-read-all:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
 .patient-notifications-read-all:disabled,.patient-notification-open:disabled{opacity:.55;cursor:wait}
-.patient-notification-list{display:grid;gap:9px}
-.patient-notification-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:11px;padding:12px;border:1px solid var(--dp-border,rgba(18,60,67,.1));border-radius:14px;background:var(--dp-card,#fff)}
-.patient-notification-item.is-unread{border-color:color-mix(in srgb,var(--dp-primary,#087f6b) 32%,transparent);background:color-mix(in srgb,var(--dp-primary,#087f6b) 5%,var(--dp-card,#fff))}
-.patient-notification-icon{display:grid;width:38px;height:38px;place-items:center;border-radius:12px;background:var(--dp-soft,#edf5f3);color:var(--dp-primary,#087f6b)}
-.patient-notification-content{min-width:0}
-.patient-notification-heading{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
-.patient-notification-heading strong{color:var(--dp-text,#173b40);font-size:.88rem}
-.patient-notification-new{padding:2px 7px;border-radius:999px;background:var(--dp-primary,#087f6b);color:#fff;font-size:10px;font-weight:700}
-.patient-notification-content p{margin:3px 0;color:var(--dp-muted,#647477);font-size:.78rem;line-height:1.65}
-.patient-notification-content time,.patient-notification-empty,.patient-notification-status{color:var(--dp-muted,#718184);font-size:.7rem;line-height:1.7}
-.patient-notification-empty,.patient-notification-status{margin:0;font-size:.8rem}
-@media(max-width:600px){.patient-notifications{padding:13px;border-radius:16px}.patient-notification-item{grid-template-columns:34px minmax(0,1fr);gap:9px}.patient-notification-icon{width:34px;height:34px}.patient-notification-open{grid-column:2;justify-self:start;padding:2px 0}.patient-notifications-header{align-items:flex-start}}
-
-
-/* Patient notification center — aligned with the professional notification card system. */
-.patient-notifications{box-shadow:0 8px 24px var(--dp-shadow,rgba(0,0,0,.06))}
-.patient-notification-item{border-radius:20px;box-shadow:0 2px 8px var(--dp-shadow,rgba(0,0,0,.035));transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
-.patient-notification-item:hover{transform:translateY(-1px);box-shadow:0 8px 20px var(--dp-shadow,rgba(0,0,0,.09))}
-.patient-notification-item.is-unread{border-color:var(--dp-tab-border,var(--dp-primary))}
-.patient-notification-icon{width:42px;height:42px;border-radius:14px;background:var(--dp-notification-info-bg,var(--dp-surface-2));color:var(--dp-notification-info-text,var(--dp-primary))}
-.patient-notification-new{background:var(--dp-notification-warning-bg,var(--dp-primary));color:var(--dp-notification-warning-text,#fff)}
-.patient-notification-open{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text);font-size:12px;font-weight:800}
-.patient-notification-open:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
-.patient-notification-content time{display:inline-flex;margin-top:8px}
-@media(prefers-reduced-motion:reduce){.patient-notification-item{transition:none}.patient-notification-item:hover{transform:none}}
+.patient-notification-list{display:grid;gap:12px}
+.patient-notifications .notification-card{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:12px;
+  min-width:0;
+  padding:18px;
+  border:1px solid var(--dp-border);
+  border-radius:20px;
+  background:var(--dp-surface);
+  box-shadow:0 2px 8px var(--dp-shadow);
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.patient-notifications .notification-card:hover{transform:translateY(-1px);box-shadow:0 12px 28px var(--dp-shadow)}
+.patient-notifications .notification-card.is-unread{border-color:var(--dp-tab-border,var(--dp-primary))}
+.patient-notifications .notification-card-row{display:flex;align-items:flex-start;gap:14px;min-width:0}
+.patient-notifications .notification-event-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:14px;background:var(--dp-notification-info-bg);color:var(--dp-notification-info-text)}
+.patient-notifications .notification-card-content{min-width:0;flex:1}
+.patient-notifications .notification-card-heading{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.patient-notifications .notification-card-title{margin:0;color:var(--dp-text);font-size:.95rem;font-weight:900;overflow-wrap:anywhere}
+.patient-notifications .notification-unread-label{padding:3px 8px;border-radius:999px;background:var(--dp-notification-warning-bg);color:var(--dp-notification-warning-text);font-size:10px;font-weight:900}
+.patient-notifications .notification-copy{margin:6px 0 0;color:var(--dp-text-2);font-size:.84rem;line-height:1.7;overflow-wrap:anywhere}
+.patient-notifications .notification-date{display:inline-flex;align-items:center;gap:6px;margin-top:9px;color:var(--dp-text-2);font-size:.74rem;font-weight:700}
+.patient-notifications .notification-open-button{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;gap:5px;min-height:36px;padding:8px 12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.patient-notifications .notification-open-button:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
+.patient-notification-empty,.patient-notification-status{margin:0;padding:24px 12px;color:var(--dp-text-2);font-size:.84rem;line-height:1.7;text-align:center}
+.patient-notification-status:empty{display:none}
+@media(max-width:600px){
+  .patient-notifications{padding:14px;border-radius:20px}
+  .patient-notifications .notification-card{padding:14px}
+  .patient-notifications .notification-card-row{gap:11px}
+  .patient-notifications .notification-event-icon{flex-basis:38px;width:38px;height:38px}
+  .patient-notifications .notification-card-title{font-size:.87rem}
+  .patient-notifications .notification-copy{font-size:.78rem}
+  .patient-notifications-header{align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  .patient-notifications .notification-card{transition:none}
+  .patient-notifications .notification-card:hover{transform:none}
+}
