@@ -17,8 +17,7 @@ const isUuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-
 async function currentExchangeUser(){return await window.DietPlannerAccess?.getCurrentUser?.()||null;}
 async function canWriteExchangePlan(){
   const user=await currentExchangeUser();
-  if(!user)return false;
-  return (await window.DietPlannerAccess?.canWrite?.(user.id))===true;
+  return Boolean(user && window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true);
 }
 
 function ctx(){return {patient_id:window.currentPatientId||new URLSearchParams(location.search).get('patient_id')||new URLSearchParams(location.search).get('id')}}
