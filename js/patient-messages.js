@@ -337,7 +337,7 @@
           '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-cancel" data-chat-cancel="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button></div>' +
         '</article>';
       }).join("");
-      const restoreButtonMarkup = archived && !ownerRequest
+      const restoreButtonMarkup = archived && (!ownerRequest || ["declined", "cancelled"].includes(ownerRequest.status))
         ? '<article class="dp-chat-contact-row dp-conversation-request"><div class="dp-chat-contact"><span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span><span class="dp-chat-contact-copy"><strong>' + escapeHtml(owner?.full_name || "المختص المسؤول") + '</strong><small>الملف مؤرشف. أرسل طلبًا لاستعادة التواصل مع المختص.</small></span></div><div class="dp-conversation-actions"><button type="button" class="dp-conversation-cancel" data-chat-restore-contact>طلب استعادة التواصل</button></div></article>'
         : "";
       const contactsMarkup = rows.map(contact =>
