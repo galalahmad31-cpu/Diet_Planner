@@ -626,7 +626,7 @@
 
     dietPlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-diet-plan.js?v=20261122-central-utils-v1';
+      script.src = 'js/visit-diet-plan.js?v=20261123-shared-care-access-v1';
       script.async = true;
       script.onload = () => {
         if (typeof window.dietPlan?.openPlan !== 'function') {
@@ -653,7 +653,7 @@
     if (exchangePlanModulePromise) return exchangePlanModulePromise;
     exchangePlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-exchange-plan.js?v=20261122-simple-confirm-v1';
+      script.src = 'js/visit-exchange-plan.js?v=20261123-shared-care-access-v1';
       script.async = true;
       script.onload = () => typeof window.exchangePlan?.init === 'function'
         ? resolve(true)
