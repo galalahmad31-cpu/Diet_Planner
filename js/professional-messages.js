@@ -30,8 +30,7 @@
       '<span class="dp-chat-avatar"><i class="fa-solid fa-user"></i></span>' +
       '<span class="dp-chat-contact-copy"><strong>' + esc(item.patient_name || "مريض") + '</strong>' +
       '<small>' + esc(item.subtitle || "محادثة مقبولة") + '</small></span>' +
-      '<span class="dp-chat-contact-status">متابعة نشطة</span><i class="fa-solid fa-chevron-left"></i></button>' +
-      (item.request_id ? '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-end" data-conversation-end="' + esc(item.request_id) + '">إنهاء المتابعة</button></div>' : '');
+      '<span class="dp-chat-contact-status">متابعة نشطة</span><i class="fa-solid fa-chevron-left"></i></button>';
   }
 
   async function load() {
@@ -61,31 +60,6 @@
         subtitle: "محادثة مقبولة"
       }));
 
-      // Include patients whose health files are owned by this professional.
-      // The patient account link is reused; no duplicate contact table is created.
-      const { data: accounts, error: accountsError } = await db.from("patient_accounts")
-        .select("patient_id,user_id")
-        .eq("status", "active");
-      if (!accountsError && Array.isArray(accounts) && accounts.length) {
-        const ids = [...new Set(accounts.map(row => row.patient_id).filter(Boolean))];
-        const { data: patients, error: patientsError } = await db.from("patients")
-          .select("id,name")
-          .in("id", ids);
-        if (!patientsError) {
-          const names = new Map((patients || []).map(patient => [patient.id, patient.name]));
-          accounts.forEach(account => {
-            if (!contacts.has(account.patient_id)) {
-              contacts.set(account.patient_id, {
-                patient_id: account.patient_id,
-                patient_user_id: account.user_id,
-                patient_name: names.get(account.patient_id) || "مريض",
-                subtitle: "ملف صحي مرتبط بك"
-              });
-            }
-          });
-        }
-      }
-
       const activeRows = [...contacts.values()];
       conversationsRoot.innerHTML = activeRows.length
         ? activeRows.map(renderConversation).join("")
@@ -107,28 +81,6 @@
             console.error("Conversation request response failed:", error);
             button.disabled = false;
             window.alert(error.message || "تعذر تنفيذ طلب المحادثة.");
-          }
-        });
-      });
-
-      conversationsRoot.querySelectorAll("[data-conversation-end]").forEach(button => {
-        button.addEventListener("click", async () => {
-          if (button.disabled) return;
-          const confirmed = window.confirm("هل تريد إنهاء المتابعة مع هذا المريض؟ ستتوقف المحادثة الجديدة، مع الاحتفاظ بسجل الرسائل والملف الصحي.");
-          if (!confirmed) return;
-          button.disabled = true;
-          button.textContent = "جاري إنهاء المتابعة...";
-          try {
-            const { error: endError } = await db.rpc("end_professional_connection", {
-              p_request_id: button.dataset.conversationEnd
-            });
-            if (endError) throw endError;
-            await load();
-          } catch (error) {
-            console.error("Professional connection end failed:", error);
-            button.disabled = false;
-            button.textContent = "إنهاء المتابعة";
-            window.alert(error.message || "تعذر إنهاء المتابعة.");
           }
         });
       });
