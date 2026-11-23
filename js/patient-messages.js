@@ -271,8 +271,12 @@
       return;
     }
 
-    root.innerHTML = '<div class="dp-chat-inbox"><div class="dp-chat-contact-list" data-chat-contacts><p class="patient-messages-empty">جاري تحميل جهات التواصل...</p></div></div>';
+    root.innerHTML = '<div class="dp-chat-inbox"><div class="patient-messages-toolbar"><strong>جهات التواصل والطلبات</strong><button type="button" class="patient-messages-refresh" data-chat-refresh><i class="fa-solid fa-rotate"></i> تحديث</button></div><div class="dp-chat-contact-list" data-chat-contacts><p class="patient-messages-empty">جاري تحميل جهات التواصل...</p></div></div>';
     const list = root.querySelector("[data-chat-contacts]");
+    root.querySelector("[data-chat-refresh]")?.addEventListener("click", () => {
+      root.dataset.inboxMounted = "false";
+      void mountInbox(root, options);
+    });
     try {
       const user = await access.getCurrentUser();
       if (root.dataset.patientId !== String(patientId)) return;
