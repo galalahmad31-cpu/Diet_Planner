@@ -981,7 +981,7 @@
     if (button) button.disabled = state.isSaving || sharedHealthState.saving;
   }
 
-  async function loadProfessionalAgreementStatus() {
+  async function loadPatientFinanceFollowUpStatus() {
     if (!state.user?.id || !patientId || !supabase) {
       sharedHealthState.expired = true;
       updateSharedHealthWriteState();
@@ -1066,7 +1066,7 @@
     } catch (error) {
       console.error('Professional shared health save failed:', error);
       const messages = {
-        care_agreement_expired_read_only: 'انتهت مدة اتفاق المتابعة. يمكنك الاطلاع على البيانات دون تعديلها.',
+        patient_followup_expired_read_only: 'انتهت مدة اتفاق المتابعة. يمكنك الاطلاع على البيانات دون تعديلها.',
         patient_workspace_access_denied: 'ليس لديك صلاحية تعديل السجل الصحي لهذا المريض.',
         invalid_gender_value: 'قيمة النوع غير صحيحة.',
         birth_date_in_future: 'تاريخ الميلاد لا يمكن أن يكون في المستقبل.',
@@ -1089,7 +1089,7 @@
 
   function setPatientCareView() {
     const linkedView = $('patientLinkedCareView');
-    const financeView = $('patientLegacyFinanceView');
+    const financeView = $('patientFinanceView');
     const sharedHealthSection = $('professionalSharedHealthSection');
     if (linkedView) linkedView.hidden = true;
     if (financeView) financeView.hidden = false;
@@ -1106,8 +1106,8 @@
     state.patientCareModePromise = (async () => {
       try {
         setPatientCareView();
-        await loadProfessionalAgreementStatus();
-        await Promise.all([loadPatientLegacyFinance(), loadSharedHealthHistory()]);
+        await loadPatientFinanceFollowUpStatus();
+        await Promise.all([loadPatientFinance(), loadSharedHealthHistory()]);
       } catch (error) {
         console.error('Patient owner workspace load failed:', error);
         state.patientCareMode = 'error';
@@ -1195,7 +1195,7 @@
     setPatientFinanceEditing(false);
   }
 
-  async function loadPatientLegacyFinance() {
+  async function loadPatientFinance() {
     if (!state.patient || !state.user?.id || state.patientFinanceLoading) return;
     state.patientFinanceLoading = true;
     const loading = $('patientFinanceLoading');
@@ -1221,7 +1221,7 @@
     }
   }
 
-  async function savePatientLegacyFinance() {
+  async function savePatientFinance() {
     if (!canWrite() || state.patientCareMode !== 'owner' || !state.patient || !state.user?.id || !state.patientFinanceEditing) return;
     const startDate = $('pfInputStart').value || null;
     const months = $('pfInputMonths').value === '' ? null : Number($('pfInputMonths').value);
@@ -1279,7 +1279,7 @@
     }
   }
 
-  async function deletePatientLegacyFinance() {
+  async function deletePatientFinance() {
     if (!canWrite() || state.patientCareMode !== 'owner' || !state.patientFinance) return;
     const confirmed = await window.DPConfirm?.ask({
       title: 'حذف بيانات Finance؟',
@@ -1498,8 +1498,8 @@
   function bindPatientFinanceEvents() {
     $('patientFinanceEdit')?.addEventListener('click', () => setPatientFinanceEditing(true));
     $('patientFinanceCancel')?.addEventListener('click', () => fillPatientFinance(state.patientFinance));
-    $('patientFinanceSave')?.addEventListener('click', () => void savePatientLegacyFinance());
-    $('patientFinanceDelete')?.addEventListener('click', () => void deletePatientLegacyFinance());
+    $('patientFinanceSave')?.addEventListener('click', () => void savePatientFinance());
+    $('patientFinanceDelete')?.addEventListener('click', () => void deletePatientFinance());
     ['pfInputAmount', 'pfInputDiscount', 'pfInputStart', 'pfInputMonths'].forEach(id => {
       $(id)?.addEventListener('input', updatePatientFinancePreview);
       $(id)?.addEventListener('change', updatePatientFinancePreview);
