@@ -32,7 +32,7 @@
     root.dataset.messagesMounted = "true";
     const patientId = options.patientId;
     const role = options.role;
-    if (!patientId || !["patient", "professional"].includes(role)) {
+    if ((patientId == null && !options.allowStandalone) || !["patient", "professional"].includes(role)) {
       root.textContent = "بيانات المحادثة غير مكتملة.";
       return;
     }
@@ -128,9 +128,10 @@
           p_other_user_id: recipientId
         });
         if (readError) throw readError;
-        const { data, error } = await supabase.from("patient_messages")
-          .select("id,sender_id,recipient_id,body,created_at,read_at")
-          .eq("patient_id", patientId)
+        let messageQuery = supabase.from("patient_messages")
+          .select("id,sender_id,recipient_id,body,created_at,read_at");
+        messageQuery = patientId == null ? messageQuery.is("patient_id", null) : messageQuery.eq("patient_id", patientId);
+        const { data, error } = await messageQuery
           .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
           .order("created_at", { ascending: false })
           .limit(200);
@@ -168,7 +169,7 @@
       setStatus(root, "جاري إرسال الرسالة...");
       try {
         const { error } = await supabase.from("patient_messages").insert({
-          patient_id: patientId,
+          patient_id: patientId ?? null,
           sender_id: user.id,
           recipient_id: recipientId,
           body
@@ -254,7 +255,7 @@
     body.appendChild(chatRoot);
     widget.hidden = false;
     document.getElementById("dpCentralChatLauncher")?.setAttribute("aria-expanded", "true");
-    void mount(chatRoot, chatOptions);
+    void mount(chatRoot, { ...chatOptions, allowStandalone: chatOptions?.patientId == null });
   }
 
   async function mountInbox(root, options = {}) {
