@@ -227,55 +227,11 @@
     return null;
   }
 
-  async function canAddPatient(userId) {
-    if (!userId) return false;
-    if (await getUserAccountType(userId) !== "professional") return false;
-
-    const { data, error } = await supabaseClient.rpc(
-      "can_add_patient",
-      { p_user_id: userId }
-    );
-
-    if (error) {
-      console.error("Patient quota check failed:", error);
-      return false;
-    }
-
-    return data === true;
-  }
-
   async function canWrite(userId) {
     if (!userId) return false;
 
     const active = await hasActiveSubscription(userId);
     return active === true;
-  }
-
-  // ---------------------------------------------------------
-  // Feature
-  // ---------------------------------------------------------
-  async function hasFeature(userId, featureKey) {
-    if (!userId || !featureKey) return false;
-    const role = await getUserRole(userId);
-    if (role !== "admin" && await getUserAccountType(userId) !== "professional") return false;
-
-    const { data, error } = await supabaseClient.rpc(
-      "has_feature",
-      {
-        p_user_id: userId,
-        p_feature: featureKey
-      }
-    );
-
-    if (error) {
-      console.error(
-        `Feature check failed (${featureKey}):`,
-        error
-      );
-      return false;
-    }
-
-    return data === true;
   }
 
   // ---------------------------------------------------------
@@ -992,9 +948,7 @@
     getUserRole,
     getUserAccountType,
     hasActiveSubscription,
-    canAddPatient,
     canWrite,
-    hasFeature,
     getAccessStatus,
     showAccessPrompt,
     logout: logoutUser
