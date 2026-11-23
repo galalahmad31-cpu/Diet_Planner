@@ -68,12 +68,16 @@ async function loadProfiles(){
  finally{state.loading=false;more.disabled=false;}
 }
 function requestKey(patientId,professionalId){return String(patientId)+":"+String(professionalId);}
+function currentRequest(professionalId){
+ const matches=[...state.requests.values()].filter(item=>item.professional_id===professionalId);
+ return matches.find(item=>item.status==="accepted")||matches.find(item=>item.status==="pending")||matches.find(item=>item.patient_id==null)||null;
+}
 function renderRequestPanel(){
  const section=$("directoryRequestSection"),button=$("directoryRequestSubmit"),cancel=$("directoryRequestCancel"),status=$("directoryModalStatus");
  if(!section||!button||!cancel||!status)return;
  section.hidden=false;cancel.hidden=true;cancel.disabled=false;button.hidden=false;button.disabled=false;
  if(!state.user){button.textContent="تسجيل الدخول لطلب المحادثة";status.textContent="سجّل الدخول بحساب المريض لإرسال طلب المحادثة.";status.className="directory-modal-status is-error";return;}
- const request=state.requests.get(requestKey(null,state.selectedProfileId));
+ const request=currentRequest(state.selectedProfileId);
  if(request?.status==="accepted"){
   button.textContent="فتح المحادثة";status.textContent="وافق المختص على طلبك. يمكنك بدء المحادثة الآن.";status.className="directory-modal-status is-success";return;
  }
@@ -110,14 +114,14 @@ async function requestConversation(){
   $("directoryModalStatus").className="directory-modal-status is-success";
  }catch(error){
   console.error("[Professional Directory] Conversation request failed:",error);
-  $("directoryModalStatus").textContent=error.message==="already_primary_professional"?"هذا المختص هو المسؤول عن الملف بالفعل. افتح تبويب التواصل داخل الملف الصحي.":error.message==="conversation_already_accepted"?"المحادثة مقبولة بالفعل. افتح الملف الصحي لبدء النقاش.":error.message==="patient_file_not_linked_to_account"?"اربط الملف الصحي بحسابك أولًا.":error.message||"تعذر إرسال طلب المحادثة.";
+  $("directoryModalStatus").textContent=error.message==="already_primary_professional"?"هذا المختص هو المسؤول عن الملف بالفعل. افتح تبويب التواصل داخل الملف الصحي.":error.message==="conversation_already_accepted"?"المحادثة مقبولة بالفعل. افتح الملف الصحي لبدء النقاش.":error.message||"تعذر إرسال طلب المحادثة.";
   $("directoryModalStatus").className="directory-modal-status is-error";
   button.disabled=false;button.textContent="إعادة إرسال الطلب";
  }
 }
 async function cancelConversationRequest(){
  const professionalId=state.selectedProfileId;
- const request=state.requests.get(requestKey(null,professionalId));
+ const request=currentRequest(professionalId);
  const button=$("directoryRequestCancel");
  if(!request?.id||request.status!=="pending"||!button||button.disabled)return;
  button.disabled=true;button.textContent="جاري إلغاء الطلب...";
@@ -156,7 +160,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   const request=state.requests.get(requestKey(null,state.selectedProfileId));
   if(request?.status==="accepted"){
    const profile=state.profiles.find(x=>x.user_id===state.selectedProfileId);
-   window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{patientId:null,role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص"});
+   window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{patientId:request.patient_id??null,role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص"});
    return;
   }
   void requestConversation();
