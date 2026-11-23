@@ -332,7 +332,6 @@
       }
       return;
     }
-    const errorBox = $("portalMeasurementsError");
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
     renderMeasurements();
     if (loading) loading.hidden = false;
