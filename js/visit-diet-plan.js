@@ -64,8 +64,7 @@ function formatHouseholdNumber(v){if(!Number.isFinite(v))return'—';if(Math.abs
 async function currentUser(){return await window.DietPlannerAccess?.getCurrentUser?.()||null;}
 async function canWriteVisitData(){
   const user=await currentUser();
-  if(!user)return false;
-  return (await window.DietPlannerAccess?.canWrite?.(user.id))===true;
+  return Boolean(user && window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true);
 }
 
 async function loadPatient(){
@@ -75,7 +74,8 @@ async function loadPatient(){
  if(!resolvedPatientId){showToast('لم يتم تحديد المريض','error');return false;}
  const {data:p,error}=await sb.from('patients').select('*').eq('id',resolvedPatientId).maybeSingle();
  const role=await window.DietPlannerAccess?.getUserRole?.(user.id);
-  if(error||!p||(p.user_id!==user.id&&role!=='admin')){showToast('تعذر تحميل ملف المريض أو لا تملك صلاحية الوصول إليه','error');return false;}
+  const hasCareManagementAccess = window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true;
+  if(error||!p||(p.user_id!==user.id&&role!=='admin'&&!hasCareManagementAccess)){showToast('تعذر تحميل ملف المريض أو لا تملك صلاحية الوصول إليه','error');return false;}
  window.currentPatientId=resolvedPatientId; patientId=resolvedPatientId;
  patientInfo={...p,targetCal:p.energy_target_calories??'',targetPro:p.energy_target_protein??'',targetCarb:p.energy_target_carb??'',targetFat:p.energy_target_fat??''};
  return true;
