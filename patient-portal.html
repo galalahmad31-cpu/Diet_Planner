@@ -29,7 +29,7 @@
   <script src="js/patient-messages.js?v=20261122-central-floating-chat-v2" defer></script>
   <script src="js/patient-notifications.js?v=20261122-patient-notifications-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261123-care-management-refresh-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261123-published-plans-history-v2" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -196,7 +196,7 @@
           <div class="portal-empty-state">تم تجهيز مساحة مستقلة لحفظ خططك الذاتية بعيدًا عن خطط المختص. واجهة إنشاء الخطة وتعديلها وحساب قيمها الغذائية هي المرحلة التالية، ولن تختلط خطتك الشخصية بأي خطة يشاركها المختص.</div>
         </section>
         <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel" hidden>
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المهنية التي شاركها المختص المرتبط بك.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المنشورة التي شاركها المختصون معك، بما فيها خطط المتابعة السابقة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
           <section class="portal-connection-options" aria-labelledby="patientConnectionOptionsTitle">
             <div class="portal-connection-options__heading"><strong id="patientConnectionOptionsTitle">البدء مع مختص</strong><p>إذا كان لديك كود ربط أرسله المختص، أدخله هنا. أو استعرض دليل المختصين واختر من يناسبك لبدء طلب متابعة.</p></div>
             <form id="patientProfessionalCodeForm" class="portal-professional-code-form">
@@ -209,7 +209,6 @@
             </form>
             <a class="portal-directory-link" href="professional-directory.html"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> استعراض دليل المختصين</a>
           </section>
-          <div id="portalProfessionalPlanUnavailable" class="portal-empty-state" hidden>تظهر هنا الخطط التي يشاركها معك المختص بعد تفعيل المتابعة وتأكيد بدء الاتفاق.</div>
           <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
           <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
           <div id="portalPlansList" class="portal-plans-list"></div>
