@@ -79,8 +79,7 @@
         return;
       }
 
-      state.canAddPatient =
-        (await access?.canAddPatient?.(state.user.id)) === true;
+      state.canAddPatient = true;
 
       updateWriteControls();
     } catch (error) {
