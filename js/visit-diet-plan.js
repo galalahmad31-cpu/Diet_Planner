@@ -64,7 +64,8 @@ function formatHouseholdNumber(v){if(!Number.isFinite(v))return'—';if(Math.abs
 async function currentUser(){return await window.DietPlannerAccess?.getCurrentUser?.()||null;}
 async function canWriteVisitData(){
   const user=await currentUser();
-  return Boolean(user && window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true);
+  if(!user || window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() !== true) return false;
+  return (await window.DietPlannerAccess?.hasActiveSubscription?.(user.id)) === true;
 }
 
 async function loadPatient(){
