@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, activePlanTab: "self", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
+  const state = { user: null, patient: null, patientId: null, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -132,7 +132,7 @@
     const loaders = {
       portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
       portalMeasurementsPanel: loadMeasurements,
-      portalCareManagementPanel: loadProfessionalCareManagement,
+      portalCareManagementPanel: loadPatientFinanceSummary,
       portalSharedHealthPanel: loadSharedHealthRecord
     };
     const loader = loaders[panelId];
@@ -147,7 +147,7 @@
         const targets = {
           portalPlansPanel: "portalPlansLoading",
           portalMeasurementsPanel: "portalMeasurementsError",
-          portalCareManagementPanel: "patientCareManagementContent",
+          portalCareManagementPanel: "patientFinanceSummary",
           portalSharedHealthPanel: "patientSharedHealthStatus"
         };
         const target = $(targets[panelId]);
@@ -202,12 +202,12 @@
   async function getPatientAccount() {
     const { data, error } = await supabase
       .from("patient_accounts")
-      .select("patient_id")
+      .select("patient_id,linked_at")
       .eq("user_id", state.user.id)
       .eq("status", "active")
-      .maybeSingle();
+      .order("linked_at", { ascending: false });
     if (error) throw error;
-    return data;
+    return Array.isArray(data) ? data : [];
   }
 
   async function acceptInvitation(token) {
@@ -215,11 +215,12 @@
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleanToken)) {
       throw new Error("رمز الدعوة غير صحيح. تأكد من نسخ الرمز كاملًا.");
     }
-    const { error } = await supabase.rpc("accept_patient_invitation", { p_token: cleanToken });
+    const { data, error } = await supabase.rpc("accept_patient_invitation", { p_token: cleanToken });
     if (error) throw error;
     const url = new URL(window.location.href);
     url.searchParams.delete("invite");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    return data;
   }
 
   async function loadPatient() {
@@ -280,12 +281,7 @@
         water: log.water_percent, waist: log.waist_cm, hip: log.hip_cm,
         adherence: log.diet_adherence, notes: log.notes
       })),
-      actionCell: log => log.created_by === state.user?.id
-        ? `<div class="measurement-row-actions">
-            <button type="button" class="measurement-edit-button" data-edit-measurement="${escapeHtml(log.id)}">تعديل</button>
-            <button type="button" class="measurement-delete-button" data-delete-measurement="${escapeHtml(log.id)}">حذف</button>
-          </div>`
-        : '<span class="portal-measurement-readonly">سجل المختص</span>'
+      actionCell: () => '<span class="portal-measurement-readonly">للعرض فقط</span>'
     });
   }
 
@@ -311,82 +307,14 @@
     }
   }
 
-  function openPatientMeasurement(log = null) {
-    const body = $("portalMeasurementsRows");
-    if (!body || body.querySelector("[data-measurement-editor]")) return;
-    const editor = window.DietPlannerWeightLogs.createEditorRow(log ? {id:log.id,date:log.measurement_date,weight:log.weight,bodyFat:log.body_fat_percent,muscle:log.muscle_percent,water:log.water_percent,waist:log.waist_cm,hip:log.hip_cm,adherence:log.diet_adherence,notes:log.notes} : null);
-    body.prepend(editor);
-    editor.querySelector("[data-field=weight]")?.focus();
-    editor.scrollIntoView({behavior:"smooth",block:"center"});
-  }
-
-  async function savePatientMeasurement(row) {
-    if (!row || state.busy || row.dataset.saving === "true") return;
-    const read = field => row.querySelector('[data-field="'+field+'"]')?.value?.trim() ?? "";
-    const numeric = field => read(field)==="" ? null : Number(read(field));
-    const record = {patient_id:state.patientId,weight:numeric("weight"),measurement_date:read("date"),body_fat_percent:numeric("bodyFat"),muscle_percent:numeric("muscle"),water_percent:numeric("water"),waist_cm:numeric("waist"),hip_cm:numeric("hip"),diet_adherence:read("adherence")||null,notes:read("notes")||null};
-    const validPercent = value => value===null || (Number.isFinite(value)&&value>=0&&value<=100);
-    if(!record.measurement_date||!Number.isFinite(record.weight)||record.weight<=0){setMessage("portalMeasurementMessage","أدخل تاريخ القياس والوزن بصورة صحيحة.","error");row.querySelector("[data-field=weight]")?.focus();return;}
-    if(![record.body_fat_percent,record.muscle_percent,record.water_percent].every(validPercent)){setMessage("portalMeasurementMessage","النسب المئوية يجب أن تكون بين 0 و100%.","error");return;}
-    if([record.waist_cm,record.hip_cm].some(value=>value!==null&&(!Number.isFinite(value)||value<=0))){setMessage("portalMeasurementMessage","محيطات الجسم يجب أن تكون أكبر من صفر.","error");return;}
-    const editingId=row.dataset.measurementEditorId||"";
-    row.dataset.saving="true";
-    const save=row.querySelector("[data-measurement-save]");
-    if(save){save.disabled=true;save.textContent="جارٍ الحفظ";}
-    state.busy=true;
-    try {
-      const query=editingId ? supabase.from("weight_logs").update(record).eq("id",editingId).eq("patient_id",state.patientId).eq("created_by",state.user.id) : supabase.from("weight_logs").insert(record);
-      const {data,error}=await query.select("id,patient_id,weight,measurement_date,body_fat_percent,muscle_percent,water_percent,waist_cm,hip_cm,diet_adherence,notes,created_at,created_by").single();
-      if(error)throw error;
-      const index=state.logs.findIndex(item=>String(item.id)===String(editingId));
-      if(index>=0)state.logs[index]=data;else state.logs.push(data);
-      state.logs.sort((x,y)=>String(x.measurement_date).localeCompare(String(y.measurement_date))||String(x.created_at||"").localeCompare(String(y.created_at||"")));
-      renderMeasurements();
-      setMessage("portalMeasurementMessage",editingId?"تم تحديث القياس بنجاح.":"تم حفظ القياس بنجاح.","success");
-    } catch(error) {
-      console.error("Patient measurement save failed:",error);
-      row.dataset.saving="false";
-      if(save){save.disabled=false;save.textContent="حفظ";}
-      setMessage("portalMeasurementMessage",error.message||"تعذر حفظ القياس. تحقق من صلاحيات قاعدة البيانات.","error");
-    } finally { state.busy=false; }
-  }
-
-  async function deletePatientMeasurement(id, button) {
-    const log = state.logs.find(item => String(item.id) === String(id));
-    if (!log || log.created_by !== state.user?.id || state.busy) return;
-    const confirmed = await window.DPConfirm?.ask({ title: "حذف القياس؟", message: "هل تريد حذف القياس الذي سجلته؟ لا يمكن التراجع عن الحذف.", confirmText: "حذف", variant: "danger" });
-    if (!confirmed) return;
-    state.busy = true; button.disabled = true;
-    try {
-      const { error } = await supabase.from("weight_logs").delete()
-        .eq("id", log.id).eq("patient_id", state.patientId).eq("created_by", state.user.id);
-      if (error) throw error;
-      state.logs = state.logs.filter(item => item.id !== log.id);
-      renderMeasurements();
-      setMessage("portalMeasurementMessage", "تم حذف القياس.", "success");
-    } catch (error) {
-      console.error("Patient measurement delete failed:", error);
-      setMessage("portalMeasurementMessage", error.message || "تعذر حذف القياس.", "error");
-    } finally { state.busy = false; button.disabled = false; }
-  }
-
-
-  function activatePlanTab(tab) {
-    if (!["self", "professional"].includes(tab)) return;
-    state.activePlanTab = tab;
-    document.querySelectorAll("[data-plan-tab]").forEach(button => {
-      const active = button.dataset.planTab === tab;
-      button.classList.toggle("is-active", active);
-      button.setAttribute("aria-selected", String(active));
-    });
-    const selfPanel = $("portalPlansSelfPanel");
+  function activatePlanTab() {
+    state.activePlanTab = "professional";
     const professionalPanel = $("portalPlansProfessionalPanel");
-    if (selfPanel) selfPanel.hidden = tab !== "self";
-    if (professionalPanel) professionalPanel.hidden = tab !== "professional";
-    if (tab === "professional") {
-      state.loadedPanels.delete("portalPlansPanel");
-      void ensureHealthPanelLoaded("portalPlansPanel");
-    }
+    if (professionalPanel) professionalPanel.hidden = false;
+    document.querySelectorAll("[data-plan-tab]").forEach(button => {
+      button.classList.add("is-active");
+      button.setAttribute("aria-selected", "true");
+    });
   }
 
   async function loadPlans() {
@@ -487,37 +415,14 @@
   }
 
 
-  function careAgreementMarkup(item) {
-    const hasAgreement = Boolean(item.agreement_service_title);
-    const agreed = Boolean(item.patient_agreement_at && item.professional_agreement_at);
-    const sent = Boolean(item.payment_sent_at), received = Boolean(item.payment_received_at);
-    const expired = item.agreement_end_date && item.agreement_end_date < localToday();
-    const money = item.agreement_amount == null ? "—" : Number(item.agreement_amount).toLocaleString("ar-EG") + " " + (item.agreement_currency || "EGP");
-    const statusLabels = { pending:"طلب المحادثة قيد الانتظار", accepted:"بانتظار استكمال الاتفاق", active:"المتابعة نشطة", ended:"انتهت المتابعة", declined:"لم يتم قبول الطلب", cancelled:"تم إلغاء الطلب" };
-    const status = expired && item.status === "active" ? "انتهت مدة الاتفاق — قراءة فقط" : statusLabels[item.status] || "حالة الطلب غير محددة";
-    let actions = "";
-    if (hasAgreement && item.status === "accepted" && !item.patient_agreement_at) actions += '<button type="button" class="portal-primary-button" data-care-confirm="agreement" data-request-id="' + escapeHtml(item.request_id) + '">الموافقة على الاتفاق</button>';
-    if (agreed && item.status === "accepted" && !sent) actions += '<button type="button" class="portal-primary-button" data-care-confirm="payment_sent" data-request-id="' + escapeHtml(item.request_id) + '">تأكيد إرسال المبلغ</button>';
-    if (item.status === "pending") actions += '<button type="button" class="portal-secondary-button" data-cancel-professional-request="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button>';
-    const details = hasAgreement
-      ? '<div class="portal-care-agreement__details"><div><small>الخدمة</small><strong>' + escapeHtml(item.agreement_service_title) + '</strong></div><div><small>القيمة</small><strong>' + escapeHtml(money) + '</strong></div><div><small>المدة</small><strong>' + escapeHtml(item.agreement_duration_days) + ' يوم</strong></div><div><small>من</small><strong>' + escapeHtml(formatDate(item.agreement_start_date)) + '</strong></div><div><small>إلى</small><strong>' + escapeHtml(formatDate(item.agreement_end_date)) + '</strong></div></div>' +
-        (item.agreement_service_description ? '<p>' + escapeHtml(item.agreement_service_description) + '</p>' : '') +
-        (item.agreement_terms ? '<p>' + escapeHtml(item.agreement_terms) + '</p>' : '') +
-        '<ol class="portal-care-steps"><li class="' + (item.patient_agreement_at ? 'is-done' : '') + '">موافقة المريض</li><li class="' + (item.professional_agreement_at ? 'is-done' : '') + '">موافقة المختص</li><li class="' + (sent ? 'is-done' : '') + '">إرسال المبلغ</li><li class="' + (received ? 'is-done' : '') + '">استلام المبلغ وبدء المتابعة</li></ol>'
-      : '<p>لم يرسل المختص تفاصيل الاتفاق بعد. ستظهر الخدمة والسعر والمدة هنا قبل أي التزام مالي.</p>';
-    const label = item.agreement_service_title || (item.status === "pending" ? "طلب محادثة جديد" : "طلب متابعة");
-    return '<details class="portal-care-agreement" data-care-request-id="' + escapeHtml(item.request_id) + '"><summary><span><strong>' + escapeHtml(label) + '</strong><small>' + escapeHtml(status) + '</small></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary><div class="portal-care-agreement__body"><div class="portal-care-agreement__details-wrap">' + details + '</div><div class="portal-care-agreement__actions">' + actions + '</div>' +
-      (hasAgreement ? '<p class="portal-care-agreement__notice">الدفع مباشر بينك وبين المختص؛ المنصة تسجل التأكيدات ولا تحصّل المبلغ.</p>' : '') + '</div></details>';
-  }
-
   function renderSharedHealthForm() {
     const patient = state.patient || {};
-    $("sharedHealthName").value = patient.name || "";
-    $("sharedHealthGender").value = ["male", "ذكر"].includes(patient.gender) ? "male" : ["female", "أنثى"].includes(patient.gender) ? "female" : "";
-    $("sharedHealthBirthDate").value = patient.birth_date || "";
-    $("sharedHealthHeight").value = patient.height ?? "";
-    $("sharedHealthDiagnosis").value = patient.diagnosis || "";
-    $("sharedHealthComplaints").value = patient.complaints || "";
+    $("sharedHealthName").value = patient.name || ""; $("sharedHealthName").disabled = true;
+    $("sharedHealthGender").value = ["male", "ذكر"].includes(patient.gender) ? "male" : ["female", "أنثى"].includes(patient.gender) ? "female" : ""; $("sharedHealthGender").disabled = true;
+    $("sharedHealthBirthDate").value = patient.birth_date || ""; $("sharedHealthBirthDate").disabled = true;
+    $("sharedHealthHeight").value = patient.height ?? ""; $("sharedHealthHeight").disabled = true;
+    $("sharedHealthDiagnosis").value = patient.diagnosis || ""; $("sharedHealthDiagnosis").disabled = true;
+    $("sharedHealthComplaints").value = patient.complaints || ""; $("sharedHealthComplaints").disabled = true;
   }
 
   async function loadSharedHealthRecord() {
@@ -535,7 +440,7 @@
       .select("id,actor_id,actor_role,operation,changed_fields,created_at")
       .eq("patient_id", state.patientId).order("created_at", { ascending: false }).limit(100);
     if (error) throw error;
-    status.textContent = "يمكنك مراجعة بياناتك الأساسية وتحديثها. يحتفظ النظام بسجل لمن قام بالتعديل ووقته.";
+    status.textContent = "هذه البيانات للعرض فقط. لطلب تحديثها، تواصل مع المختص المسؤول عن هذا الملف.";
     const labels = {name:"اسم المريض",gender:"النوع",birth_date:"تاريخ الميلاد",age:"العمر",height:"الطول",diagnosis:"التشخيص",complaints:"الشكوى"};
     const healthEvents = (data || []).filter(item =>
       (item.changed_fields || []).some(field => Object.prototype.hasOwnProperty.call(labels, field))
@@ -549,191 +454,62 @@
     }).join("");
   }
 
-  async function saveSharedHealthRecord(event) {
-    event.preventDefault();
-    const form = $("patientSharedHealthForm");
-    const button = form?.querySelector('button[type="submit"]');
-    if (!isValidPatientId(state.patientId)) {
-      setMessage("patientSharedHealthStatus", "تعذر حفظ البيانات لأن ملف المريض غير محدد بشكل صحيح. أعد تحميل البوابة.", "error");
-      return;
-    }
-    if (!form || !button) return;
-
-    const name = $("sharedHealthName").value.trim();
-    if (name.length < 2 || name.length > 120) {
-      setMessage("patientSharedHealthStatus", "اسم المريض يجب أن يكون من 2 إلى 120 حرفًا.", "error");
-      $("sharedHealthName").focus();
-      return;
-    }
-
-    const raw = $("sharedHealthHeight").value.trim();
-    const height = raw === "" ? null : Number(raw);
-    if (height !== null && (!Number.isFinite(height) || height < 30 || height > 260)) {
-      setMessage("patientSharedHealthStatus", "الطول يجب أن يكون بين 30 و260 سم.", "error");
-      return;
-    }
-
-    const currentName = String(state.patient?.name || "").trim();
-    const nameChanged = name !== currentName;
-    let nameSaved = false;
-    button.disabled = true;
-    setMessage("patientSharedHealthStatus", "جاري حفظ البيانات...");
-    try {
-      // The UI uses one save action; backend permissions remain separated by field scope.
-      if (nameChanged) {
-        const { data: nameData, error: nameError } = await supabase.rpc("update_my_patient_record_name", {
-          p_patient_id: state.patientId,
-          p_name: name
-        });
-        if (nameError) throw nameError;
-        state.patient = { ...state.patient, name: nameData?.name || name };
-        nameSaved = true;
-      }
-
-      const { data, error } = await supabase.rpc("update_shared_patient_health_profile", {
-        p_patient_id: state.patientId,
-        p_gender: $("sharedHealthGender").value.trim() || null,
-        p_birth_date: $("sharedHealthBirthDate").value || null,
-        p_height: height,
-        p_diagnosis: $("sharedHealthDiagnosis").value.trim() || null,
-        p_complaints: $("sharedHealthComplaints").value.trim() || null
-      });
-      if (error) throw error;
-
-      state.patient = { ...state.patient, ...data, name };
-      renderSharedHealthForm();
-      try {
-        await loadSharedHealthRecord();
-        setMessage("patientSharedHealthStatus", "تم حفظ الاسم والبيانات الصحية وتسجيل التعديلات.", "success");
-      } catch (refreshError) {
-        console.error("Shared health history refresh failed:", refreshError);
-        setMessage("patientSharedHealthStatus", "تم حفظ البيانات، لكن تعذر تحديث سجل التعديلات. أعد تحميل الصفحة لمراجعته.", "success");
-      }
-    } catch (error) {
-      console.error("Shared health profile save failed:", error);
-      let message = error.message === "care_agreement_expired_read_only"
-        ? "انتهت مدة المتابعة. يمكنك الاطلاع على البيانات دون تعديلها."
-        : error.message === "patient_record_access_denied"
-          ? "لا تملك صلاحية تعديل اسم هذا الملف."
-          : error.message === "invalid_patient_name"
-            ? "اسم المريض يجب أن يكون من 2 إلى 120 حرفًا."
-            : (error.message || "تعذر حفظ البيانات.");
-      if (nameSaved) {
-        message = "تم حفظ اسم المريض، لكن تعذر حفظ بقية البيانات: " + message;
-      }
-      setMessage("patientSharedHealthStatus", message, "error");
-    } finally {
-      button.disabled = false;
-    }
-  }
-
   async function redeemProfessionalInvitation(event) {
     event.preventDefault();
     const form = $("patientProfessionalCodeForm");
     const input = $("patientProfessionalCode");
     const button = form?.querySelector('button[type="submit"]');
     const token = String(input?.value || "").trim();
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token)) {
-      setMessage("patientProfessionalCodeStatus", "كود الربط غير صحيح. أدخل الكود كاملًا كما أرسله المختص.", "error");
-      return;
-    }
     if (!button || button.disabled) return;
     button.disabled = true;
-    setMessage("patientProfessionalCodeStatus", "جاري التحقق من الكود وإرسال طلب المتابعة...");
+    setMessage("patientProfessionalCodeStatus", "جاري ربط الملف...");
     try {
-      const { error } = await supabase.rpc("redeem_patient_professional_invitation", { p_token: token });
-      if (error) throw error;
+      const linkedPatientId = await acceptInvitation(token);
+      state.patientId = linkedPatientId;
       input.value = "";
-      setMessage("patientProfessionalCodeStatus", "تم التحقق من الكود وإرسال طلب المتابعة للمختص. ستظهر حالته هنا.", "success");
-      state.loadedPanels.delete("portalCareManagementPanel");
-      await ensureHealthPanelLoaded("portalCareManagementPanel");
+      state.loadedPanels.clear();
+      state.loadingPanels.clear();
+      setMessage("patientProfessionalCodeStatus", "تم ربط الملف بنجاح. يمكنك اختياره من قائمة الملفات.", "success");
+      await loadPortal();
     } catch (error) {
-      console.error("Professional invitation redemption failed:", error);
+      console.error("Patient file linking failed:", error);
       const messages = {
         invitation_invalid_expired_or_used: "الكود غير صحيح أو انتهت صلاحيته أو سبق استخدامه.",
-        invitation_already_used: "تم استخدام هذا الكود من قبل.",
-        active_patient_account_required: "يلزم تسجيل الدخول بحساب مريض نشط لاستخدام كود الربط.",
-        already_in_care_team: "أنت مرتبط بالفعل بهذا المختص.",
-        connection_request_already_open_or_processed: "يوجد طلب أو متابعة سابقة مع هذا المختص بالفعل."
+        patient_account_required: "يلزم استخدام حساب مريض لربط الملف.",
+        patient_record_already_linked: "هذا الملف مرتبط بالفعل بحساب مريض آخر."
       };
-      setMessage("patientProfessionalCodeStatus", messages[error?.message] || "تعذر استخدام الكود. راجع صلاحيته أو تواصل مع المختص.", "error");
+      setMessage("patientProfessionalCodeStatus", messages[error?.message] || error.message || "تعذر ربط الملف.", "error");
     } finally {
       button.disabled = false;
     }
   }
 
-  async function loadProfessionalCareManagement() {
-    const root = $("patientCareManagementContent");
-    if (!root) return;
-    root.textContent = "جاري تحميل طلبات المتابعة...";
-    const { data, error } = await supabase.rpc("list_my_professional_connection_requests");
+  async function loadPatientFinanceSummary() {
+    const root = $("patientFinanceSummary");
+    if (!root || !state.patientId) return;
+    root.textContent = "جاري تحميل بيانات الاشتراك والمتابعة...";
+    const { data, error } = await supabase.from("patient_finances")
+      .select("subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discounted_amount,is_paid,last_visit_date,next_follow_up_date")
+      .eq("patient_id", state.patientId)
+      .maybeSingle();
     if (error) throw error;
-
-    const requests = Array.isArray(data) ? data : [];
-    if (!requests.length) {
-      root.textContent = "لا توجد طلبات أو اتفاقات متابعة حتى الآن. يمكنك اختيار مختص من الدليل لبدء التواصل.";
+    if (!data) {
+      root.textContent = "لم يسجل المختص بيانات الاشتراك والمتابعة لهذا الملف بعد.";
       return;
     }
-
-    const groups = new Map();
-    requests.forEach(item => {
-      const key = item.professional_id || ("name:" + (item.professional_name || item.request_id));
-      if (!groups.has(key)) groups.set(key, { name: item.professional_name || "المختص", title: item.professional_title || "", items: [] });
-      groups.get(key).items.push(item);
-    });
-    root.innerHTML = [...groups.values()].map(group =>
-      '<details class="portal-care-professional"><summary><span><strong>' + escapeHtml(group.name) + '</strong><small>' + escapeHtml(group.title || (group.items.length.toLocaleString("ar-EG") + " اتفاق / طلب")) + '</small></span><span class="portal-care-count">' + group.items.length.toLocaleString("ar-EG") + '</span></summary><div class="portal-care-professional__agreements">' +
-      group.items.map(careAgreementMarkup).join("") + '</div></details>'
-    ).join("");
-    root.querySelectorAll("[data-care-confirm]").forEach(button => button.addEventListener("click", async () => {
-      if (button.disabled) return;
-      const step = button.dataset.careConfirm;
-      const message = step === "agreement"
-        ? "بتأكيدك، أنت توافق على الخدمة والسعر والمدة والشروط الموضحة."
-        : "هل تؤكد أنك أرسلت المبلغ مباشرة إلى المختص؟";
-      const ok = await window.DPConfirm?.ask({
-        title: step === "agreement" ? "تأكيد الاتفاق" : "تأكيد الدفع",
-        message,
-        confirmText: "تأكيد"
-      });
-      if (!ok) return;
-
-      button.disabled = true;
-      const { error: rpcError } = await supabase.rpc("confirm_professional_connection_step", {
-        p_request_id: button.dataset.requestId,
-        p_step: step
-      });
-      if (rpcError) {
-        button.disabled = false;
-        button.insertAdjacentHTML("afterend", '<p class="portal-inline-message is-error" role="status">تعذر تسجيل التأكيد: ' + escapeHtml(rpcError.message) + '</p>');
-        return;
-      }
-      state.loadedPanels.delete("portalCareManagementPanel");
-      await loadProfessionalCareManagement();
-    }));
-
-    root.querySelectorAll("[data-cancel-professional-request]").forEach(button => button.addEventListener("click", async () => {
-      if (button.disabled) return;
-      const confirmed = await window.DPConfirm?.ask({
-        title: "إلغاء طلب المحادثة؟",
-        message: "هل تريد إلغاء هذا الطلب؟",
-        confirmText: "إلغاء الطلب",
-        variant: "danger"
-      });
-      if (!confirmed) return;
-
-      button.disabled = true;
-      const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", {
-        p_request_id: button.dataset.cancelProfessionalRequest
-      });
-      if (cancelError) {
-        button.disabled = false;
-        button.insertAdjacentHTML("afterend", '<p class="portal-inline-message is-error" role="status">تعذر إلغاء الطلب: ' + escapeHtml(cancelError.message) + '</p>');
-        return;
-      }
-      state.loadedPanels.delete("portalCareManagementPanel");
-      await loadProfessionalCareManagement();
-    }));
+    const amount = data.discounted_amount ?? data.subscription_amount;
+    const rows = [
+      ["بداية الاشتراك", formatDate(data.subscription_start_date)],
+      ["مدة الاشتراك", data.subscription_months ? optionalNumber(data.subscription_months, " شهر") : "—"],
+      ["نهاية الاشتراك", formatDate(data.subscription_end_date)],
+      ["قيمة الاشتراك", amount == null ? "—" : optionalNumber(amount, " جنيه")],
+      ["حالة السداد", data.is_paid ? "مسدد" : "غير مسدد"],
+      ["آخر زيارة", formatDate(data.last_visit_date)],
+      ["المتابعة القادمة", formatDate(data.next_follow_up_date)]
+    ];
+    root.innerHTML = '<div class="portal-finance-summary-grid">' + rows.map(([label,value]) =>
+      '<div class="portal-finance-summary-item"><small>' + escapeHtml(label) + '</small><strong>' + escapeHtml(value) + '</strong></div>'
+    ).join("") + '</div>';
   }
 
   const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
@@ -1059,90 +835,84 @@
 
   async function loadPortal() {
     showOnly("portalLoading");
-    let account = await getPatientAccount();
+    let newlyLinkedPatientId = null;
     const invitationToken = new URLSearchParams(window.location.search).get("invite");
-    let invitationStatus = "";
-
-    // Existing self-owned patient accounts redeem professional invitations as requests,
-    // while unlinked accounts keep the original invitation-to-record linking flow below.
-    if (account?.patient_id && invitationToken) {
+    if (invitationToken) {
       try {
-        const { error } = await supabase.rpc("redeem_patient_professional_invitation", { p_token: invitationToken });
-        if (error) throw error;
-        invitationStatus = "تم التحقق من رابط المختص وإرسال طلب المتابعة. يمكنك متابعة حالته من هذا القسم.";
+        newlyLinkedPatientId = await acceptInvitation(invitationToken);
       } catch (error) {
-        console.error("Professional invitation link redemption failed:", error);
-        invitationStatus = error?.message === "already_in_care_team"
-          ? "أنت مرتبط بالفعل بهذا المختص."
-          : error?.message === "connection_request_already_open_or_processed"
-            ? "يوجد طلب أو متابعة سابقة مع هذا المختص بالفعل."
-            : "تعذر استخدام رابط الدعوة. قد يكون منتهي الصلاحية أو سبق استخدامه.";
-      }
-      const cleanUrl = new URL(window.location.href);
-      cleanUrl.searchParams.delete("invite");
-      window.history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
-    }
-
-    if (!account?.patient_id) {
-      const token = new URLSearchParams(window.location.search).get("invite");
-      if (token) {
-        try {
-          await acceptInvitation(token);
-          return loadPortal();
-        } catch (error) {
+        console.error("Patient invitation linking failed:", error);
+        const currentAccounts = await getPatientAccount();
+        if (!currentAccounts.length) {
           showOnly("portalUnlinked");
-          $("portalInviteToken").value = token;
-          setMessage("portalInviteMessage", error.message || "تعذر قبول الدعوة. تحقق من صلاحيتها.", "error");
+          $("portalInviteToken").value = invitationToken;
+          setMessage("portalInviteMessage", error.message || "تعذر ربط الملف. تحقق من صلاحية الكود.", "error");
           return;
         }
+        setMessage("patientProfessionalCodeStatus", error.message || "تعذر ربط الملف.", "error");
       }
-
-      // One durable patient record is created on first entry; accepted requests reuse it.
-      const { data: patientId, error: ensureError } = await supabase.rpc("ensure_patient_self_record");
-      if (ensureError) throw ensureError;
-      if (!isValidPatientId(patientId)) throw new Error("تعذر إنشاء الملف الصحي المستقل. يرجى إعادة المحاولة.");
-      account = { patient_id: patientId };
     }
 
-    const nextPatientId = account.patient_id;
-    if (!isValidPatientId(nextPatientId)) {
-      state.patientId = null;
-      throw new Error("بيانات ملف المريض غير مكتملة أو غير صالحة. يرجى التواصل مع الدعم.");
+    const accounts = await getPatientAccount();
+    if (!accounts.length) {
+      showOnly("portalUnlinked");
+      return;
     }
-    if (state.patientId !== nextPatientId) {
+
+    const ids = accounts.map(item => item.patient_id).filter(isValidPatientId);
+    if (!ids.length) throw new Error("لا توجد ملفات صحية صالحة مرتبطة بهذا الحساب.");
+    const { data: patientRows, error: patientError } = await supabase.from("patients")
+      .select("id,name")
+      .in("id", ids)
+      .order("name");
+    if (patientError) throw patientError;
+
+    state.patientAccounts = (patientRows || []).map(patient => ({
+      patient_id: patient.id,
+      name: patient.name || "ملف صحي"
+    }));
+    if (!state.patientAccounts.length) throw new Error("تعذر تحميل الملفات الصحية المرتبطة بهذا الحساب.");
+
+    const previousPatientId = state.patientId;
+    const selectedId = newlyLinkedPatientId && ids.includes(newlyLinkedPatientId)
+      ? newlyLinkedPatientId
+      : state.patientAccounts.some(item => item.patient_id === previousPatientId)
+        ? previousPatientId
+        : state.patientAccounts[0].patient_id;
+
+    if (previousPatientId !== selectedId) {
       state.loadedPanels.clear();
       state.loadingPanels.clear();
       state.logs = [];
       state.patient = null;
+      state.messagesMountedFor = null;
     }
-    state.patientId = nextPatientId;
+    state.patientId = selectedId;
+
+    const selector = $("portalPatientSelector");
+    if (selector) {
+      selector.innerHTML = state.patientAccounts.map(item =>
+        '<option value="' + escapeHtml(item.patient_id) + '">' + escapeHtml(item.name) + '</option>'
+      ).join("");
+      selector.value = selectedId;
+      selector.hidden = state.patientAccounts.length < 2;
+    }
 
     await loadPatient();
     document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
-    const professionalPlanTab = document.querySelector('[data-plan-tab="professional"]');
-    if (professionalPlanTab) professionalPlanTab.hidden = false;
-
     showOnly("portalContent");
-    activatePlanTab("self");
-    // The invitation result is rendered beside the code field in the professional-plan tab.
+    if ($("portalHealthArea")) $("portalHealthArea").hidden = false;
+    activatePlanTab();
     activateHealthTab("portalPlansPanel");
-    if (invitationStatus) {
-      setMessage("patientProfessionalCodeStatus", invitationStatus,
-        invitationStatus.startsWith("تم التحقق") ? "success" : "error");
-    }
 
-    if (state.messagesMountedFor !== state.patientId) {
+    const messagesRoot = $("patientPortalMessages");
+    if (messagesRoot && state.messagesMountedFor !== state.patientId) {
+      messagesRoot.dataset.inboxMounted = "false";
+      messagesRoot.replaceChildren();
       state.messagesMountedFor = state.patientId;
-      void window.DietPlannerPatientMessages?.mountInbox($("patientPortalMessages"), { patientId: state.patientId, role: "patient" });
-    }
-    const appointmentsRoot = $("patientPortalAppointments");
-    if (appointmentsRoot && window.DietPlannerPatientAppointments?.mount) {
-      void window.DietPlannerPatientAppointments.mount(appointmentsRoot, {
+      void window.DietPlannerPatientMessages?.mountInbox(messagesRoot, {
         patientId: state.patientId,
         role: "patient"
-      }).catch(error => {
-        console.error("Patient appointments initialization failed:", error);
-        appointmentsRoot.textContent = "تعذر تهيئة قسم المواعيد. أعد تحميل الصفحة.";
       });
     }
   }
@@ -1155,7 +925,7 @@
     button.disabled = true;
     setMessage("portalInviteMessage", "جاري التحقق من الدعوة...");
     try {
-      await acceptInvitation(token);
+      state.patientId = await acceptInvitation(token);
       input.value = "";
       setMessage("portalInviteMessage", "تم ربط حسابك بنجاح.", "success");
       await loadPortal();
@@ -1235,10 +1005,10 @@
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
     $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
-    $("patientSharedHealthForm")?.addEventListener("submit", saveSharedHealthRecord);
     $("patientProfessionalCodeForm")?.addEventListener("submit", redeemProfessionalInvitation);
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
-    document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab(tab.dataset.planTab)));
+    document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab()));
+    $("portalPatientSelector")?.addEventListener("change", () => { state.patientId = $("portalPatientSelector").value; state.loadedPanels.clear(); state.loadingPanels.clear(); state.logs = []; state.patient = null; state.messagesMountedFor = null; void loadPortal().catch(error => fail(error.message || "تعذر تبديل الملف.")); });
     const initialSection = window.location.hash.slice(1);
     const patientSections = new Set([
       "portalHome",
@@ -1253,25 +1023,6 @@
         setMessage("selfProfileMessage", "تعذر تحميل بيانات الحساب.", "error");
       });
     }
-    $("portalMeasurementsTable")?.addEventListener("click", event => {
-      const add = event.target.closest("[data-add-measurement]");
-      const save = event.target.closest("[data-measurement-save]");
-      const cancel = event.target.closest("[data-measurement-cancel]");
-      const edit = event.target.closest("[data-edit-measurement]");
-      const remove = event.target.closest("[data-delete-measurement]");
-      if (add) openPatientMeasurement();
-      else if (save) void savePatientMeasurement(save.closest("[data-measurement-editor]"));
-      else if (cancel) renderMeasurements();
-      else if (edit) {
-        const log = state.logs.find(item => String(item.id) === String(edit.dataset.editMeasurement));
-        if (log?.created_by === state.user?.id) {
-          const current = edit.closest("tr");
-          const editor = window.DietPlannerWeightLogs.createEditorRow({id:log.id,date:log.measurement_date,weight:log.weight,bodyFat:log.body_fat_percent,muscle:log.muscle_percent,water:log.water_percent,waist:log.waist_cm,hip:log.hip_cm,adherence:log.diet_adherence,notes:log.notes});
-          current?.replaceWith(editor);
-          editor.querySelector("[data-field=weight]")?.focus();
-        }
-      } else if (remove) void deletePatientMeasurement(remove.dataset.deleteMeasurement, remove);
-    });
     $("portalThemeToggle")?.addEventListener("click", () => {
       if (window.DietPlannerTheme?.toggle) window.DietPlannerTheme.toggle();
     });
