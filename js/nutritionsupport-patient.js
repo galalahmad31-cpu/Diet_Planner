@@ -1472,7 +1472,7 @@ async function deleteSupportDay(id){
 }
 async function saveCurrentSupportDay(){
   if (supportDayOperationBusy) return false;
-  if (!canWriteSupportDays()) { alert('تعديل أيام الدعم الغذائي متاح أثناء الاشتراك المدفوع وخاصية التغذية الداعمة فقط.'); return false; }
+  if (!canWriteSupportDays()) { alert('تعديل أيام الدعم الغذائي يتطلب اشتراكًا فعالًا.'); return false; }
   if(!supportPatientId||!supportUserId||!currentSupportDayId){
     alert('أضف يومًا أولاً ثم اضغط تعديل.');
     return false;
@@ -1573,6 +1573,11 @@ async function loadPatientData(){
   try{
     const sessionUser=await access.getCurrentUser();
     if(!sessionUser){location.replace('login.html');return;}
+    const accessStatus=await access.getAccessStatus();
+    if(accessStatus?.isAdmin!==true && accessStatus?.hasActiveSubscription!==true){
+      access.showAccessPrompt?.({title:'اشتراك فعال مطلوب',message:'الدعم الغذائي متاح للمشتركين ذوي الاشتراك الفعال.',actionLabel:'عرض الاشتراكات',actionHref:'subscription-plans.html'});
+      return;
+    }
 
     // Resolve the patient ID from the canonical link parameter and legacy aliases.
     // The session fallback is written only by the patient-profile page on an explicit click.
@@ -1716,14 +1721,14 @@ function initializePage(){
   // Bind page controls FIRST. A calculation error must never disable the UI.
   $('addDayBtn')?.addEventListener('click',()=>{
     if (!canWriteSupportDays()) {
-      alert('إضافة يوم دعم غذائي تتطلب اشتراكًا فعالًا مع خاصية الدعم الغذائي.');
+      alert('إضافة يوم الدعم الغذائي تتطلب اشتراكًا فعالًا.');
       return;
     }
     addSupportDay();
   });
   $('editDayBtn')?.addEventListener('click',()=>{
     if (!canWriteSupportDays()) {
-      alert('تعديل يوم الدعم الغذائي يتطلب اشتراكًا فعالًا مع خاصية الدعم الغذائي.');
+      alert('تعديل يوم الدعم الغذائي يتطلب اشتراكًا فعالًا.');
       return;
     }
     if(currentSupportDayId)setDayEditMode(true);
