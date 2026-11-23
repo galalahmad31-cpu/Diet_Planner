@@ -18,11 +18,13 @@
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
   <link rel="stylesheet" href="css/patient-portal.css?v=20261123-health-tabs-three-columns-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
+  <link rel="stylesheet" href="css/patient-lab-results.css?v=20261123-labs-v1">
   <script src="js/theme.js?v=20261122-theme-token-aliases-v1" defer></script>
   <script src="js/app-header.js?v=20261123-patient-health-page-v1" defer></script>
   <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
+  <script src="js/patient-lab-results.js?v=20261123-labs-v1" defer></script>
   <script src="js/patient-portal.js?v=20261123-remove-health-audit-v1" defer></script>
 </head>
 <body class="patient-portal-page">
@@ -99,7 +101,7 @@
         
         <section class="portal-section portal-measurements-section" aria-labelledby="portalMeasurementsTitle">
         <div class="portal-section-heading">
-          <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات</h2><p>استعرض القياسات التي سجلها المختص لهذا الملف.</p></div>
+          <div><span class="portal-section-kicker">PROGRESS TRACKING</span><h2 id="portalMeasurementsTitle">متابعة القياسات والتحاليل</h2><p>استعرض القياسات التي سجلها المختص لهذا الملف.</p></div>
           <span class="portal-section-icon"><i class="fa-solid fa-chart-line"></i></span>
         </div>
         <p id="portalMeasurementAccessStatus" class="measurements-access-status">القياسات للعرض فقط ولا يمكن تعديلها من بوابة المريض.</p>
@@ -112,6 +114,7 @@
           <article><span>مؤشر كتلة الجسم (BMI)</span><strong id="portalLatestBmi" class="measurement-numeric-value">—</strong><small id="portalLatestBmiNote">يعتمد على آخر وزن والطول المسجل</small></article>
         </div>
         <div id="portalMeasurementsTable" class="measurements-table-container"></div>
+        <div id="portalLabResults" class="lab-results-container"></div>
         </section>
             </div>
 
