@@ -11,7 +11,7 @@ if(!supabase){
   console.error('Diet Library: js/auth-access.js must load before this file.');
 }
 
-let user=null,isAdmin=false,foods=[],diets=[],authors={},editingId=null,activeMealIndex=null,selectedFood=null,day={day_number:1,day_name:'اليوم',meals:[]};
+let user=null,isAdmin=false,foods=[],diets=[],authors={},editingId=null,day={day_number:1,day_name:'اليوم',meals:[]};
 let dietRenderLimit=40;
 const $=id=>document.getElementById(id), num=v=>Number(v||0);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
