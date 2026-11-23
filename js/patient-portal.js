@@ -1099,7 +1099,10 @@
     });
 
     if (isHealthPage) {
-      await window.DietPlannerPatientPortal.navigateToSection("portalContent");
+      const requestedHealthPanel = ["portalSharedHealthPanel", "portalPlansPanel", "portalFinancePanel"].includes(initialSection)
+        ? initialSection
+        : "portalContent";
+      await window.DietPlannerPatientPortal.navigateToSection(requestedHealthPanel);
     } else if (query.has("invite")) {
       openHealthArea();
     } else if (patientSections.has(initialSection)) {
