@@ -234,16 +234,11 @@
     const supabase = window.DietPlannerAccess?.supabaseClient;
     if (!supabase) return;
 
-    // Public users read through a restricted view; admins use the source table.
-    // This preserves public display without granting table-level access to user_id.
-    const source = state.isAdmin ? "app_feedback" : "app_feedback_public";
-    const columns = state.isAdmin
-      ? "id,user_id,rating,comment,display_name,created_at,updated_at"
-      : "id,rating,comment,display_name,created_at,updated_at";
-
+    // All roles use the same restricted public view for the shared reviews list.
+    // The source table is queried separately only for the signed-in user's own record.
     const { data, error } = await supabase
-      .from(source)
-      .select(columns)
+      .from("app_feedback_public")
+      .select("id,rating,comment,display_name,created_at,updated_at")
       .order("created_at", { ascending: false });
 
     if (error) {
