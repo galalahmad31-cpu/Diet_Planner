@@ -136,7 +136,7 @@
   }
 
   function canEditSharedHealth() {
-    return state.patientCareMode === 'linked' && !sharedHealthState.expired;
+    return state.patientCareMode === 'linked' && sharedHealthState.expired === false;
   }
 
   function canEditPatientPrivateFields() {
