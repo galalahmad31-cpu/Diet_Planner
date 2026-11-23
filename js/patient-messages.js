@@ -306,39 +306,67 @@
         status: "accepted",
         owner: true
       });
-      (requests || []).forEach(item => {
-        const current = contacts.get(item.professional_id);
-        contacts.set(item.professional_id, {
+      (requests || []).filter(item => item.status === "accepted").forEach(item => {
+        if (!contacts.has(item.professional_id)) contacts.set(item.professional_id, {
           id: item.professional_id,
           name: item.professional_name || "المختص",
           subtitle: item.professional_title || "مختص معتمد",
-          status: current?.status === "accepted" ? "accepted" : item.status,
-          owner: Boolean(current?.owner)
+          status: "accepted",
+          owner: false
         });
       });
 
+      const pending = (requests || []).filter(item => item.status === "pending");
       const rows = [...contacts.values()];
-      if (!rows.length) {
-        list.innerHTML = '<div class="patient-messages-empty">لا توجد جهات تواصل مرتبطة بهذا الملف.</div>';
-        return;
-      }
-      list.innerHTML = rows.map(contact => {
-        const active = contact.status === "accepted";
-        const statusLabel = contact.owner ? "المختص المسؤول" :
-          active ? "المحادثة متاحة" :
-          contact.status === "pending" ? "طلب قيد المراجعة" :
-          contact.status === "declined" ? "لم يُقبل الطلب" : "غير متاح";
-        return '<div class="dp-chat-contact-row">' +
-          '<button type="button" class="dp-chat-contact" data-chat-open="' + escapeHtml(contact.id) + '"' + (active ? "" : " disabled") + '>' +
-          '<span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span>' +
-          '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(contact.name) + '</strong><small>' + escapeHtml(contact.subtitle) + '</small></span>' +
-          '<span class="dp-chat-contact-status">' + escapeHtml(statusLabel) + '</span>' +
-          (active ? '<i class="fa-solid fa-chevron-left"></i>' : '') +
-          '</button></div>';
-      }).join("");
+      const pendingMarkup = pending.map(item =>
+        '<article class="dp-chat-contact-row dp-conversation-request">' +
+          '<div class="dp-chat-contact">' +
+            '<span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span>' +
+            '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(item.professional_name || "المختص") + '</strong><small>تم إرسال طلب المحادثة، في انتظار موافقة المختص</small></span>' +
+            '<span class="dp-chat-contact-status">قيد الانتظار</span>' +
+          '</div>' +
+          '<div class="dp-conversation-actions"><button type="button" class="dp-conversation-cancel" data-chat-cancel="' + escapeHtml(item.request_id) + '">إلغاء الطلب</button></div>' +
+        '</article>'
+      ).join("");
+      const contactsMarkup = rows.map(contact =>
+        '<div class="dp-chat-contact-row">' +
+          '<button type="button" class="dp-chat-contact" data-chat-open="' + escapeHtml(contact.id) + '">' +
+            '<span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span>' +
+            '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(contact.name) + '</strong><small>' + escapeHtml(contact.subtitle) + '</small></span>' +
+            '<span class="dp-chat-contact-status">' + (contact.owner ? "المختص المسؤول" : "محادثة مقبولة") + '</span>' +
+            '<i class="fa-solid fa-chevron-left"></i>' +
+          '</button></div>'
+      ).join("");
+      list.innerHTML = pendingMarkup + contactsMarkup ||
+        '<div class="patient-messages-empty">لا توجد جهات تواصل مرتبطة بهذا الملف.</div>';
+
+      list.querySelectorAll("[data-chat-cancel]").forEach(button => {
+        button.addEventListener("click", async () => {
+          if (button.disabled) return;
+          button.disabled = true;
+          button.textContent = "جاري الإلغاء...";
+          try {
+            const { error: cancelError } = await supabase.rpc("cancel_professional_connection_request", {
+              p_request_id: button.dataset.chatCancel
+            });
+            if (cancelError) throw cancelError;
+            root.dataset.inboxMounted = "false";
+            await mountInbox(root, options);
+          } catch (cancelError) {
+            console.error("Conversation request cancellation failed:", cancelError);
+            button.disabled = false;
+            button.textContent = "إلغاء الطلب";
+            const status = document.createElement("small");
+            status.className = "patient-messages-status is-error";
+            status.textContent = cancelError.message || "تعذر إلغاء الطلب.";
+            button.parentElement.appendChild(status);
+          }
+        });
+      });
+
       list.querySelectorAll("[data-chat-open]").forEach(button => {
         const contact = contacts.get(button.dataset.chatOpen);
-        if (!contact || contact.status !== "accepted") return;
+        if (!contact) return;
         button.addEventListener("click", () => openCentralConversation(contact, {
           patientId, role: "patient", professionalId: contact.id, counterpartName: contact.name
         }));
