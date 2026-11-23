@@ -71,19 +71,26 @@
     let counterpartLabel = role === "patient" ? "المختص" : "المريض";
     try {
       if (role === "patient") {
-        const { data: patient, error } = await supabase.from("patients")
-          .select("id,user_id")
-          .eq("id", patientId)
-          .maybeSingle();
-        if (error) throw error;
-        if (!patient?.user_id) throw new Error("تعذر تحديد المختص المسؤول عن هذا الملف.");
-        recipientId = patient.user_id;
+        if (options.professionalId) {
+          recipientId = options.professionalId;
+        } else {
+          const { data: patient, error } = await supabase.from("patients")
+            .select("id,user_id")
+            .eq("id", patientId)
+            .maybeSingle();
+          if (error) throw error;
+          if (!patient?.user_id) throw new Error("تعذر تحديد المختص المسؤول عن هذا الملف.");
+          recipientId = patient.user_id;
+        }
         const { data: profile, error: profileError } = await supabase.from("profiles")
           .select("full_name,profession")
           .eq("id", recipientId)
           .maybeSingle();
         if (profileError) throw profileError;
-        counterpartLabel = profile?.full_name || "المختص";
+        counterpartLabel = options.counterpartName || profile?.full_name || "المختص";
+      } else if (options.patientUserId) {
+        recipientId = options.patientUserId;
+        counterpartLabel = options.patientName || "المريض";
       } else {
         const { data: account, error } = await supabase.from("patient_accounts")
           .select("user_id")
@@ -252,55 +259,98 @@
 
   async function mountInbox(root, options = {}) {
     if (!root || root.dataset.inboxMounted === "true") return;
-    if (!supabase || !access?.getCurrentUser) { root.textContent = "تعذر تهيئة قائمة المحادثات."; return; }
-    root.dataset.inboxMounted = "true";
-    const role = options.role, patientId = options.patientId;
-    root.dataset.patientId = String(patientId || "");
-    if (role !== "patient" || !patientId) {
-      root.textContent = "قائمة المحادثات متاحة لكل ملف صحي مرتبط بحساب المريض.";
+    if (!supabase || !access?.getCurrentUser) {
+      root.textContent = "تعذر تهيئة قائمة المحادثات.";
       return;
     }
-    root.innerHTML = '<div class="dp-chat-inbox"><div class="dp-chat-contact-list" data-chat-contacts><p class="patient-messages-empty">جاري تحميل المختص المسؤول...</p></div></div>';
+    root.dataset.inboxMounted = "true";
+    const patientId = options.patientId;
+    root.dataset.patientId = String(patientId || "");
+    if (options.role !== "patient" || !patientId) {
+      root.textContent = "قائمة المحادثات متاحة داخل الملف الصحي للمريض.";
+      return;
+    }
+
+    root.innerHTML = '<div class="dp-chat-inbox"><div class="dp-chat-contact-list" data-chat-contacts><p class="patient-messages-empty">جاري تحميل جهات التواصل...</p></div></div>';
     const list = root.querySelector("[data-chat-contacts]");
     try {
       const user = await access.getCurrentUser();
       if (root.dataset.patientId !== String(patientId)) return;
       if (!user?.id) throw new Error("يجب تسجيل الدخول لعرض المحادثات.");
+
       const { data: patient, error } = await supabase.from("patients")
         .select("id,user_id")
         .eq("id", patientId)
         .maybeSingle();
       if (error) throw error;
-      if (root.dataset.patientId !== String(patientId)) return;
       if (!patient?.user_id) throw new Error("تعذر تحديد المختص المسؤول عن هذا الملف.");
-      const { data: profile, error: profileError } = await supabase.from("profiles")
+
+      const { data: owner, error: ownerError } = await supabase.from("profiles")
         .select("id,full_name,profession")
         .eq("id", patient.user_id)
         .maybeSingle();
-      if (profileError) throw profileError;
+      if (ownerError) throw ownerError;
+
+      const { data: requests, error: requestsError } = await supabase.rpc(
+        "list_my_professional_connection_requests",
+        { p_patient_id: patientId }
+      );
+      if (requestsError) throw requestsError;
       if (root.dataset.patientId !== String(patientId)) return;
-      const contact = {
+
+      const contacts = new Map();
+      contacts.set(patient.user_id, {
         id: patient.user_id,
-        name: profile?.full_name || "المختص",
-        subtitle: profile?.profession || "المختص المسؤول",
-        status: "active"
-      };
-      ensureFloatingChatWidget();
-      list.innerHTML =
-        '<button type="button" class="dp-chat-contact" data-chat-open="' + escapeHtml(contact.id) + '">' +
-        '<span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span>' +
-        '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(contact.name) + '</strong><small>' + escapeHtml(contact.subtitle) + '</small></span>' +
-        '<span class="dp-chat-contact-status">متاح</span><i class="fa-solid fa-chevron-left"></i></button>';
-      list.querySelector("[data-chat-open]")?.addEventListener("click", () => {
-        openCentralConversation(contact, { patientId, role: "patient", professionalId: contact.id });
+        name: owner?.full_name || "المختص المسؤول",
+        subtitle: owner?.profession || "المختص المسؤول عن الملف",
+        status: "accepted",
+        owner: true
+      });
+      (requests || []).forEach(item => {
+        const current = contacts.get(item.professional_id);
+        contacts.set(item.professional_id, {
+          id: item.professional_id,
+          name: item.professional_name || "المختص",
+          subtitle: item.professional_title || "مختص معتمد",
+          status: current?.status === "accepted" ? "accepted" : item.status,
+          owner: Boolean(current?.owner)
+        });
+      });
+
+      const rows = [...contacts.values()];
+      if (!rows.length) {
+        list.innerHTML = '<div class="patient-messages-empty">لا توجد جهات تواصل مرتبطة بهذا الملف.</div>';
+        return;
+      }
+      list.innerHTML = rows.map(contact => {
+        const active = contact.status === "accepted";
+        const statusLabel = contact.owner ? "المختص المسؤول" :
+          active ? "المحادثة متاحة" :
+          contact.status === "pending" ? "طلب قيد المراجعة" :
+          contact.status === "declined" ? "لم يُقبل الطلب" : "غير متاح";
+        return '<div class="dp-chat-contact-row">' +
+          '<button type="button" class="dp-chat-contact" data-chat-open="' + escapeHtml(contact.id) + '"' + (active ? "" : " disabled") + '>' +
+          '<span class="dp-chat-avatar"><i class="fa-solid fa-user-doctor"></i></span>' +
+          '<span class="dp-chat-contact-copy"><strong>' + escapeHtml(contact.name) + '</strong><small>' + escapeHtml(contact.subtitle) + '</small></span>' +
+          '<span class="dp-chat-contact-status">' + escapeHtml(statusLabel) + '</span>' +
+          (active ? '<i class="fa-solid fa-chevron-left"></i>' : '') +
+          '</button></div>';
+      }).join("");
+      list.querySelectorAll("[data-chat-open]").forEach(button => {
+        const contact = contacts.get(button.dataset.chatOpen);
+        if (!contact || contact.status !== "accepted") return;
+        button.addEventListener("click", () => openCentralConversation(contact, {
+          patientId, role: "patient", professionalId: contact.id, counterpartName: contact.name
+        }));
       });
     } catch (error) {
       console.error("Conversation inbox load failed:", error);
       if (root.dataset.patientId === String(patientId)) {
-        list.innerHTML = '<div class="patient-messages-empty is-error">' + escapeHtml(error.message || "تعذر تحميل المختص المسؤول.") + '</div>';
+        list.innerHTML = '<div class="patient-messages-empty is-error">' +
+          escapeHtml(error.message || "تعذر تحميل جهات التواصل.") + '</div>';
       }
     }
   }
 
-  window.DietPlannerPatientMessages = { mount, mountInbox };
+  window.DietPlannerPatientMessages = { mount, mountInbox, openConversation: openCentralConversation };
 })();
