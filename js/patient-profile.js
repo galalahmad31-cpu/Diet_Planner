@@ -128,7 +128,8 @@
   }
 
   function canManagePatientCare() {
-    return canWritePatientPrivateData() || canEditSharedHealth();
+    const ownsWorkspace = Boolean(state.user?.id && state.patient?.user_id === state.user.id);
+    return (ownsWorkspace && canWritePatientPrivateData()) || canEditSharedHealth();
   }
 
   function canWrite() {
@@ -274,11 +275,11 @@
       container: $("weightTableContainer"),
       logs: measurementState.logs,
       addDisabled: !canManagePatientCare(),
-      actionCell: (_log, index) => `
+      actionCell: (_log, index) => canManagePatientCare() ? `
         <div class="measurement-row-actions">
           <button type="button" class="measurement-edit-button" data-measurement-edit="${index}" aria-label="تعديل القياس">تعديل</button>
           <button type="button" class="measurement-delete-button" data-measurement-delete="${index}" aria-label="حذف القياس">حذف</button>
-        </div>`
+        </div>` : ''
     });
   }
 
@@ -352,6 +353,11 @@
 
   async function saveMeasurementEntry(row) {
     if (!row || row.dataset.saving === 'true') return;
+    if (!canManagePatientCare()) {
+      showMeasurementError('انتهت صلاحية إدارة القياسات لهذا المريض.');
+      renderMeasurements();
+      return;
+    }
     const read = field => row.querySelector('[data-field="' + field + '"]')?.value?.trim() ?? '';
     const numeric = field => read(field) === '' ? null : Number(read(field));
     const payload = { date: read('date'), weight: numeric('weight'), bodyFat: numeric('bodyFat'), muscle: numeric('muscle'), water: numeric('water'), waist: numeric('waist'), hip: numeric('hip'), adherence: read('adherence') || null, notes: read('notes') || null };
