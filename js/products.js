@@ -994,6 +994,11 @@ async function init() {
       $('loading')?.remove();
       return;
     }
+    if (status.isAdmin !== true && status.hasActiveSubscription !== true) {
+      window.DietPlannerAccess?.showAccessPrompt?.({title:'اشتراك فعال مطلوب',message:'المنتجات الغذائية متاحة للمشتركين ذوي الاشتراك الفعال.',actionLabel:'عرض الاشتراكات',actionHref:'subscription-plans.html'});
+      $('loading')?.remove();
+      return;
+    }
 
     state.isAdmin = status.isAdmin === true;
     // The verified profile role is the single source of truth for this admin-only toolbar.
