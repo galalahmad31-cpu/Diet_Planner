@@ -653,7 +653,7 @@
     if (exchangePlanModulePromise) return exchangePlanModulePromise;
     exchangePlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/visit-exchange-plan.js?v=20261123-atomic-exchange-save-v1';
+      script.src = 'js/visit-exchange-plan.js?v=20261123-atomic-exchange-save-v2';
       script.async = true;
       script.onload = () => typeof window.exchangePlan?.init === 'function'
         ? resolve(true)
