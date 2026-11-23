@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, portalLoadSequence: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
+  const state = { user: null, patient: null, patientId: null, preferredPatientId: null, contextVersion: 0, portalLoadSequence: 0, patientAccounts: [], logs: [], busy: false, activePlanTab: "professional", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }] };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -522,10 +522,6 @@
 
   const FOOD_COLUMNS = "id,name_ar,name_en,carb,protein,potassium,phosphorus,sodium,household,preparation_method";
 
-  function normalizeFoodSearch(value) {
-    return String(value || "").toLocaleLowerCase("ar").normalize("NFKD").replace(/[\u064B-\u065F\u0670]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").trim();
-  }
-
   async function ensurePatientFoods() {
     if (state.foods) return state.foods;
     if (state.foodsPromise) return state.foodsPromise;
@@ -547,19 +543,6 @@
       const node = $(id);
       if (node) node.textContent = message;
     });
-  }
-
-  function findFoods(query) {
-    const needle = normalizeFoodSearch(query);
-    if (!needle) return [];
-    return (state.foodSearchIndex || []).filter(entry => entry.searchText.includes(needle)).map(entry => entry.food);
-  }
-
-  function foodSearchMarkup(food) {
-    return `<button type="button" class="portal-food-search-item" data-select-food="${escapeHtml(food.id)}">
-      <strong>${escapeHtml(food.name_ar || food.name_en || "غذاء")}</strong>
-      <small>${escapeHtml(food.household || "لا يوجد مقياس منزلي مسجل")}</small>
-    </button>`;
   }
 
   const TOOL_CONFIG = {
@@ -642,15 +625,6 @@
   function renderCarbMeals() { renderToolMeals("carb"); }
   function renderRenalMeals() { renderToolMeals("renal"); }
 
-  function renderFoodSearchResults(query) {
-    const root = $("portalCarbSearchResults");
-    if (!root) return;
-    const matches = query.trim() ? findFoods(query) : (state.foods || []);
-    root.innerHTML = matches.length
-      ? '<p class="portal-food-results-count">' + (query.trim() ? 'نتائج البحث' : 'جميع الأصناف') + ' · ' + matches.length.toLocaleString('ar-EG') + ' صنف</p>' + matches.map(foodSearchMarkup).join("")
-      : '<p class="portal-tool-hint">لا توجد أصناف مطابقة.</p>';
-  }
-
   function activateToolsTab(panelId) {
     const allowed = ["portalCarbPanel", "portalRenalPanel"];
     if (!allowed.includes(panelId)) return;
@@ -663,78 +637,42 @@
   }
 
   function openFoodPicker(tool, mealId) {
-    const meals = getToolMeals(tool);
-    const meal = meals.find(item => item.id === mealId);
-    const picker = $("portalCarbPicker");
-    if (!picker || !meal) return;
-    state.activeFoodTool = tool;
-    state.activeFoodMeal = mealId;
-    state.selectedFood = null;
-    $("portalCarbMealLabel").textContent = "إضافة صنف إلى " + meal.name;
-    $("portalCarbSearch").value = "";
-    renderFoodSearchResults("");
-    $("portalCarbSelectedFood").hidden = true;
-    $("portalCarbConfirm").disabled = true;
-    $("portalCarbGrams").value = "100";
-    $("portalCarbConfirm").textContent = "إضافة للوجبة";
-    picker.hidden = false;
-    document.body.classList.add("portal-modal-open");
-    window.setTimeout(() => $("portalCarbSearch")?.focus(), 30);
-  }
-
-  function selectFood(foodId) {
-    const food = state.foods?.find(item => String(item.id) === String(foodId));
-    if (!food) return;
-    state.selectedFood = food;
-    $("portalCarbSelectedName").textContent = food.name_ar || food.name_en || "غذاء";
-    $("portalCarbHousehold").textContent = food.household || "لا يوجد مقياس منزلي مسجل لهذا الصنف.";
-    $("portalCarbSelectedFood").hidden = false;
-    $("portalCarbConfirm").disabled = false;
-  }
-
-  function closeFoodPicker() {
-    const picker = $("portalCarbPicker");
-    if (picker) picker.hidden = true;
-    document.body.classList.remove("portal-modal-open");
-    state.activeFoodTool = null;
-    state.activeFoodMeal = null;
-    state.selectedFood = null;
-  }
-
-  function confirmFood() {
-    const food = state.selectedFood;
-    const tool = state.activeFoodTool;
-    const meal = tool ? getToolMeals(tool).find(item => item.id === state.activeFoodMeal) : null;
-    const grams = Number($("portalCarbGrams")?.value);
-    if (!food || !meal || !Number.isFinite(grams) || grams <= 0 || grams > 10000) {
-      setMessage("portalToolsStatus", "اختر صنفًا وأدخل كمية صحيحة بالجرام.", "error");
+    const meal = getToolMeals(tool).find(item => item.id === mealId);
+    if (!meal || !Array.isArray(state.foods)) return;
+    const picker = window.DietPlannerFoodPicker;
+    if (!picker || typeof picker.open !== "function") {
+      setMessage("portalToolsStatus", "منتقي الأغذية المركزي غير متاح. أعد تحميل الصفحة.", "error");
       return;
     }
-    meal.items.push({ id: window.crypto?.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2), food, grams });
-    closeFoodPicker();
-    setMessage("portalToolsStatus", "", "");
-    renderToolMeals(tool);
+    picker.open({
+      title: "إضافة صنف إلى " + meal.name,
+      foods: state.foods,
+      grams: 100,
+      confirmText: "إضافة للوجبة",
+      onConfirm: ({ food, grams }) => {
+        if (!food || !Number.isFinite(grams) || grams <= 0 || grams > 10000) throw new Error("أدخل كمية صحيحة بالجرام.");
+        meal.items.push({ id: window.crypto?.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2), food, grams });
+        setMessage("portalToolsStatus", "", "");
+        renderToolMeals(tool);
+        return true;
+      }
+    });
   }
 
   function handlePatientToolsClick(event) {
     const carbAdd = event.target.closest("[data-add-carb-food]");
     const renalAdd = event.target.closest("[data-add-renal-food]");
-    const selected = event.target.closest("[data-select-food]");
     const carbRemove = event.target.closest("[data-remove-carb-item]");
     const renalRemove = event.target.closest("[data-remove-renal-item]");
-    const close = event.target.closest("[data-close-carb-picker]");
-    const confirm = event.target.closest("#portalCarbConfirm");
     const tab = event.target.closest("[data-tools-tab]");
     if (carbAdd) openFoodPicker("carb", carbAdd.dataset.addCarbFood);
     else if (renalAdd) openFoodPicker("renal", renalAdd.dataset.addRenalFood);
-    else if (selected) selectFood(selected.dataset.selectFood);
     else if (carbRemove || renalRemove) {
       const tool = carbRemove ? "carb" : "renal";
       const itemId = (carbRemove || renalRemove).dataset[carbRemove ? "removeCarbItem" : "removeRenalItem"];
       getToolMeals(tool).forEach(meal => { meal.items = meal.items.filter(item => item.id !== itemId); });
       renderToolMeals(tool);
-    } else if (close) closeFoodPicker();
-    else if (confirm) confirmFood();
+    }
     else if (tab) activateToolsTab(tab.dataset.toolsTab);
     else if (event.target === $("portalCarbPicker")) closeFoodPicker();
   }
@@ -1087,8 +1025,6 @@
     $("portalToolsPanel")?.addEventListener("change", event => {
       if (event.target.matches("#portalDiabetesType, #portalInsulinRegimen, #portalInsulinKind, #portalInsulinMeal")) calculateInsulinEstimate();
     });
-    $("portalCarbSearch")?.addEventListener("input", event => renderFoodSearchResults(event.target.value));
-    $("portalCarbPicker")?.addEventListener("keydown", event => { if (event.key === "Escape") closeFoodPicker(); });
     activateToolsTab("portalCarbPanel");
     calculateInsulinEstimate();
     window.addEventListener("hashchange", () => {
