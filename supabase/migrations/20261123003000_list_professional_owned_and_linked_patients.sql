@@ -1,4 +1,6 @@
-create or replace function public.list_my_professional_patients(
+drop function if exists public.list_my_professional_patients(integer, integer);
+
+create function public.list_my_professional_patients(
   p_limit integer default 50,
   p_offset integer default 0
 )
@@ -9,6 +11,7 @@ returns table (
   diagnosis text,
   is_linked boolean,
   has_care_team boolean,
+  next_appointment_at timestamptz,
   total_count bigint
 )
 language plpgsql
@@ -87,6 +90,16 @@ begin
     vp.diagnosis,
     vp.is_linked,
     vp.has_care_team,
+    case when vp.has_care_team then (
+      select a.scheduled_at
+      from public.patient_appointments a
+      where a.patient_id = vp.id
+        and a.professional_id = v_uid
+        and a.status = 'confirmed'
+        and a.scheduled_at >= now()
+      order by a.scheduled_at asc
+      limit 1
+    ) else null end as next_appointment_at,
     count(*) over () as total_count
   from visible_patients vp
   order by vp.name asc nulls last, vp.id asc
