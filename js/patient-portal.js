@@ -1131,5 +1131,10 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", init, { once: true });
+  document.addEventListener("DOMContentLoaded", () => {
+    init().catch(error => {
+      console.error("Patient portal initialization failed:", error);
+      fail(error?.message || "تعذر تهيئة الملف الصحي. أعد تحميل الصفحة.");
+    });
+  }, { once: true });
 })();
