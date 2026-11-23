@@ -865,22 +865,6 @@ body.patient-conversation-open{overflow:hidden}
 .measurement-number{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
 
 
-/* Shared health record inside the professional patient profile */
-.professional-shared-health{margin:18px 0 4px;padding:16px;border:1px solid var(--dp-border,#dce5e8);border-radius:16px;background:var(--dp-surface-soft,#f7fafb);display:grid;gap:12px}
-.professional-shared-health-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.professional-shared-health-heading>div{display:grid;gap:3px}
-.professional-shared-health-heading strong{font-size:13px;font-weight:900;color:var(--dp-text,#17313b)}
-.professional-shared-health-heading small{font-size:10px;color:var(--dp-muted,#71828a);line-height:1.6}
-.professional-shared-health-badge{font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:var(--dp-accent-soft,#e5f4f1);color:var(--dp-accent,#087f72)}
-.professional-shared-health-status{margin:0;font-size:11px;line-height:1.7;color:var(--dp-muted,#71828a)}
-.professional-shared-health-history{display:grid;gap:8px;max-height:230px;overflow:auto}
-.professional-health-audit-item{padding:10px 12px;border:1px solid var(--dp-border,#dce5e8);border-radius:11px;background:var(--dp-surface,#fff)}
-.professional-health-audit-item>div{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.professional-health-audit-item strong{font-size:11px;color:var(--dp-text,#17313b)}
-.professional-health-audit-item time{font-size:9px;color:var(--dp-muted,#71828a);direction:ltr;unicode-bidi:isolate}
-.professional-health-audit-item p{margin:5px 0 0;font-size:10px;color:var(--dp-muted,#71828a);line-height:1.7}
-
-
 /* Legacy Finance panel — shown only for unlinked patients */
 .patient-finance-details{margin-top:14px;border-top:1px solid var(--dp-border)}
 .patient-finance-summary{display:flex;align-items:center;gap:10px;min-height:62px;padding:10px 2px;cursor:pointer;list-style:none}
