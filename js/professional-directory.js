@@ -106,13 +106,14 @@ async function requestConversation(){
  if(!state.user){window.location.href="login.html?next="+encodeURIComponent("professional-directory.html");return;}
  if(!professionalId||button?.disabled)return;
  const message=$("directoryRequestMessage")?.value.trim()||"";
- button.disabled=true;button.textContent="جاري إرسال الطلب...";
+ const restoring=currentRequest(professionalId)?.status==="blocked";
+ button.disabled=true;button.textContent=restoring?"جاري إرسال طلب الاستعادة...":"جاري إرسال الطلب...";
  try{
   const {data,error}=await db.rpc("request_professional_connection",{p_professional_id:professionalId,p_patient_id:null,p_message:message});
   if(error)throw error;
-  state.requests.set(requestKey(null,professionalId),{id:data,request_id:data,patient_id:null,professional_id:professionalId,status:"pending"});
+  state.requests.set(requestKey(null,professionalId),{id:data,request_id:data,patient_id:null,professional_id:professionalId,status:restoring?"restore_pending":"pending"});
   renderRequestPanel();
-  $("directoryModalStatus").textContent="تم إرسال طلب المحادثة، في انتظار موافقة المختص. يمكنك إلغاء الطلب قبل قبوله.";
+  $("directoryModalStatus").textContent=restoring?"تم إرسال طلب استعادة التواصل، في انتظار موافقة المختص.":"تم إرسال طلب المحادثة، في انتظار موافقة المختص. يمكنك إلغاء الطلب قبل قبوله.";
   $("directoryModalStatus").className="directory-modal-status is-success";
  }catch(error){
   console.error("[Professional Directory] Conversation request failed:",error);
