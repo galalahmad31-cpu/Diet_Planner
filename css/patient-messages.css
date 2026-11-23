@@ -59,3 +59,14 @@ html[data-theme="dark"] .patient-message-bubble.is-mine{background:#214c43;color
 
 .dp-conversation-actions .dp-conversation-cancel{background:var(--dp-card,#fff);color:#b45353;border-color:#e8caca}
 .dp-conversation-actions .dp-conversation-cancel:disabled{opacity:.55;cursor:wait}
+
+
+/* Communications tabs — shared semantic theme, independent of utility-class generation. */
+.dp-communications-tab{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:42px;padding:9px 14px;border:1px solid var(--dp-tab-border,var(--dp-border));border-radius:12px;background:var(--dp-tab-bg,var(--dp-surface));color:var(--dp-tab-text,var(--dp-text));font:800 12px/1.5 var(--dp-font,Cairo,sans-serif);cursor:pointer;transition:background .16s,border-color .16s,color .16s}
+.dp-communications-tab:hover{border-color:var(--dp-primary);background:var(--dp-surface-2)}
+.dp-communications-tab.is-active{border-color:var(--dp-primary);background:var(--dp-primary);color:var(--dp-on-primary,#fff)}
+.dp-communications-tab-count{display:inline-grid;place-items:center;flex:0 0 auto;min-width:22px;height:22px;padding:0 6px;border:1px solid var(--dp-border);border-radius:999px;background:var(--dp-surface-3);color:var(--dp-text);font:900 10px/1 var(--dp-font,Cairo,sans-serif);font-variant-numeric:tabular-nums}
+.dp-communications-tab.is-active .dp-communications-tab-count{border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.18);color:#fff}
+.dp-communications-tab:focus-visible{outline:2px solid var(--dp-primary);outline-offset:3px}
+html[data-theme="dark"] .dp-communications-tab.is-active .dp-communications-tab-count{background:rgba(255,255,255,.18);color:#fff}
+@media(max-width:640px){.dp-communications-tab{min-height:40px;padding:8px 9px;font-size:11px}.dp-communications-tab-count{min-width:20px;height:20px}}
