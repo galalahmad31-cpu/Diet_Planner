@@ -3,7 +3,7 @@
 const db=window.DietPlannerAccess?.supabaseClient;
 const $=id=>document.getElementById(id);
 const PAGE_SIZE=20;
-const state={profiles:[],offers:new Map(),offset:0,loading:false,selectedProfile:null,requestStatus:new Map(),currentUserId:null};
+const state={profiles:[],offers:new Map(),offset:0,loading:false,selectedProfile:null};
 const modeLabels={online:"متابعة أونلاين",in_person:"متابعة حضورية",phone:"متابعة هاتفية"};
 const esc=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const arr=value=>Array.isArray(value)?value:[];
@@ -34,7 +34,7 @@ function renderProfiles(){
    +field("طرق المتابعة",modes.join("، "),"fa-video")
    +specialtyField(p)+'</div><p class="directory-card-bio">'+esc(p.bio||"لم يضف المختص نبذة تعريفية بعد.")+'</p>'
    +'<section class="directory-card-offers"><h3>الخدمات والأسعار</h3>'+renderOffers(p.user_id,true)+'</section>'
-   +'<div class="directory-card-actions"><button type="button" class="directory-secondary-button" data-view-profile="'+esc(p.user_id)+'">عرض الملف</button><button type="button" class="directory-primary-button" data-request-profile="'+esc(p.user_id)+'" '+(["pending","accepted","active"].includes(state.requestStatus.get(p.user_id))?"disabled":"")+'>'+({pending:"الطلب قيد الانتظار",accepted:"المحادثة مفتوحة",active:"متابعة نشطة"}[state.requestStatus.get(p.user_id)]||"طلب محادثة")+'</button></div></article>';
+   +'<div class="directory-card-actions"><button type="button" class="directory-secondary-button" data-view-profile="'+esc(p.user_id)+'">عرض الملف</button></div></article>';
  }).join("");
  $("directoryStatus").textContent=list.length?"عدد النتائج المحمّلة: "+list.length:"لا توجد ملفات مهنية مطابقة لمعايير البحث.";
 }
@@ -52,14 +52,6 @@ async function loadOffers(profiles){
  for(const id of ids)state.offers.set(id,[]);
  for(const offer of data||[])state.offers.get(offer.professional_id)?.push(offer);
 }
-async function loadMyRequests(){
- const user=await window.DietPlannerAccess?.getCurrentUser();
- state.currentUserId=user?.id||null;
- if(!user||!db)return;
- const {data,error}=await db.rpc("list_my_professional_connection_requests");
- if(error){console.warn("[Professional Directory] Existing requests could not be loaded:",error);return;}
- (data||[]).forEach(item=>state.requestStatus.set(item.professional_id,item.status));
-}
 async function loadProfiles(){
  if(state.loading)return;
  if(!db){$("directoryStatus").textContent="تعذر تهيئة الاتصال بقاعدة البيانات.";return;}
@@ -67,7 +59,6 @@ async function loadProfiles(){
  $("directoryStatus").textContent=state.profiles.length?"جاري تحميل المزيد...":"جاري تحميل المتخصصين...";
  try{
   let query=db.from("professional_directory_profiles").select("user_id,display_name,professional_title,bio,specialties,city,governorate,experience_years,service_modes").eq("listing_status","published").eq("is_verified",true).order("governorate");
-  if(state.currentUserId)query=query.neq("user_id",state.currentUserId);
   const {data,error}=await query.range(state.offset,state.offset+PAGE_SIZE-1);
   if(error)throw error;
   const page=Array.isArray(data)?data:[];
@@ -83,35 +74,18 @@ function openProfile(profileId){
  $("directoryModalSpecialties").innerHTML=arr(p.specialties).map(s=>'<span class="directory-chip">'+esc(s)+'</span>').join("")||'<span class="directory-muted">لم تُحدد تخصصات</span>';
  $("directoryModalOffers").innerHTML=renderOffers(profileId);
  $("directoryModalBio").textContent=p.bio||"لم يضف المختص نبذة تعريفية بعد.";
- $("directoryRequestMessage").value="";$("directoryModalStatus").textContent="";$("directoryModalStatus").className="directory-modal-status";
- const send=$("directorySendRequest"),requestStatus=state.requestStatus.get(profileId);send.disabled=["pending","accepted","active"].includes(requestStatus);send.textContent=({pending:"الطلب قيد الانتظار",accepted:"المحادثة مفتوحة",active:"متابعة نشطة"}[requestStatus]||"إرسال طلب المحادثة");
+ $("directoryModalStatus").textContent="لربط ملف صحي، احصل على كود ربط مباشر من المختص.";
+ $("directoryModalStatus").className="directory-modal-status";
  $("directoryModal").hidden=false;document.body.classList.add("directory-modal-open");$("directoryModalClose").focus();
 }
 function closeModal(){$("directoryModal").hidden=true;document.body.classList.remove("directory-modal-open");state.selectedProfile=null;}
-async function submitRequest(){
- const p=state.selectedProfile;if(!p)return;
- const user=await window.DietPlannerAccess?.getCurrentUser();if(!user){window.location.href="login.html?next="+encodeURIComponent("patient-portal.html");return;}
- const send=$("directorySendRequest"),message=$("directoryRequestMessage").value.trim();
- if(message.length>1000){$("directoryModalStatus").textContent="الرسالة يجب ألا تتجاوز 1000 حرف.";return;}
- send.disabled=true;$("directoryModalStatus").textContent="جاري إرسال طلب المحادثة...";
- try{
-  const accountType=await window.DietPlannerAccess?.getUserAccountType(user.id);if(accountType!=="patient")throw new Error("patient_account_required");
-  const {error}=await db.rpc("request_professional_connection",{p_professional_id:p.user_id,p_message:message||null});if(error)throw error;
-  state.requestStatus.set(p.user_id,"pending");$("directoryModalStatus").textContent="تم إرسال طلب المحادثة. يمكنك إلغاءه من بوابة المريض ما دام قيد الانتظار.";
-  $("directoryModalStatus").className="directory-modal-status is-success";send.textContent="تم إرسال طلب المحادثة";send.disabled=true;renderProfiles();
- }catch(error){
-  console.error("[Professional Directory] Request failed:",error);
-  const messages={patient_account_required:"هذه الخدمة متاحة لحسابات المرضى فقط.",professional_not_available:"هذا الملف لم يعد متاحًا لاستقبال الطلبات.",already_in_care_team:"أنت مرتبط بالفعل بهذا المختص.",connection_already_open:"لديك محادثة مفتوحة بالفعل مع هذا المختص.",message_too_long:"الرسالة أطول من الحد المسموح."};
-  $("directoryModalStatus").textContent=messages[error.message]||"تعذر إرسال الطلب. حاول مرة أخرى.";$("directoryModalStatus").className="directory-modal-status is-error";send.disabled=false;
- }
-}
 document.addEventListener("DOMContentLoaded",()=>{
  $("directoryMore").addEventListener("click",loadProfiles);
  ["directorySearch","directoryGovernorate","directoryMode"].forEach(id=>$(id).addEventListener(id==="directorySearch"?"input":"change",renderProfiles));
- $("directoryCards").addEventListener("click",e=>{const v=e.target.closest("[data-view-profile]"),r=e.target.closest("[data-request-profile]");if(v)openProfile(v.dataset.viewProfile);if(r)openProfile(r.dataset.requestProfile);});
+ $("directoryCards").addEventListener("click",e=>{const v=e.target.closest("[data-view-profile]");if(v)openProfile(v.dataset.viewProfile);});
  $("directoryModalClose").addEventListener("click",closeModal);
  $("directoryModal").addEventListener("click",e=>{if(e.target===$("directoryModal"))closeModal();});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("directoryModal").hidden)closeModal();});
- $("directorySendRequest").addEventListener("click",submitRequest);void loadMyRequests().catch(error=>console.warn("[Professional Directory] Request status load failed:",error)).finally(loadProfiles);
+ void loadProfiles();
 });
 })();
