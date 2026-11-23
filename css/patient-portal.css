@@ -296,3 +296,15 @@
 .portal-file-switcher .portal-professional-code-form{grid-column:1/-1;margin:0}.portal-file-access-message{grid-column:1/-1;margin:0;color:var(--portal-muted);font-size:12px;line-height:1.8}
 .portal-measurement-readonly{color:var(--portal-muted,#64748b);font-size:12px}
 @media(max-width:640px){.portal-file-switcher{grid-template-columns:1fr}.portal-file-switcher>label{grid-column:auto}}
+
+
+/* Patient finance and appointment information: shared source, patient read-only view. */
+.portal-finance-readonly-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.portal-finance-readonly-grid[hidden]{display:none!important}
+.portal-finance-readonly-grid article{display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:94px;min-width:0;padding:14px;border:1px solid var(--portal-line);border-radius:13px;background:var(--portal-bg)}
+.portal-finance-readonly-grid article span{font-size:10px;color:var(--portal-muted);font-weight:800}
+.portal-finance-readonly-grid article strong{font-size:15px;line-height:1.5;color:var(--portal-ink);font-weight:900;overflow-wrap:anywhere}
+.portal-finance-readonly-grid article.is-next{border-color:var(--dp-primary);background:var(--dp-surface-2)}
+.portal-readonly-note{margin-top:14px;color:var(--portal-muted);font-size:11px;line-height:1.8;font-weight:700}
+@media(max-width:650px){.portal-finance-readonly-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.portal-finance-readonly-grid article{min-height:82px;padding:11px}.portal-finance-readonly-grid article strong{font-size:13px}}
+@media(max-width:360px){.portal-finance-readonly-grid{grid-template-columns:minmax(0,1fr)}}
