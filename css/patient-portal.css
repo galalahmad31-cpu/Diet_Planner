@@ -29,7 +29,7 @@
 .measurements-table-wrap{overflow-x:auto;overscroll-behavior-inline:contain;}
 
 /* Patient portal information architecture: shared tokens, one tab system. */
-.portal-health-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 16px;padding:7px;border:1px solid var(--dp-border);border-radius:15px;background:var(--dp-surface-2)}
+.portal-health-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:12px 0 16px;padding:7px;border:1px solid var(--dp-border);border-radius:15px;background:var(--dp-surface-2)}
 .portal-plan-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}
 .portal-health-tabs button{min-width:0;min-height:42px;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--dp-text-2);font:800 11px/1.5 var(--dp-font);cursor:pointer}
 .portal-health-tabs button:hover{background:var(--dp-surface-3);color:var(--dp-text)}
@@ -295,7 +295,7 @@
 .portal-file-switcher{display:grid;grid-template-columns:minmax(180px,1fr) minmax(260px,1.6fr);gap:12px;align-items:end;margin:0 0 18px;padding:14px;border:1px solid var(--portal-border,#e2e8f0);border-radius:16px;background:var(--portal-card,#fff)}
 .portal-file-switcher>label{grid-column:1/-1;font-weight:800}
 .portal-file-switcher>select{width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--portal-border,#cbd5e1);border-radius:10px;background:var(--portal-surface,#fff);color:inherit}
-.portal-file-switcher .portal-professional-code-form{margin:0}
+.portal-file-switcher .portal-professional-code-form{grid-column:1/-1;margin:0}.portal-file-access-message{grid-column:1/-1;margin:0;color:var(--portal-muted);font-size:12px;line-height:1.8}
 .portal-finance-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
 .portal-finance-summary-item{display:grid;gap:5px;padding:12px;border:1px solid var(--portal-border,#e2e8f0);border-radius:12px;background:var(--portal-surface,#fff)}
 .portal-finance-summary-item small{color:var(--portal-muted,#64748b);font-size:12px}
