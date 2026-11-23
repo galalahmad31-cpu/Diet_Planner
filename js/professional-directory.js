@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("directoryCards").addEventListener("click",e=>{const request=e.target.closest("[data-request-profile]");if(request){openProfile(request.dataset.requestProfile);return;}const v=e.target.closest("[data-view-profile]");if(v)openProfile(v.dataset.viewProfile);});
 
  $("directoryRequestSubmit")?.addEventListener("click",()=>{
-  const request=state.requests.get(requestKey(null,state.selectedProfileId));
+  const request=currentRequest(state.selectedProfileId);
   if(request?.status==="accepted"){
    const profile=state.profiles.find(x=>x.user_id===state.selectedProfileId);
    window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{patientId:request.patient_id??null,role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص"});
