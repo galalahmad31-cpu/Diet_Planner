@@ -14,7 +14,8 @@
     ["about.html", "عن المنصة", "fa-circle-info"],
     ["feedback.html", "شاركنا رأيك", "fa-comment-dots"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
-    ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"]
+    ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"],
+    ["contact.html", "تواصل معنا", "fa-headset"]
   ];
   // Patient navigation: keep this list as the single source of truth.
   // Internal portal sections remain in patient-portal.html; standalone destinations keep their own pages.
@@ -27,7 +28,8 @@
     ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
     ["feedback.html", "شاركنا رأيك", "fa-comment-dots"],
-    ["patient-portal.html#portalProfileArea", "الصفحة الشخصية", "fa-user"]
+    ["patient-portal.html#portalProfileArea", "الصفحة الشخصية", "fa-user"],
+    ["contact.html", "تواصل معنا", "fa-headset"]
   ];
   // Professional navigation is the single source of truth for all professional pages.
   // Keep the requested order; the shared six-column grid wraps naturally into rows of six.
@@ -49,14 +51,15 @@
     ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
     ["about.html", "عن المنصة", "fa-circle-info"],
-    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"]
+    ["feedback.html", "شاركنا رأيك", "fa-comment-dots"],
+    ["contact.html", "تواصل معنا", "fa-headset"]
   ];
   const adminPage = ["admin.html", "الإدارة", "fa-shield-halved"];
-  const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html"]);
+  const publicPaths = new Set([...publicPages.map(([href]) => href), "article-view.html", "privacy.html", "job.html", "contact.html"]);
   const titles = {
     "patient-profile.html":"ملف المريض", "patient-health.html":"الملف الصحي", "visit.html":"الخطة الغذائية",
     "nutritionsupport-patient.html":"الدعم الغذائي", "admin.html":"لوحة الإدارة",
-    "article-view.html":"المقال", "privacy.html":"سياسة الخصوصية", "job.html":"تفاصيل الوظيفة"
+    "article-view.html":"المقال", "privacy.html":"سياسة الخصوصية", "job.html":"تفاصيل الوظيفة", "contact.html":"تواصل معنا"
   };
   let notificationChannel = null;
   let notificationUserId = null;
