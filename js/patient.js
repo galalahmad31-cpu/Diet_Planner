@@ -276,7 +276,7 @@
       box.innerHTML = `
         <div class="patient-empty">
           <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-          <p>${hasPatients ? 'لا توجد ملفات مطابقة للبحث أو التصفية.' : 'لا توجد ملفات مرضى حتى الآن.'}</p>
+          <p>${hasPatients ? 'لا توجد ملفات مطابقة للبحث أو التصفية.' : state.showArchived ? 'لا توجد ملفات مؤرشفة.' : 'لا توجد ملفات مرضى حتى الآن.'}</p>
         </div>`;
       return;
     }
@@ -306,9 +306,8 @@
             </button>`;
 
       return `
-        <article class="patient-row" role="link" tabindex="0"
-          data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}"
-          aria-label="فتح ملف المريض ${escapeHtml(patient.name || 'بدون اسم')}">
+        <article class="patient-row" ${patient.isArchived ? '' : `role="link" tabindex="0" data-action="open-patient" data-patient-id="${escapeHtml(patient.id)}"`}
+          aria-label="${patient.isArchived ? 'ملف مؤرشف' : 'فتح ملف المريض'} ${escapeHtml(patient.name || 'بدون اسم')}">
           <div class="patient-row-main">
             <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
             <div class="patient-row-meta">
