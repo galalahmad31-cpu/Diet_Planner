@@ -114,7 +114,7 @@ async function requestConversation(){
   $("directoryModalStatus").className="directory-modal-status is-success";
  }catch(error){
   console.error("[Professional Directory] Conversation request failed:",error);
-  $("directoryModalStatus").textContent=error.message==="already_primary_professional"?"هذا المختص هو المسؤول عن الملف بالفعل. افتح تبويب التواصل داخل الملف الصحي.":error.message==="conversation_already_accepted"?"المحادثة مقبولة بالفعل. افتح الملف الصحي لبدء النقاش.":error.message||"تعذر إرسال طلب المحادثة.";
+  $("directoryModalStatus").textContent=error.message==="conversation_already_accepted"?"المحادثة مقبولة بالفعل. حدّث حالة الطلب لفتح المحادثة.":error.message||"تعذر إرسال طلب المحادثة.";
   $("directoryModalStatus").className="directory-modal-status is-error";
   button.disabled=false;button.textContent="إعادة إرسال الطلب";
  }
@@ -128,7 +128,7 @@ async function cancelConversationRequest(){
  try{
   const {error}=await db.rpc("cancel_professional_connection_request",{p_request_id:request.id});
   if(error)throw error;
-  state.requests.set(requestKey(null,professionalId),{...request,status:"cancelled"});
+  state.requests.set(requestKey(request.patient_id,professionalId),{...request,status:"cancelled"});
   renderRequestPanel();
   $("directoryModalStatus").textContent="تم إلغاء طلب المحادثة. يمكنك إرسال طلب جديد لاحقًا.";
   $("directoryModalStatus").className="directory-modal-status is-success";
