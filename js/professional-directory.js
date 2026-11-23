@@ -96,9 +96,9 @@ async function loadPatientContext(){
   state.user=await window.DietPlannerAccess?.getCurrentUser?.()||null;
   if(!state.user)return;
   const {data,error}=await db.from("professional_connection_requests")
-   .select("id,patient_id,professional_id,status").eq("requested_by",state.user.id);
+   .select("id,professional_id,status").eq("requested_by",state.user.id);
   if(error)throw error;
-  (data||[]).forEach(r=>state.requests.set(requestKey(r.patient_id,r.professional_id),{...r,request_id:r.id}));
+  (data||[]).forEach(r=>state.requests.set(requestKey(null,r.professional_id),{...r,request_id:r.id}));
  }catch(error){console.error("[Professional Directory] Conversation context failed:",error);}
 }
 async function requestConversation(){
@@ -109,7 +109,7 @@ async function requestConversation(){
  const restoring=currentRequest(professionalId)?.status==="blocked";
  button.disabled=true;button.textContent=restoring?"جاري إرسال طلب الاستعادة...":"جاري إرسال الطلب...";
  try{
-  const {data,error}=await db.rpc("request_professional_connection",{p_professional_id:professionalId,p_patient_id:null,p_message:message});
+  const {data,error}=await db.rpc("request_professional_connection",{p_professional_id:professionalId,p_message:message});
   if(error)throw error;
   state.requests.set(requestKey(null,professionalId),{id:data,request_id:data,patient_id:null,professional_id:professionalId,status:restoring?"restore_pending":"pending"});
   renderRequestPanel();
@@ -131,7 +131,7 @@ async function cancelConversationRequest(){
  try{
   const {error}=await db.rpc("cancel_professional_connection_request",{p_request_id:request.id});
   if(error)throw error;
-  state.requests.set(requestKey(request.patient_id,professionalId),{...request,status:"cancelled"});
+  state.requests.set(requestKey(null,professionalId),{...request,status:"cancelled"});
   renderRequestPanel();
   $("directoryModalStatus").textContent="تم إلغاء طلب المحادثة. يمكنك إرسال طلب جديد لاحقًا.";
   $("directoryModalStatus").className="directory-modal-status is-success";
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   const request=currentRequest(state.selectedProfileId);
   if(request?.status==="accepted"){
    const profile=state.profiles.find(x=>x.user_id===state.selectedProfileId);
-   window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{patientId:null,role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص",allowStandalone:true});
+   window.DietPlannerPatientMessages?.openConversation({name:profile?.display_name||"المختص",subtitle:"محادثة مقبولة"},{role:"patient",professionalId:state.selectedProfileId,counterpartName:profile?.display_name||"المختص",allowStandalone:true});
    return;
   }
   void requestConversation();
