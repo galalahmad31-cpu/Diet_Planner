@@ -104,7 +104,7 @@
     const accessBox = $('writeAccessStatus');
     if (accessBox) {
       if (canEditSharedHealth()) {
-        accessBox.textContent = 'ارتباط المتابعة نشط — يمكنك إدارة بيانات الرعاية المشتركة.';
+        accessBox.textContent = 'مالك الملف — يمكنك إدارة البيانات الصحية والمالية من مساحة المختص.';
         accessBox.className =
           'mt-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2';
       } else if (canWritePatientPrivateData()) {
@@ -118,7 +118,7 @@
           'mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2';
       }
     }
-    if (state.patientCareMode === 'unlinked') {
+    if (state.patientCareMode === 'owner') {
       setPatientFinanceEditing(state.patientFinanceEditing);
     }
     if (measurementState.loaded) renderMeasurements();
@@ -142,11 +142,11 @@
   }
 
   function canEditSharedHealth() {
-    return state.patientCareMode === 'linked' && sharedHealthState.expired === false;
+    return state.patientCareMode === 'owner' && sharedHealthState.expired === false;
   }
 
   function canEditPatientPrivateFields() {
-    return state.patientCareMode === 'unlinked' && canWrite();
+    return state.patientCareMode === 'owner' && canWrite();
   }
 
   async function loadPatient() {
@@ -973,9 +973,9 @@
     });
     if (host) {
       host.textContent = expired
-        ? 'انتهت مدة اتفاق المتابعة؛ البيانات متاحة للعرض فقط.'
+        ? 'انتهت مدة المتابعة المسجلة في Finance؛ الملف متاح للعرض فقط.'
         : verified
-          ? 'هذه البيانات مشتركة مع المريض، ويُسجّل النظام مصدر كل تعديل ووقته.'
+          ? 'يمكنك تعديل البيانات الصحية، ويُسجّل النظام مصدر كل تعديل ووقته.'
           : 'جارٍ التحقق من صلاحية الاتفاق؛ التعديل متوقف مؤقتًا.';
     }
     if (button) button.disabled = state.isSaving || sharedHealthState.saving;
@@ -987,68 +987,25 @@
       updateSharedHealthWriteState();
       return;
     }
-
     try {
-      const { data, error } = await supabase
-        .from('professional_connection_requests')
-        .select('agreement_end_date')
+      const { data, error } = await supabase.from('patient_finances')
+        .select('subscription_end_date')
         .eq('patient_id', patientId)
-        .eq('professional_id', state.user.id)
-        .eq('status', 'active')
-        .order('updated_at', { ascending: false })
-        .limit(1)
+        .eq('user_id', state.user.id)
         .maybeSingle();
-
       if (error) throw error;
       const today = new Date().toISOString().slice(0, 10);
-      sharedHealthState.expired = Boolean(
-        data?.agreement_end_date && data.agreement_end_date < today
-      );
+      sharedHealthState.expired = Boolean(data?.subscription_end_date && data.subscription_end_date < today);
     } catch (error) {
-      // The database RPC remains the authoritative write gate if this read is unavailable.
       sharedHealthState.expired = null;
-      console.warn('Could not verify care agreement status; shared editing remains locked:', error);
+      console.warn('Could not verify Finance follow-up status; clinical editing remains locked:', error);
     }
-
     updateSharedHealthWriteState();
     updateWriteControls();
   }
 
-  function renderSharedHealthInProfessionalProfile() {
-    const patient = state.patient;
-    if (!patient) return;
-    const root = $('professionalSharedHealthHistory');
-    if (!root) return;
-    if (!sharedHealthState.history.length) {
-      root.textContent = sharedHealthState.loaded ? 'لا توجد تعديلات مسجلة حتى الآن.' : 'جاري تحميل سجل التعديلات...';
-      return;
-    }
-    root.replaceChildren();
-    sharedHealthState.history.forEach(item => {
-      const article = document.createElement('article');
-      article.className = 'professional-health-audit-item';
-      const heading = document.createElement('div');
-      const actor = document.createElement('strong');
-      const actorLabel = item.actor_role === 'patient'
-        ? 'المريض'
-        : item.actor_role === 'professional'
-          ? 'المختص'
-          : item.actor_role === 'admin' ? 'إدارة المنصة' : 'مستخدم مخوّل';
-      actor.textContent = item.actor_id === state.user?.id ? `أنت — ${actorLabel}` : actorLabel;
-      const time = document.createElement('time');
-      time.dateTime = item.created_at;
-      time.textContent = new Date(item.created_at).toLocaleString('ar-EG');
-      heading.append(actor, time);
-      const detail = document.createElement('p');
-      const fields = (item.changed_fields || []).map(key => sharedHealthLabels[key] || key).join('، ');
-      detail.textContent = (item.operation === 'UPDATE' ? 'تحديث البيانات الصحية' : 'إنشاء السجل') + (fields ? ' · ' + fields : '');
-      article.append(heading, detail);
-      root.append(article);
-    });
-  }
-
   async function loadSharedHealthHistory() {
-    if (state.patientCareMode !== 'linked' || !patientId || !supabase || !state.user?.id || sharedHealthState.loading) return;
+    if (state.patientCareMode !== 'owner' || !patientId || !supabase || !state.user?.id || sharedHealthState.loading) return;
     sharedHealthState.loading = true;
     const root = $('professionalSharedHealthHistory');
     if (root) root.textContent = 'جاري تحميل سجل التعديلات...';
@@ -1130,67 +1087,34 @@
     'pfInputPaid', 'pfInputLastVisit', 'pfInputNextFollowUp'
   ];
 
-  function setPatientCareView(mode) {
-    const linked = mode === 'linked';
+  function setPatientCareView() {
     const linkedView = $('patientLinkedCareView');
     const financeView = $('patientLegacyFinanceView');
     const sharedHealthSection = $('professionalSharedHealthSection');
-    if (sharedHealthSection) sharedHealthSection.hidden = !linked;
-    if (linkedView) linkedView.hidden = !linked;
-    if (financeView) financeView.hidden = linked;
-    state.patientCareMode = mode;
+    if (linkedView) linkedView.hidden = true;
+    if (financeView) financeView.hidden = false;
+    if (sharedHealthSection) sharedHealthSection.hidden = false;
+    state.patientCareMode = 'owner';
     updateWriteControls();
   }
 
   async function loadPatientCareMode() {
     if (!patientId || !state.user?.id || !state.patient) return;
-    if (state.patientCareMode === 'linked' || state.patientCareMode === 'unlinked') return;
+    if (state.patientCareMode === 'owner') return;
     if (state.patientCareModePromise) return state.patientCareModePromise;
 
-    state.patientCareMode = 'resolving';
     state.patientCareModePromise = (async () => {
       try {
-        const [requestsResult, careTeamResult] = await Promise.all([
-          supabase.from('professional_connection_requests')
-            .select('id')
-            .eq('patient_id', patientId)
-            .eq('professional_id', state.user.id)
-            .eq('status', 'active')
-            .limit(1),
-          supabase.from('patient_care_team')
-            .select('id')
-            .eq('patient_id', patientId)
-            .eq('professional_id', state.user.id)
-            .eq('status', 'active')
-            .limit(1)
-        ]);
-        if (requestsResult.error) throw requestsResult.error;
-        if (careTeamResult.error) throw careTeamResult.error;
-
-        const linked = Boolean((requestsResult.data || []).length || (careTeamResult.data || []).length);
-        setPatientCareView(linked ? 'linked' : 'unlinked');
-
-        if (linked) {
-          await loadProfessionalAgreementStatus();
-          await loadCareAgreementPanel();
-          mountProfessionalAppointments();
-          await loadSharedHealthHistory();
-        } else {
-          await loadPatientLegacyFinance();
-        }
+        setPatientCareView();
+        await loadProfessionalAgreementStatus();
+        await Promise.all([loadPatientLegacyFinance(), loadSharedHealthHistory()]);
       } catch (error) {
-        console.error('Patient care mode resolution failed:', error);
+        console.error('Patient owner workspace load failed:', error);
         state.patientCareMode = 'error';
-        const linkedView = $('patientLinkedCareView');
-        const financeView = $('patientLegacyFinanceView');
-        const sharedHealthSection = $('professionalSharedHealthSection');
-        if (linkedView) linkedView.hidden = true;
-        if (financeView) financeView.hidden = false;
-        if (sharedHealthSection) sharedHealthSection.hidden = true;
         const financeError = $('patientFinanceError');
         if (financeError) {
           financeError.hidden = false;
-          financeError.textContent = 'تعذر تحديد حالة ارتباط المريض؛ أعد فتح هذا التبويب أو حدّث الصفحة.';
+          financeError.textContent = 'تعذر تحميل بيانات Finance أو سجل الملف الصحي.';
         }
       } finally {
         state.patientCareModePromise = null;
@@ -1198,6 +1122,7 @@
     })();
     return state.patientCareModePromise;
   }
+
   function formatFinanceAmount(value) {
     if (value === null || value === undefined || value === '') return '—';
     return Number(value).toLocaleString('ar-EG', { maximumFractionDigits: 2 }) + ' جنيه';
@@ -1234,7 +1159,7 @@
 
   function setPatientFinanceEditing(editing) {
     state.patientFinanceEditing = editing;
-    const writable = canWrite() && state.patientCareMode === 'unlinked';
+    const writable = canWrite() && state.patientCareMode === 'owner';
     patientFinanceFields.forEach(id => {
       const field = $(id);
       if (field) field.disabled = !editing || !writable;
@@ -1297,7 +1222,7 @@
   }
 
   async function savePatientLegacyFinance() {
-    if (!canWrite() || state.patientCareMode !== 'unlinked' || !state.patient || !state.user?.id || !state.patientFinanceEditing) return;
+    if (!canWrite() || state.patientCareMode !== 'owner' || !state.patient || !state.user?.id || !state.patientFinanceEditing) return;
     const startDate = $('pfInputStart').value || null;
     const months = $('pfInputMonths').value === '' ? null : Number($('pfInputMonths').value);
     const amount = $('pfInputAmount').value === '' ? null : Number($('pfInputAmount').value);
@@ -1355,7 +1280,7 @@
   }
 
   async function deletePatientLegacyFinance() {
-    if (!canWrite() || state.patientCareMode !== 'unlinked' || !state.patientFinance) return;
+    if (!canWrite() || state.patientCareMode !== 'owner' || !state.patientFinance) return;
     const confirmed = await window.DPConfirm?.ask({
       title: 'حذف بيانات Finance؟',
       message: 'سيتم حذف سجل الاشتراك المالي لهذا المريض فقط.',
@@ -1385,35 +1310,6 @@
       }
     }
   }
-
-  const careAgreementState = { loaded:false, loading:false, appointmentsMounted:false };
-  const agreementStatusLabels = {pending:'بانتظار الموافقة',accepted:'بانتظار استكمال الدفع',active:'نشط',ended:'منتهٍ',declined:'مرفوض',cancelled:'ملغي'};
-  function formatProfileDate(value) { if (!value) return '—'; const d=new Date(value+(String(value).length===10?'T00:00:00':'')); return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('ar-EG'); }
-  function renderCareAgreementPanel(rows) {
-    const root=$('careAgreementSummary'); if(!root)return;
-    if(!rows.length){root.textContent='لا يوجد اتفاق متابعة مسجل لهذا المريض.';return;}
-    const row=rows.find(x=>x.status==='active')||rows[0];
-    const values=[
-      ['الخدمة',row.agreement_service_title||'اتفاق متابعة'],
-      ['الحالة',agreementStatusLabels[row.status]||row.status],
-      ['قيمة الاتفاق',row.agreement_amount==null?'غير محددة':Number(row.agreement_amount).toLocaleString('ar-EG')+' '+(row.agreement_currency||'EGP')],
-      ['المدة',row.agreement_duration_days?row.agreement_duration_days+' يوم':'غير محددة'],
-      ['البداية',formatProfileDate(row.agreement_start_date)],['النهاية',formatProfileDate(row.agreement_end_date)],
-      ['السداد',row.payment_received_at?'تم تأكيد الاستلام':row.payment_sent_at?'تم تأكيد الإرسال':'غير مكتمل']
-    ];
-    root.replaceChildren(); const card=document.createElement('div'); card.className='patient-care-agreement-card';
-    values.forEach(([label,value])=>{const item=document.createElement('div');item.className='patient-care-value';const l=document.createElement('small');l.textContent=label;const v=document.createElement('strong');v.textContent=value;item.append(l,v);card.append(item);});
-    root.append(card);
-    if(rows.length>1){const history=document.createElement('details');history.className='patient-care-history';const summary=document.createElement('summary');summary.textContent='سجل الاتفاقات السابقة ('+(rows.length-1)+')';history.append(summary);rows.filter(x=>x.id!==row.id).forEach(x=>{const line=document.createElement('p');line.textContent=(x.agreement_service_title||'اتفاق متابعة')+' · '+(agreementStatusLabels[x.status]||x.status)+' · '+formatProfileDate(x.agreement_start_date)+' — '+formatProfileDate(x.agreement_end_date);history.append(line);});root.append(history);}
-  }
-  async function loadCareAgreementPanel() {
-    if(!patientId||!state.user?.id||careAgreementState.loading||careAgreementState.loaded)return;
-    careAgreementState.loading=true;const root=$('careAgreementSummary');if(root)root.textContent='جاري تحميل الاتفاق...';
-    try{const r=await supabase.from('professional_connection_requests').select('id,status,agreement_service_title,agreement_amount,agreement_currency,agreement_duration_days,agreement_start_date,agreement_end_date,payment_sent_at,payment_received_at,created_at').eq('patient_id',patientId).eq('professional_id',state.user.id).order('created_at',{ascending:false}).limit(50);if(r.error)throw r.error;renderCareAgreementPanel(r.data||[]);careAgreementState.loaded=true;}
-    catch(error){console.error('Care agreement load failed:',error);if(root)root.textContent='تعذر تحميل الاتفاق. تحقق من صلاحية القراءة.';}
-    finally{careAgreementState.loading=false;}
-  }
-  function mountProfessionalAppointments(){const root=$('professionalAppointmentsRoot');if(!root||careAgreementState.appointmentsMounted||!state.user?.id||!window.DietPlannerPatientAppointments?.mount)return;careAgreementState.appointmentsMounted=true;void window.DietPlannerPatientAppointments.mount(root,{patientId,role:'professional'});}
 
   async function saveAllPatientData() {
     if (!state.isEditing || state.isSaving) return;
