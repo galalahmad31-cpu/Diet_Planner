@@ -639,8 +639,11 @@
       const script = document.createElement('script');
       script.src = 'js/diet-builder.js?v=20261123-central-meal-builder-v1';
       script.onload = () => {
+        const summaryScript = document.createElement('script');
+        summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v1';
+        summaryScript.onload = () => {
         const planScript = document.createElement('script');
-        planScript.src = 'js/visit-diet-plan.js?v=20261123-central-meal-builder-v1';
+        planScript.src = 'js/visit-diet-plan.js?v=20261123-central-summary-v1';
         planScript.async = true;
         planScript.onload = () => {
         if (typeof window.dietPlan?.openPlan !== 'function') {
@@ -651,6 +654,9 @@
         };
         planScript.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
         document.head.appendChild(planScript);
+        };
+        summaryScript.onerror = () => reject(new Error('تعذر تحميل ملخص القيم الغذائية.'));
+        document.head.appendChild(summaryScript);
       };
       script.onerror = () => reject(new Error('تعذر تحميل محرر بناء الوجبات.'));
       document.head.appendChild(script);
