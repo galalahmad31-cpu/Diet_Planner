@@ -17,3 +17,16 @@
 .patient-notification-content time,.patient-notification-empty,.patient-notification-status{color:var(--dp-muted,#718184);font-size:.7rem;line-height:1.7}
 .patient-notification-empty,.patient-notification-status{margin:0;font-size:.8rem}
 @media(max-width:600px){.patient-notifications{padding:13px;border-radius:16px}.patient-notification-item{grid-template-columns:34px minmax(0,1fr);gap:9px}.patient-notification-icon{width:34px;height:34px}.patient-notification-open{grid-column:2;justify-self:start;padding:2px 0}.patient-notifications-header{align-items:flex-start}}
+
+
+/* Patient notification center — aligned with the professional notification card system. */
+.patient-notifications{box-shadow:0 8px 24px var(--dp-shadow,rgba(0,0,0,.06))}
+.patient-notification-item{border-radius:20px;box-shadow:0 2px 8px var(--dp-shadow,rgba(0,0,0,.035));transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.patient-notification-item:hover{transform:translateY(-1px);box-shadow:0 8px 20px var(--dp-shadow,rgba(0,0,0,.09))}
+.patient-notification-item.is-unread{border-color:var(--dp-tab-border,var(--dp-primary))}
+.patient-notification-icon{width:42px;height:42px;border-radius:14px;background:var(--dp-notification-info-bg,var(--dp-surface-2));color:var(--dp-notification-info-text,var(--dp-primary))}
+.patient-notification-new{background:var(--dp-notification-warning-bg,var(--dp-primary));color:var(--dp-notification-warning-text,#fff)}
+.patient-notification-open{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border:1px solid var(--dp-border);border-radius:10px;background:var(--dp-surface-2);color:var(--dp-text);font-size:12px;font-weight:800}
+.patient-notification-open:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
+.patient-notification-content time{display:inline-flex;margin-top:8px}
+@media(prefers-reduced-motion:reduce){.patient-notification-item{transition:none}.patient-notification-item:hover{transform:none}}
