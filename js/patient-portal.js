@@ -383,9 +383,6 @@
     const professionalPanel = $("portalPlansProfessionalPanel");
     if (selfPanel) selfPanel.hidden = tab !== "self";
     if (professionalPanel) professionalPanel.hidden = tab !== "professional";
-    const loading = $("portalPlansLoading");
-    const empty = $("portalPlansEmpty");
-    const list = $("portalPlansList");
     if (tab === "professional") {
       state.loadedPanels.delete("portalPlansPanel");
       void ensureHealthPanelLoaded("portalPlansPanel");
