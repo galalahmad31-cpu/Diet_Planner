@@ -80,6 +80,13 @@
     const professionalForm = root.querySelector("[data-professional-appointment-form]");
     const professionalSubmit = root.querySelector("[data-professional-appointment-submit]");
     const providerSelect = root.querySelector("[data-appointment-provider]");
+    const professionalRole = await access.getUserRole?.(user.id);
+    const hasCareManagementAccess = role === "professional" &&
+      window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true;
+    const hasProfessionalSubscription = professionalRole === "admin" ||
+      (await access.hasActiveSubscription?.(user.id)) === true;
+    const canCreateProfessionalAppointment = hasCareManagementAccess && hasProfessionalSubscription;
+    if (professionalForm) professionalForm.hidden = !canCreateProfessionalAppointment;
     let busy = false;
     let localMin = "";
 
@@ -141,7 +148,7 @@
           const actions = role === "patient"
             ? (["pending","confirmed"].includes(item.status)
               ? `<button type="button" class="patient-appointment-action is-cancel" data-appointment-action="cancel" data-appointment-id="${esc(item.id)}">إلغاء الموعد</button>` : "")
-            : (item.status === "pending"
+            : (!hasCareManagementAccess ? "" : item.status === "pending"
               ? `<button type="button" class="patient-appointment-action is-confirm" data-appointment-action="confirm" data-appointment-id="${esc(item.id)}">تأكيد</button><button type="button" class="patient-appointment-action is-decline" data-appointment-action="decline" data-appointment-id="${esc(item.id)}">رفض</button><button type="button" class="patient-appointment-action is-cancel" data-appointment-action="cancel" data-appointment-id="${esc(item.id)}">إلغاء</button>`
               : item.status === "confirmed"
                 ? `<button type="button" class="patient-appointment-action is-complete" data-appointment-action="complete" data-appointment-id="${esc(item.id)}">تسجيل الزيارة كمكتملة</button><button type="button" class="patient-appointment-action is-cancel" data-appointment-action="cancel" data-appointment-id="${esc(item.id)}">إلغاء</button>`
