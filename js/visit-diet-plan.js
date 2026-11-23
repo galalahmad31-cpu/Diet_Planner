@@ -181,7 +181,7 @@ async function loadPlan(shouldRender=true){
   const itemsByMeal=new Map();
   meals.forEach(meal=>{const group=mealsByDay.get(meal.day_id)||[];group.push(meal);mealsByDay.set(meal.day_id,group);});
   items.forEach(item=>{const group=itemsByMeal.get(item.meal_id)||[];group.push(item);itemsByMeal.set(item.meal_id,group);});
-  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:(mealsByDay.get(d.id)||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:(itemsByMeal.get(m.id)||[]).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,:true,...(i.notes!=null?{notes:i.notes}:{})}))}))}));
+  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:(mealsByDay.get(d.id)||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:(itemsByMeal.get(m.id)||[]).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,includeInCalculation:true,...(i.frequency!=null?{repeat:i.frequency}:{}),...(i.notes!=null?{notes:i.notes}:{})}))}))}));
   savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
 }
 
@@ -496,21 +496,23 @@ const escapeHtml = window.DPUtils.escapeHtml;
 
 function confirmAddFoodItem(){
  const foodId=document.getElementById('selectedFoodId').value,grams=parseFloat(document.getElementById('foodGramsInput').value);
- const =document.getElementById('foodRepeatInput')?.value?.trim()||'';
+ const repeat=document.getElementById('foodRepeatInput')?.value?.trim()||'';
  const notes=document.getElementById('foodNotesInput')?.value?.trim()||'';
  if(!foodId||!Number.isFinite(grams)||grams<=0){showToast('اختر صنفًا وأدخل كمية صحيحة','error');return;}
  const d=daysData.find(x=>x.id===currentModalContext.dayId),m=d?.meals.find(x=>x.id===currentModalContext.mealId);
  if(!d||!m||!isDayEditing(d.id))return;
- m.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(foodId),grams:Number(grams),:true,,notes});
+ m.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(foodId),grams:Number(grams),includeInCalculation:true,repeat,notes});
  renderDays();closeFoodModal();showToast('تمت إضافة الصنف بنجاح');
 }
 function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Number(v)||0;renderDays();}}
+function updateMealItemRepeat(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))it.repeat=v;}
 function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))it.notes=v;}
 function deleteFoodItemFromMeal(did,mid,iid){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){m.items=m.items.filter(x=>x.itemId!==iid);renderDays();}}
+function updateMealItemCalculation(did,mid,iid,checked){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.includeInCalculation=!!checked;renderDays();}}
 
 function calculateDay(day){
  let cal=0,pro=0,carb=0,fat=0,sod=0,pot=0,pho=0;
- (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{const f=foodById.get(String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
+ (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{if(it.includeInCalculation===false)return;const f=foodById.get(String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
  return {cal,pro,carb,fat,sod,pot,pho};
 }
 function metricRing(label,value,unit,target,kind){
@@ -627,7 +629,7 @@ async function loadFixedDietDetails(dietId){
    items:items.filter(i=>i.meal_id===m.id).map(i=>({
     foodId:String(i.food_id),
     grams:Number(i.quantity_g)||0,
-    :i.frequency??'',
+    repeat:i.frequency??'',
     notes:i.notes??'',
     household_measure:i.household_measure||''
    }))
@@ -706,8 +708,8 @@ async function applyFixedDiet(i){
     itemId:'it_'+Date.now()+'_'+mi+'_'+ii+'_'+Math.random().toString(36).slice(2),
     foodId:String(it.foodId),
     grams:num(it.grams),
-    :true,
-    :it.||'',
+    includeInCalculation:true,
+    repeat:it.repeat||'',
     notes:it.notes||''
    }))
   }));
@@ -763,7 +765,8 @@ function serializePlanDay(day){
      household_measure:food?.household
       ? scaleHouseholdMeasure(food.household,num(item.grams))
       : null,
-          notes:item.notes??null
+     repeat:item.repeat??null,
+     notes:item.notes??null
     };
    })
   }))
@@ -838,7 +841,21 @@ function renderDayCard(d,di){
         <button type="button" onclick="window.dietPlan.deleteMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}')" class="meal-delete-btn" title="حذف الوجبة" aria-label="حذف الوجبة"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
        </div>
       </header>
-      ${window.DietPlannerDietBuilder.renderTable((m.items||[]).map(it=>{const f=foodById.get(String(it.foodId));return f?{key:it.itemId,name:f.name,grams:it.grams,household:f.household?scaleHouseholdMeasure(f.household,num(it.grams)):'—',notes:it.notes||'',gramsChange:`onchange="window.dietPlan.updateMealItemGrams('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)"`,notesChange:`onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)"`,deleteAction:`onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')"`}:null;}).filter(Boolean),{editable:true,caption:'أصناف '+(m.name||'الوجبة')})}     </article>`;
+      <div class="meal-table-wrap">
+       <table class="meal-items-table">
+        <thead><tr><th>الصنف</th><th>الكمية</th><th>المقياس المنزلي</th><th>التكرار</th><th>ملاحظة</th><th class="no-print">حساب</th><th class="no-print">إجراء</th></tr></thead>
+        <tbody>${foods.map(({item:it,food:f})=>`<tr>
+         <td class="meal-food-name">${escapeHtml(f.name)}</td>
+         <td class="meal-quantity"><input type="number" min="0" step="1" value="${num(it.grams)}" onchange="window.dietPlan.updateMealItemGrams('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" aria-label="الكمية بالجرام"><span>جم</span></td>
+         <td class="meal-household">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td>
+         <td><input type="text" value="${escapeHtml(it.repeat??'')}" onchange="window.dietPlan.updateMealItemRepeat('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="7/7" aria-label="التكرار" class="meal-repeat-input"></td>
+         <td><input type="text" value="${escapeHtml(it.notes??'')}" onchange="window.dietPlan.updateMealItemNotes('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.value)" placeholder="ملاحظة" aria-label="ملاحظة الصنف" class="meal-item-note"></td>
+         <td class="meal-calc-cell no-print"><input type="checkbox" ${it.includeInCalculation!==false?'checked':''} onchange="window.dietPlan.updateMealItemCalculation('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}',this.checked)" aria-label="إدراج الصنف في الحساب"></td>
+         <td class="meal-action-cell no-print"><button type="button" onclick="window.dietPlan.deleteFoodItemFromMeal('${escapeHtml(d.id)}','${escapeHtml(m.id)}','${escapeHtml(it.itemId)}')" class="meal-item-delete" title="حذف الصنف" aria-label="حذف الصنف"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td>
+        </tr>`).join('')}</tbody>
+       </table>
+      </div>
+     </article>`;
     }).join('')}
    </section>
   </div>
@@ -959,7 +976,7 @@ function buildPrintPlan(){
  container.innerHTML=rows.length?rows.map((day,di)=>{
    const meals=(day.meals||[]).filter(m=>(m.items||[]).some(it=>foodDatabase.some(f=>String(f.id)===String(it.foodId))));
    return `<section class="print-day"><h2 class="print-day-title">${escapeHtml(day.title||`اليوم ${di+1}`)}</h2>
-   ${meals.length?meals.map(meal=>`<div class="print-meal"><h3 class="print-meal-title">${escapeHtml(meal.name||'وجبة')}</h3><table><thead><tr><th>الصنف</th><th style="width:18%;text-align:center">الكمية</th><th style="width:28%;text-align:center">المقياس المنزلي</th><th style="width:15%;text-align:center">التكرار</th><th style="width:22%;text-align:center">ملاحظة</th></tr></thead><tbody>${(meal.items||[]).map(it=>{const f=foodById.get(String(it.foodId));if(!f)return'';return `<tr><td>${escapeHtml(f.name)}</td><td style="text-align:center">${num(it.grams)} جم</td><td style="text-align:center">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td style="text-align:center">${escapeHtml(it.||'—')}</td><td>${escapeHtml(it.notes||'—')}</td></tr>`}).join('')}</tbody></table></div>`).join(''):`<p class="print-note">لا توجد أصناف مسجلة لهذا اليوم.</p>`}
+   ${meals.length?meals.map(meal=>`<div class="print-meal"><h3 class="print-meal-title">${escapeHtml(meal.name||'وجبة')}</h3><table><thead><tr><th>الصنف</th><th style="width:18%;text-align:center">الكمية</th><th style="width:28%;text-align:center">المقياس المنزلي</th><th style="width:15%;text-align:center">التكرار</th><th style="width:22%;text-align:center">ملاحظة</th></tr></thead><tbody>${(meal.items||[]).map(it=>{const f=foodById.get(String(it.foodId));if(!f)return'';return `<tr><td>${escapeHtml(f.name)}</td><td style="text-align:center">${num(it.grams)} جم</td><td style="text-align:center">${f.household?escapeHtml(scaleHouseholdMeasure(f.household,num(it.grams))):'—'}</td><td style="text-align:center">${escapeHtml(it.repeat||'—')}</td><td>${escapeHtml(it.notes||'—')}</td></tr>`}).join('')}</tbody></table></div>`).join(''):`<p class="print-note">لا توجد أصناف مسجلة لهذا اليوم.</p>`}
    ${day.notes?`<p class="print-note">ملاحظات اليوم: ${escapeHtml(day.notes)}</p>`:''}</section>`;
  }).join(''):`<p class="print-note">لا توجد أيام غذائية مسجلة.</p>`;
 }
@@ -1033,6 +1050,6 @@ async function openPlan(planId=null, createNew=false){
  return init();
 }
 
-window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
+window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateFoodModalHousehold, filterFoodList, selectFoodForMeal, confirmAddFoodItem, updateMealItemGrams, updateMealItemRepeat, updateMealItemNotes, deleteFoodItemFromMeal, updateMealItemCalculation, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
 window.__dpDietPlanLoadError = null;
 })();
