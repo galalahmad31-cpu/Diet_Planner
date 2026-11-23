@@ -85,8 +85,10 @@
       $("communicationsDescription").textContent=isPatient()?"تابع محادثاتك وطلبات التواصل مع المختصين من مكان واحد.":"إدارة محادثات المرضى وطلبات التواصل والاستعادة من مكان واحد.";
       $("communicationsSearch").placeholder=isPatient()?"ابحث باسم المختص...":"ابحث باسم المريض...";
       $("communicationsRequestLabel").textContent=isPatient()?"الطلبات والموقوفة":"طلبات التواصل";
+      const params=new URLSearchParams(window.location.search);
+      if(isPatient() && params.get("tab")==="requests") state.tab="requests";
       await load();
-      const patientId=new URLSearchParams(window.location.search).get("patient_id");
+      const patientId=params.get("patient_id");
       if(!isPatient()&&patientId){
         const row=state.rows.find(r=>r.status==="accepted"&&r.patient_user_id===patientId);
         if(row)openConversationRow(row);
