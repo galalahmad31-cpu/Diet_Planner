@@ -148,44 +148,25 @@
       const rows = pagePatients || [];
       if (reset) state.totalPatients = Number(rows[0]?.total_count || 0);
 
-      const linkedPatientIds = new Set(
-        rows.filter(patient => patient.is_linked).map(patient => patient.id)
-      );
       const patientIds = rows.map(patient => patient.id).filter(Boolean);
-
-      const unlinkedPatientIds = patientIds.filter(id => !linkedPatientIds.has(id));
       let financeRows = [];
 
-      if (unlinkedPatientIds.length) {
+      if (patientIds.length) {
         const { data, error: financeError } = await supabase
           .from('patient_finances')
           .select('patient_id,subscription_start_date,subscription_end_date,next_follow_up_date')
-          .in('patient_id', unlinkedPatientIds);
-
+          .eq('user_id', state.user.id)
+          .in('patient_id', patientIds);
         if (financeError) throw financeError;
         financeRows = data || [];
       }
 
-      // Resolve legacy duplicate finance rows deterministically within this page.
-      financeRows.sort((a, b) =>
-        String(b.subscription_start_date || '').localeCompare(String(a.subscription_start_date || '')) ||
-        String(b.subscription_end_date || '').localeCompare(String(a.subscription_end_date || ''))
-      );
-
-      const financeByPatient = new Map();
-      financeRows.forEach((finance) => {
-        if (finance.patient_id && !financeByPatient.has(finance.patient_id)) {
-          financeByPatient.set(finance.patient_id, finance);
-        }
-      });
-
-      state.patients.push(...rows.map((patient) => ({
+      const financeByPatient = new Map(financeRows.map(finance => [finance.patient_id, finance]));
+      state.patients.push(...rows.map(patient => ({
         ...patient,
-        isLinked: linkedPatientIds.has(patient.id),
-        nextAppointmentAt: patient.next_appointment_at || null,
-        finance: linkedPatientIds.has(patient.id)
-          ? null
-          : financeByPatient.get(patient.id) || null
+        isLinked: Boolean(patient.is_linked),
+        nextAppointmentAt: null,
+        finance: financeByPatient.get(patient.id) || null
       })));
 
       state.hasMorePatients = state.patients.length < state.totalPatients;
