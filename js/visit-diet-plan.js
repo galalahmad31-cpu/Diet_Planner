@@ -279,6 +279,7 @@ async function saveDayNow(id){
   else savedDaysData.push(savedDay);
 
   renderDays();
+  window.dispatchEvent(new CustomEvent('dp-nutrition-plan-content-changed',{detail:{planId:activeCloudPlanId}}));
   showToast('تم حفظ هذا اليوم فقط بنجاح');
  }catch(error){
   console.error('Single day save failed:',error);
@@ -351,6 +352,7 @@ function deleteDay(id){
    delete dayEditModes[String(id)];
    if(activeDayDetailsId===String(id))closeDayDetails();
    renderDays();
+   window.dispatchEvent(new CustomEvent('dp-nutrition-plan-content-changed',{detail:{planId:activeCloudPlanId}}));
    showToast('تم حذف هذا اليوم فقط بنجاح');
   }catch(error){
    console.error('Single day delete failed:',error);
