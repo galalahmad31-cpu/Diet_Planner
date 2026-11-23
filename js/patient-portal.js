@@ -4,7 +4,7 @@
   const access = window.DietPlannerAccess;
   const supabase = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, hasActiveCareTeam: false, activePlanTab: "self", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
+  const state = { user: null, patient: null, patientId: null, logs: [], busy: false, activePlanTab: "self", messagesMountedFor: null, loadedPanels: new Set(), loadingPanels: new Map(), foods: null, foodSearchIndex: null, foodsPromise: null, carbMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], renalMeals: [{ id: "breakfast", name: "الفطور", items: [] }, { id: "lunch", name: "الغداء", items: [] }, { id: "dinner", name: "العشاء", items: [] }, { id: "snacks", name: "الوجبات الخفيفة", items: [] }], activeFoodTool: null, activeFoodMeal: null, selectedFood: null };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -383,17 +383,9 @@
     const professionalPanel = $("portalPlansProfessionalPanel");
     if (selfPanel) selfPanel.hidden = tab !== "self";
     if (professionalPanel) professionalPanel.hidden = tab !== "professional";
-    const unavailable = $("portalProfessionalPlanUnavailable");
-    if (unavailable) unavailable.hidden = state.hasActiveCareTeam || tab !== "professional";
     const loading = $("portalPlansLoading");
     const empty = $("portalPlansEmpty");
     const list = $("portalPlansList");
-    if (!state.hasActiveCareTeam && tab === "professional") {
-      if (loading) loading.hidden = true;
-      if (empty) empty.hidden = true;
-      if (list) list.replaceChildren();
-      return;
-    }
     if (tab === "professional") {
       state.loadedPanels.delete("portalPlansPanel");
       void ensureHealthPanelLoaded("portalPlansPanel");
@@ -1129,15 +1121,6 @@
       state.patient = null;
     }
     state.patientId = nextPatientId;
-
-    const { data: careLinks, error: careError } = await supabase
-      .from("patient_care_team")
-      .select("id")
-      .eq("patient_id", state.patientId)
-      .eq("status", "active")
-      .limit(1);
-    if (careError) throw careError;
-    state.hasActiveCareTeam = Boolean(careLinks?.length);
 
     await loadPatient();
     document.querySelectorAll("[data-health-tab]").forEach(tab => { tab.hidden = false; });
