@@ -166,7 +166,7 @@
     if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) return;
     const loaders = {
       portalMessagesPanel: () => Promise.resolve(),
-      portalSharedHealthPanel: async () => { await Promise.all([loadSharedHealthRecord(), loadMeasurements()]); },
+      portalSharedHealthPanel: async () => { await Promise.all([loadSharedHealthRecord(), loadMeasurements()]); await window.DietPlannerLabResults?.init({container: $("portalLabResults"), patientId, canEdit: () => false}); },
       portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
       portalFinancePanel: loadPatientFinanceReadOnly
     };
