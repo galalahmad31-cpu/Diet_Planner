@@ -24,7 +24,6 @@
     patientFinanceEditing: false,
     patientFinanceLoading: false,
     patientAccountLinked: false,
-    relationshipRequestId: null,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1479,11 +1478,9 @@
   async function loadPatientRelationshipActions() {
     const linkButton = $('createPatientPortalInvite');
     const contactButton = $('openPatientConversation');
-    const endButton = $('endPatientFollowup');
     state.patientAccountLinked = false;
-    state.relationshipRequestId = null;
 
-    [linkButton, contactButton, endButton].forEach(button => {
+    [linkButton, contactButton].forEach(button => {
       if (button) button.hidden = true;
     });
 
@@ -1515,45 +1512,10 @@
         .limit(1);
       if (requestError) throw requestError;
 
-      state.relationshipRequestId = requests?.[0]?.id || null;
-      if (state.relationshipRequestId) {
-        if (contactButton) contactButton.hidden = false;
-        if (endButton) endButton.hidden = false;
-      }
+      if (requests?.length && contactButton) contactButton.hidden = false;
     } catch (error) {
       state.patientAccountLinked = false;
-      state.relationshipRequestId = null;
       console.error('Patient relationship actions load failed:', error);
-    }
-  }
-
-  async function endPatientFollowup() {
-    const button = $('endPatientFollowup');
-    const requestId = state.relationshipRequestId;
-    if (!button || !requestId || button.disabled) return;
-
-    const confirmed = window.confirm(
-      'هل تريد إنهاء المتابعة مع هذا المريض؟ ستتوقف الرسائل الجديدة، مع الاحتفاظ بحساب المريض والملف الصحي وسجل الرسائل.'
-    );
-    if (!confirmed) return;
-
-    button.disabled = true;
-    const original = button.innerHTML;
-    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>جاري إنهاء المتابعة...</span>';
-    try {
-      const { error } = await supabase.rpc('end_professional_connection', {
-        p_request_id: requestId
-      });
-      if (error) throw error;
-
-      await loadPatientRelationshipActions();
-      window.alert('تم إنهاء المتابعة. تم الاحتفاظ بربط الحساب والملف الصحي والبيانات السابقة.');
-    } catch (error) {
-      console.error('Patient follow-up termination failed:', error);
-      window.alert(error?.message || 'تعذر إنهاء المتابعة. حاول مرة أخرى.');
-    } finally {
-      button.disabled = false;
-      button.innerHTML = original;
     }
   }
 
@@ -1607,7 +1569,6 @@
   function bindEvents() {
     bindPatientModuleTabs();
     bindPatientConversationDrawer();
-    $('endPatientFollowup')?.addEventListener('click', () => void endPatientFollowup());
     bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
