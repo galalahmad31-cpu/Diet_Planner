@@ -27,7 +27,8 @@
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
   
   <script src="js/patient-notifications.js?v=20261123-notification-destination-fix-v1" defer></script>
-  <script src="js/patient-portal.js?v=20261123-home-only-notifications-v1" defer></script>
+  <script src="js/food-picker.js?v=20261123-single-source-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261123-central-food-picker-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -111,32 +112,6 @@
 
       <p id="portalToolsStatus" class="portal-inline-message" role="status"></p>
 
-      <div id="portalCarbPicker" class="portal-modal-backdrop" hidden>
-        <section class="portal-food-modal" role="dialog" aria-modal="true" aria-labelledby="portalCarbPickerTitle">
-          <div class="portal-food-modal-header">
-            <div><span class="portal-section-kicker">FOOD LIBRARY</span><h3 id="portalCarbPickerTitle">إضافة صنف</h3><p id="portalCarbMealLabel">اختر الصنف للوجبة</p></div>
-            <button type="button" class="portal-modal-close" data-close-carb-picker aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-          <label for="portalCarbSearch">ابحث باسم الصنف</label>
-          <input id="portalCarbSearch" type="search" autocomplete="off" placeholder="مثال: أرز، خبز، تفاح">
-          <div id="portalCarbSearchResults" class="portal-food-search-results" aria-live="polite"><p class="portal-tool-hint">اكتب اسم الصنف لعرض النتائج.</p></div>
-          <div id="portalCarbSelectedFood" class="portal-selected-food" hidden>
-            <div class="portal-selected-food-name"><span>الصنف المختار</span><strong id="portalCarbSelectedName"></strong></div>
-            <div class="portal-food-measure-row">
-              <div class="portal-food-grams-field">
-                <label for="portalCarbGrams">الكمية بالجرام</label>
-                <input id="portalCarbGrams" type="number" min="0.1" max="10000" step="1" value="100" inputmode="decimal">
-              </div>
-              <div class="portal-household-measure"><span>المقياس المنزلي المسجل في مكتبة الأغذية</span><strong id="portalCarbHousehold">—</strong></div>
-            </div>
-            <small class="portal-tool-hint">المقياس المنزلي يُعرض كما هو مسجل للصنف؛ لا يتم تحويله إلى كمية مكافئة بالجرام لعدم وجود وزن مرجعي منفصل في بيانات المكتبة.</small>
-          </div>
-          <div class="portal-food-modal-actions">
-            <button type="button" class="portal-secondary-button" data-close-carb-picker>إلغاء</button>
-            <button type="button" class="portal-primary-button" id="portalCarbConfirm" disabled>إضافة للوجبة</button>
-          </div>
-        </section>
-      </div>
     </section>
     <section id="portalProfileArea" class="portal-profile-area" hidden>
       <div class="portal-section-heading"><div><span class="portal-section-kicker">PERSONAL PROFILE</span><h2>الملف الشخصي</h2><p>إدارة بيانات حسابك ووسائل التواصل.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-pen"></i></span></div>
