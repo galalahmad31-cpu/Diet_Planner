@@ -15,6 +15,7 @@
     if(isPatient()){
       if(row.status==="pending")actions='<button type="button" data-cancel="'+id+'">إلغاء الطلب</button>';
       if(row.status==="blocked")actions='<button type="button" data-restore="'+id+'">طلب استعادة التواصل</button>';
+      if(row.status==="declined")actions='<button type="button" data-restore="'+id+'">إعادة إرسال الطلب</button>';
     }else if(row.status==="pending"||row.status==="restore_pending"){
       actions='<button type="button" data-accept="'+id+'">موافقة</button><button type="button" data-decline="'+id+'">رفض</button>';
     }else if(row.status==="accepted")actions='<button type="button" data-block="'+id+'">إيقاف التواصل</button>';
@@ -38,8 +39,8 @@
   function render(){
     const requests=$("professionalConversationRequests"),conversations=$("professionalConversationList");if(!requests||!conversations)return;
     const active=filtered(state.rows.filter(r=>r.status==="accepted"));
-    const pending=filtered(state.rows.filter(r=>["pending","restore_pending","blocked"].includes(r.status)));
-    $("communicationsRequestCount").textContent=String(state.rows.filter(r=>["pending","restore_pending","blocked"].includes(r.status)).length);
+    const pending=filtered(state.rows.filter(r=>["pending","restore_pending","blocked","declined"].includes(r.status)));
+    $("communicationsRequestCount").textContent=String(state.rows.filter(r=>["pending","restore_pending","blocked","declined"].includes(r.status)).length);
     $("communicationsConversationCount").textContent=String(active.length);
     requests.innerHTML=pending.length?pending.map(renderRow).join(""):'<p class="patient-messages-empty">'+(state.search?"لا توجد نتائج مطابقة.":"لا توجد طلبات أو محادثات موقوفة.")+'</p>';
     conversations.innerHTML=active.length?active.map(renderRow).join(""):'<p class="patient-messages-empty">'+(state.search?"لا توجد نتائج مطابقة.":"لا توجد محادثات نشطة حتى الآن.")+'</p>';
