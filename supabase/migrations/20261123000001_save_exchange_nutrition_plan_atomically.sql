@@ -104,5 +104,5 @@ begin
 end;
 $function$;
 
-revoke all on function public.save_exchange_nutrition_plan(uuid, text, jsonb) from public;
+revoke all on function public.save_exchange_nutrition_plan(uuid, text, jsonb) from public, anon;
 grant execute on function public.save_exchange_nutrition_plan(uuid, text, jsonb) to authenticated, service_role;
