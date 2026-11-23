@@ -616,34 +616,6 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
 
 
 
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .day-summary-heading span,
-
-
-
-
-
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .day-ring{
-  display:grid;place-items:center;width:clamp(54px,8vw,96px);aspect-ratio:1;
-  padding:6px;border-radius:50%;
-  background:conic-gradient(var(--ring-color,var(--dp-accent)) var(--ring-progress,0%),var(--dp-surface-3) 0);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dp-border) 65%,transparent);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 :is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .day-tools{
   display:grid;grid-template-columns:auto minmax(220px,1fr);align-items:center;gap:12px;
 }
