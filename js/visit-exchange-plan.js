@@ -163,18 +163,20 @@ async function save(options={}){
  render();
  const rows=G.map(g=>{
   const r=S.r[g.k],v=vals(g),c=n(r.count);
-  return {plan_id:planId,group_name:g.n,subgroup_name:g.subs?(r.sub||null):null,exchange_count:c,kcal:rnd(c*v.kcal),carb:rnd(c*v.carb),protein:rnd(c*v.pro),fat:rnd(c*v.fat)};
+  return {group_name:g.n,subgroup_name:g.subs?(r.sub||null):null,exchange_count:c,kcal:rnd(c*v.kcal),carb:rnd(c*v.carb),protein:rnd(c*v.pro),fat:rnd(c*v.fat)};
  });
  const note=document.getElementById('exchangePlanNotes');
  const normalizedNotes=normalizePlanNotes(note?.value??S.notes).trim();
- const noteUpdate=await dbx.from('nutrition_plans').update({notes:normalizedNotes}).eq('id',planId);
- if(noteUpdate.error){status('تعذر حفظ نص الخطة: '+noteUpdate.error.message,true);return false}
+ const {data,error}=await dbx.rpc('save_exchange_nutrition_plan',{
+  p_plan_id:planId,
+  p_notes:normalizedNotes,
+  p_values:rows
+ });
+ if(error){status('تعذر حفظ خطة البدائل: '+error.message,true);return false}
+ if(data!==true){status('لم تؤكد قاعدة البيانات حفظ خطة البدائل',true);return false}
  S.notes=normalizedNotes;
- const del=await dbx.from('exchange_values').delete().eq('plan_id',planId);
- if(del.error){status('تعذر تحديث خطة البدائل: '+del.error.message,true);return false}
- const ins=await dbx.from('exchange_values').insert(rows);
- if(ins.error){status('تعذر حفظ خطة البدائل: '+ins.error.message,true);return false}
  S.plan=planId;S.saved=true;S.editing=false;render();setButtons();window.dispatchEvent(new CustomEvent('dp-nutrition-plan-content-changed',{detail:{planId}}));status('تم حفظ خطة البدائل بنجاح');return true;
+return true;
 }
 async function saveAndPrintFromSettings(){
  const pb=document.getElementById('executePrintBtn');
