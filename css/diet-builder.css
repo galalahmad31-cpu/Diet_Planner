@@ -17,3 +17,17 @@
 .dpb-table .dpb-empty{text-align:center;color:var(--dp-muted,#94a3b8);padding:24px}
 .dpb-caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 @media print{.dpb-table-wrap{overflow:visible}.dpb-table{min-width:0}.dpb-actions{display:none!important}}
+
+/* Shared meal controls: one visual system for the diet library and patient plan. */
+.meal-card{min-width:0;border:0;border-top:1px solid var(--dp-border,#e2e8f0);border-radius:0;background:transparent}
+.meal-card-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;background:transparent;border:0}
+.meal-title-wrap{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.meal-order{display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:8px;background:var(--dp-surface-3,#e2e8f0);color:var(--dp-primary,#0d9488);font-size:10px;font-weight:900}
+.meal-title-input{width:100%;min-width:70px;max-width:240px;border:0;background:transparent;color:var(--dp-text,#1e293b);font-size:12px;font-weight:900}
+.meal-card-actions{display:flex;align-items:center;gap:5px}
+.meal-card-actions button{display:inline-flex;align-items:center;justify-content:center;min-width:31px;height:31px;padding:0 9px;border:1px solid var(--dp-border,#e2e8f0);border-radius:8px;background:var(--dp-surface,#fff);color:var(--dp-text-2,#475569);font-size:10px;cursor:pointer}
+.meal-card-actions .meal-add-food-btn{gap:6px;border-color:var(--dp-primary,#0d9488);background:var(--dp-primary,#0d9488);color:#fff;font-weight:800}
+.meal-card-actions .meal-delete-btn{color:var(--dp-danger,#dc2626)}
+.meal-card-actions button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:640px){.meal-card-header{align-items:flex-start;flex-direction:column;gap:8px}.meal-card-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.meal-card-actions .meal-add-food-btn{min-height:31px}}
+@media print{.meal-card-actions{display:none!important}}
