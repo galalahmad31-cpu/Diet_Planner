@@ -56,3 +56,6 @@ html[data-theme="dark"] .patient-message-bubble.is-mine{background:#214c43;color
 .dp-conversation-actions button+button{background:var(--dp-card,#fff);color:var(--dp-text,#183c3b)}
 .dp-conversation-actions button:disabled{opacity:.55;cursor:wait}
 .dp-chat-contact:disabled{cursor:not-allowed;opacity:.75}
+
+.dp-conversation-actions .dp-conversation-cancel{background:var(--dp-card,#fff);color:#b45353;border-color:#e8caca}
+.dp-conversation-actions .dp-conversation-cancel:disabled{opacity:.55;cursor:wait}
