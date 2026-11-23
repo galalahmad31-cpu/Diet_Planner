@@ -466,6 +466,7 @@
     try {
       const linkedPatientId = await acceptInvitation(token);
       state.patientId = linkedPatientId;
+      state.patient = null; state.logs = []; state.loadedPanels.clear(); state.loadingPanels.clear(); state.messagesMountedFor = null;
       input.value = "";
       state.loadedPanels.clear();
       state.loadingPanels.clear();
@@ -926,6 +927,7 @@
     setMessage("portalInviteMessage", "جاري التحقق من الدعوة...");
     try {
       state.patientId = await acceptInvitation(token);
+      state.patient = null; state.logs = []; state.loadedPanels.clear(); state.loadingPanels.clear(); state.messagesMountedFor = null;
       input.value = "";
       setMessage("portalInviteMessage", "تم ربط حسابك بنجاح.", "success");
       await loadPortal();
