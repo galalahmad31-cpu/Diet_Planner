@@ -72,7 +72,7 @@ function renderRequestPanel(){
  const section=$("directoryRequestSection"),select=$("directoryPatientFile"),button=$("directoryRequestSubmit"),status=$("directoryModalStatus");
  if(!section||!select||!button||!status)return;
  section.hidden=false;
- if(!state.user){select.innerHTML='<option value="">سجّل الدخول أولًا</option>';select.disabled=true;button.disabled=true;status.textContent="سجّل الدخول بحساب المريض لطلب محادثة.";status.className="directory-modal-status is-error";return;}
+ if(!state.user){select.innerHTML='<option value="">سجّل الدخول أولًا</option>';select.disabled=true;button.disabled=false;button.textContent="تسجيل الدخول لطلب المحادثة";status.textContent="سجّل الدخول بحساب المريض لطلب محادثة.";status.className="directory-modal-status is-error";return;}
  select.disabled=false;
  select.innerHTML=state.patientFiles.length
   ? state.patientFiles.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.name)+'</option>').join("")
