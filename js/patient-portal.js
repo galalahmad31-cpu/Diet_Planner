@@ -974,7 +974,7 @@
       selector.hidden = false;
       if (selectorLabel) selectorLabel.hidden = false;
       const addFileDetails = $("portalAddFileDetails");
-      if (addFileDetails && !addFileDetails.dataset.userToggled) addFileDetails.open = false;
+      if (addFileDetails) addFileDetails.open = false;
     }
     const loaded = await loadPatient();
     if (!isCurrentLoad()) return;
@@ -1074,7 +1074,6 @@
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
     document.querySelectorAll("[data-plan-tab]").forEach(tab => tab.addEventListener("click", () => activatePlanTab()));
     $("portalPatientSelector")?.addEventListener("change", () => { state.preferredPatientId = $("portalPatientSelector").value; void loadPortal().catch(error => fail(error.message || "تعذر تبديل الملف.")); });
-    $("portalAddFileDetails")?.addEventListener("toggle", event => { event.currentTarget.dataset.userToggled = "true"; });
     const initialSection = window.location.hash.slice(1);
     const patientSections = new Set([
       "portalHome",
