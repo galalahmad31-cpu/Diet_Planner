@@ -65,8 +65,13 @@
   }
 
   function getDestination(type) {
-    if (type === "nutrition_plan_published") return "portalPlansPanel";
-    return "portalCommunicationPanel";
+    if (type === "nutrition_plan_published") return "patient-health.html#portalPlansPanel";
+    if (type === "message_received") return "communications.html";
+    if (["connection_request_received", "connection_request_accepted", "connection_request_declined"].includes(type)) {
+      return "communications.html?tab=requests";
+    }
+    if (["followup_activated", "followup_ended"].includes(type)) return "patient-health.html#portalFinancePanel";
+    return "patient-portal.html";
   }
 
   function buildReminders(finances) {
@@ -344,13 +349,12 @@
     openButton.disabled = true;
 
     try {
+      const destination = openButton.dataset.destination;
       await markRead(openButton.dataset.openPatientNotification);
-      await load();
-      await window.DietPlannerPatientPortal?.navigateToSection(openButton.dataset.destination);
+      window.location.assign(destination);
     } catch (error) {
       console.error("Patient notification action failed:", error);
       setStatus("تعذر فتح الإشعار. حاول مرة أخرى.");
-    } finally {
       busy = false;
       openButton.disabled = false;
     }
