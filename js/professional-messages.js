@@ -35,7 +35,7 @@
   }
 
   function renderConversation(item) {
-    return '<button type="button" class="dp-chat-contact" data-conversation-open="' + esc(item.patient_id) + '">' +
+    return '<button type="button" class="dp-chat-contact" data-conversation-open="' + esc(item.patient_user_id) + '">' +
       '<span class="dp-chat-avatar"><i class="fa-solid fa-user"></i></span>' +
       '<span class="dp-chat-contact-copy"><strong>' + esc(item.patient_name || "مريض") + '</strong>' +
       '<small>محادثة مقبولة</small></span>' +
@@ -94,7 +94,7 @@
     });
     conversationsRoot.querySelectorAll("[data-conversation-open]").forEach(button => {
       button.addEventListener("click", () => {
-        const contact = state.conversations.find(item => item.patient_id === button.dataset.conversationOpen);
+        const contact = state.conversations.find(item => item.patient_user_id === button.dataset.conversationOpen);
         if (!contact) return;
         window.DietPlannerPatientMessages?.openConversation({
           name: contact.patient_name || "المريض", subtitle: "محادثة مقبولة"
@@ -124,7 +124,8 @@
       const accepted = rows.filter(row => row.status === "accepted");
       const unique = new Map();
       accepted.forEach(row => {
-        if (!unique.has(row.patient_id)) unique.set(row.patient_id, {
+        const key = row.patient_id || row.patient_user_id;
+        if (!unique.has(key)) unique.set(key, {
           patient_id: row.patient_id, patient_user_id: row.patient_user_id,
           patient_name: row.patient_name
         });
