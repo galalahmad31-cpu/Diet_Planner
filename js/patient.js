@@ -182,28 +182,10 @@
         }
       });
 
-      const nextAppointmentByPatient = new Map();
-      if (careTeamPatientIds.size) {
-        const { data: appointments, error: appointmentsError } = await supabase
-          .from('patient_appointments')
-          .select('patient_id,scheduled_at')
-          .in('patient_id', [...careTeamPatientIds])
-          .eq('status', 'confirmed')
-          .gte('scheduled_at', new Date().toISOString())
-          .order('scheduled_at', { ascending: true });
-
-        if (appointmentsError) throw appointmentsError;
-        (appointments || []).forEach(item => {
-          if (!nextAppointmentByPatient.has(item.patient_id)) {
-            nextAppointmentByPatient.set(item.patient_id, item.scheduled_at);
-          }
-        });
-      }
-
       state.patients.push(...rows.map((patient) => ({
         ...patient,
         isLinked: linkedPatientIds.has(patient.id),
-        nextAppointmentAt: nextAppointmentByPatient.get(patient.id) || null,
+        nextAppointmentAt: patient.next_appointment_at || null,
         finance: linkedPatientIds.has(patient.id)
           ? null
           : financeByPatient.get(patient.id) || null
