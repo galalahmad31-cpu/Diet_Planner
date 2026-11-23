@@ -38,7 +38,6 @@
       if (root) root.textContent = "تعذر تهيئة خدمة المواعيد.";
       return;
     }
-    root.dataset.appointmentsMounted = "true";
     root.dataset.appointmentsMountedFor = String(patientId);
     root.innerHTML = `
       <div class="patient-appointments-shell">
