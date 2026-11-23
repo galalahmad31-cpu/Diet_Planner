@@ -28,6 +28,10 @@ function calcShowToast(msg, type = 'success') {
     }, 3000);
 }
 
+function canApproveEnergyTargets() {
+    return window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true;
+}
+
         function selectEnergyEquation(eq) {
             selectedEnergyEquation = eq === 'schofield' ? 'schofield' : 'mifflin';
 
@@ -86,7 +90,7 @@ function calcShowToast(msg, type = 'success') {
             const tdee = Math.round(bmr * activity);
             lastEnergyCalculation = { bmr: Math.round(bmr), tdee, group, activity };
             const approveButton = document.getElementById('approveEnergyTargetsBtn');
-            if (approveButton) approveButton.disabled = false;
+            if (approveButton) approveButton.disabled = !canApproveEnergyTargets();
 
             document.getElementById('resBMR').textContent = Math.round(bmr);
             document.getElementById('resTDEE').textContent = tdee;
@@ -276,13 +280,8 @@ function markEnergyCalculationStale() {
 }
 
 async function applyCustomTargetToPatient() {
-    const user = await window.DietPlannerAccess?.getCurrentUser?.();
-    const canWrite = user
-        ? (await window.DietPlannerAccess?.canWrite?.(user.id)) === true
-        : false;
-
-    if (!canWrite) {
-        calcShowToast('اعتماد احتياجات المريض متاح أثناء الاشتراك المدفوع فقط', 'error');
+    if (!canApproveEnergyTargets()) {
+        calcShowToast('اعتماد الاحتياجات يتطلب ملكية الملف بصلاحية سارية أو ارتباط متابعة نشطًا.', 'error');
         return;
     }
     if (!lastEnergyCalculation) {
@@ -324,8 +323,7 @@ async function applyCustomTargetToPatient() {
         energy_fat_percent: fatPercent,
         energy_target_protein: proGrams,
         energy_target_carb: carbGrams,
-        energy_target_fat: fatGrams,
-        energy_approved_at: new Date().toISOString()
+        energy_target_fat: fatGrams
     };
 
     const button = document.getElementById('approveEnergyTargetsBtn');
@@ -335,12 +333,10 @@ async function applyCustomTargetToPatient() {
         button.textContent = 'جاري الاعتماد...';
     }
 
-    const { data: updated, error } = await calcDb
-        .from('patients')
-        .update(payload)
-        .eq('id', calcResolvedPatientId)
-        .select('id')
-        .maybeSingle();
+    const { data: updated, error } = await calcDb.rpc('approve_patient_energy_targets', {
+        p_patient_id: calcResolvedPatientId,
+        p_payload: payload
+    });
 
     if (button) {
         button.disabled = false;
@@ -348,9 +344,15 @@ async function applyCustomTargetToPatient() {
         delete button.dataset.originalText;
     }
 
-    if (error || !updated) {
+    if (error || !updated?.energy_approved_at) {
         console.error('Patient energy approval failed:', error);
-        calcShowToast('تعذر اعتماد الاحتياجات. تحقق من صلاحية التعديل والاتصال.', 'error');
+        const reason = error?.message || '';
+        calcShowToast(
+            reason.includes('care_agreement_expired_read_only')
+                ? 'انتهى اتفاق المتابعة؛ الملف متاح للقراءة فقط.'
+                : 'تعذر اعتماد الاحتياجات. تحقق من صلاحية التعديل والاتصال.',
+            'error'
+        );
         return;
     }
 
@@ -359,7 +361,7 @@ async function applyCustomTargetToPatient() {
         status.classList.remove('is-error');
         status.classList.add('is-approved');
         status.textContent = 'تم اعتماد وحفظ احتياجات المريض بنجاح — ' +
-            new Date(payload.energy_approved_at).toLocaleDateString('ar-EG');
+            new Date(updated.energy_approved_at).toLocaleDateString('ar-EG');
     }
     calcShowToast('تم اعتماد وحفظ الطاقة والماكروز للمريض بنجاح');
 }
