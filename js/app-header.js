@@ -22,6 +22,7 @@
     ["patient-portal.html#portalHome", "الرئيسية", "fa-house"],
     ["patient-health.html", "الملف الصحي", "fa-heart-pulse"],
     ["professional-directory.html", "دليل المختصين", "fa-user-doctor"],
+    ["communications.html", "التواصل مع المختص", "fa-comments"],
     ["article.html", "المقالات", "fa-newspaper"],
     ["books.html", "مكتبة الكتب", "fa-book-open"],
     ["patient-portal.html#portalTools", "أدوات التغذية", "fa-calculator"],
