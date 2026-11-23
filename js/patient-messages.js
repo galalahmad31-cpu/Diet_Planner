@@ -255,6 +255,7 @@
     if (!supabase || !access?.getCurrentUser) { root.textContent = "تعذر تهيئة قائمة المحادثات."; return; }
     root.dataset.inboxMounted = "true";
     const role = options.role, patientId = options.patientId;
+    root.dataset.patientId = String(patientId || "");
     if (role !== "patient" || !patientId) {
       root.textContent = "قائمة المحادثات متاحة لكل ملف صحي مرتبط بحساب المريض.";
       return;
@@ -263,18 +264,21 @@
     const list = root.querySelector("[data-chat-contacts]");
     try {
       const user = await access.getCurrentUser();
+      if (root.dataset.patientId !== String(patientId)) return;
       if (!user?.id) throw new Error("يجب تسجيل الدخول لعرض المحادثات.");
       const { data: patient, error } = await supabase.from("patients")
         .select("id,user_id")
         .eq("id", patientId)
         .maybeSingle();
       if (error) throw error;
+      if (root.dataset.patientId !== String(patientId)) return;
       if (!patient?.user_id) throw new Error("تعذر تحديد المختص المسؤول عن هذا الملف.");
       const { data: profile, error: profileError } = await supabase.from("profiles")
         .select("id,full_name,profession")
         .eq("id", patient.user_id)
         .maybeSingle();
       if (profileError) throw profileError;
+      if (root.dataset.patientId !== String(patientId)) return;
       const contact = {
         id: patient.user_id,
         name: profile?.full_name || "المختص",
@@ -292,7 +296,9 @@
       });
     } catch (error) {
       console.error("Conversation inbox load failed:", error);
-      list.innerHTML = '<div class="patient-messages-empty is-error">' + escapeHtml(error.message || "تعذر تحميل المختص المسؤول.") + '</div>';
+      if (root.dataset.patientId === String(patientId)) {
+        list.innerHTML = '<div class="patient-messages-empty is-error">' + escapeHtml(error.message || "تعذر تحميل المختص المسؤول.") + '</div>';
+      }
     }
   }
 
