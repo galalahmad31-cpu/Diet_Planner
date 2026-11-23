@@ -42,7 +42,7 @@
     ["quickcalc.html", "الحاسبة السريعة", "fa-calculator"],
     ["finance.html", "اشتراكات المرضى", "fa-wallet"],
     ["notifications.html", "الإشعارات", "fa-bell"],
-    ["professional-communication.html", "التواصل مع المرضى", "fa-comments"],
+    
     ["profile.html", "الصفحة الشخصية", "fa-user"],
     ["professional-directory-manage.html", "الملف المهني", "fa-id-card"],
     ["jobs.html", "الوظائف الطبية", "fa-briefcase"],
