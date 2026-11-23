@@ -177,8 +177,8 @@
 
     <section id="portalUnlinked" class="portal-state-card" hidden>
       <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
-      <h1>تعذر إكمال ربط الدعوة</h1>
-      <p>تعذر إكمال ربط الملف باستخدام رمز الدعوة. راجع الرمز أو تواصل مع المختص لإرسال دعوة صحيحة. يمكنك إعادة المحاولة دون إنشاء ملف جديد.</p>
+      <h1>اربط ملفك الصحي</h1>
+      <p>لا يوجد ملف صحي مرتبط بحسابك حتى الآن. أدخل كود الربط الذي أرسله لك المختص لعرض ملفك الصحي.</p>
       <form id="portalInviteForm" class="portal-invite-form">
         <label for="portalInviteToken">رمز الدعوة</label>
         <input id="portalInviteToken" type="text" inputmode="text" autocomplete="off" placeholder="الصق رمز الدعوة هنا" required>
@@ -202,7 +202,7 @@
       </section>
       <div id="portalPlansPanel" class="portal-health-tab-panel" role="tabpanel">
         <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المنشورة التي شاركها المختصون معك، بما فيها خطط المتابعة السابقة.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المنشورة من المختص المسؤول عن هذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
           <a class="portal-directory-link" href="professional-directory.html"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> استعراض دليل المختصين</a>
           <div id="portalPlansLoading" class="portal-muted-state">جاري تحميل الخطط...</div>
           <div id="portalPlansEmpty" class="portal-empty-state" hidden>لا توجد خطة منشورة لك حاليًا. ستظهر هنا عندما يشاركها مختصك.</div>
@@ -212,7 +212,7 @@
 
       <div id="portalCareManagementPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
         <section class="portal-section" aria-labelledby="patientCareManagementTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">FINANCE & FOLLOW-UP</span><h2 id="patientCareManagementTitle">الاشتراك والمتابعة</h2><p>بيانات الاشتراك والمواعيد المسجلة من المختص لهذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-wallet"></i></span></div>
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">FINANCE & FOLLOW-UP</span><h2 id="patientCareManagementTitle">الاشتراك والمتابعة</h2><p>بيانات الاشتراك والمتابعة المسجلة في Finance لهذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-wallet"></i></span></div>
           <div id="patientFinanceSummary" class="portal-finance-summary">جاري تحميل بيانات الاشتراك والمتابعة...</div>
         </section>
         <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
@@ -224,7 +224,7 @@
 
       <div id="portalSharedHealthPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
         <section class="portal-section" aria-labelledby="patientSharedHealthTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية المشتركة</h2><p>بيانات الملف المسجلة بواسطة المختص، للعرض فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية للملف</h2><p>بيانات الملف المسجلة بواسطة المختص، للعرض فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
           <div id="patientSharedHealthForm" class="portal-shared-health-form">
             <div class="portal-shared-health-grid">
               <label for="sharedHealthName">اسم المريض<input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" disabled></label>
