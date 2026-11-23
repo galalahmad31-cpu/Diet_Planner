@@ -23,7 +23,7 @@ let activePlanStartDate=null, activePlanName=null;
 let activeCloudPlanId=null, patientInfo={}, foodDatabase=[], foodById=new Map(), daysData=[], savedDaysData=[], dayEditModes={};
 const savingDayIds=new Set();
 let daySaveQueue=Promise.resolve();
-let fixedMealsDatabase=[], fixedMealsTargetDayId=null, currentModalContext={dayId:null,mealId:null}, targetMealDayId=null;
+let fixedMealsDatabase=[], fixedMealsTargetDayId=null, targetMealDayId=null;
 let fixedMealsLoadPromise=null, foodsLoadPromise=null, foodsFullyLoaded=false;
 const FIXED_DIET_CACHE_V2='fixed-diet-cache-v2';
 const FIXED_DIET_CACHE_TTL=5*60*1000;
@@ -373,23 +373,16 @@ async function openFoodModal(dayId,mealId){
  if(!(await ensureAllFoods()))return;
  const picker=window.DietPlannerFoodPicker;
  if(!picker){showToast('مكوّن اختيار الأغذية غير متاح. أعد تحميل الصفحة.','error');return;}
- currentModalContext={dayId,mealId};
  picker.open({foods:foodDatabase,title:'إضافة صنف إلى '+(meal.name||'الوجبة'),confirmText:'إضافة للوجبة',grams:100,
-  onClose:()=>{currentModalContext={dayId:null,mealId:null};},
   onConfirm:({normalizedFood,grams,notes})=>{
-   const context=currentModalContext,targetDay=daysData.find(item=>item.id===context.dayId),targetMeal=targetDay?.meals.find(item=>item.id===context.mealId);
+   const targetDay=daysData.find(item=>item.id===dayId),targetMeal=targetDay?.meals.find(item=>item.id===mealId);
    if(!targetDay||!targetMeal||!isDayEditing(targetDay.id))return false;
    targetMeal.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(normalizedFood.id),grams:Number(grams),notes:notes||''});
    renderDays();showToast('تمت إضافة الصنف بنجاح');return true;
   }
  });
 }
-function closeFoodModal(){window.DietPlannerFoodPicker?.close();currentModalContext={dayId:null,mealId:null};}
-function normalizeFoodSearch(value){
- return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[ًٌٍَُِّْـ]/g,'')
-  .replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي')
-  .toLocaleLowerCase('ar-EG').trim();
-}
+const normalizeFoodSearch=window.DietPlannerFoodPicker.normalizeSearch;
 const escapeHtml = window.DPUtils.escapeHtml;
 
 function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Number(v)||0;renderDays();}}
@@ -855,7 +848,7 @@ async function openPlan(planId=null, createNew=false){
  if(dietInitPromise) await dietInitPromise;
  await daySaveQueue;
  closeDayDetails();
- closeFoodModal();
+ window.DietPlannerFoodPicker?.close();
  closeFixedMeals();
  closeAddMealModal();
  closeConfirmModal();
@@ -869,12 +862,11 @@ async function openPlan(planId=null, createNew=false){
  savedDaysData=[];
  dayEditModes={};
  fixedMealsTargetDayId=null;
- currentModalContext={dayId:null,mealId:null};
  targetMealDayId=null;
  dietInitPromise=null;
  return init();
 }
 
-window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, closeFoodModal, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
+window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
 window.__dpDietPlanLoadError = null;
 })();
