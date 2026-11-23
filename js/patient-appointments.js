@@ -98,9 +98,23 @@
           .eq("patient_id", patientId)
           .eq("status", "active");
         if (teamError) throw teamError;
-        const sorted = (team || []).slice().sort((a,b) =>
-          (a.relationship_role === "primary" ? 0 : 1) - (b.relationship_role === "primary" ? 0 : 1)
-        );
+        const { data: agreements, error: agreementError } = await supabase
+          .from("professional_connection_requests")
+          .select("professional_id,agreement_end_date")
+          .eq("patient_id", patientId)
+          .eq("requested_by", user.id)
+          .eq("status", "active");
+        if (agreementError) throw agreementError;
+        const today = new Date().toISOString().slice(0, 10);
+        const expiredProfessionalIds = new Set((agreements || [])
+          .filter(item => item.agreement_end_date && item.agreement_end_date < today)
+          .map(item => item.professional_id));
+        const sorted = (team || [])
+          .filter(item => !expiredProfessionalIds.has(item.professional_id))
+          .slice()
+          .sort((a,b) =>
+            (a.relationship_role === "primary" ? 0 : 1) - (b.relationship_role === "primary" ? 0 : 1)
+          );
         const ids = [...new Set(sorted.map(item => item.professional_id))];
         if (!ids.length) throw new Error("لا يوجد مختص نشط مرتبط بملفك حاليًا.");
         const { data: profiles, error: profileError } = await supabase
