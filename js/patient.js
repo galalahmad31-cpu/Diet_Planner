@@ -11,6 +11,7 @@
     hasMorePatients: false,
     isLoadingPatients: false,
     statusFilter: 'all',
+    showArchived: false,
     statusTimer: null,
     user: null,
     accountType: null,
@@ -140,7 +141,7 @@
       const from = state.patients.length;
       const { data: pagePatients, error: patientsError } = await supabase.rpc(
         'list_my_professional_patients',
-        { p_limit: state.pageSize, p_offset: from }
+        { p_limit: state.pageSize, p_offset: from, p_include_archived: state.showArchived }
       );
 
       if (patientsError) throw patientsError;
@@ -165,6 +166,7 @@
       state.patients.push(...rows.map(patient => ({
         ...patient,
         isLinked: Boolean(patient.is_linked),
+        isArchived: Boolean(patient.is_archived),
         finance: financeByPatient.get(patient.id) || null
       })));
 
@@ -231,6 +233,15 @@
       linkedPatientsCount: counts.linked
     };
 
+    const stats = $('patientStats');
+    if (stats) stats.hidden = state.showArchived;
+
+    document.querySelectorAll('[data-record-view]').forEach((button) => {
+      const selected = button.dataset.recordView === (state.showArchived ? 'archived' : 'active');
+      button.classList.toggle('is-selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+
     Object.entries(values).forEach(([id, value]) => {
       const element = $(id);
       if (element) element.textContent = String(value);
@@ -277,12 +288,22 @@
     };
 
     box.innerHTML = filtered.map((patient) => {
-      const status = getPatientSubscriptionStatus(patient);
+      const status = patient.isArchived ? 'archived' : getPatientSubscriptionStatus(patient);
       const diagnosis = patient.diagnosis
         ? escapeHtml(patient.diagnosis)
         : 'التشخيص غير مسجل';
       const followUp = formatPatientDate(patient.finance?.next_follow_up_date);
       const followUpLabel = 'المتابعة القادمة';
+
+      const actionButton = patient.isArchived
+        ? `<button type="button" data-action="ask-restore" data-patient-id="${escapeHtml(patient.id)}"
+              class="patient-record-action patient-record-action--restore" title="استعادة الملف" aria-label="استعادة الملف">
+              <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+            </button>`
+        : `<button type="button" data-action="ask-archive" data-patient-id="${escapeHtml(patient.id)}"
+              class="patient-record-action patient-record-action--archive" title="أرشفة الملف" aria-label="أرشفة الملف">
+              <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
+            </button>`;
 
       return `
         <article class="patient-row" role="link" tabindex="0"
@@ -292,18 +313,15 @@
             <h3 class="patient-name">${escapeHtml(patient.name || 'بدون اسم')}</h3>
             <div class="patient-row-meta">
               <span class="patient-diagnosis" title="التشخيص">${diagnosis}</span>
-              <span class="patient-follow-up">
+              ${patient.isArchived ? '<span class="patient-follow-up">ملف مؤرشف</span>' : `<span class="patient-follow-up">
                 <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                 <span>${followUpLabel}: ${escapeHtml(followUp)}</span>
-              </span>
+              </span>`}
             </div>
           </div>
           <div class="patient-row-actions">
-            <span class="patient-status patient-status--${status}">${statusLabels[status]}</span>
-            <button type="button" data-action="ask-delete" data-patient-id="${escapeHtml(patient.id)}"
-              class="patient-delete" title="حذف المريض" aria-label="حذف المريض">
-              <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-            </button>
+            <span class="patient-status patient-status--${status}">${patient.isArchived ? 'مؤرشف' : statusLabels[status]}</span>
+            ${actionButton}
           </div>
         </article>`;
     }).join('');
@@ -387,48 +405,47 @@
     }
   }
 
-  async function askDelete(id) {
+  async function confirmArchiveAction(id, archived) {
     const patient = state.patients.find((item) => item.id === id);
-    if (!patient) return;
+    if (!patient || patient.isArchived === archived) return;
+
     const confirmed = await window.DPConfirm?.ask({
-      title: "حذف المريض؟",
-      message: `هل تريد حذف ملف «${patient.name || 'بدون اسم'}»؟`,
-      confirmText: "حذف",
-      variant: "danger"
+      title: archived ? "أرشفة ملف المريض؟" : "استعادة ملف المريض؟",
+      message: archived
+        ? `سيُنقل ملف «${patient.name || 'بدون اسم'}» إلى الأرشيف. ستظل بياناته محفوظة ويمكنك استعادته لاحقًا.`
+        : `سيعود ملف «${patient.name || 'بدون اسم'}» إلى قائمة الملفات النشطة.`,
+      confirmText: archived ? "أرشفة الملف" : "استعادة الملف",
+      variant: archived ? "warning" : "primary"
     });
     if (!confirmed) return;
-    await deletePatient(id);
-  }
-
-  async function deletePatient(id) {
-    if (!id) return;
-
-    if (!state.user) {
-      showStatus('يجب تسجيل الدخول أولاً.');
-      return;
-    }
 
     try {
-      const { error } = await supabase
-        .from('patients')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await supabase.rpc('set_patient_archive_status', {
+        p_patient_id: id,
+        p_archived: archived
+      });
       if (error) throw error;
 
-      state.patients = state.patients.filter((patient) => patient.id !== id);
-      state.totalPatients = Math.max(0, state.totalPatients - 1);
-
-      renderPatients();
-      showStatus('تم حذف المريض.', 'success');
+      await loadPatients();
+      showStatus(archived ? 'تمت أرشفة الملف مع الاحتفاظ ببياناته.' : 'تمت استعادة الملف بنجاح.', 'success');
     } catch (error) {
-      console.error('Delete patient failed:', error);
-
-      showStatus('تعذر حذف المريض.');
+      console.error(archived ? 'Archive patient failed:' : 'Restore patient failed:', error);
+      showStatus(archived ? 'تعذرت أرشفة الملف.' : 'تعذرت استعادة الملف.');
     }
   }
 
   function handleClick(event) {
+    const recordViewButton = event.target.closest('[data-record-view]');
+    if (recordViewButton) {
+      const nextArchived = recordViewButton.dataset.recordView === 'archived';
+      if (nextArchived !== state.showArchived) {
+        state.showArchived = nextArchived;
+        state.statusFilter = 'all';
+        void loadPatients();
+      }
+      return;
+    }
+
     const filterButton = event.target.closest('[data-status-filter]');
     if (filterButton) {
       state.statusFilter = filterButton.dataset.statusFilter || 'all';
@@ -448,10 +465,15 @@
     if (action === 'close-add-patient') closeAddPatientModal();
     if (action === 'create-patient') createPatient();
     if (action === 'open-patient') openPatient(target.dataset.patientId);
-    if (action === 'ask-delete') {
+    if (action === 'ask-archive') {
       event.preventDefault();
       event.stopPropagation();
-      askDelete(target.dataset.patientId);
+      void confirmArchiveAction(target.dataset.patientId, true);
+    }
+    if (action === 'ask-restore') {
+      event.preventDefault();
+      event.stopPropagation();
+      void confirmArchiveAction(target.dataset.patientId, false);
     }
   }
 
@@ -465,7 +487,7 @@
   function bindEvents() {
     document.addEventListener('click', handleClick);
     $('patientsList')?.addEventListener('keydown', (event) => {
-      const card = event.target.closest('.patient-card[role="link"]');
+      const card = event.target.closest('.patient-row[role="link"]');
       if (card) handleCardKeydown({ key: event.key, target: event.target, currentTarget: card, preventDefault: () => event.preventDefault() });
     });
     $('searchInput')?.addEventListener('input', renderPatients);
