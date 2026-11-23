@@ -28,7 +28,7 @@
 .dp-app-header__account [hidden],.dp-app-header__context[hidden],.dp-app-header__notification-badge[hidden]{display:none!important}
 .dp-app-header__account-link:disabled{opacity:.65;cursor:wait}
 .dp-app-header__nav{position:relative;cursor:default;z-index:1;display:flex;flex-direction:column;align-items:stretch;gap:7px;width:100%;min-width:0}
-.dp-app-header.is-collapsed .dp-app-header__track > .dp-app-header__link:nth-child(n+7){display:none!important}
+.dp-app-header.is-collapsed .dp-app-header__track > .dp-app-header__link:nth-child(n+7):not([data-header-key="contact"]){display:none!important}
 .dp-app-header.is-collapsed .dp-app-header__page-title,
 .dp-app-header.is-collapsed .dp-app-header__context{display:none!important}
 .dp-app-header.is-collapsed{padding-bottom:11px}
