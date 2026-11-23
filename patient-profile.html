@@ -17,7 +17,7 @@
   <script src="js/weight-logs-table.js?v=20261122-clean-measurement-headings-v1" defer></script>
   <script src="js/patient-lab-results.js?v=20261123-labs-v1" defer></script>
   <script src="js/dp-utils.js?v=20261122-central-utils-v1"></script>
-  <script src="js/patient-profile.js?v=20261123-central-summary-v1" defer></script>
+  <script src="js/patient-profile.js?v=20261123-central-food-picker-v1" defer></script>
   
   <script src="js/patient-portal-link.js?v=20261123-code-only-v1" defer></script>
   <script src="js/patient-messages.js?v=20261123-direct-file-messaging-v2" defer></script>
@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="css/diet-plan.css?v=20261123-central-summary-v2">
   <link rel="stylesheet" href="css/diet-builder.css?v=20261123-central-meal-builder-v2">
   <link rel="stylesheet" href="css/nutrition-summary.css?v=20261123-central-summary-v2">
+  <link rel="stylesheet" href="css/food-picker.css?v=20261123-central-food-picker-v1">
   <link rel="stylesheet" href="css/patient-profile.css?v=20261123-labs-v1">
   
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261122-clean-measurement-headings-v1">
@@ -440,46 +441,7 @@
                 
             
 <div class="embedded-diet-modals">
-                    <div id="foodModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
-                        <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
-                            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                                <h3 id="modalMealTitle" class="font-extrabold text-slate-800 text-base">
-                                    إضافة صنف للوجبة
-                                </h3>
-                                <button data-action="dietPlan.closeFoodModal" class="text-slate-400 hover:text-slate-600">
-                                    <i class="fa-solid fa-xmark text-lg">
-                                    </i>
-                                </button>
-                            </div>
-                            <div class="space-y-3">
-                                <input type="text" id="foodSearchInput" placeholder="اكتب اسم الطعام للبحث..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
-                                <input type="hidden" id="selectedFoodId">
-                                <div id="foodDropdownList" class="border border-slate-200 rounded-xl max-h-56 overflow-y-auto divide-y divide-slate-100">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 mb-1">
-                                        الكمية (جرام)
-                                    </label>
-                                    <input type="number" id="foodGramsInput" value="100" data-action-input="updateFoodModalHousehold" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-emerald-700">
-                                </div>
-                                <div id="foodModalHouseholdBox" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
-                                    <div class="text-[10px] text-emerald-600 font-bold">
-                                        المقياس المنزلي
-                                    </div>
-                                    <div id="foodModalHousehold" class="text-xs text-emerald-800 font-black">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 pt-2 border-t border-slate-100">
-                                <button data-action="dietPlan.confirmAddFoodItem" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl">
-                                    إضافة للوجبة
-                                </button>
-                                <button data-action="dietPlan.closeFoodModal" class="bg-slate-100 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl">
-                                    إلغاء
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <!-- Add meal -->
                     <div id="addMealModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
                         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
