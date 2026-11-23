@@ -3,7 +3,7 @@
 const db=window.DietPlannerAccess?.supabaseClient;
 const $=id=>document.getElementById(id);
 const PAGE_SIZE=20;
-const state={profiles:[],offers:new Map(),offset:0,loading:false,selectedProfile:null};
+const state={profiles:[],offers:new Map(),offset:0,loading:false};
 const modeLabels={online:"متابعة أونلاين",in_person:"متابعة حضورية",phone:"متابعة هاتفية"};
 const esc=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const arr=value=>Array.isArray(value)?value:[];
@@ -68,7 +68,7 @@ async function loadProfiles(){
  finally{state.loading=false;more.disabled=false;}
 }
 function openProfile(profileId){
- const p=state.profiles.find(x=>x.user_id===profileId);if(!p)return;state.selectedProfile=p;
+ const p=state.profiles.find(x=>x.user_id===profileId);if(!p)return;
  $("directoryModalTitle").textContent=p.display_name||"ملف المختص";$("directoryModalSubtitle").textContent=p.professional_title||"";
  $("directoryModalDetails").innerHTML=field("الموقع",[p.city,p.governorate].filter(Boolean).join("، "),"fa-location-dot")+field("سنوات الخبرة",p.experience_years==null?"غير محددة":p.experience_years+" سنة","fa-briefcase")+field("طرق المتابعة",arr(p.service_modes).map(m=>modeLabels[m]||m).join("، "),"fa-video");
  $("directoryModalSpecialties").innerHTML=arr(p.specialties).map(s=>'<span class="directory-chip">'+esc(s)+'</span>').join("")||'<span class="directory-muted">لم تُحدد تخصصات</span>';
