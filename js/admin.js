@@ -1,7 +1,6 @@
 (function(){
 'use strict';
 const access=window.DietPlannerAccess, sb=access?.supabaseClient;
-const PLAN_FEATURES=[{key:'nutrition_support',label:'الدعم الغذائي'},{key:'diet',label:'الدايت المتقدم'},{key:'article',label:'المقال المتقدم'},{key:'product',label:'المنتجات الغذائية'}];
 const PAGE_SIZE=20;
 const state={plans:[],subs:[],profiles:[],patients:[],announcements:[],privacyPolicy:null,currentUserId:null,activeTab:'requests',requestSearch:'',requestStatus:'all',requestPage:0,requestTotal:0,requestAllTotal:0,doctorSearch:'',doctorPage:0,doctorTotal:0,doctorActiveTotal:0,professionalReviewFilter:'pending_review',professionalReviewSearch:'',professionalReviewPage:0,professionalReviewTotal:0,professionalReviewProfiles:[]};
 let requestSearchTimer=null,doctorSearchTimer=null,professionalReviewSearchTimer=null;
@@ -64,7 +63,7 @@ async function loadRequestsPage(page=0){
   if(allCount.error)throw allCount.error;if(profilesResult.error)throw profilesResult.error;
   const profileIds=(profilesResult.data||[]).map(x=>x.id),planIds=q?state.plans.filter(p=>String(p.name||'').toLowerCase().includes(q.toLowerCase())).map(p=>p.id):[],filters=[];
   if(q){filters.push(`full_name.ilike.%${q}%`);if(profileIds.length)filters.push(`user_id.in.(${profileIds.join(',')})`);if(planIds.length)filters.push(`plan_id.in.(${planIds.join(',')})`)}
-  let query=sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot',{count:'exact'}).order('created_at',{ascending:false});
+  let query=sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot',{count:'exact'}).order('created_at',{ascending:false});
   if(state.requestStatus!=='all')query=query.eq('status',state.requestStatus);
   if(q){if(!filters.length){state.subs=[];state.profiles=[];state.requestTotal=0;state.requestAllTotal=allCount.count||0;$('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;renderRequests();return}query=query.or(filters.join(','))}
   const result=await query.range(from,to);if(result.error)throw result.error;
@@ -89,7 +88,7 @@ async function loadDoctorsPage(page=0){
   state.profiles=profilesResult.data||[];state.doctorTotal=profilesResult.count||0;
   const ids=state.profiles.map(p=>p.id);
   if(ids.length){
-   const sr=await sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot,max_patients_snapshot,features_snapshot').in('user_id',ids).order('created_at',{ascending:false});
+   const sr=await sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot').in('user_id',ids).order('created_at',{ascending:false});
    if(sr.error)throw sr.error;state.subs=sr.data||[];
    const subscriptionIds=state.subs.map(s=>s.id);
    let patientQuery=sb.from('patients').select('id,user_id,subscription_id');
@@ -126,15 +125,12 @@ function renderRequests(){
  setState('request','',true);
  renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));
 }
-const featureLabel=k=>PLAN_FEATURES.find(x=>x.key===k)?.label||k;
-function featuresText(f){const a=PLAN_FEATURES.filter(x=>f?.[x.key]===true).map(x=>x.label);return a.length?a.join('، '):'—'}
 function renderPlans(){
  $('planCount').textContent=state.plans.length;$('activePlanCount').textContent=state.plans.filter(p=>p.is_active).length;
  const body=$('plansBody');if(!state.plans.length){setState('plan','لا توجد خطط.');return}
  body.innerHTML=state.plans.map(p=>`<tr>
  <td><span class="name">${esc(p.name)}</span>${p.is_free_trial?'<span class="meta">تجربة مجانية</span>':''}</td>
- <td>${money(p.price)}</td><td>${esc(p.duration_days)} يوم</td><td>${p.max_patients==null?'غير محدود':esc(p.max_patients)}</td><td>${esc(p.payment_method||'—')}</td>
- <td>${esc(featuresText(p.features))}</td><td><span class="badge ${p.is_active?'active':'off'}">${p.is_active?'متاحة':'غير متاحة'}</span></td>
+ <td>${money(p.price)}</td><td>${esc(p.duration_days)} يوم</td><td>${esc(p.payment_method||'—')}</td><td><span class="badge ${p.is_active?'active':'off'}">${p.is_active?'متاحة':'غير متاحة'}</span></td>
  <td class="actions-cell"><button class="icon-btn" title="تعديل" data-edit-plan="${esc(p.id)}"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف" data-del-plan="${esc(p.id)}"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
  setState('plan','',true)
 }
@@ -163,7 +159,7 @@ function renderDoctors(){
  $('doctorActiveCount').textContent=state.doctorActiveTotal;
  const doctors=state.profiles;
  const body=$('doctorsBody');if(!doctors.length){setState('doctor',state.doctorTotal?'لا توجد نتائج مطابقة للبحث.':'لا يوجد مستخدمون.');renderPager('doctorPager',state.doctorPage,state.doctorTotal,()=>loadDoctorsPage(state.doctorPage+1),()=>loadDoctorsPage(state.doctorPage-1));return}
- body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);const max=s?.max_patients_snapshot;
+ body.innerHTML=doctors.map(p=>{const s=latestSub(p.id),count=patientCountForSub(s);
  const actions=s
   ? '<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>'
   : '<button class="icon-btn" title="إضافة اشتراك" data-add-sub="'+esc(p.id)+'"><i class="fa-solid fa-pen"></i></button>';
@@ -171,31 +167,27 @@ function renderDoctors(){
  <td>${accountTypeBadge(p.account_type,p.role)}</td>
  <td><span class="badge ${p.role==='admin'?'active':'off'}">${roleLabel(p.role)}</span></td>
  <td>${s?esc(planName(s.plan_id)):'—'}</td><td>${date(s?.start_date)}</td><td>${date(s?.expiry_date)}</td>
- <td>${count} / ${max==null?'∞':esc(max)}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
+ <td>${count}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
  <td class="actions-cell">${actions}</td></tr>`}).join('');
  setState('doctor','',true);
  renderPager('doctorPager',state.doctorPage,state.doctorTotal,()=>loadDoctorsPage(state.doctorPage+1),()=>loadDoctorsPage(state.doctorPage-1));
 }
 
 function planForm(p){
- const f=p?.features||{},keys=PLAN_FEATURES.map(x=>x.key);
  return `<form id="planForm"><div class="grid">
  <div class="field"><label>اسم الخطة *</label><input id="f_name" required value="${esc(p?.name||'')}"></div>
  <div class="field"><label>السعر (جنيه) *</label><input id="f_price" type="number" min="0" step="0.01" required value="${p?.price??0}"></div>
  <div class="field"><label>المدة بالأيام *</label><input id="f_duration" type="number" min="1" required value="${p?.duration_days??30}"></div>
- <div class="field"><label>الحد الأقصى للمرضى</label><input id="f_max" type="number" min="1" placeholder="اتركه فارغًا = غير محدود" value="${p?.max_patients??''}"></div>
- <div class="field"><label>طريقة الدفع</label><input id="f_payment" placeholder="مثال: Instapay / Vodafone Cash / تحويل بنكي" value="${esc(p?.payment_method||'')}"></div>
+  <div class="field"><label>طريقة الدفع</label><input id="f_payment" placeholder="مثال: Instapay / Vodafone Cash / تحويل بنكي" value="${esc(p?.payment_method||'')}"></div>
  <div class="field"><label>الحالة</label><select id="f_active"><option value="true" ${p?.is_active!==false?'selected':''}>متاحة للاشتراك</option><option value="false" ${p?.is_active===false?'selected':''}>غير متاحة</option></select></div>
  <div class="field"><label class="check"><input id="f_trial" type="checkbox" ${p?.is_free_trial?'checked':''}> خطة تجربة مجانية</label></div>
  <div class="field full"><label>الوصف</label><textarea id="f_desc">${esc(p?.description||'')}</textarea></div>
- <div class="field full"><label>المميزات</label><div class="check-grid">${keys.map(k=>{const meta=PLAN_FEATURES.find(x=>x.key===k);return '<label class="check"><input type="checkbox" class="feature-check" data-key="'+esc(k)+'" '+(f[k]===true?'checked':'')+'> '+esc(meta?.label||k)+'</label>'}).join('')}</div></div>
- </div><div class="modal-foot"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> حفظ الخطة</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`
+  </div><div class="modal-foot"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> حفظ الخطة</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`
 }
 function openPlan(p){openModal(p?'تعديل الخطة':'إنشاء خطة جديدة',planForm(p));$('planForm').addEventListener('submit',async e=>{e.preventDefault();await savePlan(p?.id||null)});$('cancelModal').onclick=closeModal}
 async function savePlan(id){
- const features={};document.querySelectorAll('.feature-check:checked').forEach(x=>features[x.dataset.key]=true);
- const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),max_patients:$('f_max').value?Number($('f_max').value):null,payment_method:$('f_payment').value.trim(),description:$('f_desc').value.trim()||null,is_active:$('f_active').value==='true',is_free_trial:$('f_trial').checked,features};
- if(!payload.name||payload.duration_days<1||payload.price<0||payload.max_patients===0){toast('راجع بيانات الخطة');return}
+ const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),payment_method:$('f_payment').value.trim(),description:$('f_desc').value.trim()||null,is_active:$('f_active').value==='true',is_free_trial:$('f_trial').checked};
+ if(!payload.name||payload.duration_days<1||payload.price<0){toast('راجع بيانات الخطة');return}
  let r=id?await sb.from('subscription_plans').update(payload).eq('id',id):await sb.from('subscription_plans').insert(payload);
  if(r.error){toast(r.error.message||'تعذر حفظ الخطة');return}
  closeModal();toast('تم حفظ الخطة');await loadAll()
@@ -256,8 +248,7 @@ function openSubAssignment(profile){
    const result=await sb.from('subscriptions').insert({
     user_id:profile.id,full_name:profile.full_name||null,plan_id:plan.id,status,
     notes:$('new_sub_notes').value.trim()||null,is_free_trial:plan.is_free_trial===true,
-    duration_days_snapshot:plan.duration_days,max_patients_snapshot:plan.max_patients,
-    features_snapshot:plan.features||{}
+    duration_days_snapshot:plan.duration_days
    }).select('id').single();
    if(result.error)throw result.error;
    const selectedRole=profile.id===state.currentUserId?profile.role:$('new_sub_role').value;
@@ -290,8 +281,6 @@ async function saveSub(s){
  // so the existing paid/pending subscription receives the selected plan's terms.
  if(selectedPlan.id!==s.plan_id){
   payload.duration_days_snapshot=selectedPlan.duration_days;
-  payload.max_patients_snapshot=selectedPlan.max_patients;
-  payload.features_snapshot=selectedPlan.features||{};
  }
  const r=await sb.from('subscriptions').update(payload).eq('id',s.id);
  if(r.error){toast(r.error.message||'تعذر تعديل الاشتراك');return}
