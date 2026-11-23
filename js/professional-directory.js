@@ -71,7 +71,7 @@ function requestKey(patientId,professionalId){return String(patientId)+":"+Strin
 function renderRequestPanel(){
  const section=$("directoryRequestSection"),select=$("directoryPatientFile"),button=$("directoryRequestSubmit"),cancel=$("directoryRequestCancel"),status=$("directoryModalStatus");
  if(!section||!select||!button||!cancel||!status)return;
- cancel.hidden=true;cancel.disabled=false;
+ cancel.hidden=true;cancel.disabled=false;button.hidden=false;
  section.hidden=false;
  if(!state.user){select.innerHTML='<option value="">سجّل الدخول أولًا</option>';select.disabled=true;button.disabled=false;button.textContent="تسجيل الدخول لطلب المحادثة";status.textContent="سجّل الدخول بحساب المريض لطلب محادثة.";status.className="directory-modal-status is-error";return;}
  select.disabled=false;
@@ -156,7 +156,7 @@ function openProfile(profileId){
  $("directoryModal").hidden=false;document.body.classList.add("directory-modal-open");
  renderRequestPanel();$("directoryModalClose").focus();
 }
-function closeModal(){$("directoryModal").hidden=true;document.body.classList.remove("directory-modal-open");state.selectedProfile=null;}
+function closeModal(){$("directoryModal").hidden=true;document.body.classList.remove("directory-modal-open");state.selectedProfileId=null;}
 document.addEventListener("DOMContentLoaded",()=>{
  $("directoryMore").addEventListener("click",loadProfiles);
  ["directorySearch","directoryGovernorate","directoryMode"].forEach(id=>$(id).addEventListener(id==="directorySearch"?"input":"change",renderProfiles));
