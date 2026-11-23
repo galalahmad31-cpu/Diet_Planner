@@ -506,7 +506,7 @@ async function loadProfessionalReviewPage(page=0){
    const account=accounts.get(profile.user_id)||{},pending=profile.listing_status==='pending_review',published=profile.listing_status==='published',label=pending?'قيد المراجعة':published?'منشور ومعتمد':'موقوف';
    const modes=(profile.service_modes||[]).map(mode=>({online:'أونلاين',in_person:'حضوري',online_and_in_person:'أونلاين وحضوري'}[mode]||mode)).join('، ')||'—',specialties=(profile.specialties||[]).join('، ')||'—';
    const photo=profile.photo_url?'<img class="professional-review-photo" src="'+esc(profile.photo_url)+'" alt="الصورة الشخصية" loading="lazy" referrerpolicy="no-referrer">':'<div class="professional-review-avatar"><i class="fa-solid fa-user-doctor"></i></div>';
-   const actions=pending?'<button class="btn btn-primary" type="button" data-professional-decision="published" data-user="'+esc(profile.user_id)+'">اعتماد ونشر</button><button class="btn btn-danger" type="button" data-professional-decision="rejected" data-user="'+esc(profile.user_id)+'">رفض وإعادة للتعديل</button>':published?'<button class="btn btn-warning" type="button" data-professional-decision="suspended" data-user="'+esc(profile.user_id)+'">إيقاف النشر</button>':'<span class="professional-review-note">الملف موقوف. لا يتاح إعادة نشره من هذه الحالة حاليًا.</span>';
+   const actions=pending?'<button class="btn btn-primary" type="button" data-professional-decision="published" data-user="'+esc(profile.user_id)+'">اعتماد ونشر</button><button class="btn btn-danger" type="button" data-professional-decision="rejected" data-user="'+esc(profile.user_id)+'">رفض وإعادة للتعديل</button>':published?'<button class="btn btn-warning" type="button" data-professional-decision="suspended" data-user="'+esc(profile.user_id)+'">إيقاف النشر</button>':'<button class="btn btn-primary" type="button" data-professional-decision="published" data-user="'+esc(profile.user_id)+'">إعادة التفعيل والنشر</button>';
    return '<article class="professional-review-card"><div class="professional-review-card-head">'+photo+'<div class="professional-review-identity"><h3>'+esc(profile.display_name)+'</h3><strong>'+esc(profile.professional_title)+'</strong><span>'+esc(account.email||'')+'</span><span class="professional-review-status '+(pending?'pending':published?'published':'suspended')+'">'+label+'</span></div></div><div class="professional-review-details"><div><small>التخصصات</small><p>'+esc(specialties)+'</p></div><div><small>الموقع</small><p>'+esc([profile.city,profile.governorate].filter(Boolean).join('، ')||'—')+'</p></div><div><small>سنوات الخبرة</small><p>'+esc(profile.experience_years??'—')+'</p></div><div><small>طرق تقديم الخدمة</small><p>'+esc(modes)+'</p></div><div class="full"><small>النبذة المهنية</small><p>'+esc(profile.bio||'—')+'</p></div>'+(profile.moderation_note?'<div class="full"><small>ملاحظة الإدارة السابقة</small><p>'+esc(profile.moderation_note)+'</p></div>':'')+'</div><div class="professional-review-card-foot"><span>تاريخ الإرسال: '+esc(dateTime(profile.submitted_at))+'</span><div class="professional-review-actions">'+actions+'</div></div></article>';
   }).join('');status.style.display='none';renderProfessionalReviewPager();
  }catch(error){console.error('Professional directory review load failed:',error);status.textContent='تعذر تحميل الملفات المهنية: '+(error.message||'خطأ غير معروف');renderProfessionalReviewPager()}
@@ -517,12 +517,13 @@ async function moderateProfessionalProfile(button){
   button.disabled=true;
   const {error}=await sb.rpc('moderate_professional_directory_profile',{p_user_id:userId,p_decision:decision,p_note:note});
   if(error){toast(error.message||'تعذر تحديث حالة الملف.');button.disabled=false;return}
-  toast(decision==='published'?'تم اعتماد الملف ونشره.':decision==='rejected'?'تم رفض الملف وإعادته للمختص للتعديل.':'تم إيقاف نشر الملف.');
+  toast(decision==='published'?(profile.listing_status==='suspended'?'تمت إعادة تفعيل الملف ونشره.':'تم اعتماد الملف ونشره.'):decision==='rejected'?'تم رفض الملف وإعادته للمختص للتعديل.':'تم إيقاف نشر الملف.');
   await loadProfessionalReviewPage(state.professionalReviewPage);
  };
  let note='';
  if(decision==='published'){
-  askConfirm('اعتماد ونشر الملف','هل تريد اعتماد ونشر الملف المهني لـ '+esc(profile.display_name)+'؟',applyDecision);
+  const isReactivation=profile.listing_status==='suspended';
+  askConfirm(isReactivation?'إعادة تفعيل الملف المهني':'اعتماد ونشر الملف','هل تريد '+(isReactivation?'إعادة تفعيل ونشر':'اعتماد ونشر')+' الملف المهني لـ '+esc(profile.display_name)+'؟ سيعود الملف للظهور في الدليل إذا كان الاشتراك مستوفيًا للشروط.',applyDecision);
   return;
  }
  if(!window.DPConfirm?.askText){toast('نافذة الإدخال المركزية غير متاحة.');return}
