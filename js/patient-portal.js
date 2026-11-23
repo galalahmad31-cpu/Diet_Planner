@@ -25,7 +25,13 @@
   }
 
   function showOnly(id) {
-    ["portalLoading", "portalError", "portalUnlinked"].forEach(key => { if ($(key)) $(key).hidden = key !== id; });
+    ["portalLoading", "portalError"].forEach(key => { if ($(key)) $(key).hidden = key !== id; });
+    const fileAccess = $("portalFileAccess");
+    if (fileAccess) fileAccess.hidden = id === "portalLoading" || id === "portalError";
+    if ($("portalFileAccessMessage")) $("portalFileAccessMessage").hidden = id !== "portalUnlinked";
+    if ($("portalPatientSelector")) $("portalPatientSelector").hidden = id === "portalUnlinked" || !state.patientAccounts.length;
+    const selectorLabel = document.querySelector('label[for="portalPatientSelector"]');
+    if (selectorLabel) selectorLabel.hidden = id === "portalUnlinked" || !state.patientAccounts.length;
     if ($("portalContent")) $("portalContent").hidden = id !== "portalContent";
   }
 
@@ -105,8 +111,14 @@
   }
 
   function activateHealthTab(panelId) {
-    const allowed = ["portalPlansPanel", "portalMeasurementsPanel", "portalCareManagementPanel", "portalSharedHealthPanel"];
+    const allowed = ["portalMessagesPanel", "portalPlansPanel", "portalMeasurementsPanel", "portalCareManagementPanel", "portalSharedHealthPanel"];
     if (!allowed.includes(panelId)) return;
+    if (!isValidPatientId(state.patientId) || !state.patient) {
+      void loadPortal().then(() => {
+        if (isValidPatientId(state.patientId) && state.patient) activateHealthTab(panelId);
+      }).catch(error => fail(error.message || "تعذر تحميل الملف الصحي."));
+      return;
+    }
 
     // Keep the selected panel's ancestors visible. Tabs live outside portalContent,
     // so a hidden parent would otherwise leave an active tab with a completely blank body.
@@ -131,7 +143,9 @@
     const contextVersion = state.contextVersion;
     if (state.loadedPanels.has(panelId)) return;
     if (state.loadingPanels.has(panelId)) return state.loadingPanels.get(panelId);
+    if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) return;
     const loaders = {
+      portalMessagesPanel: () => Promise.resolve(),
       portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
       portalMeasurementsPanel: loadMeasurements,
       portalCareManagementPanel: loadPatientFinanceSummary,
@@ -174,11 +188,11 @@
     const home = $("portalHome"), health = $("portalHealthArea"), profile = $("portalProfileArea"), tools = $("portalToolsPanel");
     const toolsOpen = id === "portalToolsPanel" || id === "portalTools";
     if (home) home.hidden = !["portalHome", "portalDietBuilder"].includes(id) || toolsOpen;
-    if (health) health.hidden = id !== "portalContent" && !["portalPlansPanel","portalMeasurementsPanel","portalCareManagementPanel","portalSharedHealthPanel"].includes(id);
+    if (health) health.hidden = id !== "portalContent" && !["portalMessagesPanel","portalPlansPanel","portalMeasurementsPanel","portalCareManagementPanel","portalSharedHealthPanel"].includes(id);
     if (profile) profile.hidden = id !== "portalProfileArea";
     if (tools) tools.hidden = !toolsOpen;
     if (health && !health.hidden) {
-      if (id === "portalContent") activateHealthTab("portalPlansPanel");
+      if (id === "portalContent") activateHealthTab("portalMessagesPanel");
       else if (id.startsWith("portal")) activateHealthTab(id);
     }
     if (toolsOpen) {
@@ -288,6 +302,17 @@
     const patientId = state.patientId;
     const contextVersion = state.contextVersion;
     const loading = $("portalMeasurementsLoading");
+    const errorBox = $("portalMeasurementsError");
+    if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) {
+      state.logs = [];
+      $("portalMeasurementsTable")?.replaceChildren();
+      if (loading) loading.hidden = true;
+      if (errorBox) {
+        errorBox.textContent = "اختر ملفًا صحيًا مرتبطًا أولًا لعرض القياسات.";
+        errorBox.hidden = false;
+      }
+      return;
+    }
     const errorBox = $("portalMeasurementsError");
     if (errorBox) { errorBox.hidden = true; errorBox.textContent = ""; }
     renderMeasurements();
@@ -789,8 +814,8 @@
         if (!isCurrentLoad()) return;
         if (!currentAccounts.length) {
           showOnly("portalUnlinked");
-          $("portalInviteToken").value = invitationToken;
-          setMessage("portalInviteMessage", error.message || "تعذر ربط الملف. تحقق من صلاحية الكود.", "error");
+          $("patientProfessionalCode").value = invitationToken;
+          setMessage("patientProfessionalCodeStatus", error.message || "تعذر ربط الملف. تحقق من صلاحية الكود.", "error");
           return;
         }
         setMessage("patientProfessionalCodeStatus", error.message || "تعذر ربط الملف.", "error");
@@ -798,7 +823,22 @@
     }
     const accounts = await getPatientAccount();
     if (!isCurrentLoad()) return;
-    if (!accounts.length) { showOnly("portalUnlinked"); return; }
+    if (!accounts.length) {
+      state.contextVersion += 1;
+      state.patientAccounts = [];
+      state.patientId = null;
+      state.preferredPatientId = null;
+      state.patient = null;
+      state.logs = [];
+      state.loadedPanels.clear();
+      state.loadingPanels.clear();
+      state.messagesMountedFor = null;
+      $("patientPortalMessages")?.replaceChildren();
+      $("portalMeasurementsTable")?.replaceChildren();
+      $("portalPlansList")?.replaceChildren();
+      showOnly("portalUnlinked");
+      return;
+    }
     const ids = accounts.map(item => item.patient_id).filter(isValidPatientId);
     if (!ids.length) throw new Error("لا توجد ملفات صحية صالحة مرتبطة بهذا الحساب.");
     const { data: patientRows, error: patientError } = await supabase.from("patients").select("id,name").in("id", ids).order("name");
@@ -854,7 +894,7 @@
     showOnly("portalContent");
     if ($("portalHealthArea")) $("portalHealthArea").hidden = false;
     activatePlanTab();
-    activateHealthTab("portalPlansPanel");
+    activateHealthTab("portalMessagesPanel");
 
     const messagesRoot = $("patientPortalMessages");
     if (messagesRoot && state.messagesMountedFor !== state.patientId) {
@@ -865,27 +905,6 @@
       void window.DietPlannerPatientMessages?.mountInbox(messagesRoot, {patientId:state.patientId,role:"patient"});
     }
   }
-  async function handleInviteSubmit(event) {
-    event.preventDefault();
-    const input = $("portalInviteToken");
-    const button = event.submitter || $("portalInviteForm").querySelector("button[type=submit]");
-    const token = input.value.trim();
-    if (!button || button.disabled) return;
-    button.disabled = true;
-    setMessage("portalInviteMessage", "جاري التحقق من كود الربط...");
-    try {
-      state.preferredPatientId = await acceptInvitation(token);
-      input.value = "";
-      setMessage("portalInviteMessage", "تم ربط الملف بحسابك بنجاح.", "success");
-      await loadPortal();
-    } catch (error) {
-      console.error("Invitation acceptance failed:", error);
-      setMessage("portalInviteMessage", error.message || "تعذر قبول كود الربط.", "error");
-    } finally {
-      button.disabled = false;
-    }
-  }
-
   async function loadPatientAnnouncements() {
     const section = $("patientAnnouncementsSection");
     const host = $("patientAnnouncementsList");
@@ -953,7 +972,6 @@
     void loadPatientAnnouncements();
     $("portalLogout")?.addEventListener("click", () => access.logout());
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
-    $("portalInviteForm")?.addEventListener("submit", handleInviteSubmit);
     $("patientSelfProfileForm")?.addEventListener("submit", saveSelfProfile);
     $("patientProfessionalCodeForm")?.addEventListener("submit", redeemProfessionalInvitation);
     document.querySelectorAll("[data-health-tab]").forEach(tab => tab.addEventListener("click", () => activateHealthTab(tab.dataset.healthTab)));
@@ -1004,6 +1022,7 @@
     async navigateToSection(id) {
       const healthSections = [
         "portalContent",
+        "portalMessagesPanel",
         "portalPlansPanel",
         "portalMeasurementsPanel",
         "portalCareManagementPanel",
