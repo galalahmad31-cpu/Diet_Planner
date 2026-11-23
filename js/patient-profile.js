@@ -23,6 +23,8 @@
     patientFinance: null,
     patientFinanceEditing: false,
     patientFinanceLoading: false,
+    patientAccountLinked: false,
+    relationshipRequestId: null,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -216,6 +218,7 @@
 
     state.patient = data;
     fillPatientData();
+    void loadPatientRelationshipActions();
 
     // Reveal the loaded patient immediately. Access checks and secondary modules
     // run afterward and cannot block the main patient record.
@@ -1508,6 +1511,87 @@
     activatePatientModule(null);
   }
 
+  async function loadPatientRelationshipActions() {
+    const linkButton = $('createPatientPortalInvite');
+    const contactButton = $('openPatientConversation');
+    const endButton = $('endPatientFollowup');
+    state.patientAccountLinked = false;
+    state.relationshipRequestId = null;
+
+    [linkButton, contactButton, endButton].forEach(button => {
+      if (button) button.hidden = true;
+    });
+
+    if (!supabase || !patientId || !state.user?.id || !state.patient) return;
+
+    try {
+      const { data: account, error: accountError } = await supabase
+        .from('patient_accounts')
+        .select('user_id')
+        .eq('patient_id', patientId)
+        .eq('status', 'active')
+        .maybeSingle();
+      if (accountError) throw accountError;
+
+      state.patientAccountLinked = Boolean(account?.user_id);
+      if (!state.patientAccountLinked) {
+        if (linkButton) linkButton.hidden = false;
+        return;
+      }
+
+      const { data: requests, error: requestError } = await supabase
+        .from('professional_connection_requests')
+        .select('id')
+        .eq('patient_id', patientId)
+        .eq('professional_id', state.user.id)
+        .eq('requested_by', account.user_id)
+        .eq('status', 'accepted')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (requestError) throw requestError;
+
+      state.relationshipRequestId = requests?.[0]?.id || null;
+      if (state.relationshipRequestId) {
+        if (contactButton) contactButton.hidden = false;
+        if (endButton) endButton.hidden = false;
+      }
+    } catch (error) {
+      state.patientAccountLinked = false;
+      state.relationshipRequestId = null;
+      console.error('Patient relationship actions load failed:', error);
+    }
+  }
+
+  async function endPatientFollowup() {
+    const button = $('endPatientFollowup');
+    const requestId = state.relationshipRequestId;
+    if (!button || !requestId || button.disabled) return;
+
+    const confirmed = window.confirm(
+      'هل تريد إنهاء المتابعة مع هذا المريض؟ ستتوقف الرسائل الجديدة، مع الاحتفاظ بحساب المريض والملف الصحي وسجل الرسائل.'
+    );
+    if (!confirmed) return;
+
+    button.disabled = true;
+    const original = button.innerHTML;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>جاري إنهاء المتابعة...</span>';
+    try {
+      const { error } = await supabase.rpc('end_professional_connection', {
+        p_request_id: requestId
+      });
+      if (error) throw error;
+
+      await loadPatientRelationshipActions();
+      window.alert('تم إنهاء المتابعة. تم الاحتفاظ بربط الحساب والملف الصحي والبيانات السابقة.');
+    } catch (error) {
+      console.error('Patient follow-up termination failed:', error);
+      window.alert(error?.message || 'تعذر إنهاء المتابعة. حاول مرة أخرى.');
+    } finally {
+      button.disabled = false;
+      button.innerHTML = original;
+    }
+  }
+
   function bindPatientConversationDrawer() {
     const drawer = $('patientConversationDrawer');
     const openButton = $('openPatientConversation');
@@ -1559,6 +1643,7 @@
   function bindEvents() {
     bindPatientModuleTabs();
     bindPatientConversationDrawer();
+    $('endPatientFollowup')?.addEventListener('click', () => void endPatientFollowup());
     bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
