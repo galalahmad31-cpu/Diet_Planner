@@ -38,7 +38,13 @@
   }
 
   function openHealthArea() {
-    showOnly("portalLoading");
+    const navigate = window.DietPlannerPatientPortal?.navigateToSection;
+    if (typeof navigate === "function") {
+      void navigate("portalContent");
+      return;
+    }
+    // Safe fallback: expose the health destination before loading its data.
+    showPortalDestination("portalContent");
     loadPortal().catch(error => {
       console.error("Patient health area load failed:", error);
       fail(error.message || "تعذر تحميل الملف الصحي.");
