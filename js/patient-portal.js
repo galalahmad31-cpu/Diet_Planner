@@ -398,8 +398,6 @@
     const list = $("portalPlansList");
     if (!loading || !empty || !list || !state.patientId) return;
 
-    const unavailable = $("portalProfessionalPlanUnavailable");
-    if (unavailable) unavailable.hidden = true;
     loading.hidden = false;
     empty.hidden = true;
     list.replaceChildren();
@@ -1139,6 +1137,16 @@
     if (state.messagesMountedFor !== state.patientId) {
       state.messagesMountedFor = state.patientId;
       void window.DietPlannerPatientMessages?.mountInbox($("patientPortalMessages"), { patientId: state.patientId, role: "patient" });
+    }
+    const appointmentsRoot = $("patientPortalAppointments");
+    if (appointmentsRoot && window.DietPlannerPatientAppointments?.mount) {
+      void window.DietPlannerPatientAppointments.mount(appointmentsRoot, {
+        patientId: state.patientId,
+        role: "patient"
+      }).catch(error => {
+        console.error("Patient appointments initialization failed:", error);
+        appointmentsRoot.textContent = "تعذر تهيئة قسم المواعيد. أعد تحميل الصفحة.";
+      });
     }
   }
 
