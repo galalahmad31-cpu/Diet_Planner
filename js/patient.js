@@ -16,7 +16,7 @@
     user: null,
     accountType: null,
     isAdmin: false,
-    canAddPatient: false,
+    canCreatePatient: false,
     accessReady: false,
     accessPromise: null,
     openingAddModal: false
@@ -65,7 +65,7 @@
 
       if (!state.user) {
         state.isAdmin = false;
-        state.canAddPatient = false;
+        state.canCreatePatient = false;
         updateWriteControls();
         return;
       }
@@ -74,18 +74,18 @@
 
       // Admin accounts with a professional profile use their own isolated workspace.
       if (state.accountType !== 'professional') {
-        state.canAddPatient = false;
+        state.canCreatePatient = false;
         updateWriteControls();
         return;
       }
 
-      state.canAddPatient = true;
+      state.canCreatePatient = true;
 
       updateWriteControls();
     } catch (error) {
       console.error('Patient access check failed:', error);
       state.isAdmin = false;
-      state.canAddPatient = false;
+      state.canCreatePatient = false;
       updateWriteControls();
     } finally {
       state.accessReady = true;
@@ -95,10 +95,9 @@
   function updateWriteControls() {
     const addButton = $('addPatientBtn');
     const accessBox = $('accessStatus');
-    const canAdd = state.accountType === 'professional' && state.canAddPatient;
+    const canAdd = state.accountType === 'professional' && state.canCreatePatient;
 
-    // Do not show subscription/quota warnings on the patient directory.
-    // The add action itself is controlled solely by the authoritative quota RPC.
+    // Patient creation is available to every authenticated professional account.
     if (addButton) {
       addButton.disabled = !canAdd;
       addButton.classList.toggle('opacity-50', !canAdd);
@@ -338,8 +337,7 @@
   }
 
   async function openAddPatientModal() {
-    // If access/quota is still being checked on initial page load, wait for
-    // that same request rather than dropping the first tap.
+    // Wait for the account type check before opening the patient form.
     if (state.openingAddModal) return;
     state.openingAddModal = true;
 
@@ -348,7 +346,7 @@
         state.accessPromise = state.accessPromise || refreshAccess();
         await state.accessPromise;
       }
-      if (state.accountType !== 'professional' || !state.canAddPatient) return;
+      if (state.accountType !== 'professional' || !state.canCreatePatient) return;
 
       const modal = $('addPatientModal');
       if (!modal) return;
@@ -373,7 +371,7 @@
   }
 
   async function createPatient() {
-    if (state.accountType !== 'professional' || !state.canAddPatient) return;
+    if (state.accountType !== 'professional' || !state.canCreatePatient) return;
 
     const input = $('newPatientName');
     const name = input?.value.trim();
