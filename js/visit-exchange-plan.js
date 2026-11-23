@@ -176,7 +176,6 @@ async function save(options={}){
  if(data!==true){status('لم تؤكد قاعدة البيانات حفظ خطة البدائل',true);return false}
  S.notes=normalizedNotes;
  S.plan=planId;S.saved=true;S.editing=false;render();setButtons();window.dispatchEvent(new CustomEvent('dp-nutrition-plan-content-changed',{detail:{planId}}));status('تم حفظ خطة البدائل بنجاح');return true;
-return true;
 }
 async function saveAndPrintFromSettings(){
  const pb=document.getElementById('executePrintBtn');
