@@ -158,7 +158,7 @@
           const { data, error: requestError } = await supabase
             .from("professional_connection_requests").select("id,requested_by")
             .eq("patient_id", patientId).eq("professional_id", user.id)
-            .in("status", ["accepted", "active"]).maybeSingle();
+            .in("status", ["accepted", "active", "ended"]).maybeSingle();
           if (requestError) throw requestError;
           request = data;
           requestId = request?.id || null;
@@ -194,11 +194,15 @@
       requestState = null;
       if (!requestId) { form.hidden = false; return; }
       const { data, error } = await supabase.from("professional_connection_requests")
-        .select("id,status")
+        .select("id,status,agreement_end_date")
         .eq("id", requestId).maybeSingle();
       if (error) throw error;
       requestState = data || null;
-      form.hidden = requestState?.status === "ended";
+      const agreementExpired = Boolean(
+        requestState?.agreement_end_date &&
+        requestState.agreement_end_date < new Date().toISOString().slice(0, 10)
+      );
+      form.hidden = requestState?.status === "ended" || agreementExpired;
     }
 
     async function loadMessages() {
