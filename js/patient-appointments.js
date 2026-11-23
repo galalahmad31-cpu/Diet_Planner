@@ -32,12 +32,14 @@
   }
 
   async function mount(root, { patientId, role } = {}) {
-    if (!root || root.dataset.appointmentsMounted === "true") return;
+    if (!root) return;
+    if (root.dataset.appointmentsMountedFor === String(patientId || "")) return;
     if (!supabase || !access?.getCurrentUser || !patientId || !["patient","professional"].includes(role)) {
       if (root) root.textContent = "تعذر تهيئة خدمة المواعيد.";
       return;
     }
     root.dataset.appointmentsMounted = "true";
+    root.dataset.appointmentsMountedFor = String(patientId);
     root.innerHTML = `
       <div class="patient-appointments-shell">
         <div class="patient-appointments-heading">
