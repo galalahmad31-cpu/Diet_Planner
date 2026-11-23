@@ -1,1 +1,139 @@
-(()=>{"use strict";const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const instances=new WeakMap();function make(container){const s={patientId:null,canEdit:()=>false,rows:[],db:window.DietPlannerAccess?.supabaseClient,loading:false};const render=()=>{const edit=!!s.canEdit();const body=s.rows.map((r,i)=>'<tr><td>'+esc(r.test_date)+'</td><td>'+esc(r.test_name)+'</td><td>'+esc(r.result_value)+'</td><td>'+esc(r.unit||"—")+'</td><td>'+esc(r.reference_range||"—")+'</td><td>'+esc(r.notes||"—")+'</td>'+(edit?'<td><button type="button" data-edit="'+i+'">تعديل</button> <button type="button" data-del="'+i+'">حذف</button></td>':'')+'</tr>').join("");container.innerHTML='<div class="lab-heading"><h3>سجل التحاليل</h3>'+(edit?'<button type="button" data-add>＋ إضافة تحليل</button>':'')+'</div>'+(edit?'<form data-form hidden><input type="hidden" name="id"><label>التاريخ<input name="test_date" type="date" required></label><label>اسم التحليل<input name="test_name" maxlength="160" required></label><label>النتيجة<input name="result_value" maxlength="120" required></label><label>الوحدة<input name="unit" maxlength="40"></label><label>المدى المرجعي<input name="reference_range" maxlength="120"></label><label>ملاحظات<input name="notes" maxlength="1000"></label><button type="submit">حفظ</button><button type="button" data-cancel>إلغاء</button></form>':'<p class="lab-readonly">النتائج للقراءة فقط.</p>')+'<div class="lab-table-wrap"><table class="lab-table"><thead><tr><th>التاريخ</th><th>التحليل</th><th>النتيجة</th><th>الوحدة</th><th>المدى المرجعي</th><th>ملاحظات</th>'+(edit?'<th>إجراء</th>':'')+'</tr></thead><tbody>'+(body||'<tr><td colspan="'+(edit?7:6)+'">لا توجد تحاليل مسجلة.</td></tr>')+'</tbody></table></div>';};const open=r=>{if(!s.canEdit())return;const f=container.querySelector("[data-form]");if(!f)return;f.reset();f.elements.id.value=r?.id||"";f.elements.test_date.value=r?.test_date||new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);["test_name","result_value","unit","reference_range","notes"].forEach(k=>f.elements[k].value=r?.[k]||"");f.hidden=false;};s.load=async()=>{if(!s.patientId||!s.db||s.loading)return;s.loading=true;container.textContent="جاري تحميل سجل التحاليل...";try{const {data,error}=await s.db.from("patient_lab_results").select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at").eq("patient_id",s.patientId).order("test_date",{ascending:false}).order("created_at",{ascending:false});if(error)throw error;s.rows=data||[];render();}catch(e){console.error("Patient labs load failed:",e);container.textContent="تعذر تحميل سجل التحاليل. تحقق من الاتصال والصلاحيات.";}finally{s.loading=false;}};container.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b)return;if(b.hasAttribute("data-add"))open();else if(b.hasAttribute("data-cancel"))container.querySelector("[data-form]").hidden=true;else if(b.hasAttribute("data-edit"))open(s.rows[+b.dataset.edit]);else if(b.hasAttribute("data-del")&&s.canEdit()){const r=s.rows[+b.dataset.del];const ok=await window.DPConfirm?.ask({title:"حذف نتيجة التحليل؟",message:"سيتم حذف النتيجة المحددة.",confirmText:"حذف",variant:"danger"});if(!ok)return;const {error}=await s.db.from("patient_lab_results").delete().eq("id",r.id).eq("patient_id",s.patientId);if(error){alert("تعذر حذف نتيجة التحليل.");return;}s.rows=s.rows.filter(x=>x.id!==r.id);render();}});container.addEventListener("submit",async e=>{if(!e.target.matches("[data-form]"))return;e.preventDefault();if(!s.canEdit())return;const f=e.target,d=new FormData(f),id=String(d.get("id")||"");const rec={patient_id:s.patientId,test_date:String(d.get("test_date")||""),test_name:String(d.get("test_name")||"").trim(),result_value:String(d.get("result_value")||"").trim(),unit:String(d.get("unit")||"").trim()||null,reference_range:String(d.get("reference_range")||"").trim()||null,notes:String(d.get("notes")||"").trim()||null};const q=id?s.db.from("patient_lab_results").update(rec).eq("id",id).eq("patient_id",s.patientId):s.db.from("patient_lab_results").insert(rec);const {data,error}=await q.select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at").single();if(error){console.error(error);alert("تعذر حفظ نتيجة التحليل.");return;}s.rows=id?s.rows.map(x=>x.id===id?data:x):[data,...s.rows];s.rows.sort((a,b)=>String(b.test_date).localeCompare(String(a.test_date)));render();});return s;}async function init({container,patientId,canEdit=()=>false}){if(!container||!patientId)return;let s=instances.get(container);if(!s){s=make(container);instances.set(container,s);}s.patientId=patientId;s.canEdit=canEdit;s.rows=[];await s.load();}window.DietPlannerLabResults=Object.freeze({init});})();
+(() => {
+  "use strict";
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const instances = new WeakMap();
+  const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
+
+  function create(container) {
+    const state = { patientId:null, canEdit:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loading:false, saving:false };
+    const root = container;
+    const fields = [
+      ["test_name","اسم التحليل","text",160],
+      ["result_value","النتيجة","text",120],
+      ["unit","الوحدة","text",40],
+      ["reference_range","المدى المرجعي","text",120],
+      ["notes","ملاحظات","text",1000]
+    ];
+    function editor(row = null) {
+      const tr = document.createElement("tr");
+      tr.className = "lab-entry-row";
+      tr.dataset.labEditor = "true";
+      if (row?.id) tr.dataset.labId = row.id;
+      tr.innerHTML = '<td><input type="date" data-lab-field="test_date" required aria-label="تاريخ التحليل"></td>' +
+        fields.map(([key,label,type,max]) => '<td><input type="'+type+'" data-lab-field="'+key+'" maxlength="'+max+'" aria-label="'+label+'" '+(key==="test_name"||key==="result_value"?"required":"")+'></td>').join("") +
+        '<td class="no-print lab-actions"><button type="button" data-lab-save>حفظ</button><button type="button" data-lab-cancel>إلغاء</button></td>';
+      tr.querySelector('[data-lab-field="test_date"]').value = row?.test_date || today();
+      fields.forEach(([key]) => { tr.querySelector('[data-lab-field="'+key+'"]').value = row?.[key] || ""; });
+      return tr;
+    }
+    function render() {
+      const editable = !!state.canEdit();
+      const body = state.rows.map((row,index) => '<tr data-lab-row="'+esc(row.id)+'">' +
+        '<td data-label="التاريخ">'+esc(row.test_date)+'</td>' +
+        '<td data-label="اسم التحليل" class="lab-name">'+esc(row.test_name)+'</td>' +
+        '<td data-label="النتيجة" class="lab-value">'+esc(row.result_value)+'</td>' +
+        '<td data-label="الوحدة">'+esc(row.unit || "—")+'</td>' +
+        '<td data-label="المدى المرجعي">'+esc(row.reference_range || "—")+'</td>' +
+        '<td data-label="ملاحظات" class="lab-notes">'+esc(row.notes || "—")+'</td>' +
+        (editable ? '<td class="no-print lab-actions"><button type="button" data-lab-edit="'+index+'">تعديل</button><button type="button" data-lab-delete="'+index+'">حذف</button></td>' : '') +
+        '</tr>').join("");
+      root.innerHTML = '<div class="lab-table-heading"><div><h3>سجل التحاليل</h3><p>أدخل النتيجة مباشرة في صف الجدول.</p></div>' +
+        (editable ? '<button type="button" class="lab-add-button" data-lab-add>＋ إضافة تحليل</button>' : '<span class="lab-readonly">للعرض فقط</span>') +
+        '</div><div class="lab-table-wrap" role="region" aria-label="جدول نتائج التحاليل" tabindex="0"><table class="lab-table"><caption class="lab-caption">نتائج التحاليل المسجلة للمريض</caption><thead><tr><th>التاريخ</th><th>اسم التحليل</th><th>النتيجة</th><th>الوحدة</th><th>المدى المرجعي</th><th>ملاحظات</th>'+(editable?'<th class="no-print">إجراء</th>':'')+'</tr></thead><tbody id="labResultsBody">'+(body || '<tr><td colspan="'+(editable?7:6)+'" class="lab-empty">لا توجد تحاليل مسجلة.</td></tr>')+'</tbody></table></div>';
+    }
+    function openNew() {
+      if (!state.canEdit()) return;
+      if (root.querySelector('[data-lab-editor]')) return;
+      const body = root.querySelector("#labResultsBody");
+      if (!body) return;
+      const empty = body.querySelector(".lab-empty");
+      if (empty) body.replaceChildren();
+      const row = editor();
+      body.prepend(row);
+      row.querySelector('[data-lab-field="test_name"]')?.focus();
+    }
+    function openEdit(index) {
+      if (!state.canEdit() || root.querySelector('[data-lab-editor]')) return;
+      const record = state.rows[index];
+      const target = root.querySelector('[data-lab-row="'+CSS.escape(String(record?.id || ""))+'"]');
+      if (!record || !target) return;
+      target.replaceWith(editor(record));
+      root.querySelector('[data-lab-editor] [data-lab-field="test_name"]')?.focus();
+    }
+    async function save(row) {
+      if (!row || state.saving || !state.canEdit()) return;
+      const value = key => String(row.querySelector('[data-lab-field="'+key+'"]')?.value || "").trim();
+      const record = {
+        patient_id:state.patientId, test_date:value("test_date"),
+        test_name:value("test_name"), result_value:value("result_value"),
+        unit:value("unit") || null, reference_range:value("reference_range") || null,
+        notes:value("notes") || null
+      };
+      if (!record.test_date || !record.test_name || !record.result_value) {
+        alert("أدخل التاريخ واسم التحليل والنتيجة.");
+        return;
+      }
+      state.saving = true;
+      const saveButton = row.querySelector("[data-lab-save]");
+      if (saveButton) { saveButton.disabled = true; saveButton.textContent = "جارٍ الحفظ"; }
+      try {
+        const id = row.dataset.labId || "";
+        let query = id
+          ? state.db.from("patient_lab_results").update(record).eq("id",id).eq("patient_id",state.patientId)
+          : state.db.from("patient_lab_results").insert(record);
+        const {data,error} = await query.select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at").single();
+        if (error) throw error;
+        state.rows = id ? state.rows.map(item => item.id===id ? data : item) : [data,...state.rows];
+        state.rows.sort((a,b)=>String(b.test_date).localeCompare(String(a.test_date)) || String(b.created_at).localeCompare(String(a.created_at)));
+        render();
+      } catch (error) {
+        console.error("Patient lab save failed:",error);
+        alert(error?.message || "تعذر حفظ نتيجة التحليل. تحقق من الاتصال والصلاحيات.");
+        if (saveButton) { saveButton.disabled=false; saveButton.textContent="حفظ"; }
+      } finally { state.saving=false; }
+    }
+    root.addEventListener("click", async event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      if (button.hasAttribute("data-lab-add")) openNew();
+      else if (button.hasAttribute("data-lab-cancel")) render();
+      else if (button.hasAttribute("data-lab-save")) void save(button.closest("[data-lab-editor]"));
+      else if (button.hasAttribute("data-lab-edit")) openEdit(Number(button.dataset.labEdit));
+      else if (button.hasAttribute("data-lab-delete") && state.canEdit()) {
+        const record = state.rows[Number(button.dataset.labDelete)];
+        if (!record) return;
+        const confirmed = await window.DPConfirm?.ask({title:"حذف نتيجة التحليل؟",message:"سيتم حذف نتيجة التحليل المحددة.",confirmText:"حذف",variant:"danger"});
+        if (!confirmed) return;
+        const {error} = await state.db.from("patient_lab_results").delete().eq("id",record.id).eq("patient_id",state.patientId);
+        if (error) { console.error(error); alert("تعذر حذف نتيجة التحليل."); return; }
+        state.rows = state.rows.filter(item=>item.id!==record.id);
+        render();
+      }
+    });
+    state.load = async () => {
+      if (!state.patientId || !state.db || state.loading) return;
+      state.loading = true;
+      root.textContent = "جاري تحميل سجل التحاليل...";
+      try {
+        const {data,error} = await state.db.from("patient_lab_results")
+          .select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at")
+          .eq("patient_id",state.patientId).order("test_date",{ascending:false}).order("created_at",{ascending:false});
+        if (error) throw error;
+        state.rows = data || [];
+        render();
+      } catch (error) {
+        console.error("Patient labs load failed:",error);
+        root.textContent = "تعذر تحميل سجل التحاليل. تحقق من الاتصال والصلاحيات.";
+      } finally { state.loading=false; }
+    };
+    return state;
+  }
+  async function init({container,patientId,canEdit=()=>false}={}) {
+    if (!container || !patientId) return;
+    let state = instances.get(container);
+    if (!state) { state=create(container); instances.set(container,state); }
+    state.patientId=patientId; state.canEdit=canEdit; state.rows=[];
+    await state.load();
+  }
+  window.DietPlannerLabResults = Object.freeze({init});
+})();
