@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
   <link rel="stylesheet" href="css/dp-confirm.css?v=20261122-simple-confirm-v1">
   <link rel="stylesheet" href="css/app-header.css?v=20261122-icon-only-controls-v1">
-  <link rel="stylesheet" href="css/patient-portal.css?v=20261123-four-core-sections-v1">
+  <link rel="stylesheet" href="css/patient-portal.css?v=20261123-readonly-finance-v1">
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261121-unified-v3">
   <link rel="stylesheet" href="css/patient-messages.css?v=20261122-central-floating-chat-v2">
   <script src="js/theme.js?v=20261122-theme-token-aliases-v1" defer></script>
@@ -25,7 +25,7 @@
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
   <script src="js/patient-messages.js?v=20261123-direct-file-messaging-v2" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261123-four-core-sections-v1" defer></script>
+  <script src="js/patient-portal.js?v=20261123-readonly-finance-v1" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -36,6 +36,7 @@
         <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">البيانات الأساسية</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel">الخطة الغذائية</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalFinancePanel" data-health-tab="portalFinancePanel">اشتراك ومواعيد المريض</button>
       </nav>
 
     <section id="portalLoading" class="portal-state-card">
@@ -88,16 +89,40 @@
           <div id="patientSharedHealthForm" class="portal-shared-health-form">
             <div class="portal-shared-health-grid">
               <label for="sharedHealthName">اسم المريض<input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" disabled></label>
+              <label for="sharedHealthPhone">رقم الهاتف<input id="sharedHealthPhone" type="tel" dir="ltr" disabled></label>
               <label for="sharedHealthGender">النوع (اختياري)<select id="sharedHealthGender" disabled><option value="">غير محدد</option><option value="male">ذكر</option><option value="female">أنثى</option></select></label>
               <label>تاريخ الميلاد<input id="sharedHealthBirthDate" type="date" disabled></label>
+              <label>العمر (محسوب تلقائيًا)<input id="sharedHealthAge" type="number" disabled readonly></label>
               <label>الطول (سم)<input id="sharedHealthHeight" type="number" min="30" max="260" step="0.1" disabled></label>
-              <label class="is-wide">التشخيص<input id="sharedHealthDiagnosis" type="text" maxlength="4000" disabled></label>
-              <label class="is-wide">الشكوى<textarea id="sharedHealthComplaints" rows="3" maxlength="4000" disabled></textarea></label>
+              <label class="is-wide">التشخيص الطبي<textarea id="sharedHealthDiagnosis" rows="2" maxlength="4000" disabled></textarea></label>
+              <label class="is-wide">شكوى / أعراض<textarea id="sharedHealthComplaints" rows="2" maxlength="4000" disabled></textarea></label>
+              <label class="is-wide">ملاحظات سريرية<textarea id="sharedHealthClinicalNotes" rows="2" disabled></textarea></label>
             </div>
             <div class="portal-form-footer"><p id="patientSharedHealthStatus" class="portal-inline-message" role="status">هذه البيانات للعرض فقط. لطلب تحديثها، تواصل مع المختص المسؤول عن هذا الملف.</p></div>
           </div>
         </section>
         <section class="portal-section" aria-labelledby="patientHealthAuditTitle"><div class="portal-section-heading"><div><span class="portal-section-kicker">CHANGE HISTORY</span><h3 id="patientHealthAuditTitle">سجل التعديلات</h3><p>من قام بالتعديل ومتى.</p></div></div><div id="patientHealthAuditList" class="portal-health-audit-list">جاري تحميل السجل...</div></section>
+      </div>
+
+      <div id="portalFinancePanel" class="portal-health-tab-panel" role="tabpanel" hidden>
+        <section class="portal-section" aria-labelledby="portalFinanceTitle">
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">SUBSCRIPTION & APPOINTMENTS</span><h2 id="portalFinanceTitle">اشتراك ومواعيد المريض</h2><p>نفس بيانات الاشتراك والمتابعة التي سجلها المختص في ملفك، للعرض فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-calendar-check"></i></span></div>
+          <div id="portalFinanceLoading" class="portal-muted-state" hidden>جاري تحميل بيانات الاشتراك والمواعيد...</div>
+          <div id="portalFinanceError" class="portal-measurements-error" role="alert" hidden></div>
+          <div id="portalFinanceEmpty" class="portal-empty-state" hidden>لم يسجل المختص بيانات الاشتراك والمواعيد لهذا الملف حتى الآن.</div>
+          <div id="portalFinanceReadOnly" class="portal-finance-readonly-grid" aria-label="بيانات الاشتراك والمواعيد">
+            <article><span>بداية الاشتراك</span><strong id="portalFinanceStart">—</strong></article>
+            <article><span>مدة الاشتراك</span><strong id="portalFinanceMonths">—</strong></article>
+            <article><span>نهاية الاشتراك</span><strong id="portalFinanceEnd">—</strong></article>
+            <article><span>قيمة الاشتراك</span><strong id="portalFinanceAmount">—</strong></article>
+            <article><span>نسبة الخصم</span><strong id="portalFinanceDiscount">—</strong></article>
+            <article><span>قيمة الاشتراك بعد الخصم</span><strong id="portalFinanceDiscounted">—</strong></article>
+            <article><span>حالة السداد</span><strong id="portalFinancePaid">—</strong></article>
+            <article><span>آخر زيارة فعلية</span><strong id="portalFinanceLastVisit">—</strong></article>
+            <article class="is-next"><span>موعد المتابعة القادم</span><strong id="portalFinanceNextFollowUp">—</strong></article>
+          </div>
+          <p class="portal-readonly-note">هذه البيانات للعرض فقط. لتصحيح أو تحديث أي بيان، تواصل مع المختص المسؤول عن الملف.</p>
+        </section>
       </div>
 
       <div id="portalMeasurementsPanel" class="portal-health-tab-panel" role="tabpanel" hidden><section class="portal-section" aria-labelledby="portalMeasurementsTitle">
