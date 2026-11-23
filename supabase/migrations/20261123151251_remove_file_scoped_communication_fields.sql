@@ -19,7 +19,7 @@ create index patient_messages_recipient_sender_created_idx
   on public.patient_messages(recipient_id,sender_id,created_at desc);
 create index patient_messages_recipient_unread_idx
   on public.patient_messages(recipient_id,sender_id,created_at desc) where read_at is null;
-create index professional_connection_requests_requester_status_idx
+create index professional_connection_requests_patient_status_idx
   on public.professional_connection_requests(requested_by,status,updated_at desc);
 
 create or replace function private.can_read_patient_conversation_message(p_sender_id uuid,p_recipient_id uuid)
