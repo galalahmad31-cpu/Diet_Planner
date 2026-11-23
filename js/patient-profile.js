@@ -140,7 +140,7 @@
   }
 
   function canEditPatientPrivateFields() {
-    return state.patientCareMode !== 'linked' && canWrite();
+    return state.patientCareMode === 'unlinked' && canWrite();
   }
 
   async function loadPatient() {
@@ -943,7 +943,7 @@
     loaded: false,
     loading: false,
     saving: false,
-    expired: false,
+    expired: null,
     history: []
   };
   const sharedHealthLabels = {
@@ -956,13 +956,16 @@
     const button = $('savePatientButton');
     const fields = sharedHealthFieldIds.map(id => $(id)).filter(Boolean);
     const expired = sharedHealthState.expired === true;
+    const verified = sharedHealthState.expired === false;
     fields.forEach(field => {
       field.disabled = !state.isEditing || !canEditSharedHealth() || state.isSaving;
     });
     if (host) {
       host.textContent = expired
         ? 'انتهت مدة اتفاق المتابعة؛ البيانات متاحة للعرض فقط.'
-        : 'هذه البيانات مشتركة مع المريض، ويُسجّل النظام مصدر كل تعديل ووقته.';
+        : verified
+          ? 'هذه البيانات مشتركة مع المريض، ويُسجّل النظام مصدر كل تعديل ووقته.'
+          : 'جارٍ التحقق من صلاحية الاتفاق؛ التعديل متوقف مؤقتًا.';
     }
     if (button) button.disabled = state.isSaving || sharedHealthState.saving;
   }
@@ -992,8 +995,8 @@
       );
     } catch (error) {
       // The database RPC remains the authoritative write gate if this read is unavailable.
-      sharedHealthState.expired = false;
-      console.warn('Could not pre-check care agreement expiry:', error);
+      sharedHealthState.expired = null;
+      console.warn('Could not verify care agreement status; shared editing remains locked:', error);
     }
 
     updateSharedHealthWriteState();
@@ -1401,10 +1404,13 @@
   function mountProfessionalAppointments(){const root=$('professionalAppointmentsRoot');if(!root||careAgreementState.appointmentsMounted||!state.user?.id||!window.DietPlannerPatientAppointments?.mount)return;careAgreementState.appointmentsMounted=true;void window.DietPlannerPatientAppointments.mount(root,{patientId,role:'professional'});}
 
   async function saveAllPatientData() {
-    if ((!canWrite() && !canEditSharedHealth()) || !state.isEditing || state.isSaving) return;
+    if (!state.isEditing || state.isSaving) return;
+
+    const saveSharedHealth = canEditSharedHealth();
+    const savePrivateData = canEditPatientPrivateFields();
+    if (!saveSharedHealth && !savePrivateData) return;
 
     state.isSaving = true;
-    // Lock both sections while the single shared save operation is running.
     setEditing(true);
     const saveButton = $('savePatientButton');
     if (saveButton) {
@@ -1413,16 +1419,18 @@
     }
 
     try {
-      const sharedHealthSaved = await updateSharedHealthFromProfessional();
-      if (!sharedHealthSaved) return;
+      if (saveSharedHealth) {
+        const sharedHealthSaved = await updateSharedHealthFromProfessional();
+        if (!sharedHealthSaved) return;
+      }
 
-      if (state.patientCareMode !== 'linked') {
+      if (savePrivateData) {
         const patientSaved = await savePatientSection();
         if (!patientSaved) return;
       }
 
       fillPatientData();
-      if (state.patientCareMode === 'linked') await loadSharedHealthHistory();
+      if (saveSharedHealth) await loadSharedHealthHistory();
       setEditing(false);
       showPatientProfileSuccess();
     } catch (error) {
@@ -1434,7 +1442,6 @@
         saveButton.disabled = false;
         saveButton.textContent = 'حفظ التعديلات';
       }
-      
       if (state.isEditing) setEditing(true);
     }
   }
