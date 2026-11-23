@@ -76,7 +76,7 @@
   }
 
   function updateWriteControls() {
-    const canWrite = canWritePatientPrivateData();
+    const canWrite = canWritePatientPrivateData() || canEditSharedHealth();
     const canManageCare = canManagePatientCare();
 
     const editButton = $('editButton');
@@ -388,6 +388,7 @@
   function showMeasurementError(message) { const box = $('measurementsError'); if (box) { box.textContent = String(message || 'حدث خطأ غير متوقع.'); box.hidden = false; } }
 
   async function deleteMeasurement(index) {
+    if (!canManagePatientCare()) { showMeasurementError('حذف القياسات يتطلب ارتباط متابعة نشطًا أو صلاحية مالك الملف.'); return; }
     const entry = measurementState.logs[index];
     if (!entry) return;
 
@@ -1123,6 +1124,7 @@
     if (linkedView) linkedView.hidden = !linked;
     if (financeView) financeView.hidden = linked;
     state.patientCareMode = mode;
+    updateWriteControls();
   }
 
   async function loadPatientCareMode() {
@@ -1399,7 +1401,7 @@
   function mountProfessionalAppointments(){const root=$('professionalAppointmentsRoot');if(!root||careAgreementState.appointmentsMounted||!state.user?.id||!window.DietPlannerPatientAppointments?.mount)return;careAgreementState.appointmentsMounted=true;void window.DietPlannerPatientAppointments.mount(root,{patientId,role:'professional'});}
 
   async function saveAllPatientData() {
-    if (!canWrite() || !state.isEditing || state.isSaving) return;
+    if ((!canWrite() && !canEditSharedHealth()) || !state.isEditing || state.isSaving) return;
 
     state.isSaving = true;
     // Lock both sections while the single shared save operation is running.
