@@ -33,10 +33,9 @@
     <section id="portalHealthArea" class="portal-health-area">
       <nav class="portal-health-tabs" role="tablist" aria-label="أقسام الملف الصحي">
         <button type="button" role="tab" aria-selected="true" aria-controls="portalMessagesPanel" data-health-tab="portalMessagesPanel" class="is-active">التواصل مع المختص</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">البيانات الصحية</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">البيانات الأساسية</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel">الخطة الغذائية</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalCareManagementPanel" data-health-tab="portalCareManagementPanel">الاشتراك والمتابعة</button>
       </nav>
 
     <section id="portalLoading" class="portal-state-card">
@@ -83,16 +82,9 @@
         </section>
       </div>
 
-      <div id="portalCareManagementPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
-        <section class="portal-section" aria-labelledby="patientCareManagementTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">FINANCE & FOLLOW-UP</span><h2 id="patientCareManagementTitle">الاشتراك والمتابعة</h2><p>بيانات الاشتراك والمتابعة المسجلة في Finance لهذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-wallet"></i></span></div>
-          <div id="patientFinanceSummary" class="portal-finance-summary">جاري تحميل بيانات الاشتراك والمتابعة...</div>
-        </section>
-      </div>
-
       <div id="portalSharedHealthPanel" class="portal-health-tab-panel" role="tabpanel" hidden>
         <section class="portal-section" aria-labelledby="patientSharedHealthTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الصحية للملف</h2><p>بيانات الملف المسجلة بواسطة المختص، للعرض فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">SHARED HEALTH RECORD</span><h2 id="patientSharedHealthTitle">البيانات الأساسية للملف</h2><p>بيانات الملف المسجلة بواسطة المختص، للعرض فقط.</p></div><span class="portal-section-icon"><i class="fa-solid fa-notes-medical"></i></span></div>
           <div id="patientSharedHealthForm" class="portal-shared-health-form">
             <div class="portal-shared-health-grid">
               <label for="sharedHealthName">اسم المريض<input id="sharedHealthName" type="text" maxlength="120" autocomplete="name" disabled></label>
