@@ -512,27 +512,6 @@ function calculateDay(day){
  (day.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{const f=foodById.get(String(it.foodId));if(!f)return;const k=num(it.grams)/100;cal+=f.calories*k;pro+=f.protein*k;carb+=f.carbs*k;fat+=f.fat*k;sod+=f.sodium*k;pot+=f.potassium*k;pho+=f.phosphorus*k;}));
  return {cal,pro,carb,fat,sod,pot,pho};
 }
-function metricRing(label,value,unit,target,kind){
- const targetValue=num(target);
- const currentValue=num(value);
- const hasTarget=targetValue>0;
- const rawPercent=hasTarget?Math.round(currentValue/targetValue*100):0;
- const ringPercent=hasTarget?Math.max(0,Math.min(100,rawPercent)):0;
- return `<article class="day-ring-metric day-ring-${kind}" role="group" aria-label="${label}">
-  <strong class="day-ring-label">${label}</strong>
-  <div class="day-ring" role="img" aria-label="${label}: ${Math.round(currentValue)} ${unit}${hasTarget?`, ${rawPercent}% من الهدف ${Math.round(targetValue)} ${unit}`: ', لم يحدد الهدف'}" style="--ring-progress:${ringPercent}%">
-   <div class="day-ring-center">
-    <strong>${Math.round(currentValue).toLocaleString('en-US')}</strong>
-    <span>${unit}</span>
-   </div>
-  </div>
-  <div class="day-ring-meta">
-   <strong>${hasTarget?`${rawPercent}%`:'—'}</strong>
-   <small>${hasTarget?`من <b class="day-ring-target-value">${Math.round(targetValue).toLocaleString('en-US')}</b> ${unit}`:'لم يحدد الهدف'}</small>
-  </div>
- </article>`;
-}
-
 async function syncFixedMeals(){
  const user=await currentUser();
  if(!user)return;
@@ -793,24 +772,7 @@ function renderDayCard(d,di){
   </header>
 
   <div class="day-card-body">
-   <section class="day-summary" aria-label="ملخص القيمة الغذائية لليوم">
-    <div class="day-summary-heading">
-     <div><strong>ملخص اليوم</strong><span>متابعة الإنجاز مقارنة بالهدف الغذائي</span></div>
-    </div>
-    <div class="day-summary-layout">
-     <div class="day-rings-grid" aria-label="تحقيق الأهداف الغذائية">
-      ${metricRing('السعرات',calc.cal,'kcal',targetCal,'calories')}
-      ${metricRing('الكربوهيدرات',calc.carb,'g',targetCarb,'carbs')}
-      ${metricRing('البروتين',calc.pro,'g',targetPro,'protein')}
-      ${metricRing('الدهون',calc.fat,'g',targetFat,'fat')}
-     </div>
-    </div>
-    <div class="day-micros-row" aria-label="المعادن">
-     <span><b>الصوديوم</b><strong>${Math.round(calc.sod).toLocaleString('en-US')}</strong><small>mg</small></span>
-     <span><b>البوتاسيوم</b><strong>${Math.round(calc.pot).toLocaleString('en-US')}</strong><small>mg</small></span>
-     <span><b>الفوسفور</b><strong>${Math.round(calc.pho).toLocaleString('en-US')}</strong><small>mg</small></span>
-    </div>
-   </section>
+   ${window.DietPlannerNutritionSummary.renderTargets(calc,{cal:targetCal,carb:targetCarb,pro:targetPro,fat:targetFat},{title:'ملخص اليوم',subtitle:'متابعة الإنجاز مقارنة بالهدف الغذائي'})}
 
    <section class="day-tools" aria-label="أدوات اليوم">
     <div class="day-primary-actions no-print">
