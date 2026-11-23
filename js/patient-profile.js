@@ -216,8 +216,8 @@
   }
 
 
-  // Inline patient measurements: reuse the existing weight_logs schema and the
-  // same subscription/admin write gate without navigating away from this profile.
+  // Inline patient measurements use the same owner-or-active-care permission
+  // model as the database policies, without navigating away from this profile.
   const measurementState = { logs: [], loaded: false, loading: false };
 
   function formatMeasurementDelta(value) {
