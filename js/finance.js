@@ -141,72 +141,27 @@ async function loadData() {
         .select('id,name')
         .eq('user_id', user.id)
         .order('name');
-
     if (patientsError) throw patientsError;
 
-    const [connectionsResult, careTeamResult] = await Promise.all([
-        supabase
-            .from('professional_connection_requests')
-            .select('patient_id')
-            .eq('professional_id', user.id)
-            .in('status', ['accepted', 'active']),
-        supabase
-            .from('patient_care_team')
-            .select('patient_id')
-            .eq('professional_id', user.id)
-            .eq('status', 'active')
-    ]);
-
-    if (connectionsResult.error) throw connectionsResult.error;
-    if (careTeamResult.error) throw careTeamResult.error;
-
-    const linkedPatientIds = new Set([
-        ...(connectionsResult.data || []).map(item => item.patient_id),
-        ...(careTeamResult.data || []).map(item => item.patient_id)
-    ].filter(Boolean));
-    const unlinkedPatients = (patients || []).filter(patient => !linkedPatientIds.has(patient.id));
-    const unlinkedPatientIds = unlinkedPatients.map(patient => patient.id);
-
+    const patientIds = (patients || []).map(patient => patient.id).filter(Boolean);
     let finances = [];
-    if (unlinkedPatientIds.length) {
+    if (patientIds.length) {
         const { data, error } = await supabase
             .from('patient_finances')
-            .select(`
-                id,
-                patient_id,
-                subscription_start_date,
-                subscription_months,
-                subscription_end_date,
-                subscription_amount,
-                discount_percent,
-                discounted_amount,
-                is_paid,
-                last_visit_date,
-                next_follow_up_date
-            `)
+            .select('id,patient_id,subscription_start_date,subscription_months,subscription_end_date,subscription_amount,discount_percent,discounted_amount,is_paid,last_visit_date,next_follow_up_date')
             .eq('user_id', user.id)
-            .in('patient_id', unlinkedPatientIds);
-
+            .in('patient_id', patientIds);
         if (error) throw error;
         finances = data || [];
     }
 
-    const financeMap = new Map(finances.map(finance => [finance.patient_id, finance]));
-
-    rows = unlinkedPatients.map(patient => ({
+    const financeByPatient = new Map(finances.map(finance => [finance.patient_id, finance]));
+    rows = (patients || []).map(patient => ({
         ...patient,
-        finance: financeMap.get(patient.id) || {
-            patient_id: patient.id,
-            is_paid: false
-        }
+        finance: financeByPatient.get(patient.id) || { patient_id: patient.id, is_paid: false }
     }));
-
     renderPatients();
 }
-
-/* =========================================================
-   Patient cards
-   ========================================================= */
 
 function getDiscountedSubscriptionAmount(finance) {
     if (Number.isFinite(Number(finance.discounted_amount)) && finance.discounted_amount !== null) {
