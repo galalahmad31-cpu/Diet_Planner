@@ -1218,11 +1218,9 @@
     const edit = $('patientFinanceEdit');
     const save = $('patientFinanceSave');
     const cancel = $('patientFinanceCancel');
-    const remove = $('patientFinanceDelete');
     if (edit) edit.hidden = editing || !writable;
     if (save) save.hidden = !editing || !writable;
     if (cancel) cancel.hidden = !editing;
-    if (remove) remove.hidden = editing || !writable || !state.patientFinance;
     const note = $('patientFinanceAccessNote');
     if (note) {
       note.textContent = writable
@@ -1328,39 +1326,6 @@
       }
     } finally {
       if (save) { save.disabled = false; save.textContent = 'حفظ البيانات'; }
-    }
-  }
-
-  async function deletePatientFinance() {
-    if (!canManagePatientFinance() || state.patientCareMode !== 'owner' || !state.patientFinance) return;
-    const confirmed = await window.DPConfirm?.ask({
-      title: 'حذف بيانات Finance؟',
-      message: 'سيتم حذف سجل الاشتراك المالي لهذا المريض فقط.',
-      confirmText: 'حذف',
-      variant: 'danger'
-    });
-    if (!confirmed) return;
-    try {
-      const { error } = await supabase.from('patient_finances')
-        .delete()
-        .eq('patient_id', patientId);
-      if (error) throw error;
-      fillPatientFinance(null);
-      await loadPatientFinanceFollowUpStatus();
-      const errorBox = $('patientFinanceError');
-      if (errorBox) {
-        errorBox.hidden = false;
-        errorBox.textContent = 'تم حذف سجل Finance.';
-        errorBox.classList.add('is-success');
-      }
-    } catch (error) {
-      console.error('Legacy patient finance delete failed:', error);
-      const errorBox = $('patientFinanceError');
-      if (errorBox) {
-        errorBox.hidden = false;
-        errorBox.textContent = error.message || 'تعذر حذف سجل Finance.';
-        errorBox.classList.remove('is-success');
-      }
     }
   }
 
@@ -1633,7 +1598,6 @@
     $('patientFinanceEdit')?.addEventListener('click', () => setPatientFinanceEditing(true));
     $('patientFinanceCancel')?.addEventListener('click', () => fillPatientFinance(state.patientFinance));
     $('patientFinanceSave')?.addEventListener('click', () => void savePatientFinance());
-    $('patientFinanceDelete')?.addEventListener('click', () => void deletePatientFinance());
     ['pfInputAmount', 'pfInputDiscount', 'pfInputStart', 'pfInputMonths'].forEach(id => {
       $(id)?.addEventListener('input', updatePatientFinancePreview);
       $(id)?.addEventListener('change', updatePatientFinancePreview);
