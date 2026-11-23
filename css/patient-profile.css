@@ -805,7 +805,10 @@ body.support-delete-modal-open{overflow:hidden}
 .patient-profile-identity{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .patient-profile-identity #patientName{min-width:0;flex:1 1 220px}
 .patient-profile-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.patient-profile-actions .patient-portal-invite-button,.patient-profile-contact-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:9px 14px;border:1px solid var(--dp-border);border-radius:11px;background:var(--dp-surface-2);color:var(--dp-text);font:800 11px Cairo,sans-serif;text-decoration:none;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
+.patient-profile-actions [hidden]{display:none!important}
+.patient-profile-actions .patient-profile-end-followup-button{border-color:#dc2626;background:#fff5f5;color:#b91c1c}
+.patient-profile-actions .patient-profile-end-followup-button:hover{background:#fee2e2}
+.patient-profile-actions .patient-portal-invite-button,.patient-profile-contact-button,.patient-profile-end-followup-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:9px 14px;border:1px solid var(--dp-border);border-radius:11px;background:var(--dp-surface-2);color:var(--dp-text);font:800 11px Cairo,sans-serif;text-decoration:none;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
 .patient-profile-actions .patient-portal-invite-button{margin:0}
 .patient-profile-contact-button{border-color:var(--dp-primary);background:var(--dp-primary);color:#fff}
 .patient-profile-contact-button:hover{border-color:var(--dp-primary-hover);background:var(--dp-primary-hover)}
@@ -840,8 +843,8 @@ body.patient-conversation-open{overflow:hidden}
  #patientContent{display:block;height:auto!important;min-height:0!important}
  .patient-profile-identity{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start!important;gap:8px;height:auto!important;min-height:0!important}
  .patient-profile-identity #patientName{display:block;flex:0 1 auto!important;width:100%;max-width:100%;min-height:0!important;margin:0!important;line-height:1.45;overflow-wrap:anywhere}
- .patient-profile-actions{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:7px}
- .patient-profile-actions>button{width:100%;min-width:0;min-height:44px;padding:8px 6px;white-space:normal;line-height:1.45}
+ .patient-profile-actions{display:grid;width:100%;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:7px}
+ .patient-profile-actions>button{width:100%;min-width:0;min-height:44px;padding:8px 5px;white-space:normal;line-height:1.4;font-size:10px;gap:4px}
  .patient-data-heading{margin-top:8px!important}
  .patient-data-summary{min-height:40px;gap:6px}
  .patient-data-actions,.patient-data-actions .patient-save-actions{gap:4px!important}
