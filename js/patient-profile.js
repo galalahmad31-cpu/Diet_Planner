@@ -1004,13 +1004,46 @@
         .maybeSingle();
       if (error) throw error;
       const today = new Date().toISOString().slice(0, 10);
-      sharedHealthState.expired = !data?.subscription_end_date || data.subscription_end_date < today;
+      sharedHealthState.expired = Boolean(data?.subscription_end_date && data.subscription_end_date < today);
     } catch (error) {
       sharedHealthState.expired = null;
       console.warn('Could not verify Finance follow-up status; clinical editing remains locked:', error);
     }
     updateSharedHealthWriteState();
     updateWriteControls();
+  }
+
+  function renderSharedHealthInProfessionalProfile() {
+    const patient = state.patient;
+    if (!patient) return;
+    const root = $('professionalSharedHealthHistory');
+    if (!root) return;
+    if (!sharedHealthState.history.length) {
+      root.textContent = sharedHealthState.loaded ? 'لا توجد تعديلات مسجلة حتى الآن.' : 'جاري تحميل سجل التعديلات...';
+      return;
+    }
+    root.replaceChildren();
+    sharedHealthState.history.forEach(item => {
+      const article = document.createElement('article');
+      article.className = 'professional-health-audit-item';
+      const heading = document.createElement('div');
+      const actor = document.createElement('strong');
+      const actorLabel = item.actor_role === 'patient'
+        ? 'المريض'
+        : item.actor_role === 'professional'
+          ? 'المختص'
+          : item.actor_role === 'admin' ? 'إدارة المنصة' : 'مستخدم مخوّل';
+      actor.textContent = item.actor_id === state.user?.id ? `أنت — ${actorLabel}` : actorLabel;
+      const time = document.createElement('time');
+      time.dateTime = item.created_at;
+      time.textContent = new Date(item.created_at).toLocaleString('ar-EG');
+      heading.append(actor, time);
+      const detail = document.createElement('p');
+      const fields = (item.changed_fields || []).map(key => sharedHealthLabels[key] || key).join('، ');
+      detail.textContent = (item.operation === 'UPDATE' ? 'تحديث البيانات الصحية' : 'إنشاء السجل') + (fields ? ' · ' + fields : '');
+      article.append(heading, detail);
+      root.append(article);
+    });
   }
 
   async function loadSharedHealthHistory() {
