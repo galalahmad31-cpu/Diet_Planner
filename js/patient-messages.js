@@ -124,13 +124,11 @@
       refreshButton.disabled = true;
       try {
         const { error: readError } = await supabase.rpc("mark_patient_messages_read", {
-          p_patient_id: null,
           p_other_user_id: recipientId
         });
         if (readError) throw readError;
         let messageQuery = supabase.from("patient_messages")
           .select("id,sender_id,recipient_id,body,created_at,read_at");
-        messageQuery = messageQuery.is("patient_id", null);
         const { data, error } = await messageQuery
           .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
           .order("created_at", { ascending: false })
@@ -169,7 +167,6 @@
       setStatus(root, "جاري إرسال الرسالة...");
       try {
         const { error } = await supabase.from("patient_messages").insert({
-          patient_id: null,
           sender_id: user.id,
           recipient_id: recipientId,
           body
