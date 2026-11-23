@@ -585,7 +585,7 @@ async function loadProductsPage(reset = false) {
     const offset = reset ? 0 : state.products.length;
     let query = sb
       .from('food_products')
-      .select('id,product_name,usage,notes,sort_order,subcategory_id,required_feature,is_active', { count: 'exact' })
+      .select('id,product_name,usage,notes,sort_order,subcategory_id,is_active', { count: 'exact' })
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('product_name', { ascending: true })
@@ -838,7 +838,6 @@ function openEditor(mode, productId = null) {
   $('formUsage').value = product?.usage || '';
   setRichEditorValue('formProductNotes', product?.notes || '');
   $('formProductSort').value = product?.sort_order ?? 0;
-  $('formRequiredFeature').value = product?.required_feature || 'product';
   $('formProductActive').checked = product ? !!product.is_active : true;
 
   renderFormulaEditor();
@@ -892,7 +891,6 @@ async function saveProduct() {
     usage: $('formUsage').value.trim() || null,
     notes: getRichEditorValue('formProductNotes'),
     sort_order: Number($('formProductSort').value || 0),
-    required_feature: $('formRequiredFeature').value.trim() || 'product',
     subcategory_id: subcategoryId,
     is_active: $('formProductActive').checked
   };
