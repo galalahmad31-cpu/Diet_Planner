@@ -22,6 +22,13 @@
     const active=row.status==="accepted";
     return '<article class="dp-chat-contact-row dp-conversation-request"><div class="dp-chat-contact"><span class="dp-chat-avatar"><i class="fa-solid '+(isPatient()?"fa-user-doctor":"fa-user")+'"></i></span><span class="dp-chat-contact-copy"><strong>'+name+'</strong><small>'+({pending:"طلب جديد",restore_pending:"طلب استعادة التواصل",blocked:"التواصل موقوف",accepted:"محادثة نشطة"}[row.status]||"")+'</small></span><span class="dp-chat-contact-status">'+dateText+'</span></div><div class="dp-conversation-actions">'+(active?'<button type="button" data-open="'+esc(counterpartId(row))+'">فتح المحادثة</button>':"")+actions+'</div></article>';
   }
+  function openConversationRow(row){
+    if(!row||row.status!=="accepted")return;
+    const name=nameOf(row)||(isPatient()?"المختص":"المريض");
+    window.DietPlannerPatientMessages?.openConversation({name,subtitle:"محادثة نشطة"},isPatient()
+      ?{role:"patient",professionalId:row.professional_id,counterpartName:name,allowStandalone:true}
+      :{role:"professional",patientUserId:row.patient_user_id,patientName:name,allowStandalone:true});
+  }
   function bindRows(root){
     root.querySelectorAll("[data-accept]").forEach(b=>b.addEventListener("click",()=>act(b,"accepted")));
     root.querySelectorAll("[data-decline]").forEach(b=>b.addEventListener("click",()=>act(b,"declined")));
@@ -29,11 +36,8 @@
     root.querySelectorAll("[data-cancel]").forEach(b=>b.addEventListener("click",()=>patientAction(b,false)));
     root.querySelectorAll("[data-restore]").forEach(b=>b.addEventListener("click",()=>patientAction(b,true)));
     root.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>{
-      const row=state.rows.find(r=>counterpartId(r)===b.dataset.open&&r.status==="accepted");if(!row)return;
-      const name=nameOf(row)||(isPatient()?"المختص":"المريض");
-      window.DietPlannerPatientMessages?.openConversation({name,subtitle:"محادثة نشطة"},isPatient()
-        ?{role:"patient",professionalId:row.professional_id,counterpartName:name,allowStandalone:true}
-        :{role:"professional",patientUserId:row.patient_user_id,patientName:name,allowStandalone:true});
+      const row=state.rows.find(r=>counterpartId(r)===b.dataset.open&&r.status==="accepted");
+      openConversationRow(row);
     }));
   }
   function render(){
@@ -82,6 +86,11 @@
       $("communicationsSearch").placeholder=isPatient()?"ابحث باسم المختص...":"ابحث باسم المريض...";
       $("communicationsRequestLabel").textContent=isPatient()?"الطلبات والموقوفة":"طلبات التواصل";
       await load();
+      const patientId=new URLSearchParams(window.location.search).get("patient_id");
+      if(!isPatient()&&patientId){
+        const row=state.rows.find(r=>r.status==="accepted"&&r.patient_user_id===patientId);
+        if(row)openConversationRow(row);
+      }
     }catch(error){console.error("Communications initialization failed:",error);empty($("professionalConversationList"),"تعذر تهيئة صفحة التواصل.");}
   }
   document.addEventListener("DOMContentLoaded",()=>{
