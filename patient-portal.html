@@ -31,7 +31,7 @@
   
   <script src="js/patient-notifications.js?v=20261123-remove-appointment-events-v1" defer></script>
   <script src="js/weight-logs-table.js?v=20261121-unified-v6" defer></script>
-  <script src="js/patient-portal.js?v=20261123-multifile-readonly-v2" defer></script>
+  <script src="js/patient-portal.js?v=20261123-multi-file-messaging-primary-v3" defer></script>
 </head>
 <body class="patient-portal-page">
   <div data-dp-patient-header></div>
@@ -157,10 +157,11 @@
     </section>
     <section id="portalHealthArea" class="portal-health-area" hidden>
       <nav class="portal-health-tabs" role="tablist" aria-label="أقسام الملف الصحي">
+        <button type="button" role="tab" aria-selected="true" aria-controls="portalMessagesPanel" data-health-tab="portalMessagesPanel" class="is-active">التواصل مع المختص</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalSharedHealthPanel" data-health-tab="portalSharedHealthPanel">البيانات الصحية</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="portalMeasurementsPanel" data-health-tab="portalMeasurementsPanel">متابعة القياسات</button>
-        <button type="button" role="tab" aria-selected="true" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel" class="is-active">الخطة الغذائية</button>
-        <button type="button" role="tab" aria-selected="false" aria-controls="portalCareManagementPanel" data-health-tab="portalCareManagementPanel">إدارة المتابعة و التواصل مع المختص</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalPlansPanel" data-health-tab="portalPlansPanel">الخطة الغذائية</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="portalCareManagementPanel" data-health-tab="portalCareManagementPanel">الاشتراك والمتابعة</button>
       </nav>
 
     <section id="portalLoading" class="portal-state-card">
@@ -175,31 +176,28 @@
       <button type="button" id="portalRetry" class="portal-primary-button">إعادة المحاولة</button>
     </section>
 
-    <section id="portalUnlinked" class="portal-state-card" hidden>
-      <span class="portal-state-icon"><i class="fa-solid fa-link"></i></span>
-      <h1>اربط ملفك الصحي</h1>
-      <p>لا يوجد ملف صحي مرتبط بحسابك حتى الآن. أدخل كود الربط الذي أرسله لك المختص لعرض ملفك الصحي.</p>
-      <form id="portalInviteForm" class="portal-invite-form">
-        <label for="portalInviteToken">رمز الدعوة</label>
-        <input id="portalInviteToken" type="text" inputmode="text" autocomplete="off" placeholder="الصق رمز الدعوة هنا" required>
-        <button type="submit" class="portal-primary-button">تأكيد الربط</button>
+    <section id="portalFileAccess" class="portal-file-switcher" aria-label="الملفات الصحية">
+      <p id="portalFileAccessMessage" class="portal-file-access-message" hidden>لا يوجد ملف صحي مرتبط بحسابك حتى الآن. أدخل كود الدعوة الذي أرسله لك المختص لعرض ملفه الصحي.</p>
+      <label for="portalPatientSelector" hidden>الملف الصحي المرتبط بحسابك</label>
+      <select id="portalPatientSelector" aria-label="اختيار الملف الصحي" hidden></select>
+      <form id="patientProfessionalCodeForm" class="portal-professional-code-form">
+        <label for="patientProfessionalCode">إضافة ملف صحي جديد بكود المختص</label>
+        <div class="portal-professional-code-form__row">
+          <input id="patientProfessionalCode" name="invitationCode" type="text" inputmode="text" autocomplete="off" maxlength="36" dir="ltr" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+          <button type="submit" class="portal-primary-button">ربط الملف</button>
+        </div>
+        <p id="patientProfessionalCodeStatus" class="portal-inline-message" role="status" aria-live="polite"></p>
       </form>
-      <p id="portalInviteMessage" class="portal-inline-message" role="status"></p>
     </section>
 
     <div id="portalContent" hidden>
-      <section class="portal-file-switcher" aria-label="اختيار الملف الصحي">
-        <label for="portalPatientSelector">الملف الصحي</label>
-        <select id="portalPatientSelector" aria-label="اختيار الملف الصحي"></select>
-        <form id="patientProfessionalCodeForm" class="portal-professional-code-form">
-          <label for="patientProfessionalCode">ربط ملف جديد بكود المختص</label>
-          <div class="portal-professional-code-form__row">
-            <input id="patientProfessionalCode" name="invitationCode" type="text" inputmode="text" autocomplete="off" maxlength="36" dir="ltr" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
-            <button type="submit" class="portal-primary-button">ربط الملف</button>
-          </div>
-          <p id="patientProfessionalCodeStatus" class="portal-inline-message" role="status" aria-live="polite"></p>
-        </form>
-      </section>
+      <div id="portalMessagesPanel" class="portal-health-tab-panel" role="tabpanel">
+        <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
+          <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>هذه هي قناة التواصل الأساسية مع المختص المسؤول عن الملف المحدد.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
+          <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
+        </section>
+      </div>
+
       <div id="portalPlansPanel" class="portal-health-tab-panel" role="tabpanel">
         <section id="portalPlansProfessionalPanel" class="portal-section" role="tabpanel">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">PROFESSIONAL PLAN</span><h2>الخطة المقدمة من المختص</h2><p>الخطط المنشورة من المختص المسؤول عن هذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-user-doctor"></i></span></div>
@@ -214,10 +212,6 @@
         <section class="portal-section" aria-labelledby="patientCareManagementTitle">
           <div class="portal-section-heading"><div><span class="portal-section-kicker">FINANCE & FOLLOW-UP</span><h2 id="patientCareManagementTitle">الاشتراك والمتابعة</h2><p>بيانات الاشتراك والمتابعة المسجلة في Finance لهذا الملف.</p></div><span class="portal-section-icon"><i class="fa-solid fa-wallet"></i></span></div>
           <div id="patientFinanceSummary" class="portal-finance-summary">جاري تحميل بيانات الاشتراك والمتابعة...</div>
-        </section>
-        <section class="portal-section" aria-labelledby="patientPortalMessagesTitle">
-          <div class="portal-section-heading"><div><span class="portal-section-kicker">MESSAGES</span><h2 id="patientPortalMessagesTitle">التواصل مع المختص</h2><p>المحادثات والرسائل في مكان واحد، دون تكرار بيانات الاتفاق.</p></div><span class="portal-section-icon"><i class="fa-solid fa-comments"></i></span></div>
-          <div id="patientPortalMessages" data-patient-messages data-patient-role="patient"></div>
         </section>
       </div>
 
