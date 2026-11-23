@@ -14,9 +14,9 @@
   <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1" defer></script>
   <script src="js/dp-utils.js?v=20261122-central-utils-v1"></script>
   <script src="js/dp-date.js?v=20261122-central-date-v1"></script>
-  <script src="js/patient.js?v=20261123-finance-only-followup-v1" defer></script>
+  <script src="js/patient.js?v=20261123-patient-archive-v1" defer></script>
 
-  <link rel="stylesheet" href="css/patient.css?v=20261122-linked-patient-routing-v1">
+  <link rel="stylesheet" href="css/patient.css?v=20261123-patient-archive-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261122-responsive-foundation-v1">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
@@ -51,6 +51,11 @@
           placeholder="البحث باسم المريض..."
           aria-label="البحث باسم المريض"
           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-emerald-500">
+      </div>
+
+      <div class="patient-record-views" role="group" aria-label="عرض ملفات المرضى">
+        <button type="button" class="patient-record-view is-selected" data-record-view="active" aria-pressed="true">الملفات النشطة</button>
+        <button type="button" class="patient-record-view" data-record-view="archived" aria-pressed="false">الأرشيف</button>
       </div>
     </div>
 
