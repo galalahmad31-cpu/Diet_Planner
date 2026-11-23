@@ -703,7 +703,7 @@
 
     const isDietPlanElement = (element) => Boolean(
       element?.closest(
-        '#planWorkspace, #foodModal, #fixedMealsModal, #addMealModal, #printSettingsModal, #dayDetailsModal'
+        '#planWorkspace, #fixedMealsModal, #addMealModal, #printSettingsModal, #dayDetailsModal'
       )
     );
 
@@ -801,7 +801,7 @@
     printSettingsModal?.classList.add('hidden');
     const executePrintButton = $('executePrintBtn');
     if (executePrintButton) delete executePrintButton.dataset.printMode;
-    window.dietPlan?.closeFoodModal?.();
+    window.DietPlannerFoodPicker?.close();
     window.dietPlan?.closeFixedMeals?.();
     window.dietPlan?.closeAddMealModal?.();
     window.dietPlan?.closeConfirmModal?.();
