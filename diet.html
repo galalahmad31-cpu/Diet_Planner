@@ -22,6 +22,7 @@
   <script src="js/app-header.js?v=20261123-remove-approval-workflow-v1" defer></script>
   <link rel="stylesheet" href="css/diet-builder.css?v=20261123-central-meal-builder-v2">
         <link rel="stylesheet" href="css/nutrition-summary.css?v=20261123-central-summary-v2">
+        <link rel="stylesheet" href="css/food-picker.css?v=20261123-central-food-picker-v1">
 </head>
     <body>
         <div id="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#f7fafb]">
@@ -148,50 +149,7 @@
                 </div>
             </div>
         </div>
-        <div id="foodPicker" class="modal-bg fixed inset-0 z-[120] hidden items-center justify-center p-3 sm:p-6">
-            <div class="w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-3xl bg-white shadow-2xl">
-                <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                    <div>
-                        <h3 class="font-extrabold">
-                            اختيار صنف
-                        </h3>
-                        <p class="mt-1 text-[11px] text-slate-400">
-                            ابحث في مكتبة الأغذية، ثم حدد الكمية وأضف الصنف للوجبة.
-                        </p>
-                    </div>
-                    <button id="closePicker" class="h-9 w-9 rounded-xl bg-slate-100">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                <div class="border-b border-slate-100 p-4">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="foodSearch" class="w-full rounded-xl border border-slate-200 px-4 py-3 pr-11 text-sm" placeholder="ابحث باسم الصنف بالعربي أو الإنجليزي...">
-                    </div>
-                </div>
-                <div id="selectedFoodBox" class="hidden border-b border-brand-100 bg-brand-50/60 p-4">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-                        <div class="flex-1">
-                            <div class="text-[10px] font-bold text-brand-700">
-                                الصنف المختار
-                            </div>
-                            <div id="selectedFoodName" class="mt-1 font-extrabold text-slate-800">
-                            </div>
-                        </div>
-                        <div class="sm:w-40">
-                            <label class="text-[10px] font-bold text-slate-600">
-                                الكمية بالجرام
-                            </label>
-                            <input id="selectedFoodGrams" type="number" min="0" step="1" value="100" class="mt-1 w-full rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-center font-extrabold text-brand-700">
-                        </div>
-                        <button id="addSelectedFood" class="rounded-xl bg-brand-600 px-5 py-2.5 text-xs font-bold text-white">
-                            <i class="fa-solid fa-plus ml-1"></i>إضافة للوجبة
-                        </button>
-                    </div>
-                </div>
-                <div id="pickerList" class="max-h-[58vh] overflow-y-auto">
-                </div>
-            </div>
-        </div>
+        
         <div id="toast" class="fixed bottom-5 left-5 z-[150] hidden max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl">
         </div>
         <script>
@@ -211,6 +169,7 @@
         <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1"></script>
         <script src="js/diet-builder.js?v=20261123-central-meal-builder-v1"></script>
         <script src="js/nutrition-summary.js?v=20261123-central-summary-v2"></script>
+        <script src="js/food-picker.js?v=20261123-central-food-picker-v1"></script>
         <script src="js/auth-access.js?v=20261123-unrestricted-features-v1">
         </script>
         <script src="js/diet.js?v=20261123-central-summary-v2">
