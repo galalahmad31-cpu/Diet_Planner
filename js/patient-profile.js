@@ -126,6 +126,11 @@
 
   function canWritePatientPrivateData() {
     const ownsWorkspace = Boolean(state.user?.id && state.patient?.user_id === state.user.id);
+    return ownsWorkspace && (state.isAdmin || state.hasActiveSubscription) && sharedHealthState.expired === false;
+  }
+
+  function canManagePatientFinance() {
+    const ownsWorkspace = Boolean(state.user?.id && state.patient?.user_id === state.user.id);
     return ownsWorkspace && (state.isAdmin || state.hasActiveSubscription);
   }
 
@@ -204,9 +209,13 @@
       return;
     }
 
+    if (!state.user?.id || data.user_id !== state.user.id) {
+      showError('هذه الصفحة مخصصة للمختص مالك الملف. استخدم بوابة المريض لعرض ملفك الصحي.');
+      return;
+    }
+
     state.patient = data;
     fillPatientData();
-    if (state.user?.id) void loadPatientCareMode();
 
     // Reveal the loaded patient immediately. Access checks and secondary modules
     // run afterward and cannot block the main patient record.
@@ -994,8 +1003,9 @@
         .eq('user_id', state.user.id)
         .maybeSingle();
       if (error) throw error;
-      const today = new Date().toISOString().slice(0, 10);
-      sharedHealthState.expired = Boolean(data?.subscription_end_date && data.subscription_end_date < today);
+      const now = new Date();
+      const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      sharedHealthState.expired = !data?.subscription_end_date || data.subscription_end_date < today;
     } catch (error) {
       sharedHealthState.expired = null;
       console.warn('Could not verify Finance follow-up status; clinical editing remains locked:', error);
@@ -1088,24 +1098,30 @@
   ];
 
   function setPatientCareView() {
-    const linkedView = $('patientLinkedCareView');
+    if (!state.user?.id || state.patient?.user_id !== state.user.id) return false;
     const financeView = $('patientFinanceView');
     const sharedHealthSection = $('professionalSharedHealthSection');
-    if (linkedView) linkedView.hidden = true;
     if (financeView) financeView.hidden = false;
     if (sharedHealthSection) sharedHealthSection.hidden = false;
     state.patientCareMode = 'owner';
     updateWriteControls();
+    return true;
   }
 
   async function loadPatientCareMode() {
     if (!patientId || !state.user?.id || !state.patient) return;
+    if (state.patient.user_id !== state.user.id) {
+      state.patientCareMode = 'readonly';
+      setEditing(false);
+      updateWriteControls();
+      return;
+    }
     if (state.patientCareMode === 'owner') return;
     if (state.patientCareModePromise) return state.patientCareModePromise;
 
     state.patientCareModePromise = (async () => {
       try {
-        setPatientCareView();
+        if (!setPatientCareView()) return;
         await loadPatientFinanceFollowUpStatus();
         await Promise.all([loadPatientFinance(), loadSharedHealthHistory()]);
       } catch (error) {
@@ -1159,7 +1175,7 @@
 
   function setPatientFinanceEditing(editing) {
     state.patientFinanceEditing = editing;
-    const writable = canWrite() && state.patientCareMode === 'owner';
+    const writable = canManagePatientFinance() && state.patientCareMode === 'owner';
     patientFinanceFields.forEach(id => {
       const field = $(id);
       if (field) field.disabled = !editing || !writable;
@@ -1222,7 +1238,7 @@
   }
 
   async function savePatientFinance() {
-    if (!canWrite() || state.patientCareMode !== 'owner' || !state.patient || !state.user?.id || !state.patientFinanceEditing) return;
+    if (!canManagePatientFinance() || state.patientCareMode !== 'owner' || !state.patient || !state.user?.id || !state.patientFinanceEditing) return;
     const startDate = $('pfInputStart').value || null;
     const months = $('pfInputMonths').value === '' ? null : Number($('pfInputMonths').value);
     const amount = $('pfInputAmount').value === '' ? null : Number($('pfInputAmount').value);
@@ -1262,6 +1278,7 @@
         .single();
       if (error) throw error;
       fillPatientFinance(data);
+      await loadPatientFinanceFollowUpStatus();
       if (errorBox) {
         errorBox.hidden = false;
         errorBox.textContent = 'تم حفظ بيانات Finance بنجاح.';
@@ -1280,7 +1297,7 @@
   }
 
   async function deletePatientFinance() {
-    if (!canWrite() || state.patientCareMode !== 'owner' || !state.patientFinance) return;
+    if (!canManagePatientFinance() || state.patientCareMode !== 'owner' || !state.patientFinance) return;
     const confirmed = await window.DPConfirm?.ask({
       title: 'حذف بيانات Finance؟',
       message: 'سيتم حذف سجل الاشتراك المالي لهذا المريض فقط.',
@@ -1294,6 +1311,7 @@
         .eq('patient_id', patientId);
       if (error) throw error;
       fillPatientFinance(null);
+      await loadPatientFinanceFollowUpStatus();
       const errorBox = $('patientFinanceError');
       if (errorBox) {
         errorBox.hidden = false;
@@ -1556,26 +1574,13 @@
         throw new Error('تعذر تهيئة الاتصال بقاعدة البيانات.');
       }
 
-      // Patient data loading is not blocked by a separate session lookup.
-      // Supabase applies the existing authenticated session and RLS to the query.
-      // User/role lookup only controls write permissions after the page has started.
-      void Promise.resolve()
-        .then(() => access.getCurrentUser?.())
-        .then((user) => {
-          state.user = user || null;
-          if (state.user) {
-            void refreshWriteAccess();
-          } else {
-            updateWriteControls();
-          }
-        })
-        .catch((error) => {
-          console.error('Patient profile session lookup failed:', error);
-          state.user = null;
-          updateWriteControls();
-        });
+      const user = await access.getCurrentUser?.();
+      if (!user?.id) throw new Error('يجب تسجيل الدخول بحساب المختص مالك الملف.');
+      state.user = user;
 
       await loadPatient();
+      if (!state.patient) return;
+      await refreshWriteAccess();
     } catch (error) {
       console.error('Patient profile initialization failed:', error);
       showError(error?.message || 'تعذر تحميل ملف المريض.');
