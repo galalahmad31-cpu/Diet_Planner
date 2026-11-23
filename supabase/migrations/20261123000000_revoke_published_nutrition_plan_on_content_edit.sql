@@ -61,6 +61,8 @@ begin
 end;
 $function$;
 
+revoke all on function private.revoke_plan_publication_on_content_change() from public, anon, authenticated;
+
 drop trigger if exists trg_revoke_publication_on_plan_update on public.nutrition_plans;
 create trigger trg_revoke_publication_on_plan_update
 after update on public.nutrition_plans
