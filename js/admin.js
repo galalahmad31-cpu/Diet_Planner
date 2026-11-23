@@ -202,7 +202,7 @@ function subForm(s){
  <div class="field"><label>الحالة</label><select id="s_status"><option value="pending" ${s.status==='pending'?'selected':''}>قيد المراجعة</option><option value="paid" ${s.status==='paid'?'selected':''}>مفعّلة</option><option value="canceled" ${s.status==='canceled'?'selected':''}>ملغاة</option></select></div>
  <div class="field"><label>تاريخ الطلب</label><input value="${esc(dateTime(s.created_at))}" disabled></div>
  <div class="field full"><label>ملاحظات</label><textarea id="s_notes">${esc(s.notes||'')}</textarea></div>
- <div class="field full"><div style="font-size:11px;color:#718683;background:#f7faf9;border-radius:9px;padding:9px">عند تفعيل الاشتراك، يقوم النظام تلقائيًا بحساب تاريخ البداية والنهاية وأخذ Snapshot من الخطة.</div></div>
+ <div class="field full"><div style="font-size:11px;color:#718683;background:#f7faf9;border-radius:9px;padding:9px">عند تفعيل الاشتراك، يحسب النظام تلقائيًا تاريخ البداية والنهاية وفق مدة الخطة.</div></div>
  </div><div class="modal-foot"><button class="btn btn-primary" type="submit">حفظ التعديل</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`
 }
 function openSub(s){openModal('تعديل الاشتراك',subForm(s));$('subForm').addEventListener('submit',async e=>{e.preventDefault();await saveSub(s)});$('cancelModal').onclick=closeModal}
