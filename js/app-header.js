@@ -122,6 +122,7 @@
     link.className = "dp-app-header__link";
     link.href = base + href;
     link.dataset.headerHref = href;
+    if (href === "contact.html") link.dataset.headerKey = "contact";
     link.innerHTML = '<i class="fa-solid ' + icon + '" aria-hidden="true"></i><span></span>';
     link.querySelector("span").textContent = label;
     if (activeFor(href, role)) {
