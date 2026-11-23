@@ -174,7 +174,7 @@ async function save(options={}){
  if(del.error){status('تعذر تحديث خطة البدائل: '+del.error.message,true);return false}
  const ins=await dbx.from('exchange_values').insert(rows);
  if(ins.error){status('تعذر حفظ خطة البدائل: '+ins.error.message,true);return false}
- S.plan=planId;S.saved=true;S.editing=false;render();setButtons();status('تم حفظ خطة البدائل بنجاح');return true;
+ S.plan=planId;S.saved=true;S.editing=false;render();setButtons();window.dispatchEvent(new CustomEvent('dp-nutrition-plan-content-changed',{detail:{planId}}));status('تم حفظ خطة البدائل بنجاح');return true;
 }
 async function saveAndPrintFromSettings(){
  const pb=document.getElementById('executePrintBtn');
