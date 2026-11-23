@@ -80,7 +80,7 @@
       if (error) throw error;
       const token = typeof data === "string" ? data : data?.token;
       if (!token) throw new Error("لم يتم استلام رمز الدعوة من الخادم.");
-      const url = new URL("patient-portal.html", window.location.href);
+      const url = new URL("patient-health.html", window.location.href);
       url.searchParams.set("invite", token);
       const modal = ensureDialog();
       modal.querySelector("#patientPortalInviteUrl").value = url.toString();
