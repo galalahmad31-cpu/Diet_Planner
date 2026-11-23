@@ -315,16 +315,27 @@ function mealHTML(mi,m){
   ${window.DietPlannerDietBuilder.renderTable(rows,{editable:true,caption:'أصناف '+(m.name||'الوجبة')})}
  </article>`;
 }
-async function openPicker(mi,ii=null){await loadFoods();activeMealIndex=mi;selectedFood=null;$('selectedFoodBox').classList.add('hidden');$('selectedFoodGrams').value='100';$('foodSearch').value='';$('foodPicker').classList.remove('hidden');$('foodPicker').classList.add('flex');renderPicker();if(ii!==null){selectedFood={editIndex:ii}}}
-function closePicker(){activeMealIndex=null;selectedFood=null;$('foodPicker').classList.add('hidden');$('foodPicker').classList.remove('flex')}
-function renderPicker(){const q=$('foodSearch').value.trim().toLowerCase();const arr=foods.filter(f=>(`${f.name_ar||''} ${f.name_en||''} ${f.id}`.toLowerCase().includes(q)));$('pickerList').innerHTML=arr.map(f=>`<button data-food="${esc(f.id)}" class="flex w-full items-center justify-between gap-4 border-b border-slate-100 px-5 py-3 text-right hover:bg-brand-50"><div class="min-w-0"><div class="text-xs font-extrabold text-slate-700">${esc(f.name_ar)}</div><div class="mt-1 text-[9px] text-slate-400">${esc(f.name_en||'')}</div></div><div class="flex shrink-0 items-center gap-2 text-[9px] text-slate-400"><span>${f.kcal} kcal/100g</span><span class="${f.is_custom?'text-violet-600':'text-emerald-600'}">${f.is_custom?'مخصص':'أساسي'}</span><i class="fa-solid fa-chevron-left text-slate-300"></i></div></button>`).join('')||'<div class="p-10 text-center text-xs text-slate-400">لا توجد نتائج</div>'}
-function chooseFood(id){const f=foods.find(x=>x.id===String(id));if(!f)return;selectedFood={...f,editIndex:selectedFood?.editIndex??null};$('selectedFoodName').textContent=f.name_ar||f.name_en||f.id;$('selectedFoodGrams').value=selectedFood.editIndex!==null&&selectedFood.editIndex!==undefined?num(day.meals[activeMealIndex].items[selectedFood.editIndex]?.quantity_g)||100:100;$('selectedFoodBox').classList.remove('hidden');$('selectedFoodGrams').focus()}
-function addSelected(){if(!selectedFood||activeMealIndex===null){toast('اختر صنفًا أولاً',false);return}const grams=num($('selectedFoodGrams').value);if(grams<=0){toast('حدد كمية صحيحة بالجرام',false);return}const m=day.meals[activeMealIndex];if(selectedFood.editIndex!==null&&selectedFood.editIndex!==undefined){const it=m.items[selectedFood.editIndex];it.food_id=selectedFood.id;it.quantity_g=grams;it.household_measure=selectedFood.household||''}else m.items.push({food_id:selectedFood.id,quantity_g:grams,household_measure:selectedFood.household||'',});closePicker();renderDay()}
+async function openPicker(mealIndex,itemIndex=null){
+ if(!(await loadFoods()))return;
+ const meal=day.meals[mealIndex];if(!meal)return;
+ const existing=itemIndex===null?null:meal.items[itemIndex],picker=window.DietPlannerFoodPicker;
+ if(!picker){toast('مكوّن اختيار الأغذية غير متاح. أعد تحميل الصفحة.',false);return;}
+ picker.open({foods,title:existing?'تعديل صنف في '+(meal.name||'الوجبة'):'إضافة صنف إلى '+(meal.name||'الوجبة'),
+  selectedFoodId:existing?.food_id??null,grams:existing?.quantity_g??100,notes:existing?.notes??'',
+  confirmText:existing?'حفظ التعديل':'إضافة للوجبة',
+  onConfirm:({normalizedFood,grams,notes})=>{
+   const target=day.meals[mealIndex];if(!target)return false;
+   if(itemIndex!==null){const item=target.items[itemIndex];if(!item)return false;item.food_id=String(normalizedFood.id);item.quantity_g=grams;item.household_measure=normalizedFood.household||'';item.notes=notes;}
+   else target.items.push({food_id:String(normalizedFood.id),quantity_g:grams,household_measure:normalizedFood.household||'',notes});
+   renderDay();return true;
+  }
+ });
+}
 $('mealsEditor').addEventListener('input',e=>{const x=e.target.dataset.mealName;if(x!==undefined)day.meals[+x].name=e.target.value});
 window.DietPlannerDietBuilder.bind($('mealsEditor'),{onInput:({key,field,value})=>{const [mi,ii]=String(key).split(':').map(Number);const it=day.meals[mi]?.items[ii];if(it&&field==='notes')it.notes=value},onChange:({key,field,value})=>{const [mi,ii]=String(key).split(':').map(Number);const it=day.meals[mi]?.items[ii];if(!it)return;if(field==='grams'){it.quantity_g=Math.max(0,num(value));renderDay()}else if(field==='notes')it.notes=value},onDelete:({key})=>{const [mi,ii]=String(key).split(':').map(Number);if(!day.meals[mi]?.items[ii])return;openConfirm('حذف الصنف','هل أنت متأكد من حذف هذا الصنف من الوجبة؟',()=>{day.meals[mi].items.splice(ii,1);renderDay()})}});
 $('mealsEditor').addEventListener('click',async e=>{let b=e.target.closest('[data-add-item]');if(b){await openPicker(+b.dataset.addItem);return}b=e.target.closest('[data-pick]');if(b){const [mi,ii]=b.dataset.pick.split(':').map(Number);await openPicker(mi,ii);chooseFood(day.meals[mi].items[ii].food_id);return}b=e.target.closest('[data-remove-item]');if(b){const [mi,ii]=b.dataset.removeItem.split(':').map(Number);openConfirm('حذف الصنف','هل أنت متأكد من حذف هذا الصنف من الوجبة؟',()=>{day.meals[mi].items.splice(ii,1);renderDay()});return}b=e.target.closest('[data-remove-meal]');if(b){const mi=+b.dataset.removeMeal;openConfirm('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بكل أصنافها؟',()=>{day.meals.splice(mi,1);renderDay()});return}b=e.target.closest('[data-move-meal]');if(b){const [mi,dir]=b.dataset.moveMeal.split(':');const i=Number(mi),j=dir==='up'?i-1:i+1;if(j<0||j>=day.meals.length)return;[day.meals[i],day.meals[j]]=[day.meals[j],day.meals[i]];renderDay()}});
 $('addMeal').onclick=()=>{day.meals.push({name:`وجبة ${day.meals.length+1}`,items:[]});renderDay()};
-$('foodSearch').oninput=renderPicker;$('closePicker').onclick=closePicker;$('pickerList').onclick=e=>{const b=e.target.closest('[data-food]');if(b)chooseFood(b.dataset.food)};$('addSelectedFood').onclick=addSelected;
+
 $('newBtn').onclick=openNew;$('cancelEditor').onclick=()=>toggleEditor(false);
 $('search').oninput=()=>{
   dietRenderLimit=40;
