@@ -1,7 +1,8 @@
-/* Diet Planner — one responsive header system for guests, patients and professionals. */
+/* Diet Planner — single source of truth for shared header geometry and responsive layout. */
+.dp-app-header,.dp-app-header *,.dp-app-header *::before,.dp-app-header *::after{box-sizing:border-box}
 .dp-app-header{
   cursor:default;
-  position:relative;z-index:30;width:min(100% - 24px,1600px);margin:12px auto 18px;
+  position:relative;z-index:30;display:block;box-sizing:border-box;width:calc(100% - 24px);max-width:1600px;min-width:0;margin:12px auto 18px;float:none;
   padding:15px 18px 12px;color:#fff;border:1px solid rgba(255,255,255,.13);
   border-radius:24px;background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%);
   box-shadow:0 12px 30px rgba(8,76,64,.16);overflow:hidden;
@@ -83,7 +84,7 @@
 @media(max-width:640px){
   /* Preserve six tabs per row on every viewport; only spacing and type scale down. */
   .dp-app-header__track{grid-template-columns:repeat(6,minmax(0,1fr))}
-  .dp-app-header{width:calc(100% - 16px);margin:8px auto 12px;padding:11px 10px 9px;border-radius:18px}
+  .dp-app-header{width:calc(100% - 16px);max-width:1600px;margin:8px auto 12px;padding:11px 10px 9px;border-radius:18px}
   .dp-app-header__brand-row{gap:7px;margin-bottom:9px}
   .dp-app-header__logo{width:38px;height:38px;flex-basis:38px;border-radius:12px;font-size:17px}
   .dp-app-header__brand{gap:8px}
@@ -100,52 +101,3 @@
 }
 @media(prefers-reduced-motion:reduce){.dp-app-header__link{transition:none}}
 @media print{.dp-app-header{display:none!important}}
-
-/* Central header isolation: page-level layout and generic header rules must not
-   change the shared header's outer geometry or its navigation sizing. */
-body > header.dp-app-header{
-  display:block!important;
-  box-sizing:border-box!important;
-  width:calc(100% - 24px)!important;
-  max-width:1600px!important;
-  min-width:0!important;
-  margin:12px auto 18px!important;
-  padding:15px 18px 12px!important;
-  float:none!important;
-  inset-inline:auto!important;
-  transform:none!important;
-  font-family:var(--dp-font,Cairo,sans-serif)!important;
-}
-body > header.dp-app-header *,
-body > header.dp-app-header *::before,
-body > header.dp-app-header *::after{box-sizing:border-box}
-body > header.dp-app-header .dp-app-header__brand-row{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
-  align-items:center!important;
-  width:100%!important;
-}
-body > header.dp-app-header .dp-app-header__nav{
-  display:flex!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-}
-body > header.dp-app-header .dp-app-header__track{
-  display:grid!important;
-  grid-template-columns:repeat(6,minmax(0,1fr))!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-}
-@media(max-width:640px){
-  body > header.dp-app-header{
-    width:calc(100% - 16px)!important;
-    margin:8px auto 12px!important;
-    padding:11px 10px 9px!important;
-    border-radius:18px!important;
-  }
-  body > header.dp-app-header .dp-app-header__track{
-    grid-template-columns:repeat(6,minmax(0,1fr))!important;
-  }
-}
