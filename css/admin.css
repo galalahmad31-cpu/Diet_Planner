@@ -99,3 +99,42 @@ body{padding-top:0}
 .professional-review-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;padding:13px 0}.professional-review-details>div{min-width:0}.professional-review-details>div.full{grid-column:1/-1}.professional-review-details small{color:#849692;font-size:10px;font-weight:800}.professional-review-details p{margin:3px 0 0;color:#405b56;font-size:11px;line-height:1.8;overflow-wrap:anywhere;white-space:pre-wrap}
 .professional-review-card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:11px;border-top:1px solid #edf2f1}.professional-review-card-foot>span,.professional-review-note{color:#879692;font-size:10px}.professional-review-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.professional-review-actions .btn{font-size:10px}.professional-review-toolbar .stats{gap:6px}
 @media(max-width:850px){.professional-review-list{grid-template-columns:1fr}}@media(max-width:650px){.professional-review-tools{min-width:100%;justify-content:stretch}.professional-review-tools .search{max-width:none}.professional-review-card{padding:12px}.professional-review-details{gap:9px}.professional-review-card-foot{align-items:flex-start;flex-direction:column}}
+
+
+/* Plan editor modal — scoped layout; keeps shared modal behavior untouched. */
+#modalBg.plan-editor{padding:clamp(10px,3vh,28px);align-items:center}
+#modalBg.plan-editor #modal{max-width:620px;width:min(100%,620px);max-height:min(88vh,780px);padding:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #e1eae6;border-radius:20px}
+#modalBg.plan-editor .modal-head{flex:0 0 auto;margin:0;padding:18px 22px;border-bottom:1px solid #edf2ef;background:#fbfdfc}
+#modalBg.plan-editor .modal-head h2{font-size:19px;font-weight:900;color:#173c39}
+#modalBg.plan-editor .close{width:34px;height:34px;border-radius:10px}
+#modalBg.plan-editor #modalBody{min-height:0;overflow:auto;padding:18px 22px 20px}
+.plan-editor-form{display:flex;flex-direction:column;gap:17px}
+.plan-editor-section{display:flex;flex-direction:column;gap:12px}
+.plan-editor-section-head{display:flex;align-items:center;gap:10px}
+.plan-editor-section-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:10px;background:#e9f5f1;color:#087f6b}
+.plan-editor-section-head h3{margin:0;color:#173c39;font-size:13px;font-weight:900}
+.plan-editor-section-head p{margin:2px 0 0;color:#81918b;font-size:10px}
+.plan-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.plan-editor-form .field{min-width:0;gap:6px}
+.plan-editor-form .field label{font-size:11px;color:#526c67}
+.plan-editor-form .field label span{color:#c64b4b}
+.plan-editor-form .field :is(input,select,textarea){min-height:42px;padding:9px 11px;border-radius:10px;font-family:Cairo,sans-serif;font-size:12px}
+.plan-editor-form .field textarea{min-height:88px;resize:vertical;line-height:1.8}
+.plan-editor-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.plan-editor-trial{display:flex;align-items:center;gap:10px;min-height:42px;padding:9px 12px;border:1px solid #d6e3e1;border-radius:10px;background:#f8fbfa;cursor:pointer}
+.plan-editor-trial input{width:17px;height:17px;margin:0;accent-color:#087f6b}
+.plan-editor-trial span{display:flex;flex-direction:column;gap:2px}
+.plan-editor-trial strong{font-size:11px;color:#405b56}
+.plan-editor-trial small{font-size:9px;color:#849692}
+.plan-editor-actions{position:sticky;bottom:-20px;display:flex;justify-content:flex-start;gap:8px;margin:0 -22px -20px;padding:13px 22px;background:#fff;border-top:1px solid #e8efec}
+.plan-editor-actions .btn{min-width:104px;min-height:39px}
+@media(max-width:560px){
+ #modalBg.plan-editor{padding:8px;align-items:center}
+ #modalBg.plan-editor #modal{max-height:92dvh;border-radius:16px}
+ #modalBg.plan-editor .modal-head{padding:14px 15px}
+ #modalBg.plan-editor #modalBody{padding:14px 15px 16px}
+ .plan-editor-form{gap:14px}
+ .plan-editor-grid,.plan-editor-settings{grid-template-columns:1fr;gap:10px}
+ .plan-editor-actions{bottom:-16px;margin:0 -15px -16px;padding:11px 15px}
+ .plan-editor-actions .btn{flex:1}
+}
