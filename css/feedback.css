@@ -22,14 +22,17 @@ body{
   padding:1.25rem clamp(1rem,3vw,2.75rem) 2.5rem;
 }
 .feedback-layout{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:1.5rem;
   width:100%;
-  max-width:1440px;
+  max-width:1080px;
   margin-inline:auto;
-  display:grid;
-  grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);
-  align-items:start;
-  gap:1.25rem;
 }
+.feedback-main-card,.feedback-reviews-card{width:100%}
+.feedback-reviews-card{position:static;max-height:none;overflow:visible}
+.feedback-reviews-card>div:last-child{min-height:0;overflow:visible}
 .feedback-main-card,.feedback-reviews-card{
   min-width:0;
   overflow:hidden;
@@ -308,16 +311,8 @@ body{
 #feedbackList>article>div:last-child{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--dp-border)}
 
 
-@media(max-width:1100px){
-  .feedback-layout{grid-template-columns:minmax(0,1fr);max-width:900px}
-}
-@media(min-width:901px){
-  .feedback-reviews-card{position:sticky;top:1rem;max-height:calc(100vh - 2rem);overflow:hidden}
-  .feedback-reviews-card>div:last-child{min-height:0;overflow-y:auto}
-}
 @media(max-width:900px){
-  .feedback-layout{max-width:760px;gap:.85rem}
-  .feedback-reviews-card{margin-top:0}
+  .feedback-layout{gap:1rem}
 }
 @media(max-width:600px){
   #feedbackPage{padding:.75rem .65rem 1.5rem}
@@ -353,4 +348,22 @@ body{
   .feedback-form-topline{gap:.35rem}
   .feedback-actions{flex-basis:112px;min-width:112px}
   .star-button i{font-size:.95rem}
+}
+
+
+.feedback-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  margin:0 0 1rem;padding:1rem 1.15rem;
+  border:1px solid var(--dp-border);border-radius:1rem;
+  background:var(--dp-surface-2);
+}
+.feedback-summary-rating{display:flex;align-items:center;gap:.7rem;min-width:0}
+.feedback-summary-score{font-size:1.55rem;font-weight:900;line-height:1;color:var(--dp-text);font-variant-numeric:tabular-nums}
+.feedback-summary-stars{display:flex;gap:.15rem;color:var(--dp-warning);font-size:.85rem}
+.feedback-summary-count{font-size:.78rem;color:var(--dp-text-2);white-space:nowrap}
+.feedback-summary-caption{font-size:.72rem;color:var(--dp-muted)}
+@media(max-width:600px){
+  .feedback-summary{padding:.85rem;gap:.5rem}
+  .feedback-summary-score{font-size:1.3rem}
+  .feedback-summary-count{font-size:.7rem}
 }
