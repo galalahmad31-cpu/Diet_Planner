@@ -2405,3 +2405,40 @@ html[data-theme="dark"] body:has(#adminContactForm) :is(
 html[data-theme="dark"] body:has(#adminContactForm) .admin-contact-actions [role="status"]{
   color:var(--dp-text-2)!important;
 }
+
+
+/* Admin plan editor — semantic dark surfaces from the central theme. */
+html[data-theme="dark"] #modalBg.plan-editor #modal{
+ background:var(--dp-surface)!important;color:var(--dp-text)!important;border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .modal-head,
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-actions{
+ background:var(--dp-surface)!important;border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .modal-head h2,
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-section-head h3,
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-trial strong{
+ color:var(--dp-text)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-section-head p,
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-trial small{
+ color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-section-icon{
+ background:var(--dp-surface-3)!important;color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-trial{
+ background:var(--dp-surface-2)!important;border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-form .field label{
+ color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-form .field :is(input,select,textarea){
+ background:var(--dp-input)!important;color:var(--dp-text)!important;border-color:var(--dp-input-border)!important;
+}
+html[data-theme="dark"] #modalBg.plan-editor .plan-editor-form .field :is(input,textarea)::placeholder{
+ color:var(--dp-muted)!important;opacity:1;
+}
+html[data-theme="dark"] #modalBg.plan-editor .close{
+ background:var(--dp-surface-2)!important;color:var(--dp-text)!important;border-color:var(--dp-border)!important;
+}
