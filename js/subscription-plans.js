@@ -127,6 +127,15 @@
     if ($('submitSubscriptionBtn')) $('submitSubscriptionBtn').textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
   }
 
+  function showSubscriptionPanel() {
+    const panel = $('subscribeModal');
+    if (!panel) return;
+    panel.hidden = false;
+    panel.setAttribute('aria-hidden', 'false');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    panel.querySelector('input,select,button')?.focus({ preventScroll: true });
+  }
+
   function resetModal() {
     if ($('submitSubscriptionBtn')) { $('submitSubscriptionBtn').style.display = 'inline-block'; $('submitSubscriptionBtn').disabled = false; }
     if ($('pendingActions')) $('pendingActions').style.display = 'none';
@@ -143,12 +152,11 @@
   }
 
   function closeModal() {
-    const modal = $('subscribeModal');
-    if (modal) {
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
+    const panel = $('subscribeModal');
+    if (panel) {
+      panel.hidden = true;
+      panel.setAttribute('aria-hidden', 'true');
     }
-    document.body.style.overflow = '';
     state.selectedPlanId = null;
     state.currentSubscription = null;
     resetModal();
@@ -190,19 +198,12 @@
     if (title) title.textContent = `الاشتراك في الخطة - ${plan.name || 'الخطة'}`;
     const info = $('selectedPlanInfo');
     if (info) {
-      if ($('profilePlansList')) {
-        info.style.display = 'none';
-        info.textContent = '';
-      } else {
-        info.style.display = '';
-        info.innerHTML = `<strong>${esc(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${esc(plan.payment_method)}`;
-      }
+      info.style.display = '';
+      info.innerHTML = `<strong>${esc(plan.name)}</strong><span>المدة: ${Number(plan.duration_days)} يوم</span><span>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه</span>`;
     }
     configurePaymentMethods(plan);
     setTrialMode(plan.is_free_trial === true);
-    $('subscribeModal').style.display = 'flex';
-    $('subscribeModal').setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    showSubscriptionPanel();
   }
 
   function openPending(id) {
@@ -225,9 +226,7 @@
     if ($('paymentMethodGroup')) $('paymentMethodGroup').style.display = 'none';
     $('submitSubscriptionBtn').style.display = 'none';
     $('pendingActions').style.display = 'flex';
-    $('subscribeModal').style.display = 'flex';
-    $('subscribeModal').setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    showSubscriptionPanel();
   }
 
   async function submitSubscription() {
