@@ -281,13 +281,25 @@ body{
 #feedbackLoginPrompt>div{padding:1.5rem;border:1px solid var(--dp-border);border-radius:1.15rem;background:var(--dp-surface-2);text-align:center;color:var(--dp-text)}
 #feedbackLoginPrompt>div>i{font-size:1.5rem;color:var(--dp-primary)}
 #feedbackLoginPrompt a{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;margin-top:1rem;padding:.5rem 1.25rem;border-radius:.85rem;background:var(--dp-primary);color:#fff;font-weight:800;text-decoration:none}
-.feedback-reviews-card{display:flex;flex-direction:column}
-.feedback-reviews-card>div:first-child{padding:1.15rem 1.35rem;border-bottom:1px solid var(--dp-border)}
-.feedback-reviews-card>div:last-child{padding:1.25rem}
-.feedback-reviews-heading{display:flex;align-items:center;gap:.75rem}
-.feedback-reviews-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:.85rem;background:color-mix(in srgb,var(--dp-warning) 13%,var(--dp-surface));color:var(--dp-warning)}
-.feedback-reviews-heading h2{margin:0;font-size:1.05rem;font-weight:900;color:var(--dp-text)}
-.feedback-reviews-heading p{margin:.25rem 0 0;font-size:.75rem;color:var(--dp-text-2)}
+.feedback-reviews-card{display:flex;flex-direction:column;align-items:stretch;min-width:0}
+.feedback-reviews-header{
+  display:block!important;
+  flex:0 0 auto;
+  width:100%;
+  min-height:64px;
+  padding:1rem 1.35rem;
+  border-bottom:1px solid var(--dp-border);
+  background:var(--dp-surface-2);
+  color:var(--dp-text);
+  visibility:visible!important;
+  opacity:1!important;
+}
+.feedback-reviews-title{display:flex;align-items:center;gap:.75rem;min-width:0}
+.feedback-reviews-icon{display:flex;flex:0 0 44px;align-items:center;justify-content:center;width:44px;height:44px;border-radius:.85rem;background:color-mix(in srgb,var(--dp-warning) 13%,var(--dp-surface));color:var(--dp-warning)}
+.feedback-reviews-title-copy{display:block;min-width:0}
+.feedback-reviews-title-copy h2{display:block;margin:0;font-size:1.05rem;line-height:1.5;font-weight:900;color:var(--dp-text)}
+.feedback-reviews-title-copy p{display:block;margin:.25rem 0 0;font-size:.75rem;line-height:1.6;color:var(--dp-text-2)}
+.feedback-reviews-content{display:block;flex:0 0 auto;width:100%;min-width:0;min-height:0;height:auto;padding:1.25rem;overflow:visible}
 #feedbackList{display:grid;grid-template-columns:1fr;gap:.85rem}
 #feedbackList>article{min-width:0;padding:1.1rem;border:1px solid var(--dp-border);border-radius:1.15rem;background:var(--dp-surface);box-shadow:0 4px 15px var(--dp-shadow)}
 #feedbackList>article .feedback-review-user{display:flex;align-items:center;gap:.6rem;min-width:0}
@@ -310,10 +322,6 @@ body{
 #feedbackPage h1{font-size:1.25rem;line-height:1.4}
 #feedbackPage h2{font-size:1.05rem;line-height:1.5}
 #feedbackPage p{overflow-wrap:anywhere}
-.feedback-reviews-card>div:first-child .flex.items-center.gap-3{display:flex;align-items:center;gap:.75rem}
-.feedback-reviews-card>div:first-child .h-11.w-11{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:0 0 44px;border-radius:.85rem;background:color-mix(in srgb,var(--dp-warning) 13%,var(--dp-surface));color:var(--dp-warning)}
-.feedback-reviews-card>div:first-child h2{margin:0;font-size:1.05rem;font-weight:900;color:var(--dp-text)}
-.feedback-reviews-card>div:first-child p{margin:.25rem 0 0;font-size:.75rem;color:var(--dp-text-2)}
 #feedbackLoginPrompt>div>p{margin-top:.75rem;font-size:.875rem;font-weight:800;color:var(--dp-text)}
 #feedbackList>article>div:first-child{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
 #feedbackList>article>div:first-child>div:first-child{min-width:0}
@@ -351,8 +359,6 @@ body{
   #feedbackPage #saveFeedbackBtn,#feedbackPage #deleteFeedbackBtn{min-height:42px;height:auto;padding:.35rem .2rem;gap:.25rem;font-size:.66rem;line-height:1.4;white-space:normal;text-align:center}
   .feedback-comment-section{padding:.85rem;margin-top:.7rem}
   #feedbackComment{min-height:125px}
-  .feedback-reviews-card>div:first-child{padding:1rem}
-  .feedback-reviews-card>div:last-child{padding:.85rem}
   .feedback-layout{gap:10px}
 }
 @media(max-width:380px){
@@ -425,8 +431,6 @@ body{
   #feedbackPage #saveFeedbackBtn,#feedbackPage #deleteFeedbackBtn{min-height:40px;height:40px}
   .feedback-comment-section{margin-top:8px;padding:10px}
   #feedbackComment{min-height:82px;max-height:150px}
-  .feedback-reviews-card>div:first-child{padding:9px 16px}
-  .feedback-reviews-card>div:last-child{padding:10px 14px}
   #feedbackList{gap:8px}
   #feedbackList>article{padding:10px}
   #feedbackList>article .feedback-review-comment,
