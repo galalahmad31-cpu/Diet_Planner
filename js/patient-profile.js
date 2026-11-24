@@ -23,7 +23,6 @@
     patientFinance: null,
     patientFinanceEditing: false,
     patientFinanceLoading: false,
-    patientAccountLinked: false,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1424,15 +1423,9 @@
   }
 
   async function loadPatientRelationshipActions() {
-    const linkButton = $('createPatientPortalInvite');
     const contactButton = $('openPatientConversation');
-    state.patientAccountLinked = false;
-
-    [linkButton, contactButton].forEach(button => {
-      if (button) button.hidden = true;
-    });
-
-    if (!supabase || !patientId || !state.user?.id || !state.patient) return;
+    if (contactButton) contactButton.hidden = true;
+    if (!supabase || !patientId || !state.user?.id || !state.patient || !contactButton) return;
 
     try {
       const { data: account, error: accountError } = await supabase
@@ -1442,15 +1435,9 @@
         .eq('status', 'active')
         .maybeSingle();
       if (accountError) throw accountError;
+      if (!account?.user_id) return;
 
-      state.patientAccountLinked = Boolean(account?.user_id);
-      if (!state.patientAccountLinked) {
-        if (linkButton) linkButton.hidden = false;
-        return;
-      }
-
-      // An active patient-account link enables direct messaging.
-      // Preserve an explicit block or pending restoration as a hard stop.
+      // Active account links enable direct messaging unless either side has blocked the relationship.
       const { data: relationship, error: relationshipError } = await supabase
         .from('professional_connection_requests')
         .select('status')
@@ -1459,10 +1446,8 @@
         .maybeSingle();
       if (relationshipError) throw relationshipError;
 
-      const communicationBlocked = ['blocked', 'restore_pending'].includes(relationship?.status);
-      if (!communicationBlocked && contactButton) contactButton.hidden = false;
+      contactButton.hidden = ['blocked', 'restore_pending'].includes(relationship?.status);
     } catch (error) {
-      state.patientAccountLinked = false;
       console.error('Patient relationship actions load failed:', error);
     }
   }
