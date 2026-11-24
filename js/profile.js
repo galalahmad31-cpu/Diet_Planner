@@ -364,6 +364,16 @@
     });
   }
 
+  window.addEventListener('dietplanner:subscription-updated', async () => {
+    try {
+      await loadSubscription();
+      renderPlans();
+    } catch (error) {
+      console.error('Profile subscription refresh failed:', error);
+      showToast('تم تنفيذ الطلب، لكن تعذر تحديث حالة الاشتراك. أعد تحميل الصفحة.');
+    }
+  });
+
   async function init() {
     try {
       if (!supabase || typeof access.getAccessStatus !== 'function') {
