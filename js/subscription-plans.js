@@ -71,8 +71,14 @@
     }
   }
 
+  function todayKey() {
+    if (typeof window.DPDate?.todayKey === 'function') return window.DPDate.todayKey();
+    const now = new Date();
+    return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+  }
+
   function activeSubscription() {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayKey();
     return state.subscriptions.find(s => s.status === 'paid' && s.start_date && s.expiry_date && s.start_date <= today && s.expiry_date >= today) || null;
   }
 
@@ -81,7 +87,7 @@
   }
 
   function trialUsed() {
-    return state.subscriptions.some(s => s.is_free_trial === true || state.plans.some(p => p.id === s.plan_id && p.is_free_trial === true));
+    return state.subscriptions.some(s => s.is_free_trial === true || state.plans.some(p => String(p.id) === String(s.plan_id) && p.is_free_trial === true));
   }
 
   function getPaymentMethods(plan) {
@@ -111,6 +117,7 @@
       if (isActive) button = '<button class="btn btn-outline" disabled>الخطة مفعّلة</button>';
       else if (isPending) button = '<button class="btn btn-outline" data-action="open-pending" data-id="' + esc(pending.id) + '">الطلب قيد المراجعة</button>';
       else if (used) button = '<button class="btn btn-outline" disabled>تم استخدام التجربة</button>';
+      else if (plan.is_free_trial === true && active) button = '<button class="btn btn-outline" disabled>غير متاحة أثناء الاشتراك الحالي</button>';
       else button = '<button class="btn btn-primary" data-action="subscribe" data-id="' + esc(plan.id) + '">' + (plan.is_free_trial ? 'ابدأ التجربة' : 'اشتراك') + '</button>';
       const methods = renderPaymentMethods(plan);
       return '<div class="card"><div class="card-top"><h3>' + esc(plan.name) + '</h3><span class="badge">اشتراك</span></div><div class="price">' + Number(plan.price).toLocaleString('ar-EG') + ' <span style="font-size:13px;font-weight:700">جنيه</span></div><div class="duration"><i class="fa-regular fa-calendar"></i> ' + Number(plan.duration_days) + ' يوم</div>' + (methods ? '<div class="method"><strong>طرق التحويل</strong><div class="subscription-payment-methods">' + methods + '</div></div>' : '') + (plan.description ? '<div class="description">' + esc(plan.description) + '</div>' : '') + '<div class="card-actions">' + button + '</div></div>';
@@ -191,6 +198,7 @@
     if (!plan) return;
     if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) return toast('مدة خطة الاشتراك غير صحيحة.');
     if (plan.is_free_trial === true && trialUsed()) return toast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.');
+    if (plan.is_free_trial === true && activeSubscription()) return toast('لا يمكن بدء التجربة المجانية أثناء وجود اشتراك فعّال.');
 
     resetModal();
     state.selectedPlanId = plan.id;
@@ -242,6 +250,7 @@
 
     if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) return toast('مدة خطة الاشتراك غير صحيحة.');
     if (trial && trialUsed()) return toast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.');
+    if (trial && activeSubscription()) return toast('لا يمكن بدء التجربة المجانية أثناء وجود اشتراك فعّال.');
     if (!trial) {
       if (!selectedMethod) return toast('اختر طريقة التحويل المناسبة أولًا.');
       if (!file) return toast('من فضلك أرفق صورة التحويل.');
