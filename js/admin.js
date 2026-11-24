@@ -19,7 +19,7 @@ function statusBadge(s,expiry){
  if(s==='pending')return '<span class="badge pending">قيد المراجعة</span>';
  return '<span class="badge canceled">ملغاة</span>';
 }
-function closeModal(){ $('modalBg').style.display='none' }
+function closeModal(){ $('modalBg').style.display='none';$('modalBg').classList.remove('plan-editor') }
 function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modalBg').style.display='flex'}
 function askConfirm(title,text,action){
  if(typeof action!=="function"||!window.DPConfirm)return;
@@ -189,17 +189,31 @@ function renderDoctors(){
 }
 
 function planForm(p){
- return `<form id="planForm"><div class="grid">
- <div class="field"><label>اسم الخطة *</label><input id="f_name" required value="${esc(p?.name||'')}"></div>
- <div class="field"><label>السعر (جنيه) *</label><input id="f_price" type="number" min="0" step="0.01" required value="${p?.price??0}"></div>
- <div class="field"><label>المدة بالأيام *</label><input id="f_duration" type="number" min="1" required value="${p?.duration_days??30}"></div>
-  <div class="field"><label>طريقة الدفع</label><input id="f_payment" placeholder="مثال: Instapay / Vodafone Cash / تحويل بنكي" value="${esc(p?.payment_method||'')}"></div>
- <div class="field"><label>الحالة</label><select id="f_active"><option value="true" ${p?.is_active!==false?'selected':''}>متاحة للاشتراك</option><option value="false" ${p?.is_active===false?'selected':''}>غير متاحة</option></select></div>
- <div class="field"><label class="check"><input id="f_trial" type="checkbox" ${p?.is_free_trial?'checked':''}> خطة تجربة مجانية</label></div>
- <div class="field full"><label>الوصف</label><textarea id="f_desc">${esc(p?.description||'')}</textarea></div>
-  </div><div class="modal-foot"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> حفظ الخطة</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div></form>`
+ return `<form id="planForm" class="plan-editor-form">
+  <section class="plan-editor-section">
+   <div class="plan-editor-section-head"><span class="plan-editor-section-icon"><i class="fa-solid fa-sliders"></i></span><div><h3>البيانات الأساسية</h3><p>اسم الخطة وقيمتها ومدة الاشتراك</p></div></div>
+   <div class="plan-editor-grid">
+    <div class="field"><label for="f_name">اسم الخطة <span>*</span></label><input id="f_name" required maxlength="100" value="${esc(p?.name||'')}"></div>
+    <div class="field"><label for="f_price">السعر (جنيه) <span>*</span></label><input id="f_price" type="number" min="0" step="0.01" required value="${p?.price??0}"></div>
+    <div class="field"><label for="f_duration">المدة بالأيام <span>*</span></label><input id="f_duration" type="number" min="1" step="1" required value="${p?.duration_days??30}"></div>
+    <div class="field"><label for="f_payment">طريقة الدفع</label><input id="f_payment" maxlength="240" placeholder="Instapay / Vodafone Cash / تحويل بنكي" value="${esc(p?.payment_method||'')}"></div>
+   </div>
+  </section>
+  <section class="plan-editor-section">
+   <div class="plan-editor-section-head"><span class="plan-editor-section-icon"><i class="fa-solid fa-toggle-on"></i></span><div><h3>إعدادات الخطة</h3><p>التحكم في إتاحتها وطبيعة الاشتراك</p></div></div>
+   <div class="plan-editor-settings">
+    <div class="field"><label for="f_active">حالة الخطة</label><select id="f_active"><option value="true" ${p?.is_active!==false?'selected':''}>متاحة للاشتراك</option><option value="false" ${p?.is_active===false?'selected':''}>غير متاحة</option></select></div>
+    <label class="plan-editor-trial" for="f_trial"><input id="f_trial" type="checkbox" ${p?.is_free_trial?'checked':''}><span><strong>خطة تجربة مجانية</strong><small>تُعامل هذه الخطة كتجربة مجانية</small></span></label>
+   </div>
+  </section>
+  <section class="plan-editor-section plan-editor-description">
+   <div class="plan-editor-section-head"><span class="plan-editor-section-icon"><i class="fa-regular fa-file-lines"></i></span><div><h3>وصف الخطة</h3><p>تفاصيل مختصرة تظهر للمستخدم</p></div></div>
+   <div class="field"><label for="f_desc">الوصف</label><textarea id="f_desc" rows="3" maxlength="2000" placeholder="اكتب وصفًا واضحًا لمحتوى الخطة...">${esc(p?.description||'')}</textarea></div>
+  </section>
+  <div class="plan-editor-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> حفظ الخطة</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div>
+ </form>`
 }
-function openPlan(p){openModal(p?'تعديل الخطة':'إنشاء خطة جديدة',planForm(p));$('planForm').addEventListener('submit',async e=>{e.preventDefault();await savePlan(p?.id||null)});$('cancelModal').onclick=closeModal}
+function openPlan(p){$('modalBg').classList.add('plan-editor');openModal(p?'تعديل الخطة':'إنشاء خطة جديدة',planForm(p));$('planForm').addEventListener('submit',async e=>{e.preventDefault();await savePlan(p?.id||null)});$('cancelModal').onclick=closeModal}
 async function savePlan(id){
  const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),payment_method:$('f_payment').value.trim(),description:$('f_desc').value.trim()||null,is_active:$('f_active').value==='true',is_free_trial:$('f_trial').checked};
  if(!payload.name||payload.duration_days<1||payload.price<0){toast('راجع بيانات الخطة');return}
