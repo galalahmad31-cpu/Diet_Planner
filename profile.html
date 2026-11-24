@@ -99,7 +99,8 @@
     </div>
   </div>
   <div id="profilePlansList" class="profile-plans-list" aria-live="polite"><div class="profile-plans-loading"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الخطط...</div></div>
-  <section id="subscribeModal" class="profile-subscribe-panel" aria-hidden="true" hidden>
+  <div id="subscribeModal" class="profile-subscribe-overlay" aria-hidden="true" hidden>
+    <section class="profile-subscribe-panel" role="dialog" aria-modal="true" aria-labelledby="profileSubscribeTitle" tabindex="-1">
     <div class="profile-subscribe-panel-head">
       <div>
         <span class="profile-subscribe-kicker">SUBSCRIPTION</span>
@@ -130,7 +131,8 @@
       <button class="profile-subscribe-btn profile-subscribe-secondary" type="button" data-action="close-modal">إغلاق</button>
       <button id="submitSubscriptionBtn" class="profile-subscribe-btn profile-subscribe-primary" type="button" data-action="submit-subscription">إرسال طلب الاشتراك</button>
     </div>
-  </section>
+    </section>
+  </div>
 </section>
 
 <footer class="py-7 text-center text-xs text-slate-400">Developed by <span class="font-bold text-brand-600">Dr. Ahmed Galal</span></footer>
