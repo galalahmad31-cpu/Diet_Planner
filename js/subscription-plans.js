@@ -3,7 +3,7 @@
 
   const sb = window.DietPlannerAccess?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, plans: [], subscriptions: [], selectedPlanId: null, currentSubscription: null, confirm: null, toastTimer: null };
+  const state = { user: null, plans: [], subscriptions: [], selectedPlanId: null, selectedPaymentMethodId: null, currentSubscription: null, confirm: null, toastTimer: null };
 
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[c]));
 
@@ -84,6 +84,16 @@
     return state.subscriptions.some(s => s.is_free_trial === true || state.plans.some(p => p.id === s.plan_id && p.is_free_trial === true));
   }
 
+  function getPaymentMethods(plan) {
+    if (Array.isArray(plan?.payment_methods)) return plan.payment_methods.filter(item => item && item.name && item.details);
+    const legacy = String(plan?.payment_method || '').trim();
+    return legacy && !plan?.is_free_trial ? [{ id: 'legacy', name: 'طريقة الدفع الحالية', details: legacy, instructions: '' }] : [];
+  }
+
+  function renderPaymentMethods(plan) {
+    return getPaymentMethods(plan).map(method => '<div class="subscription-payment-method"><strong>' + esc(method.name) + '</strong><span>' + esc(method.details) + '</span>' + (method.instructions ? '<small>' + esc(method.instructions) + '</small>' : '') + '</div>').join('');
+  }
+
   function render() {
     const c = $('plans');
     if (!c) return;
@@ -99,16 +109,19 @@
       const used = plan.is_free_trial === true && trialUsed();
       let button;
       if (isActive) button = '<button class="btn btn-outline" disabled>الخطة مفعّلة</button>';
-      else if (isPending) button = `<button class="btn btn-outline" data-action="open-pending" data-id="${esc(pending.id)}">الطلب قيد المراجعة</button>`;
+      else if (isPending) button = '<button class="btn btn-outline" data-action="open-pending" data-id="' + esc(pending.id) + '">الطلب قيد المراجعة</button>';
       else if (used) button = '<button class="btn btn-outline" disabled>تم استخدام التجربة</button>';
-      else button = `<button class="btn btn-primary" data-action="subscribe" data-id="${esc(plan.id)}">${plan.is_free_trial ? 'ابدأ التجربة' : 'اشتراك'}</button>`;
-      return `<div class="card"><div class="card-top"><h3>${esc(plan.name)}</h3><span class="badge">اشتراك</span></div><div class="price">${Number(plan.price).toLocaleString('ar-EG')} <span style="font-size:13px;font-weight:700">جنيه</span></div><div class="duration"><i class="fa-regular fa-calendar"></i> ${Number(plan.duration_days)} يوم</div><div class="method"><strong>طريقة التحويل</strong>${esc(plan.payment_method)}</div>${plan.description ? `<div class="description">${esc(plan.description)}</div>` : ''}<div class="card-actions">${button}</div></div>`;
+      else button = '<button class="btn btn-primary" data-action="subscribe" data-id="' + esc(plan.id) + '">' + (plan.is_free_trial ? 'ابدأ التجربة' : 'اشتراك') + '</button>';
+      const methods = renderPaymentMethods(plan);
+      return '<div class="card"><div class="card-top"><h3>' + esc(plan.name) + '</h3><span class="badge">اشتراك</span></div><div class="price">' + Number(plan.price).toLocaleString('ar-EG') + ' <span style="font-size:13px;font-weight:700">جنيه</span></div><div class="duration"><i class="fa-regular fa-calendar"></i> ' + Number(plan.duration_days) + ' يوم</div>' + (methods ? '<div class="method"><strong>طرق التحويل</strong><div class="subscription-payment-methods">' + methods + '</div></div>' : '') + (plan.description ? '<div class="description">' + esc(plan.description) + '</div>' : '') + '<div class="card-actions">' + button + '</div></div>';
     }).join('');
   }
 
   function setTrialMode(isTrial) {
     const proof = $('paymentProof')?.closest('.form-group');
     const note = $('paymentNote')?.closest('.form-group');
+    const method = $('paymentMethodGroup');
+    if (method) method.style.display = isTrial ? 'none' : '';
     if (proof) proof.style.display = isTrial ? 'none' : '';
     if (note) note.style.display = isTrial ? 'none' : '';
     if ($('submitSubscriptionBtn')) $('submitSubscriptionBtn').textContent = isTrial ? 'بدء التجربة المجانية' : 'إرسال طلب الاشتراك';
@@ -119,6 +132,9 @@
     if ($('pendingActions')) $('pendingActions').style.display = 'none';
     if ($('paymentProof')) $('paymentProof').value = '';
     if ($('paymentNote')) $('paymentNote').value = '';
+    if ($('paymentMethodSelect')) $('paymentMethodSelect').innerHTML = '';
+    if ($('paymentMethodDetails')) $('paymentMethodDetails').textContent = '';
+    state.selectedPaymentMethodId = null;
     const title = $('profileSubscribeTitle');
     if (title) title.textContent = 'الاشتراك في الخطة';
     const info = $('selectedPlanInfo');
@@ -136,6 +152,29 @@
     state.selectedPlanId = null;
     state.currentSubscription = null;
     resetModal();
+  }
+
+  function updateSelectedPaymentMethod() {
+    const plan = state.plans.find(item => item.id === state.selectedPlanId);
+    const methods = getPaymentMethods(plan);
+    const selected = methods.find(item => String(item.id) === String($('paymentMethodSelect')?.value)) || methods[0];
+    state.selectedPaymentMethodId = selected?.id ?? null;
+    const details = $('paymentMethodDetails');
+    if (details) details.innerHTML = selected
+      ? '<strong>' + esc(selected.name) + '</strong><span>' + esc(selected.details) + '</span>' + (selected.instructions ? '<small>' + esc(selected.instructions) + '</small>' : '')
+      : 'لا توجد طريقة دفع متاحة لهذه الخطة. يرجى التواصل مع الإدارة.';
+  }
+
+  function configurePaymentMethods(plan) {
+    const methods = getPaymentMethods(plan);
+    const select = $('paymentMethodSelect');
+    const group = $('paymentMethodGroup');
+    if (!select || !group) return;
+    select.innerHTML = methods.map((method,index) => '<option value="' + esc(method.id ?? index) + '">' + esc(method.name) + '</option>').join('');
+    select.disabled = methods.length === 0;
+    select.onchange = updateSelectedPaymentMethod;
+    group.style.display = plan?.is_free_trial ? 'none' : '';
+    updateSelectedPaymentMethod();
   }
 
   function openSubscribe(planId) {
@@ -159,6 +198,7 @@
         info.innerHTML = `<strong>${esc(plan.name)}</strong><br>المدة: ${Number(plan.duration_days)} يوم<br>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه<br>طريقة التحويل: ${esc(plan.payment_method)}`;
       }
     }
+    configurePaymentMethods(plan);
     setTrialMode(plan.is_free_trial === true);
     $('subscribeModal').style.display = 'flex';
     $('subscribeModal').setAttribute('aria-hidden', 'false');
@@ -182,6 +222,7 @@
     }
     $('paymentProof').value = '';
     $('paymentNote').value = sub.notes || '';
+    if ($('paymentMethodGroup')) $('paymentMethodGroup').style.display = 'none';
     $('submitSubscriptionBtn').style.display = 'none';
     $('pendingActions').style.display = 'flex';
     $('subscribeModal').style.display = 'flex';
@@ -197,11 +238,13 @@
     const button = $('submitSubscriptionBtn');
     const file = $('paymentProof').files[0];
     const note = $('paymentNote').value.trim();
+    const selectedMethod = getPaymentMethods(plan).find(method => String(method.id) === String(state.selectedPaymentMethodId));
     const fullName = state.user.user_metadata?.full_name || state.user.user_metadata?.name || state.user.email || null;
 
     if (!Number.isInteger(Number(plan.duration_days)) || Number(plan.duration_days) <= 0) return toast('مدة خطة الاشتراك غير صحيحة.');
     if (trial && trialUsed()) return toast('لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.');
     if (!trial) {
+      if (!selectedMethod) return toast('اختر طريقة التحويل المناسبة أولًا.');
       if (!file) return toast('من فضلك أرفق صورة التحويل.');
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return toast('يرجى اختيار صورة صحيحة.');
       if (file.size > 5 * 1024 * 1024) return toast('حجم الصورة يجب ألا يتجاوز 5 ميجابايت.');
@@ -222,7 +265,12 @@
       const { data, error } = await sb.rpc('create_subscription', {
         p_plan_id: plan.id,
         p_full_name: fullName,
-        p_notes: trial ? null : (note || null),
+        p_notes: trial ? null : ([
+          'طريقة الدفع المختارة: ' + selectedMethod.name,
+          'بيانات التحويل: ' + selectedMethod.details,
+          selectedMethod.instructions ? 'تعليمات: ' + selectedMethod.instructions : '',
+          note ? 'ملاحظات المستخدم: ' + note : ''
+        ].filter(Boolean).join('\n')),
         p_payment_proof_path: filePath
       });
       if (error) throw error;
