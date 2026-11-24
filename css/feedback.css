@@ -51,7 +51,6 @@ body{
   overflow:hidden;
   border-radius:1.5rem;
 }
-.feedback-reviews-card>div:last-child{min-height:0;height:auto;overflow:visible}
 .feedback-branded-header{
   display:block;
   min-height:0;
@@ -277,13 +276,12 @@ body{
 #feedbackStatus.bg-emerald-50{background:color-mix(in srgb,var(--dp-success) 12%,var(--dp-surface));color:var(--dp-success);border-color:var(--dp-success)}
 #feedbackStatus.bg-red-50{background:color-mix(in srgb,var(--dp-danger) 12%,var(--dp-surface));color:var(--dp-danger);border-color:var(--dp-danger)}
 #feedbackStatus.bg-slate-50{background:var(--dp-surface-2);color:var(--dp-text-2)}
-.feedback-login-card{padding:1.5rem;border:1px solid var(--dp-border);border-radius:1.15rem;background:var(--dp-surface-2);text-align:center}
 #feedbackLoginPrompt>div{padding:1.5rem;border:1px solid var(--dp-border);border-radius:1.15rem;background:var(--dp-surface-2);text-align:center;color:var(--dp-text)}
 #feedbackLoginPrompt>div>i{font-size:1.5rem;color:var(--dp-primary)}
 #feedbackLoginPrompt a{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;margin-top:1rem;padding:.5rem 1.25rem;border-radius:.85rem;background:var(--dp-primary);color:#fff;font-weight:800;text-decoration:none}
 .feedback-reviews-card{display:flex;flex-direction:column;align-items:stretch;min-width:0}
 .feedback-reviews-header{
-  display:block!important;
+  display:block;
   flex:0 0 auto;
   width:100%;
   min-height:64px;
@@ -291,8 +289,8 @@ body{
   border-bottom:1px solid var(--dp-border);
   background:var(--dp-surface-2);
   color:var(--dp-text);
-  visibility:visible!important;
-  opacity:1!important;
+  visibility:visible;
+  opacity:1;
 }
 .feedback-reviews-title{display:flex;align-items:center;gap:.75rem;min-width:0}
 .feedback-reviews-icon{display:flex;flex:0 0 44px;align-items:center;justify-content:center;width:44px;height:44px;border-radius:.85rem;background:color-mix(in srgb,var(--dp-warning) 13%,var(--dp-surface));color:var(--dp-warning)}
@@ -302,11 +300,6 @@ body{
 .feedback-reviews-content{display:block;flex:0 0 auto;width:100%;min-width:0;min-height:0;height:auto;padding:1.25rem;overflow:visible}
 #feedbackList{display:grid;grid-template-columns:1fr;gap:.85rem}
 #feedbackList>article{min-width:0;padding:1.1rem;border:1px solid var(--dp-border);border-radius:1.15rem;background:var(--dp-surface);box-shadow:0 4px 15px var(--dp-shadow)}
-#feedbackList>article .feedback-review-user{display:flex;align-items:center;gap:.6rem;min-width:0}
-#feedbackList>article .feedback-review-avatar{display:flex;flex:0 0 40px;align-items:center;justify-content:center;width:40px;height:40px;border-radius:.75rem;background:var(--dp-surface-3);color:var(--dp-primary)}
-#feedbackList>article .feedback-review-name{font-weight:800;color:var(--dp-text);overflow-wrap:anywhere}
-#feedbackList>article .feedback-review-date{font-size:.75rem;color:var(--dp-muted)}
-#feedbackList>article .feedback-review-comment{margin-top:1rem;color:var(--dp-text-2);font-size:.875rem;line-height:1.9;white-space:pre-wrap}
 #feedbackList>article [data-edit-feedback],#feedbackList>article [data-delete-feedback]{
   display:inline-flex;align-items:center;gap:.5rem;min-height:40px;padding:.45rem 1rem;border:1px solid var(--dp-border);border-radius:.75rem;background:var(--dp-surface-2);color:var(--dp-text-2);font:inherit;font-size:.75rem;font-weight:800;cursor:pointer
 }
@@ -319,8 +312,6 @@ body{
 @keyframes feedback-spin{to{transform:rotate(360deg)}}
 
 /* Markup structure formerly supplied by the removed, missing Tailwind bundle. */
-#feedbackPage h1{font-size:1.25rem;line-height:1.4}
-#feedbackPage h2{font-size:1.05rem;line-height:1.5}
 #feedbackPage p{overflow-wrap:anywhere}
 #feedbackLoginPrompt>div>p{margin-top:.75rem;font-size:.875rem;font-weight:800;color:var(--dp-text)}
 #feedbackList>article>div:first-child{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
@@ -336,6 +327,10 @@ body{
 
 
 @media(max-width:600px){
+  .feedback-summary{padding:.85rem;gap:.5rem}
+  .feedback-summary-score{font-size:1.3rem}
+  .feedback-summary-count{font-size:.7rem}
+
   #feedbackPage{padding:10px 9px 20px}
   .feedback-main-card,.feedback-reviews-card{border-radius:1.15rem}
   .feedback-brand-inner{padding:9px 10px 7px}
@@ -371,7 +366,6 @@ body{
 }
 
 
-.feedback-summary:not(.hidden){display:flex!important}
 .feedback-summary{
   display:flex;align-items:center;justify-content:space-between;gap:1rem;
   margin:0 0 1rem;padding:1rem 1.15rem;
@@ -383,11 +377,6 @@ body{
 .feedback-summary-stars{display:flex;gap:.15rem;color:var(--dp-warning);font-size:.85rem}
 .feedback-summary-count{font-size:.78rem;color:var(--dp-text-2);white-space:nowrap}
 .feedback-summary-caption{font-size:.72rem;color:var(--dp-muted)}
-@media(max-width:600px){
-  .feedback-summary{padding:.85rem;gap:.5rem}
-  .feedback-summary-score{font-size:1.3rem}
-  .feedback-summary-count{font-size:.7rem}
-}
 
 
 /* Compact tablet landscape: preserve the full page and native vertical scrolling. */
@@ -418,12 +407,10 @@ body{
     max-height:none!important;
     overflow:visible!important;
   }
-  .feedback-reviews-header{display:block!important;flex:0 0 auto;min-height:58px;padding:8px 16px}
-  .feedback-reviews-title{display:flex!important;align-items:center;gap:10px}
-  .feedback-reviews-title-copy{display:block!important}
-  .feedback-reviews-title-copy h2,.feedback-reviews-title-copy p{display:block!important;visibility:visible!important;opacity:1!important}
-  .feedback-reviews-content{display:block;flex:0 0 auto;padding:10px 14px}
-  .feedback-summary:not(.hidden){display:flex!important}
+  .feedback-reviews-header{min-height:58px;padding:8px 16px}
+  .feedback-reviews-title{gap:10px}
+  .feedback-reviews-title-copy{display:block}
+  .feedback-reviews-content{padding:10px 14px}
   .feedback-brand-inner{padding:8px 14px 7px}
   .feedback-brand-row{min-height:42px}
   .feedback-brand-logo{width:40px;height:40px;flex-basis:40px;font-size:17px}
