@@ -10,7 +10,7 @@
    - Shared API for application pages.
 
    Important:
-   - Redirect logic for an existing session runs ONLY on index.html.
+   - Account routing runs after successful authentication on login.html.
    - Other application pages never redirect themselves through this file.
    ========================================================= */
 
@@ -56,7 +56,7 @@
     return new Date().toISOString().slice(0, 10);
   }
 
-  function isIndexPage() {
+  function isLoginPage() {
     const path = window.location.pathname;
 
     return (
@@ -270,7 +270,7 @@
   }
 
   // ---------------------------------------------------------
-  // Index page access routing
+  // Post-authentication account routing
   // ---------------------------------------------------------
   async function checkUserAccess(session) {
     if (!session?.user) return false;
@@ -773,15 +773,15 @@
   }
 
   // ---------------------------------------------------------
-  // Index-only event binding
+  // Login-page event binding
   // ---------------------------------------------------------
   function initializeIndex() {
-    if (!isIndexPage()) return;
+    if (!isLoginPage()) return;
 
     /*
      * IMPORTANT:
      * Do not run an asynchronous session redirect on a normal visit to
-     * index.html. On Android and some desktop browsers, an immediate
+     * login.html. On Android and some desktop browsers, an immediate
      * navigation can interrupt native input focus and make the keyboard
      * appear/disappear or make the fields feel unresponsive.
      *
@@ -820,15 +820,6 @@
     document
       .getElementById("cancelAccountTypeSelectionButton")
       ?.addEventListener("click", cancelAccountTypeSelection);
-
-    if (window.location.hash === "#register") {
-      document.querySelector('[data-auth-tab="registerForm"]')?.click();
-      const requestedAccountType = new URLSearchParams(window.location.search).get("account_type");
-      if (["patient", "professional"].includes(requestedAccountType)) {
-        const preferred = document.querySelector(`input[name="registerAccountType"][value="${requestedAccountType}"]`);
-        if (preferred) preferred.checked = true;
-      }
-    }
 
     const isAuthCallback =
       window.location.hash.includes("access_token=") ||
@@ -879,10 +870,9 @@
           document
             .querySelectorAll("[data-auth-tab]")
             .forEach((tab) => {
-              tab.classList.toggle(
-                "active",
-                tab === button
-              );
+              const active = tab === button;
+              tab.classList.toggle("active", active);
+              tab.setAttribute("aria-selected", String(active));
             });
 
           document
@@ -900,6 +890,18 @@
           if (box) box.style.display = "none";
         });
       });
+
+    // Apply the requested tab only after its click handler is registered.
+    if (window.location.hash === "#register") {
+      const registerTab = document.querySelector('[data-auth-tab="registerForm"]');
+      registerTab?.click();
+
+      const requestedAccountType = new URLSearchParams(window.location.search).get("account_type");
+      if (["patient", "professional"].includes(requestedAccountType)) {
+        const preferred = document.querySelector(`input[name="registerAccountType"][value="${requestedAccountType}"]`);
+        if (preferred) preferred.checked = true;
+      }
+    }
   }
 
   // ---------------------------------------------------------
