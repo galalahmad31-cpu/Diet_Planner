@@ -37,7 +37,7 @@
         '<td data-label="ملاحظات" class="lab-notes">'+esc(row.notes || "—")+'</td>' +
         (editable ? '<td class="no-print lab-actions"><button type="button" data-lab-edit="'+index+'">تعديل</button><button type="button" data-lab-delete="'+index+'">حذف</button></td>' : '') +
         '</tr>').join("");
-      root.innerHTML = '<div class="lab-table-heading"><div><h3>سجل التحاليل</h3><p>أدخل النتيجة مباشرة في صف الجدول.</p></div>' +
+      root.innerHTML = '<div class="lab-table-heading"><h3>سجل التحاليل</h3>' +
         (editable ? '<button type="button" class="lab-add-button" data-lab-add>＋ إضافة تحليل</button>' : '<span class="lab-readonly">للعرض فقط</span>') +
         '</div><div class="lab-table-wrap" role="region" aria-label="جدول نتائج التحاليل" tabindex="0"><table class="lab-table"><caption class="lab-caption">نتائج التحاليل المسجلة للمريض</caption><thead><tr><th>التاريخ</th><th>اسم التحليل</th><th>النتيجة</th><th>الوحدة</th><th>المدى المرجعي</th><th>ملاحظات</th>'+(editable?'<th class="no-print">إجراء</th>':'')+'</tr></thead><tbody id="labResultsBody">'+(body || '<tr><td colspan="'+(editable?7:6)+'" class="lab-empty">لا توجد تحاليل مسجلة.</td></tr>')+'</tbody></table></div>';
     }
