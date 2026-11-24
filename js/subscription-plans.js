@@ -279,6 +279,7 @@
       closeModal();
       toast(trial ? 'تم بدء التجربة المجانية بنجاح.' : 'تم إرسال طلب الاشتراك بنجاح، وسيتم مراجعته وتفعيله يدويًا.');
       await loadData();
+      window.dispatchEvent(new CustomEvent('dietplanner:subscription-updated'));
     } catch (error) {
       console.error('subscription failed:', error);
       if (filePath) await sb.storage.from('subscription-proofs').remove([filePath]).catch(() => {});
@@ -308,6 +309,7 @@
       closeModal();
       toast('تم تعديل إثبات الدفع بنجاح.');
       await loadData();
+      window.dispatchEvent(new CustomEvent('dietplanner:subscription-updated'));
     } catch (error) {
       await sb.storage.from('subscription-proofs').remove([newPath]).catch(() => {});
       showError('replace proof failed', error);
@@ -327,6 +329,7 @@
       closeModal();
       toast('تم إلغاء طلب الاشتراك.');
       await loadData();
+      window.dispatchEvent(new CustomEvent('dietplanner:subscription-updated'));
       return true;
     } catch (error) {
       showError('cancel subscription failed', error);
