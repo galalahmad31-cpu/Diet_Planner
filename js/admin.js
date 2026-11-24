@@ -29,12 +29,27 @@ function askConfirm(title,text,action){
 }
 window.DietPlannerConfirm=Object.freeze({ask(title,message,action){askConfirm(title,message,action)}});
 
+function showAdminGate(message,allowRetry=false){
+ const gate=$('adminGate'),retry=$('adminGateRetry');
+ if(gate)gate.style.display='block';
+ if($('adminGateMessage'))$('adminGateMessage').textContent=message;
+ if(retry)retry.hidden=!allowRetry;
+ $('adminContent').style.display='none';
+}
 async function requireAdmin(){
+ showAdminGate('جاري التحقق من صلاحية الدخول إلى لوحة الإدارة...');
  if(!sb||!access){location.replace('index.html');return false}
  const accessStatus=await access.getAccessStatus();
- if(!accessStatus?.authenticated || !accessStatus.isAdmin){location.replace('index.html');return false}
+ if(!accessStatus?.authenticated){location.replace('index.html');return false}
+ if(accessStatus.accessVerificationFailed||!accessStatus.role){
+  showAdminGate('تعذر التحقق من صلاحيات الحساب حاليًا. تأكد من الاتصال ثم أعد المحاولة.',true);
+  return false;
+ }
+ if(!accessStatus.isAdmin){location.replace('index.html');return false}
  state.currentUserId=accessStatus.user?.id||null;
- $('adminContent').style.display='block';return true
+ $('adminGate').style.display='none';
+ $('adminContent').style.display='block';
+ return true
 }
 
 async function loadAll(){
@@ -587,5 +602,14 @@ $('doctorsBody').onclick=e=>{
  else if(add){const profile=state.profiles.find(x=>x.id===add.dataset.addSub);if(profile)openSubAssignment(profile)}
 };
 
-(async function init(){try{if(await requireAdmin())await loadAll()}catch(e){console.error(e);['request','plan','doctor'].forEach(x=>setState(x,e.message||'حدث خطأ'))}})();
+async function initializeAdminPage(){
+ try{
+  if(await requireAdmin())await loadAll();
+ }catch(error){
+  console.error('Admin page initialization failed:',error);
+  showAdminGate('تعذر تحميل لوحة الإدارة: '+(error?.message||'حدث خطأ غير متوقع')+' — يمكنك إعادة المحاولة.',true);
+ }
+}
+$('adminGateRetry').onclick=initializeAdminPage;
+initializeAdminPage();
 })();
