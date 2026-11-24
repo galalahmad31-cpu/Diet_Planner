@@ -5,7 +5,7 @@
   const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 
   function create(container) {
-    const state = { patientId:null, canAdd:()=>false, canEditRow:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loading:false, loadVersion:0, saving:false };
+    const state = { patientId:null, canAdd:()=>false, canEditRow:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loadVersion:0, saving:false };
     const root = container;
     const fields = [
       ["test_name","اسم التحليل","text",160],
@@ -123,7 +123,6 @@
       if (!state.patientId || !state.db) return;
       const patientId = state.patientId;
       const loadVersion = ++state.loadVersion;
-      state.loading = true;
       root.textContent = "جاري تحميل سجل التحاليل...";
       try {
         const {data,error} = await state.db.from("patient_lab_results")
@@ -137,8 +136,6 @@
         if (loadVersion !== state.loadVersion || patientId !== state.patientId) return;
         console.error("Patient labs load failed:",error);
         root.textContent = "تعذر تحميل سجل التحاليل. تحقق من الاتصال والصلاحيات.";
-      } finally {
-        if (loadVersion === state.loadVersion) state.loading = false;
       }
     };
     return state;
