@@ -19,5 +19,12 @@
 .lab-entry-row input{display:block;width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--dp-input-border,var(--border-color));border-radius:6px;padding:7px 5px;background:var(--dp-input,var(--input-bg,#fff));color:var(--dp-text,var(--text-color));font:600 10px Cairo,sans-serif}
 .lab-entry-row input:focus{outline:2px solid var(--dp-primary,var(--primary-color));outline-offset:1px}
 .lab-empty{text-align:center;color:var(--dp-muted,var(--text-muted));padding:18px!important}
+
+/* Keep the measurements and lab records visually distinct without another panel. */
+.measurements-table-container + .lab-results-container{
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--dp-border,var(--border-color));
+}
 @media(max-width:600px){.lab-table-heading{align-items:flex-start}.lab-add-button{padding:7px 9px}}
 @media print{.lab-add-button,.lab-actions,.lab-entry-row{display:none!important}.lab-table{min-width:0}}
