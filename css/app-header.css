@@ -1,4 +1,5 @@
 /* Diet Planner — single source of truth for shared header geometry and responsive layout. */
+body.dp-has-app-header{margin:0!important}
 .dp-app-header,.dp-app-header *,.dp-app-header *::before,.dp-app-header *::after{box-sizing:border-box}
 .dp-app-header{
   cursor:default;
