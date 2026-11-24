@@ -105,10 +105,18 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 .profile-plan-action:disabled{background:var(--dp-surface-3,#edf3f0);color:var(--dp-text-2,#81918c);cursor:not-allowed}
 .profile-plan-action.is-secondary{background:var(--dp-surface-3,#e8f2ed);color:var(--dp-primary,#14745d)}
 .profile-plans-loading,.profile-plans-empty{grid-column:1/-1;padding:18px;text-align:center;color:var(--dp-text-2,#84938f);font-size:12px}
-remove obsolete shared benefits css.profile-subscribe-panel[hidden]{display:none!important}
+.profile-subscribe-overlay[hidden]{display:none!important}
+.profile-subscribe-overlay{
+  position:fixed;inset:0;z-index:1500;display:grid;place-items:center;
+  padding:clamp(12px,3vh,28px) 14px;
+  background:rgba(12,30,28,.58);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  overflow-y:auto;overscroll-behavior:contain;
+}
 .profile-subscribe-panel{
-  display:block;margin-top:18px;padding:20px;border:1px solid var(--dp-border,#cfe4da);
-  border-radius:16px;background:var(--dp-surface,#fff);box-shadow:0 8px 24px rgba(15,71,67,.06)
+  display:block;width:min(100%,560px);max-height:calc(100dvh - 40px);overflow-y:auto;
+  margin:auto;padding:22px;border:1px solid var(--dp-border,#cfe4da);
+  border-radius:20px;background:var(--dp-surface,#fff);
+  box-shadow:0 24px 70px rgba(0,0,0,.24);overscroll-behavior:contain;
 }
 .profile-subscribe-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .profile-subscribe-kicker{color:var(--dp-primary,#16866d);font-size:9px;font-weight:900;letter-spacing:1.2px}
@@ -146,7 +154,7 @@ remove obsolete shared benefits css.profile-subscribe-panel[hidden]{display:none
   .profile-plan-card{padding:12px 10px;border-radius:13px}
   .profile-plan-price strong{font-size:23px}
   .profile-plan-status{font-size:8px}
-  .profile-subscribe-panel{padding:15px 12px}
+  .profile-subscribe-overlay{padding:10px}\n  .profile-subscribe-panel{width:100%;max-height:calc(100dvh - 20px);padding:17px 14px;border-radius:16px}
   .profile-subscribe-actions{gap:7px}
 }
 @media(max-width:360px){.profile-plans-list{grid-template-columns:1fr}}
@@ -172,3 +180,5 @@ remove obsolete shared benefits css.profile-subscribe-panel[hidden]{display:none
 .profile-inline-save:disabled{opacity:.6;cursor:not-allowed}
 .profile-inline-cancel{flex:0 0 auto;min-width:84px;background:#eef3f1;color:#60736d}
 @media(max-width:420px){.profile-inline-actions{flex-direction:column}.profile-inline-cancel{width:100%}}
+
+body.subscription-modal-open{overflow:hidden}
