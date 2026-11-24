@@ -145,7 +145,7 @@ function renderPlans(){
  const body=$('plansBody');if(!state.plans.length){setState('plan','لا توجد خطط.');return}
  body.innerHTML=state.plans.map(p=>`<tr>
  <td><span class="name">${esc(p.name)}</span>${p.is_free_trial?'<span class="meta">تجربة مجانية</span>':''}</td>
- <td>${money(p.price)}</td><td>${esc(p.duration_days)} يوم</td><td>${esc(p.payment_method||'—')}</td><td><span class="badge ${p.is_active?'active':'off'}">${p.is_active?'متاحة':'غير متاحة'}</span></td>
+ <td>${money(p.price)}</td><td>${esc(p.duration_days)} يوم</td><td>${(Array.isArray(p.payment_methods)?p.payment_methods:[]).map(m=>esc(m.name)).join('، ')||esc(p.payment_method||'—')}</td><td><span class="badge ${p.is_active?'active':'off'}">${p.is_active?'متاحة':'غير متاحة'}</span></td>
  <td class="actions-cell"><button class="icon-btn" title="تعديل" data-edit-plan="${esc(p.id)}"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف" data-del-plan="${esc(p.id)}"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
  setState('plan','',true)
 }
@@ -188,6 +188,9 @@ function renderDoctors(){
  renderPager('doctorPager',state.doctorPage,state.doctorTotal,()=>loadDoctorsPage(state.doctorPage+1),()=>loadDoctorsPage(state.doctorPage-1));
 }
 
+function paymentMethodEditorRow(method,index){
+ return '<div class="plan-payment-method" data-payment-method-row><div class="plan-payment-method-head"><strong>وسيلة الدفع '+(index+1)+'</strong><button type="button" class="plan-payment-remove" data-remove-payment-method aria-label="حذف وسيلة الدفع"><i class="fa-solid fa-trash"></i></button></div><div class="plan-payment-method-grid"><label>طريقة التحويل<input data-payment-name maxlength="100" required value="'+esc(method?.name||'')+'" placeholder="Vodafone Cash / InstaPay / تحويل بنكي"></label><label>بيانات التحويل<input data-payment-details maxlength="300" required value="'+esc(method?.details||'')+'" placeholder="رقم الهاتف أو الحساب"></label><label class="full">تعليمات إضافية (اختياري)<textarea data-payment-instructions maxlength="600" rows="2">'+esc(method?.instructions||'')+'</textarea></label></div></div>';
+}
 function planForm(p){
  return `<form id="planForm" class="plan-editor-form">
   <section class="plan-editor-section">
@@ -196,7 +199,7 @@ function planForm(p){
     <div class="field"><label for="f_name">اسم الخطة <span>*</span></label><input id="f_name" required maxlength="100" value="${esc(p?.name||'')}"></div>
     <div class="field"><label for="f_price">السعر (جنيه) <span>*</span></label><input id="f_price" type="number" min="0" step="0.01" required value="${p?.price??0}"></div>
     <div class="field"><label for="f_duration">المدة بالأيام <span>*</span></label><input id="f_duration" type="number" min="1" step="1" required value="${p?.duration_days??30}"></div>
-    <div class="field"><label for="f_payment">طريقة الدفع</label><input id="f_payment" maxlength="240" placeholder="Instapay / Vodafone Cash / تحويل بنكي" value="${esc(p?.payment_method||'')}"></div>
+    <div class="field full"><label>طرق الدفع والتحويل</label><div id="planPaymentMethods" class="plan-payment-methods">\${(Array.isArray(p?.payment_methods)?p.payment_methods:[]).map((m,i)=>paymentMethodEditorRow(m,i)).join('') || (p?.payment_method&&!p?.is_free_trial?paymentMethodEditorRow({name:'طريقة الدفع الحالية',details:p.payment_method},0):'')}</div><button type="button" id="addPlanPaymentMethod" class="plan-payment-add"><i class="fa-solid fa-plus"></i> إضافة طريقة دفع</button><small class="plan-payment-hint">يمكن إضافة أكثر من وسيلة، ولكل وسيلة بيانات وتعليمات مستقلة.</small></div>
    </div>
   </section>
   <section class="plan-editor-section">
@@ -213,11 +216,28 @@ function planForm(p){
   <div class="plan-editor-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> حفظ الخطة</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div>
  </form>`
 }
-function openPlan(p){$('modalBg').classList.add('plan-editor');openModal(p?'تعديل الخطة':'إنشاء خطة جديدة',planForm(p));$('planForm').addEventListener('submit',async e=>{e.preventDefault();await savePlan(p?.id||null)});$('cancelModal').onclick=closeModal}
+function openPlan(p){
+ $('modalBg').classList.add('plan-editor');openModal(p?'تعديل الخطة':'إنشاء خطة جديدة',planForm(p));
+ const list=$('planPaymentMethods'),add=$('addPlanPaymentMethod');
+ add.onclick=()=>list.insertAdjacentHTML('beforeend',paymentMethodEditorRow({},list.querySelectorAll('[data-payment-method-row]').length));
+ list.onclick=e=>{const button=e.target.closest('[data-remove-payment-method]');if(!button)return;button.closest('[data-payment-method-row]')?.remove();list.querySelectorAll('[data-payment-method-row]').forEach((row,i)=>{row.querySelector('strong').textContent='وسيلة الدفع '+(i+1)})};
+ $('f_trial').onchange=e=>{if(e.target.checked){list.innerHTML='';add.disabled=true}else{add.disabled=false;if(!list.children.length)add.click()}};
+ if($('f_trial').checked){list.innerHTML='';add.disabled=true}
+ $('planForm').addEventListener('submit',async e=>{e.preventDefault();await savePlan(p?.id||null)});
+ $('cancelModal').onclick=closeModal;
+}
 async function savePlan(id){
- const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),payment_method:$('f_payment').value.trim(),description:$('f_desc').value.trim()||null,is_active:$('f_active').value==='true',is_free_trial:$('f_trial').checked};
- if(!payload.name||payload.duration_days<1||payload.price<0){toast('راجع بيانات الخطة');return}
- let r=id?await sb.from('subscription_plans').update(payload).eq('id',id):await sb.from('subscription_plans').insert(payload);
+ const isTrial=$('f_trial').checked;
+ const paymentMethods=[...document.querySelectorAll('#planPaymentMethods [data-payment-method-row]')].map(row=>({
+  id:crypto.randomUUID(),name:row.querySelector('[data-payment-name]').value.trim(),
+  details:row.querySelector('[data-payment-details]').value.trim(),
+  instructions:row.querySelector('[data-payment-instructions]').value.trim()
+ })).filter(item=>item.name&&item.details);
+ if(!isTrial&&!paymentMethods.length){toast('أضف طريقة دفع واحدة على الأقل مع بيانات التحويل');return}
+ const paymentSummary=isTrial?'تجربة مجانية':paymentMethods.map(item=>item.name+' — '+item.details+(item.instructions?' — '+item.instructions:'')).join(' | ');
+ const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),payment_method:paymentSummary,payment_methods:isTrial?[]:paymentMethods,description:$('f_desc').value.trim()||null,is_active:$('f_active').value==='true',is_free_trial:isTrial};
+ if(!payload.name||!Number.isInteger(payload.duration_days)||payload.duration_days<1||!Number.isFinite(payload.price)||payload.price<0){toast('راجع بيانات الخطة');return}
+ const r=id?await sb.from('subscription_plans').update(payload).eq('id',id):await sb.from('subscription_plans').insert(payload);
  if(r.error){toast(r.error.message||'تعذر حفظ الخطة');return}
  closeModal();toast('تم حفظ الخطة');await loadAll()
 }
