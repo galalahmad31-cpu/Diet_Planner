@@ -250,9 +250,10 @@
       }
 
       return '<article class="profile-plan-card' + (index === state.plans.length - 1 ? ' is-last' : '') + (isCurrent ? ' is-current' : '') + '">' +
-        '<div class="profile-plan-card-top"><span class="profile-plan-tier">' + escapeHTML(isTrial ? 'FREE' : (plan.name || 'SUBSCRIPTION')) + '</span>' + status + '</div>' +
+        '<div class="profile-plan-card-top"><span class="profile-plan-tier">' + escapeHTML(plan.name) + '</span>' + status + '</div>' +
         '<div class="profile-plan-price">' + (isTrial || price === 0 ? '<strong>مجاني</strong>' : '<strong>' + price.toLocaleString('ar-EG') + '</strong><span>جنيه</span>') + '</div>' +
-        '<div class="profile-plan-duration">' + (duration > 0 ? 'لمدة ' + duration.toLocaleString('ar-EG') + ' يوم' : 'مدة الاشتراك حسب الخطة') + '</div>' +
+        '<div class="profile-plan-duration">' + duration.toLocaleString('ar-EG') + ' يوم</div>' +
+        (String(plan.description || '').trim() ? '<p class="profile-plan-description">' + escapeHTML(String(plan.description).trim()).replace(/\\n/g, '<br>') + '</p>' : '') +
         action +
       '</article>';
     }).join('');
