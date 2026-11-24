@@ -427,6 +427,5 @@ body{
   #feedbackComment{min-height:82px;max-height:150px}
   #feedbackList{gap:8px}
   #feedbackList>article{padding:10px}
-  #feedbackList>article .feedback-review-comment,
   #feedbackList>article>p{margin-top:7px;line-height:1.65}
 }
