@@ -5,20 +5,6 @@
   if (window.__DP_APP_HEADER__) return;
   window.__DP_APP_HEADER__ = true;
 
-  // Load the shared header stylesheet after page styles so page-level
-  // CSS cannot accidentally override the shared header's dimensions.
-  const headerStylesheet = [...document.querySelectorAll('link[rel="stylesheet"]')]
-    .find(link => /(?:^|\/)css\/app-header\.css(?:\?|$)/.test(link.getAttribute("href") || ""));
-  if (headerStylesheet) {
-    const stylesheetPath = headerStylesheet.getAttribute("href").split("?")[0];
-    const currentVersion = new URL(headerStylesheet.href, location.href).searchParams.get("v");
-    if (currentVersion !== "20261124-central-header-v5") {
-      headerStylesheet.href = stylesheetPath + "?v=20261124-central-header-v5";
-    }
-    // Move the one shared stylesheet to the end of the head's stylesheet order.
-    headerStylesheet.parentNode.appendChild(headerStylesheet);
-  }
-
   const path = decodeURIComponent(location.pathname.split("/").pop() || "index.html");
   const base = location.hostname === "galalahmad31-cpu.github.io" ? "/Diet_Planner/" : "/";
   const publicPages = [
