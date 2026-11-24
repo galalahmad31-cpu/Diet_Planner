@@ -2349,3 +2349,59 @@ html[data-theme="dark"] body.patient-profile-page .measurement-summary-value[dat
 html[data-theme="dark"] body.patient-profile-page .measurement-summary-note{
   color:var(--dp-muted)!important;
 }
+
+/* ---------- Admin workspace: centralized dark theme ---------- */
+html[data-theme="dark"] body:has(#adminContactForm) .header.admin-branded-header{
+  background:var(--dp-brand-gradient)!important;
+  color:#fff!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) #adminGate{
+  background:var(--dp-surface)!important;
+  color:var(--dp-text-2)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:0 8px 25px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) :is(
+  .stat,.check-grid,.announcement-form-options,
+  .announcement-admin-item,.professional-review-card,
+  .admin-contact-toggle
+){
+  background:var(--dp-surface-2)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) :is(
+  .admin-contact-heading h2,.admin-contact-field,
+  .admin-contact-field label,.admin-contact-toggle,
+  .announcement-admin-item h3
+){
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) :is(
+  .admin-contact-heading p,.announcement-admin-item p,
+  .announcement-admin-meta,.field label,.confirm-text
+){
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) .admin-contact-field :is(input,textarea){
+  background:var(--dp-input)!important;
+  color:var(--dp-text)!important;
+  border-color:var(--dp-input-border)!important;
+  caret-color:var(--dp-accent);
+}
+html[data-theme="dark"] body:has(#adminContactForm) .admin-contact-field :is(input,textarea)::placeholder{
+  color:var(--dp-muted)!important;
+  opacity:1;
+}
+html[data-theme="dark"] body:has(#adminContactForm) .admin-contact-field i{
+  color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) :is(
+  .admin-contact-toggle,.announcement-form-options,
+  .check-grid,.announcement-admin-meta,.announcement-admin-actions
+){
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] body:has(#adminContactForm) .admin-contact-actions [role="status"]{
+  color:var(--dp-text-2)!important;
+}
