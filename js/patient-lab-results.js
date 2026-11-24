@@ -5,7 +5,7 @@
   const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 
   function create(container) {
-    const state = { patientId:null, canEdit:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loading:false, saving:false };
+    const state = { patientId:null, canAdd:()=>false, canEditRow:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loading:false, saving:false };
     const root = container;
     const fields = [
       ["test_name","اسم التحليل","text",160],
@@ -27,22 +27,28 @@
       return tr;
     }
     function render() {
-      const editable = !!state.canEdit();
-      const body = state.rows.map((row,index) => '<tr data-lab-row="'+esc(row.id)+'">' +
-        '<td data-label="التاريخ">'+esc(row.test_date)+'</td>' +
-        '<td data-label="اسم التحليل" class="lab-name">'+esc(row.test_name)+'</td>' +
-        '<td data-label="النتيجة" class="lab-value">'+esc(row.result_value)+'</td>' +
-        '<td data-label="الوحدة">'+esc(row.unit || "—")+'</td>' +
-        '<td data-label="المدى المرجعي">'+esc(row.reference_range || "—")+'</td>' +
-        '<td data-label="ملاحظات" class="lab-notes">'+esc(row.notes || "—")+'</td>' +
-        (editable ? '<td class="no-print lab-actions"><button type="button" data-lab-edit="'+index+'">تعديل</button><button type="button" data-lab-delete="'+index+'">حذف</button></td>' : '') +
-        '</tr>').join("");
+      const canAdd = !!state.canAdd();
+      const canEditAny = state.rows.some(row => state.canEditRow(row));
+      const showActions = canAdd || canEditAny;
+      const body = state.rows.map((row,index) => {
+        const rowEditable = !!state.canEditRow(row);
+        const actions = rowEditable
+          ? '<td class="no-print lab-actions"><button type="button" data-lab-edit="'+index+'">تعديل</button><button type="button" data-lab-delete="'+index+'">حذف</button></td>'
+          : (showActions ? '<td class="no-print lab-actions"><span class="lab-readonly">أدخله المختص</span></td>' : '');
+        return '<tr data-lab-row="'+esc(row.id)+'">' +
+          '<td data-label="التاريخ">'+esc(row.test_date)+'</td>' +
+          '<td data-label="اسم التحليل" class="lab-name">'+esc(row.test_name)+'</td>' +
+          '<td data-label="النتيجة" class="lab-value">'+esc(row.result_value)+'</td>' +
+          '<td data-label="الوحدة">'+esc(row.unit || "—")+'</td>' +
+          '<td data-label="المدى المرجعي">'+esc(row.reference_range || "—")+'</td>' +
+          '<td data-label="ملاحظات" class="lab-notes">'+esc(row.notes || "—")+'</td>' + actions + '</tr>';
+      }).join("");
       root.innerHTML = '<div class="lab-table-heading"><h3>سجل التحاليل</h3>' +
-        (editable ? '<button type="button" class="lab-add-button" data-lab-add>＋ إضافة تحليل</button>' : '<span class="lab-readonly">للعرض فقط</span>') +
-        '</div><div class="lab-table-wrap" role="region" aria-label="جدول نتائج التحاليل" tabindex="0"><table class="lab-table"><caption class="lab-caption">نتائج التحاليل المسجلة للمريض</caption><thead><tr><th>التاريخ</th><th>اسم التحليل</th><th>النتيجة</th><th>الوحدة</th><th>المدى المرجعي</th><th>ملاحظات</th>'+(editable?'<th class="no-print">إجراء</th>':'')+'</tr></thead><tbody id="labResultsBody">'+(body || '<tr><td colspan="'+(editable?7:6)+'" class="lab-empty">لا توجد تحاليل مسجلة.</td></tr>')+'</tbody></table></div>';
+        (canAdd ? '<button type="button" class="lab-add-button" data-lab-add>＋ إضافة تحليل</button>' : '<span class="lab-readonly">للعرض فقط</span>') +
+        '</div><div class="lab-table-wrap" role="region" aria-label="جدول نتائج التحاليل" tabindex="0"><table class="lab-table"><caption class="lab-caption">نتائج التحاليل المسجلة للمريض</caption><thead><tr><th>التاريخ</th><th>اسم التحليل</th><th>النتيجة</th><th>الوحدة</th><th>المدى المرجعي</th><th>ملاحظات</th>'+(showActions?'<th class="no-print">إجراء</th>':'')+'</tr></thead><tbody id="labResultsBody">'+(body || '<tr><td colspan="'+(showActions?7:6)+'" class="lab-empty">لا توجد تحاليل مسجلة.</td></tr>')+'</tbody></table></div>';
     }
     function openNew() {
-      if (!state.canEdit()) return;
+      if (!state.canAdd()) return;
       if (root.querySelector('[data-lab-editor]')) return;
       const body = root.querySelector("#labResultsBody");
       if (!body) return;
@@ -53,7 +59,7 @@
       row.querySelector('[data-lab-field="test_name"]')?.focus();
     }
     function openEdit(index) {
-      if (!state.canEdit() || root.querySelector('[data-lab-editor]')) return;
+      if (!state.canEditRow(state.rows[index]) || root.querySelector('[data-lab-editor]')) return;
       const record = state.rows[index];
       const target = root.querySelector('[data-lab-row="'+CSS.escape(String(record?.id || ""))+'"]');
       if (!record || !target) return;
@@ -61,7 +67,10 @@
       root.querySelector('[data-lab-editor] [data-lab-field="test_name"]')?.focus();
     }
     async function save(row) {
-      if (!row || state.saving || !state.canEdit()) return;
+      if (!row || state.saving) return;
+      const editingId = row.dataset.labId || "";
+      const existing = editingId ? state.rows.find(item => item.id === editingId) : null;
+      if (editingId ? (!existing || !state.canEditRow(existing)) : !state.canAdd()) return;
       const value = key => String(row.querySelector('[data-lab-field="'+key+'"]')?.value || "").trim();
       const record = {
         patient_id:state.patientId, test_date:value("test_date"),
@@ -77,11 +86,11 @@
       const saveButton = row.querySelector("[data-lab-save]");
       if (saveButton) { saveButton.disabled = true; saveButton.textContent = "جارٍ الحفظ"; }
       try {
-        const id = row.dataset.labId || "";
+        const id = editingId;
         let query = id
           ? state.db.from("patient_lab_results").update(record).eq("id",id).eq("patient_id",state.patientId)
           : state.db.from("patient_lab_results").insert(record);
-        const {data,error} = await query.select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at").single();
+        const {data,error} = await query.select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at,created_by").single();
         if (error) throw error;
         state.rows = id ? state.rows.map(item => item.id===id ? data : item) : [data,...state.rows];
         state.rows.sort((a,b)=>String(b.test_date).localeCompare(String(a.test_date)) || String(b.created_at).localeCompare(String(a.created_at)));
@@ -99,9 +108,9 @@
       else if (button.hasAttribute("data-lab-cancel")) render();
       else if (button.hasAttribute("data-lab-save")) void save(button.closest("[data-lab-editor]"));
       else if (button.hasAttribute("data-lab-edit")) openEdit(Number(button.dataset.labEdit));
-      else if (button.hasAttribute("data-lab-delete") && state.canEdit()) {
+      else if (button.hasAttribute("data-lab-delete")) {
         const record = state.rows[Number(button.dataset.labDelete)];
-        if (!record) return;
+        if (!record || !state.canEditRow(record)) return;
         const confirmed = await window.DPConfirm?.ask({title:"حذف نتيجة التحليل؟",message:"سيتم حذف نتيجة التحليل المحددة.",confirmText:"حذف",variant:"danger"});
         if (!confirmed) return;
         const {error} = await state.db.from("patient_lab_results").delete().eq("id",record.id).eq("patient_id",state.patientId);
@@ -116,7 +125,7 @@
       root.textContent = "جاري تحميل سجل التحاليل...";
       try {
         const {data,error} = await state.db.from("patient_lab_results")
-          .select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at")
+          .select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at,created_by")
           .eq("patient_id",state.patientId).order("test_date",{ascending:false}).order("created_at",{ascending:false});
         if (error) throw error;
         state.rows = data || [];
@@ -128,11 +137,11 @@
     };
     return state;
   }
-  async function init({container,patientId,canEdit=()=>false}={}) {
+  async function init({container,patientId,canAdd=()=>false,canEditRow=()=>false}={}) {
     if (!container || !patientId) return;
     let state = instances.get(container);
     if (!state) { state=create(container); instances.set(container,state); }
-    state.patientId=patientId; state.canEdit=canEdit; state.rows=[];
+    state.patientId=patientId; state.canAdd=canAdd; state.canEditRow=canEditRow; state.rows=[];
     await state.load();
   }
   window.DietPlannerLabResults = Object.freeze({init});
