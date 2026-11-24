@@ -238,9 +238,6 @@
       } else if (planPending) {
         status = '<span class="profile-plan-status is-pending"><i class="fa-regular fa-clock"></i> قيد المراجعة</span>';
         action = '<button type="button" class="profile-plan-action is-secondary" data-action="open-pending" data-id="' + escapeHTML(planPending.id) + '">متابعة الطلب</button>';
-      } else if (active) {
-        status = '<span class="profile-plan-status">لديك اشتراك فعّال</span>';
-        action = '<button type="button" class="profile-plan-action" disabled>غير متاحة حاليًا</button>';
       } else if (isTrial && trialUsed) {
         status = '<span class="profile-plan-status">تم استخدام التجربة</span>';
         action = '<button type="button" class="profile-plan-action" disabled>تم استخدام التجربة</button>';
