@@ -5,6 +5,15 @@
   if (window.__DP_APP_HEADER__) return;
   window.__DP_APP_HEADER__ = true;
 
+  // Keep the shared stylesheet cache version controlled centrally so every
+  // page receives the same header rules without editing page-specific CSS.
+  const headerStylesheet = [...document.querySelectorAll('link[rel="stylesheet"]')]
+    .find(link => /(?:^|\/)css\/app-header\.css(?:\?|$)/.test(link.getAttribute("href") || ""));
+  if (headerStylesheet) {
+    const currentHref = headerStylesheet.getAttribute("href").split("?")[0];
+    headerStylesheet.setAttribute("href", currentHref + "?v=20261124-central-header-v4");
+  }
+
   const path = decodeURIComponent(location.pathname.split("/").pop() || "index.html");
   const base = location.hostname === "galalahmad31-cpu.github.io" ? "/Diet_Planner/" : "/";
   const publicPages = [
