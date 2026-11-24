@@ -457,7 +457,7 @@ async function savePrivacyPolicy(){
  const updatedAt=dateInput?.value||'';
  dateInput?.setCustomValidity('');
  if(!updatedAt){toast('حدد تاريخ آخر تحديث.');$('privacyPolicyDate')?.focus();return}
-}
+ if(!isValidDateOnly(updatedAt)){dateInput?.setCustomValidity('اختر تاريخًا صحيحًا.');dateInput?.reportValidity();toast('تاريخ آخر تحديث غير صالح.');return}
  const button=$('savePrivacyPolicyBtn');
  const original=button.innerHTML;button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
  try{
