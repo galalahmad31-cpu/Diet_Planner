@@ -199,7 +199,7 @@
     const info = $('selectedPlanInfo');
     if (info) {
       info.style.display = '';
-      info.innerHTML = `<strong>${esc(plan.name)}</strong><span>المدة: ${Number(plan.duration_days)} يوم</span><span>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه</span>`;
+      info.innerHTML = `<strong>${esc(plan.name)}</strong>${String(plan.description || '').trim() ? `<span class="profile-selected-plan-description">${esc(String(plan.description).trim())}</span>` : ''}<span>المدة: ${Number(plan.duration_days)} يوم</span><span>السعر: ${Number(plan.price).toLocaleString('ar-EG')} جنيه</span>`;
     }
     configurePaymentMethods(plan);
     setTrialMode(plan.is_free_trial === true);
