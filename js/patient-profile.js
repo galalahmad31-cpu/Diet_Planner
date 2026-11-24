@@ -1449,17 +1449,18 @@
         return;
       }
 
-      const { data: requests, error: requestError } = await supabase
+      // An active patient-account link enables direct messaging.
+      // Preserve an explicit block or pending restoration as a hard stop.
+      const { data: relationship, error: relationshipError } = await supabase
         .from('professional_connection_requests')
-        .select('id')
+        .select('status')
         .eq('professional_id', state.user.id)
         .eq('requested_by', account.user_id)
-        .eq('status', 'accepted')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      if (requestError) throw requestError;
+        .maybeSingle();
+      if (relationshipError) throw relationshipError;
 
-      if (requests?.length && contactButton) contactButton.hidden = false;
+      const communicationBlocked = ['blocked', 'restore_pending'].includes(relationship?.status);
+      if (!communicationBlocked && contactButton) contactButton.hidden = false;
     } catch (error) {
       state.patientAccountLinked = false;
       console.error('Patient relationship actions load failed:', error);
