@@ -3,20 +3,7 @@
 
   const EVENT_ICONS = {
     nutrition_plan_published: "fa-bowl-food",
-    message_received: "fa-comment-dots",
-    connection_request_received: "fa-user-plus",
-    connection_request_accepted: "fa-user-check",
-    connection_request_declined: "fa-user-xmark",
-    patient_agreement_confirmed: "fa-file-signature",
-    professional_agreement_confirmed: "fa-file-signature",
-    care_agreement_proposed: "fa-file-signature",
-    payment_sent: "fa-money-bill-transfer",
-    followup_activated: "fa-calendar-check",
-    followup_ended: "fa-calendar-xmark",
-    appointment_requested: "fa-calendar-plus",
-    appointment_confirmed: "fa-calendar-check",
-    appointment_declined: "fa-calendar-xmark",
-    appointment_cancelled: "fa-calendar-xmark"
+    message_received: "fa-comment-dots"
   };
   const REMINDER_WINDOW_DAYS = 7;
 
@@ -72,15 +59,7 @@
 
   function getDestination(type) {
     if (type === "nutrition_plan_published") return "patient-health.html#portalPlansPanel";
-    if (type === "message_received" || type === "care_agreement_proposed") return "communications.html";
-    if (["connection_request_received", "connection_request_accepted", "connection_request_declined"].includes(type)) {
-      return "communications.html?tab=requests";
-    }
-    if ([
-      "patient_agreement_confirmed", "professional_agreement_confirmed", "payment_sent",
-      "followup_activated", "followup_ended", "appointment_requested",
-      "appointment_confirmed", "appointment_declined", "appointment_cancelled"
-    ].includes(type)) return "patient-health.html#portalFinancePanel";
+    if (type === "message_received") return "communications.html";
     return "patient-portal.html";
   }
 
