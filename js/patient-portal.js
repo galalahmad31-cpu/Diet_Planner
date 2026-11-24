@@ -343,7 +343,13 @@
       adherence: log.diet_adherence, notes: log.notes
     } : null);
     if (!editor) return;
-    body.prepend(editor);
+    if (log) {
+      const currentRow = body.querySelector('[data-measurement-id="' + CSS.escape(String(log.id)) + '"]');
+      if (!currentRow) return;
+      currentRow.replaceWith(editor);
+    } else {
+      body.prepend(editor);
+    }
     editor.querySelector('[data-field="weight"]')?.focus();
   }
 
