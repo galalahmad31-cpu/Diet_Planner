@@ -13,7 +13,9 @@
     planName: '',
     plans: [],
     selectedPlan: null,
-    toastTimer: null
+    toastTimer: null,
+    subscriptionsLoaded: false,
+    plansLoaded: false
   };
 
   function showToast(message) {
@@ -163,14 +165,9 @@
     const plan = state.subscription?.subscription_plans;
     state.planName = Array.isArray(plan) ? (plan[0]?.name || '') : (plan?.name || '');
 
+    state.subscriptionsLoaded = true;
     renderSubscription();
-  }
-
-
-  function pendingSubscriptionForPlan(planId) {
-    return state.subscriptions
-      .filter((item) => item.status === 'pending' && String(item.plan_id) === String(planId))
-      .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))[0] || null;
+    renderPlansWhenReady();
   }
 
   function escapeHTML(value) {
@@ -199,7 +196,8 @@
         const { data, error } = await Promise.race([request, timeout]);
         if (error) throw error;
         state.plans = Array.isArray(data) ? data : [];
-        renderPlans();
+        state.plansLoaded = true;
+        renderPlansWhenReady();
       } finally {
         window.clearTimeout(timeoutId);
       }
@@ -207,6 +205,10 @@
       console.error('Subscription plans loading failed:', error);
       container.innerHTML = '<div class="profile-plans-empty">تعذر تحميل خطط الاشتراك. تحقق من الاتصال ثم <button type="button" data-plans-retry style="color:var(--dp-primary,#159b78);font-weight:800;text-decoration:underline">أعد المحاولة</button>.</div>';
     }
+  }
+
+  function renderPlansWhenReady() {
+    if (state.plansLoaded && state.subscriptionsLoaded) renderPlans();
   }
 
   function renderPlans() {
@@ -242,10 +244,14 @@
       } else if (isTrial && trialUsed) {
         status = '<span class="profile-plan-status">تم استخدام التجربة</span>';
         action = '<button type="button" class="profile-plan-action" disabled>تم استخدام التجربة</button>';
+      } else if (isTrial && active) {
+        status = '<span class="profile-plan-status">يتطلب عدم وجود اشتراك فعّال</span>';
+        action = '<button type="button" class="profile-plan-action" disabled>غير متاحة أثناء الاشتراك الحالي</button>';
       } else if (pending) {
         status = '<span class="profile-plan-status is-pending">لديك طلب قيد المراجعة</span>';
         action = '<button type="button" class="profile-plan-action is-secondary" data-action="open-pending" data-id="' + escapeHTML(pending.id) + '">متابعة الطلب</button>';
       } else {
+        if (active) status = '<span class="profile-plan-status">متاحة لتغيير الخطة</span>';
         action = '<button type="button" class="profile-plan-action" data-action="subscribe" data-id="' + escapeHTML(plan.id) + '">' + (isTrial ? 'ابدأ مجانًا' : 'اشترك الآن') + '</button>';
       }
 
@@ -368,7 +374,6 @@
   window.addEventListener('dietplanner:subscription-updated', async () => {
     try {
       await loadSubscription();
-      renderPlans();
     } catch (error) {
       console.error('Profile subscription refresh failed:', error);
       showToast('تم تنفيذ الطلب، لكن تعذر تحديث حالة الاشتراك. أعد تحميل الصفحة.');
@@ -391,6 +396,7 @@
           'سجّل الدخول لعرض بيانات حسابك وإدارة اشتراكك.'
         );
         $('editProfileBtn')?.setAttribute('hidden', '');
+        state.subscriptionsLoaded = true;
         await loadPlans();
         return;
       }
