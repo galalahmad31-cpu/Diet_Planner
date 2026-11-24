@@ -367,3 +367,19 @@ body{
   .feedback-summary-score{font-size:1.3rem}
   .feedback-summary-count{font-size:.7rem}
 }
+
+
+/* Page-owned layout overrides: loaded after shared styles to prevent cascade collisions. */
+html,body{width:100%;min-height:100%;margin:0}
+body{display:block!important;overflow-x:hidden}
+#feedbackPage{display:block!important;width:100%!important;max-width:none!important;min-height:0!important;height:auto!important;margin:0!important;padding:clamp(14px,2.2vw,28px) clamp(12px,2.5vw,36px) 32px!important}
+#feedbackPage>.feedback-layout{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;align-items:stretch!important;justify-items:stretch!important;gap:20px!important;width:100%!important;max-width:1080px!important;min-height:0!important;height:auto!important;margin:0 auto!important;padding:0!important}
+#feedbackPage>.feedback-layout>section{display:block!important;position:relative!important;inset:auto!important;float:none!important;clear:both!important;width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;max-height:none!important;margin:0!important;transform:none!important}
+#feedbackPage .feedback-main-card,#feedbackPage .feedback-reviews-card{overflow:hidden!important;align-self:stretch!important}
+#feedbackPage #feedbackComposerContent,#feedbackPage #feedbackLoginPrompt,#feedbackPage .feedback-reviews-card>div{box-sizing:border-box;min-height:0!important;height:auto!important}
+#feedbackPage #feedbackForm{display:block!important;width:100%;height:auto!important;margin:0!important}
+#feedbackPage .feedback-form-topline{min-height:0!important}
+#feedbackPage .feedback-comment-section{margin-top:16px!important}
+#feedbackPage #feedbackComment{display:block;width:100%;max-width:100%;height:auto}
+#feedbackPage #feedbackList{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+@media(max-width:600px){#feedbackPage{padding:10px 9px 20px!important}#feedbackPage>.feedback-layout{gap:14px!important}#feedbackPage #feedbackComposerContent,#feedbackPage #feedbackLoginPrompt{padding:16px!important}}
