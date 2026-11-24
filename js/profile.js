@@ -187,7 +187,7 @@
     try {
       const request = supabase
         .from('subscription_plans')
-        .select('id,name,price,duration_days,description,payment_method,is_free_trial')
+        .select('id,name,price,duration_days,description,payment_method,payment_methods,is_free_trial')
         .eq('is_active', true)
         .order('price', { ascending: true });
 
@@ -241,7 +241,14 @@
       '<div class="plan-detail-line"><strong>المدة</strong><span>' + Number(plan.duration_days || 0).toLocaleString('ar-EG') + ' يوم</span></div>',
       '<div class="plan-detail-line"><strong>نوع الخطة</strong><span>' + (plan.is_free_trial === true ? 'تجربة مجانية' : 'اشتراك مدفوع') + '</span></div>'
     ];
-    if (plan.payment_method) rows.push('<div class="plan-detail-line"><strong>طريقة الدفع</strong><span>' + escapeHTML(plan.payment_method) + '</span></div>');
+    const paymentMethods = Array.isArray(plan.payment_methods) ? plan.payment_methods : [];
+    if (paymentMethods.length) {
+      rows.push('<div class="plan-detail-line plan-detail-payment-methods"><strong>طرق الدفع والتحويل</strong><span>' +
+        paymentMethods.map(method => '<span class="plan-detail-payment-method"><b>' + escapeHTML(method.name || '') + '</b><span>' + escapeHTML(method.details || '') + '</span>' + (method.instructions ? '<small>' + escapeHTML(method.instructions) + '</small>' : '') + '</span>').join('') +
+        '</span></div>');
+    } else if (plan.payment_method && !plan.is_free_trial) {
+      rows.push('<div class="plan-detail-line"><strong>طريقة الدفع</strong><span>' + escapeHTML(plan.payment_method) + '</span></div>');
+    }
     if (plan.description) rows.push('<div class="plan-detail-line plan-detail-description"><strong>تفاصيل ومميزات الخطة</strong><span>' + escapeHTML(plan.description) + '</span></div>');
     body.innerHTML = rows.join('');
     const actionButton = $('planDetailsSubscribe');
