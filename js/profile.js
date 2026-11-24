@@ -150,7 +150,7 @@
   async function loadSubscription() {
     const { data, error } = await supabase
       .from('subscriptions')
-      .select('id,user_id,start_date,expiry_date,status,notes,plan_id,created_at,subscription_plans(name)')
+      .select('id,user_id,start_date,expiry_date,status,notes,plan_id,is_free_trial,created_at,subscription_plans(name)')
       .eq('user_id', state.user.id)
       .order('created_at', { ascending: false });
 
@@ -216,110 +216,46 @@
       container.innerHTML = '<div class="profile-plans-empty">لا توجد خطط اشتراك متاحة حاليًا.</div>';
       return;
     }
-    container.innerHTML = state.plans.map((plan) => (
-      '<article class="profile-plan-tile">' +
-        '<div class="profile-plan-name">' + escapeHTML(plan.name || 'خطة اشتراك') + '</div>' +
-        '<button type="button" class="profile-plan-details" data-plan-action="details" data-plan-id="' + escapeHTML(plan.id) + '">اضغط للتفاصيل</button>' +
-      '</article>'
-    )).join('');
-  }
 
-  function openPlanDetails(planId) {
-    const plan = state.plans.find((item) => String(item.id) === String(planId));
-    if (!plan) return;
-    state.selectedPlan = plan;
-    const modal = $('planDetailsModal');
-    const title = $('planDetailsTitle');
-    const body = $('planDetailsBody');
-    if (!modal || !title || !body) return;
+    const active = state.subscriptions.find(isActive) || null;
+    const trialUsed = state.subscriptions.some((item) => item.is_free_trial === true);
+    const pending = sortByCreatedDesc(state.subscriptions.filter((item) => item.status === 'pending'))[0] || null;
 
-    title.textContent = plan.name || 'تفاصيل الخطة';
-    const pendingForPlan = Boolean(pendingSubscriptionForPlan(plan.id));
-    const price = Number(plan.price || 0).toLocaleString('ar-EG');
-    const rows = [
-      '<div class="plan-detail-line"><strong>السعر</strong><span>' + price + ' جنيه</span></div>',
-      '<div class="plan-detail-line"><strong>المدة</strong><span>' + Number(plan.duration_days || 0).toLocaleString('ar-EG') + ' يوم</span></div>',
-      '<div class="plan-detail-line"><strong>نوع الخطة</strong><span>' + (plan.is_free_trial === true ? 'تجربة مجانية' : 'اشتراك مدفوع') + '</span></div>'
-    ];
-    const paymentMethods = Array.isArray(plan.payment_methods) ? plan.payment_methods : [];
-    if (paymentMethods.length) {
-      rows.push('<div class="plan-detail-line plan-detail-payment-methods"><strong>طرق الدفع والتحويل</strong><span>' +
-        paymentMethods.map(method => '<span class="plan-detail-payment-method"><b>' + escapeHTML(method.name || '') + '</b><span>' + escapeHTML(method.details || '') + '</span>' + (method.instructions ? '<small>' + escapeHTML(method.instructions) + '</small>' : '') + '</span>').join('') +
-        '</span></div>');
-    } else if (plan.payment_method && !plan.is_free_trial) {
-      rows.push('<div class="plan-detail-line"><strong>طريقة الدفع</strong><span>' + escapeHTML(plan.payment_method) + '</span></div>');
-    }
-    if (plan.description) rows.push('<div class="plan-detail-line plan-detail-description"><strong>تفاصيل ومميزات الخطة</strong><span>' + escapeHTML(plan.description) + '</span></div>');
-    body.innerHTML = rows.join('');
-    const actionButton = $('planDetailsSubscribe');
-    if (actionButton) {
-      actionButton.innerHTML = pendingForPlan
-        ? '<i class="fa-solid fa-xmark"></i> إلغاء طلب الاشتراك'
-        : '<i class="fa-solid fa-check"></i> الاشتراك الآن';
-      actionButton.setAttribute('aria-label', pendingForPlan ? 'إلغاء طلب الاشتراك لهذه الخطة' : 'الاشتراك في هذه الخطة');
-    }
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
-    $('planDetailsSubscribe')?.focus();
-  }
+    container.innerHTML = state.plans.map((plan, index) => {
+      const isCurrent = Boolean(active && String(active.plan_id) === String(plan.id));
+      const planPending = pending && String(pending.plan_id) === String(plan.id) ? pending : null;
+      const isTrial = plan.is_free_trial === true;
+      const price = Number(plan.price || 0);
+      const duration = Number(plan.duration_days || 0);
+      let action = '';
+      let status = '';
 
-  function closePlanDetails() {
-    const modal = $('planDetailsModal');
-    if (modal) modal.hidden = true;
-    document.body.style.overflow = '';
-    state.selectedPlan = null;
-  }
-
-  async function continueToSubscription() {
-    const selectedPlan = state.selectedPlan;
-    if (!selectedPlan) return;
-    if (!state.user) {
-      showToast('سجّل الدخول أولًا حتى تتمكن من الاشتراك في هذه الخطة.');
-      return;
-    }
-
-    const isPending = Boolean(pendingSubscriptionForPlan(selectedPlan.id));
-    const button = $('planDetailsSubscribe');
-    if (button) {
-      button.disabled = true;
-      button.setAttribute('aria-busy', 'true');
-    }
-
-    try {
-      if (isPending) {
-        if (typeof window.cancelPendingSubscriptionForPlan !== 'function') {
-          showToast('تعذر إلغاء طلب الاشتراك. حدّث الصفحة وحاول مرة أخرى.');
-          return;
-        }
-        const cancelled = await window.cancelPendingSubscriptionForPlan(String(selectedPlan.id));
-        if (cancelled) {
-          closePlanDetails();
-          await loadSubscription();
-          renderPlans();
-        }
-        return;
-      }
-
-      if (typeof window.openSubscribeModal !== 'function') {
-        showToast('تعذر فتح نموذج الاشتراك. حدّث الصفحة وحاول مرة أخرى.');
-        return;
-      }
-      const opened = await window.openSubscribeModal(String(selectedPlan.id));
-      if (opened) {
-        closePlanDetails();
-        document.body.style.overflow = 'hidden';
+      if (isCurrent) {
+        status = '<span class="profile-plan-status is-current"><i class="fa-solid fa-circle-check"></i> اشتراكك الحالي</span>';
+        action = '<button type="button" class="profile-plan-action" disabled>مفعّلة حاليًا</button>';
+      } else if (planPending) {
+        status = '<span class="profile-plan-status is-pending"><i class="fa-regular fa-clock"></i> قيد المراجعة</span>';
+        action = '<button type="button" class="profile-plan-action is-secondary" data-action="open-pending" data-id="' + escapeHTML(planPending.id) + '">متابعة الطلب</button>';
+      } else if (active) {
+        status = '<span class="profile-plan-status">لديك اشتراك فعّال</span>';
+        action = '<button type="button" class="profile-plan-action" disabled>غير متاحة حاليًا</button>';
+      } else if (isTrial && trialUsed) {
+        status = '<span class="profile-plan-status">تم استخدام التجربة</span>';
+        action = '<button type="button" class="profile-plan-action" disabled>تم استخدام التجربة</button>';
+      } else if (pending) {
+        status = '<span class="profile-plan-status is-pending">لديك طلب قيد المراجعة</span>';
+        action = '<button type="button" class="profile-plan-action is-secondary" data-action="open-pending" data-id="' + escapeHTML(pending.id) + '">متابعة الطلب</button>';
       } else {
-        showToast('تعذر فتح نموذج الاشتراك لهذه الخطة. حاول مرة أخرى.');
+        action = '<button type="button" class="profile-plan-action" data-action="subscribe" data-id="' + escapeHTML(plan.id) + '">' + (isTrial ? 'ابدأ مجانًا' : 'اشترك الآن') + '</button>';
       }
-    } catch (error) {
-      console.error('Plan subscription action failed:', error);
-      showToast('حدث خطأ أثناء تنفيذ العملية.');
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.removeAttribute('aria-busy');
-      }
-    }
+
+      return '<article class="profile-plan-card' + (index === state.plans.length - 1 ? ' is-last' : '') + (isCurrent ? ' is-current' : '') + '">' +
+        '<div class="profile-plan-card-top"><span class="profile-plan-tier">' + escapeHTML(isTrial ? 'FREE' : (plan.name || 'SUBSCRIPTION')) + '</span>' + status + '</div>' +
+        '<div class="profile-plan-price">' + (isTrial || price === 0 ? '<strong>مجاني</strong>' : '<strong>' + price.toLocaleString('ar-EG') + '</strong><span>جنيه</span>') + '</div>' +
+        '<div class="profile-plan-duration">' + (duration > 0 ? 'لمدة ' + duration.toLocaleString('ar-EG') + ' يوم' : 'مدة الاشتراك حسب الخطة') + '</div>' +
+        action +
+      '</article>';
+    }).join('');
   }
 
   function openProfileEditor() {
@@ -418,16 +354,7 @@
   function bindEvents() {
     $('profilePlansList')?.addEventListener('click', (event) => {
       const retry = event.target.closest('[data-plans-retry]');
-      if (retry) { loadPlans(); return; }
-      const button = event.target.closest('[data-plan-action="details"]');
-      if (button) openPlanDetails(button.dataset.planId);
-    });
-    $('planDetailsModal')?.addEventListener('click', (event) => {
-      if (event.target === event.currentTarget || event.target.closest('[data-plan-action="close"]')) closePlanDetails();
-    });
-    $('planDetailsSubscribe')?.addEventListener('click', continueToSubscription);
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && $('planDetailsModal') && !$('planDetailsModal').hidden) closePlanDetails();
+      if (retry) loadPlans();
     });
     $('editProfileBtn')?.addEventListener('click', openProfileEditor);
     $('cancelProfileBtn')?.addEventListener('click', closeProfileEditor);
