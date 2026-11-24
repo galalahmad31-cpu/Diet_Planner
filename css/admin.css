@@ -138,3 +138,19 @@ body{padding-top:0}
  .plan-editor-actions{bottom:-16px;margin:0 -15px -16px;padding:11px 15px}
  .plan-editor-actions .btn{flex:1}
 }
+
+/* Multiple payment methods editor. */
+.plan-payment-methods{display:grid;gap:10px}
+.plan-payment-method{padding:12px;border:1px solid #dce8e3;border-radius:12px;background:#f9fcfa}
+.plan-payment-method-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.plan-payment-method-head strong{font-size:11px;color:#31564d}
+.plan-payment-remove{width:30px;height:30px;border:0;border-radius:8px;background:#fff0f0;color:#c34b4b;cursor:pointer}
+.plan-payment-method-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.plan-payment-method-grid label{display:grid;gap:5px;font-size:10px;font-weight:800;color:#526c67}
+.plan-payment-method-grid input,.plan-payment-method-grid textarea{width:100%;min-width:0;padding:9px 10px;border:1px solid #d6e3df;border-radius:9px;background:#fff;color:#263f39;font:600 11px Cairo,sans-serif;box-sizing:border-box}
+.plan-payment-method-grid .full{grid-column:1/-1}
+.plan-payment-method-grid textarea{resize:vertical}
+.plan-payment-add{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;padding:9px 13px;border:1px dashed #159078;border-radius:9px;background:#eff9f5;color:#087f6b;font:800 11px Cairo,sans-serif;cursor:pointer}
+.plan-payment-add:disabled{opacity:.5;cursor:not-allowed}
+.plan-payment-hint{color:#81918c;font-size:10px}
+@media(max-width:560px){.plan-payment-method-grid{grid-template-columns:1fr}.plan-payment-method-grid .full{grid-column:auto}}
