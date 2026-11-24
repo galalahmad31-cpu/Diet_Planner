@@ -113,6 +113,6 @@
 <script>
 document.querySelectorAll("[data-toggle-password]").forEach(button=>button.addEventListener("click",()=>{const input=document.getElementById(button.dataset.togglePassword);if(!input)return;const visible=input.type==="password";input.type=visible?"text":"password";button.innerHTML=visible?'<i class="fa-regular fa-eye-slash" aria-hidden="true"></i>':'<i class="fa-regular fa-eye" aria-hidden="true"></i>';button.setAttribute("aria-label",visible?"إخفاء كلمة المرور":"إظهار كلمة المرور")}));
 </script>
-<script src="js/auth-access.js?v=20261121-google-login-type-step-v2"></script>
+<script src="js/auth-access.js?v=20261124-register-tab-order-v1"></script>
 </body>
 </html>
