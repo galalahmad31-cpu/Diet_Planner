@@ -1452,7 +1452,6 @@
       const { data: requests, error: requestError } = await supabase
         .from('professional_connection_requests')
         .select('id')
-        .eq('patient_id', patientId)
         .eq('professional_id', state.user.id)
         .eq('requested_by', account.user_id)
         .eq('status', 'accepted')
