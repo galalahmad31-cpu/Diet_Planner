@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/tailwind.css?v=20260923-2">
-<link rel="stylesheet" href="css/profile.css?v=20261122-simple-confirm-v1">
+<link rel="stylesheet" href="css/profile.css?v=20261124-multiple-payment-methods-v1">
   <link rel="stylesheet" href="css/design-tokens.css?v=20261122-responsive-foundation-v1">
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
@@ -122,6 +122,11 @@
   <section class="profile-subscribe-dialog" role="dialog" aria-modal="true" aria-labelledby="profileSubscribeTitle">
     <h2 id="profileSubscribeTitle">الاشتراك في الخطة</h2>
     <div id="selectedPlanInfo" class="profile-selected-plan-info"></div>
+    <div id="paymentMethodGroup" class="profile-subscribe-field form-group">
+      <label for="paymentMethodSelect">اختر طريقة التحويل</label>
+      <select id="paymentMethodSelect"></select>
+      <div id="paymentMethodDetails" class="profile-payment-method-details" aria-live="polite"></div>
+    </div>
     <div class="profile-subscribe-field form-group">
       <label for="paymentProof">صورة التحويل</label>
       <input id="paymentProof" type="file" accept="image/jpeg,image/png,image/webp">
@@ -148,7 +153,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/dp-confirm.js?v=20261122-simple-confirm-v1"></script>
 <script src="js/auth-access.js?v=20261121-google-account-type-v1"></script>
-<script src="js/subscription-plans.js?v=20261122-simple-confirm-v1" defer></script>
+<script src="js/subscription-plans.js?v=20261124-multiple-payment-methods-v1" defer></script>
 <script src="js/dp-date.js?v=20261122-central-date-v1"></script>
   <script src="js/profile.js?v=20261120-public-plans-v2" defer></script>
   
