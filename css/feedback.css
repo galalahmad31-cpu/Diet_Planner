@@ -31,7 +31,7 @@ body{
   grid-auto-flow:row;
   align-items:stretch;
   justify-items:stretch;
-  gap:20px;
+  gap:12px;
   width:100%;
   max-width:1080px;
   min-height:0;
@@ -174,7 +174,9 @@ body{
 .feedback-access-card.active i{color:#168879}
 .feedback-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 
-#feedbackComposerContent,#feedbackLoginPrompt{padding:1.5rem clamp(1rem,2.4vw,2rem)}
+#feedbackComposerContent,#feedbackLoginPrompt{padding:1.1rem clamp(1rem,2.4vw,2rem) .85rem}
+.feedback-main-card{align-self:start}
+.feedback-reviews-card{align-self:start}
 #feedbackForm{display:block;width:100%;height:auto;margin-top:1.25rem}
 .feedback-form-topline{
   display:flex;
@@ -243,7 +245,7 @@ body{
 #feedbackPage #saveFeedbackBtn:hover,#feedbackPage #deleteFeedbackBtn:hover{filter:brightness(1.08)}
 #feedbackPage button:disabled{cursor:not-allowed;opacity:.6}
 .feedback-comment-section{
-  margin-top:1.15rem;
+  margin-top:.8rem;
   padding:1.15rem;
   border:1px solid var(--dp-border);
   border-radius:1.15rem;
@@ -339,7 +341,7 @@ body{
   .feedback-access-track{gap:7px}
   .feedback-access-card{min-height:33px;padding:5px 9px;border-radius:9px;font-size:9px;gap:5px}
   .feedback-access-card i{font-size:11px}
-  #feedbackComposerContent,#feedbackLoginPrompt{padding:1rem}
+  #feedbackComposerContent,#feedbackLoginPrompt{padding:.85rem .85rem .65rem}
   .feedback-form-topline{gap:.55rem;padding:.8rem}
   .feedback-rating-panel{flex:1 1 0;min-width:0;overflow:visible}
   .feedback-stars{gap:0;justify-content:space-between}
@@ -347,11 +349,11 @@ body{
   .star-button i{font-size:1.05rem}
   .feedback-actions{flex:0 0 125px;min-width:125px}
   #feedbackPage #saveFeedbackBtn,#feedbackPage #deleteFeedbackBtn{min-height:42px;height:auto;padding:.35rem .2rem;gap:.25rem;font-size:.66rem;line-height:1.4;white-space:normal;text-align:center}
-  .feedback-comment-section{padding:.85rem;margin-top:1.2rem}
+  .feedback-comment-section{padding:.85rem;margin-top:.7rem}
   #feedbackComment{min-height:125px}
   .feedback-reviews-card>div:first-child{padding:1rem}
   .feedback-reviews-card>div:last-child{padding:.85rem}
-  .feedback-layout{gap:14px}
+  .feedback-layout{gap:10px}
 }
 @media(max-width:380px){
   .feedback-brand-logo{display:none}
