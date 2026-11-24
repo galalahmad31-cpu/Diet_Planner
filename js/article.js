@@ -320,8 +320,7 @@ $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEditor()};document.
   const accessStatus=await window.DietPlannerAccess?.getAccessStatus?.();
   user=accessStatus?.user||null;
   isAdmin=accessStatus?.isAdmin===true;
-  if(!user){window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'المقالات متاحة للمشتركين ذوي الاشتراك الفعال.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});throw new Error('authentication_required');}
-  if(!isAdmin && accessStatus?.hasActiveSubscription!==true){window.DietPlannerAccess?.showAccessPrompt?.({title:'اشتراك فعال مطلوب',message:'المقالات متاحة للمشتركين ذوي الاشتراك الفعال.',actionLabel:'عرض الاشتراكات',actionHref:'subscription-plans.html'});throw new Error('active_subscription_required');}
+  // Public reading is allowed without login or subscription. Admin status only controls editorial actions.
   if(isAdmin&&user){const{data:p,error:profileError}=await supabase.from('profiles').select('full_name').eq('id',user.id).maybeSingle();if(profileError)throw profileError;profile=p||{};}
   $('addBtn').classList.toggle('hidden',!isAdmin);
   await load();
