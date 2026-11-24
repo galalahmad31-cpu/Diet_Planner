@@ -3,7 +3,7 @@
 
   const sb = window.DietPlannerAccess?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { user: null, plans: [], subscriptions: [], selectedPlanId: null, selectedPaymentMethodId: null, currentSubscription: null, confirm: null, toastTimer: null };
+  const state = { user: null, plans: [], subscriptions: [], selectedPlanId: null, selectedPaymentMethodId: null, currentSubscription: null, confirm: null, toastTimer: null, modalReturnFocus: null };
 
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[c]));
 
@@ -135,12 +135,14 @@
   }
 
   function showSubscriptionPanel() {
-    const panel = $('subscribeModal');
-    if (!panel) return;
-    panel.hidden = false;
-    panel.setAttribute('aria-hidden', 'false');
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    panel.querySelector('input,select,button')?.focus({ preventScroll: true });
+    const overlay = $('subscribeModal');
+    const dialog = overlay?.querySelector('[role="dialog"]');
+    if (!overlay || !dialog) return;
+    state.modalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    overlay.hidden = false;
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('subscription-modal-open');
+    dialog.querySelector('input:not([type="hidden"]),select,textarea,button:not([disabled])')?.focus({ preventScroll: true }) || dialog.focus({ preventScroll: true });
   }
 
   function resetModal() {
@@ -159,14 +161,17 @@
   }
 
   function closeModal() {
-    const panel = $('subscribeModal');
-    if (panel) {
-      panel.hidden = true;
-      panel.setAttribute('aria-hidden', 'true');
+    const overlay = $('subscribeModal');
+    if (overlay) {
+      overlay.hidden = true;
+      overlay.setAttribute('aria-hidden', 'true');
     }
+    document.body.classList.remove('subscription-modal-open');
     state.selectedPlanId = null;
     state.currentSubscription = null;
     resetModal();
+    if (state.modalReturnFocus?.isConnected) state.modalReturnFocus.focus({ preventScroll: true });
+    state.modalReturnFocus = null;
   }
 
   function updateSelectedPaymentMethod() {
@@ -347,6 +352,10 @@
   }
 
   document.addEventListener('click', (e) => {
+    if (e.target === $('subscribeModal')) {
+      closeModal();
+      return;
+    }
     const el = e.target.closest('[data-action]');
     if (!el) return;
     const { action, id } = el.dataset;
@@ -358,6 +367,34 @@
     else if (action === 'close-modal') closeModal();
     else if (action === 'dashboard') window.location.href = 'app.html';
     else if (action === 'profile') window.location.href = 'profile.html';
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const overlay = $('subscribeModal');
+    if (!overlay || overlay.hidden) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const dialog = overlay.querySelector('[role="dialog"]');
+    const focusable = [...(dialog?.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])') || [])]
+      .filter(element => element.getClientRects().length);
+    if (!focusable.length) {
+      event.preventDefault();
+      dialog?.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 
   let subscriptionDataPromise = null;
