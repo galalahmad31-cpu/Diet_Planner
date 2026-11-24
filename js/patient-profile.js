@@ -1353,7 +1353,12 @@
 
     if (moduleName === 'measurements') {
       void loadMeasurements();
-      void window.DietPlannerLabResults?.init({container: $('patientLabResults'), patientId, canEdit: canManagePatientCare});
+      void window.DietPlannerLabResults?.init({
+        container: $('patientLabResults'),
+        patientId,
+        canAdd: canManagePatientCare,
+        canEditRow: canManagePatientCare
+      });
     }
     if (moduleName === 'energy') {
       if (typeof window.initCalculator === 'function') void window.initCalculator();
