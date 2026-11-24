@@ -381,3 +381,54 @@ body{
   .feedback-summary-score{font-size:1.3rem}
   .feedback-summary-count{font-size:.7rem}
 }
+
+
+/* Compact tablet landscape: preserve the full page and native vertical scrolling. */
+@media (orientation: landscape) and (max-height: 800px) and (min-width: 700px){
+  html,body{
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior-y:auto;
+  }
+  body{touch-action:pan-y}
+  #feedbackPage{
+    height:auto!important;
+    min-height:0!important;
+    overflow:visible!important;
+    padding:10px 18px 18px!important;
+  }
+  .feedback-layout{
+    height:auto!important;
+    min-height:0!important;
+    gap:10px!important;
+    overflow:visible!important;
+  }
+  .feedback-main-card,.feedback-reviews-card{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .feedback-brand-inner{padding:8px 14px 7px}
+  .feedback-brand-row{min-height:42px}
+  .feedback-brand-logo{width:40px;height:40px;flex-basis:40px;font-size:17px}
+  .feedback-access-nav{margin-top:5px;padding:5px 0 2px}
+  .feedback-access-card{min-height:30px;padding:4px 10px}
+  #feedbackComposerContent,#feedbackLoginPrompt{padding:10px 18px 8px}
+  #feedbackForm{margin-top:8px}
+  .feedback-form-topline{padding:8px;gap:10px}
+  .star-button{min-height:36px}
+  .star-button i{font-size:1.1rem}
+  .feedback-actions{gap:5px}
+  #feedbackPage #saveFeedbackBtn,#feedbackPage #deleteFeedbackBtn{min-height:40px;height:40px}
+  .feedback-comment-section{margin-top:8px;padding:10px}
+  #feedbackComment{min-height:82px;max-height:150px}
+  .feedback-reviews-card>div:first-child{padding:9px 16px}
+  .feedback-reviews-card>div:last-child{padding:10px 14px}
+  #feedbackList{gap:8px}
+  #feedbackList>article{padding:10px}
+  #feedbackList>article .feedback-review-comment,
+  #feedbackList>article>p{margin-top:7px;line-height:1.65}
+}
