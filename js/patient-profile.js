@@ -1423,9 +1423,12 @@
   }
 
   async function loadPatientRelationshipActions() {
+    const linkButton = $('createPatientPortalInvite');
     const contactButton = $('openPatientConversation');
+
+    if (linkButton) linkButton.hidden = true;
     if (contactButton) contactButton.hidden = true;
-    if (!supabase || !patientId || !state.user?.id || !state.patient || !contactButton) return;
+    if (!supabase || !patientId || !state.user?.id || !state.patient) return;
 
     try {
       const { data: account, error: accountError } = await supabase
@@ -1435,9 +1438,14 @@
         .eq('status', 'active')
         .maybeSingle();
       if (accountError) throw accountError;
-      if (!account?.user_id) return;
 
-      // Active account links enable direct messaging unless either side has blocked the relationship.
+      // No linked patient account: keep the existing invitation/code flow available.
+      if (!account?.user_id) {
+        if (linkButton) linkButton.hidden = false;
+        return;
+      }
+
+      // An active account link enables direct messaging unless communication is blocked.
       const { data: relationship, error: relationshipError } = await supabase
         .from('professional_connection_requests')
         .select('status')
@@ -1446,12 +1454,16 @@
         .maybeSingle();
       if (relationshipError) throw relationshipError;
 
-      contactButton.hidden = ['blocked', 'restore_pending'].includes(relationship?.status);
+      if (contactButton) {
+        contactButton.hidden = ['blocked', 'restore_pending'].includes(relationship?.status);
+      }
     } catch (error) {
       console.error('Patient relationship actions load failed:', error);
+      // Fail closed: never expose direct messaging when relationship state is unknown.
+      if (contactButton) contactButton.hidden = true;
+      if (linkButton) linkButton.hidden = true;
     }
   }
-
   function bindPatientConversationDrawer() {
     const drawer = $('patientConversationDrawer');
     const openButton = $('openPatientConversation');
