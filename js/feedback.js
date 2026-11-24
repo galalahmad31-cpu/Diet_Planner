@@ -40,6 +40,7 @@
     elements.stars = document.querySelectorAll("[data-rating]");
     elements.list = document.getElementById("feedbackList");
     elements.empty = document.getElementById("feedbackEmpty");
+    elements.summary = document.getElementById("feedbackSummary");
   }
 
   function hideLoading() {
@@ -171,6 +172,33 @@
     }
   }
 
+  function renderFeedbackSummary(feedbacks) {
+    const summary = elements.summary;
+    if (!summary) return;
+    const items = Array.isArray(feedbacks) ? feedbacks : [];
+    if (!items.length) {
+      summary.classList.add("hidden");
+      summary.innerHTML = "";
+      return;
+    }
+    const total = items.length;
+    const average = items.reduce((sum, item) => sum + Number(item.rating || 0), 0) / total;
+    const rounded = Math.round(average * 10) / 10;
+    summary.innerHTML = `
+      <div class="feedback-summary-rating">
+        <div>
+          <div class="feedback-summary-score">${rounded.toFixed(1)} <span class="feedback-summary-caption">/ 5</span></div>
+          <div class="feedback-summary-stars" aria-label="متوسط التقييم ${rounded} من 5">
+            ${Array.from({length:5},(_,index)=>`<i class="fa-solid fa-star ${index < Math.round(average) ? "" : "opacity-30"}"></i>`).join("")}
+          </div>
+        </div>
+        <div class="feedback-summary-caption">متوسط تقييمات المستخدمين</div>
+      </div>
+      <div class="feedback-summary-count">${total.toLocaleString("ar-EG")} تقييم</div>
+    `;
+    summary.classList.remove("hidden");
+  }
+
   function renderFeedbackList(feedbacks) {
     if (!elements.list) return;
 
@@ -249,6 +277,7 @@
     }
 
     state.feedbacks = Array.isArray(data) ? data : [];
+    renderFeedbackSummary(state.feedbacks);
     renderFeedbackList(state.feedbacks);
 
     let own = null;
