@@ -11,15 +11,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
 /* Compact, phone-first diet library */
 @media (max-width: 640px) {
   main.min-h-screen { padding: 10px !important; }
-  main > .mx-auto > header .flex.items-center.gap-4 { gap: 10px !important; }
-  main > .mx-auto > header .h-14.w-14 {
-    width: 40px !important; height: 40px !important; border-radius: 12px !important;
-  }
-  main > .mx-auto > header .h-14 i { font-size: 17px !important; }
-  main > .mx-auto > header h1 { font-size: 19px !important; }
-  main > .mx-auto > header p { font-size: 10px !important; line-height: 1.5; }
-  main > .mx-auto > header .flex.flex-wrap.gap-2 a,
-  main > .mx-auto > header #newBtn { padding: 8px 10px !important; font-size: 10px !important; }
   main > .mx-auto > section.glass { margin-top: 10px !important; padding: 10px !important; border-radius: 15px !important; }
   main > .mx-auto > section.glass input,
   main > .mx-auto > section.glass select,
