@@ -76,8 +76,8 @@
       document.documentElement.classList.contains("nsp-embedded")) return;
 
   const access = () => window.DietPlannerAccess;
-  const isPatientRoute = () => path === "patient-portal.html" || path === "patient-health.html" || path === "professional-directory.html";
-  const isPublicRoute = () => publicPaths.has(path) ||
+  const isPatientRoute = () => path === "patient-portal.html" || path === "patient-health.html";
+  const isPublicRoute = () => publicPaths.has(path) || path === "professional-directory.html" ||
     document.querySelector('[data-dp-app-header][data-dp-header-variant="public"]');
 
   function activeFor(href, role) {
@@ -308,14 +308,20 @@
 
   function mountHeader(role, user, revision, isAdmin) {
     if (revision !== renderRevision || !document.body) return;
-    const placeholder = document.querySelector("[data-dp-app-header], [data-dp-patient-header]");
-    const existing = document.querySelector(".dp-app-header");
+    const placeholders = [...document.querySelectorAll("[data-dp-app-header], [data-dp-patient-header]")];
+    const existingHeaders = [...document.querySelectorAll(".dp-app-header")];
+    const placeholder = placeholders[0] || null;
+    const existing = existingHeaders[0] || null;
     const actions = findPageActions();
     const pageTitle = (placeholder?.dataset.pageTitle || titles[path] || document.title.split("|")[0].trim()).trim();
     const header = buildHeader({ role, signedIn: Boolean(user?.id), isAdmin: isAdmin === true, title: pageTitle, pageActions: actions });
+
     if (placeholder) placeholder.replaceWith(header);
     else if (existing) existing.replaceWith(header);
     else document.body.insertBefore(header, document.querySelector("main") || document.body.firstChild);
+
+    placeholders.slice(1).forEach(node => node.remove());
+    existingHeaders.forEach(node => { if (node !== existing && node !== header) node.remove(); });
     actions?.remove();
     document.body.classList.toggle("dp-has-app-header", true);
     document.body.classList.toggle("dp-has-public-header", false);
