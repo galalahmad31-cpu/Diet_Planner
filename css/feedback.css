@@ -17,27 +17,41 @@ body{
   -webkit-backdrop-filter:blur(14px);
 }
 #feedbackPage{
+  display:block;
   width:100%;
-  min-height:100vh;
-  padding:1.25rem clamp(1rem,3vw,2.75rem) 2.5rem;
+  max-width:none;
+  min-height:0;
+  height:auto;
+  margin:0;
+  padding:clamp(14px,2.2vw,28px) clamp(12px,2.5vw,36px) 32px;
 }
 .feedback-layout{
-  display:flex;
-  flex-direction:column;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-auto-flow:row;
   align-items:stretch;
-  gap:1.5rem;
+  justify-items:stretch;
+  gap:20px;
   width:100%;
   max-width:1080px;
-  margin-inline:auto;
+  min-height:0;
+  height:auto;
+  margin:0 auto;
+  padding:0;
 }
-.feedback-main-card,.feedback-reviews-card{width:100%}
-.feedback-reviews-card{position:static;max-height:none;overflow:visible}
-.feedback-reviews-card>div:last-child{min-height:0;overflow:visible}
 .feedback-main-card,.feedback-reviews-card{
+  display:block;
+  position:relative;
+  width:100%;
   min-width:0;
+  min-height:0;
+  height:auto;
+  max-height:none;
+  margin:0;
   overflow:hidden;
   border-radius:1.5rem;
 }
+.feedback-reviews-card>div:last-child{min-height:0;height:auto;overflow:visible}
 .feedback-branded-header{
   display:block;
   min-height:0;
@@ -161,7 +175,7 @@ body{
 .feedback-access-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 
 #feedbackComposerContent,#feedbackLoginPrompt{padding:1.5rem clamp(1rem,2.4vw,2rem)}
-#feedbackForm{margin-top:1.25rem}
+#feedbackForm{display:block;width:100%;height:auto;margin-top:1.25rem}
 .feedback-form-topline{
   display:flex;
   flex-direction:row;
@@ -311,11 +325,8 @@ body{
 #feedbackList>article>div:last-child{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--dp-border)}
 
 
-@media(max-width:900px){
-  .feedback-layout{gap:1rem}
-}
 @media(max-width:600px){
-  #feedbackPage{padding:.75rem .65rem 1.5rem}
+  #feedbackPage{padding:10px 9px 20px}
   .feedback-main-card,.feedback-reviews-card{border-radius:1.15rem}
   .feedback-brand-inner{padding:9px 10px 7px}
   .feedback-brand-row{min-height:48px}
@@ -340,6 +351,7 @@ body{
   #feedbackComment{min-height:125px}
   .feedback-reviews-card>div:first-child{padding:1rem}
   .feedback-reviews-card>div:last-child{padding:.85rem}
+  .feedback-layout{gap:14px}
 }
 @media(max-width:380px){
   .feedback-brand-logo{display:none}
@@ -367,19 +379,3 @@ body{
   .feedback-summary-score{font-size:1.3rem}
   .feedback-summary-count{font-size:.7rem}
 }
-
-
-/* Page-owned layout overrides: loaded after shared styles to prevent cascade collisions. */
-html,body{width:100%;min-height:100%;margin:0}
-body{display:block!important;overflow-x:hidden}
-#feedbackPage{display:block!important;width:100%!important;max-width:none!important;min-height:0!important;height:auto!important;margin:0!important;padding:clamp(14px,2.2vw,28px) clamp(12px,2.5vw,36px) 32px!important}
-#feedbackPage>.feedback-layout{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;align-items:stretch!important;justify-items:stretch!important;gap:20px!important;width:100%!important;max-width:1080px!important;min-height:0!important;height:auto!important;margin:0 auto!important;padding:0!important}
-#feedbackPage>.feedback-layout>section{display:block!important;position:relative!important;inset:auto!important;float:none!important;clear:both!important;width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;max-height:none!important;margin:0!important;transform:none!important}
-#feedbackPage .feedback-main-card,#feedbackPage .feedback-reviews-card{overflow:hidden!important;align-self:stretch!important}
-#feedbackPage #feedbackComposerContent,#feedbackPage #feedbackLoginPrompt,#feedbackPage .feedback-reviews-card>div{box-sizing:border-box;min-height:0!important;height:auto!important}
-#feedbackPage #feedbackForm{display:block!important;width:100%;height:auto!important;margin:0!important}
-#feedbackPage .feedback-form-topline{min-height:0!important}
-#feedbackPage .feedback-comment-section{margin-top:16px!important}
-#feedbackPage #feedbackComment{display:block;width:100%;max-width:100%;height:auto}
-#feedbackPage #feedbackList{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
-@media(max-width:600px){#feedbackPage{padding:10px 9px 20px!important}#feedbackPage>.feedback-layout{gap:14px!important}#feedbackPage #feedbackComposerContent,#feedbackPage #feedbackLoginPrompt{padding:16px!important}}
