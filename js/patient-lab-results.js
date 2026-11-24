@@ -5,7 +5,7 @@
   const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 
   function create(container) {
-    const state = { patientId:null, canAdd:()=>false, canEditRow:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loading:false, saving:false };
+    const state = { patientId:null, canAdd:()=>false, canEditRow:()=>false, rows:[], db:window.DietPlannerAccess?.supabaseClient, loading:false, loadVersion:0, saving:false };
     const root = container;
     const fields = [
       ["test_name","اسم التحليل","text",160],
@@ -59,8 +59,8 @@
       row.querySelector('[data-lab-field="test_name"]')?.focus();
     }
     function openEdit(index) {
-      if (!state.canEditRow(state.rows[index]) || root.querySelector('[data-lab-editor]')) return;
       const record = state.rows[index];
+      if (!record || !state.canEditRow(record) || root.querySelector('[data-lab-editor]')) return;
       const target = root.querySelector('[data-lab-row="'+CSS.escape(String(record?.id || ""))+'"]');
       if (!record || !target) return;
       target.replaceWith(editor(record));
@@ -88,7 +88,7 @@
       try {
         const id = editingId;
         let query = id
-          ? state.db.from("patient_lab_results").update(record).eq("id",id).eq("patient_id",state.patientId)
+          ? state.db.from("patient_lab_results").update(record).eq("id",id).eq("patient_id",state.patientId).eq("created_by",existing.created_by)
           : state.db.from("patient_lab_results").insert(record);
         const {data,error} = await query.select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at,created_by").single();
         if (error) throw error;
@@ -113,27 +113,33 @@
         if (!record || !state.canEditRow(record)) return;
         const confirmed = await window.DPConfirm?.ask({title:"حذف نتيجة التحليل؟",message:"سيتم حذف نتيجة التحليل المحددة.",confirmText:"حذف",variant:"danger"});
         if (!confirmed) return;
-        const {error} = await state.db.from("patient_lab_results").delete().eq("id",record.id).eq("patient_id",state.patientId);
+        const {error} = await state.db.from("patient_lab_results").delete().eq("id",record.id).eq("patient_id",state.patientId).eq("created_by",record.created_by);
         if (error) { console.error(error); alert("تعذر حذف نتيجة التحليل."); return; }
         state.rows = state.rows.filter(item=>item.id!==record.id);
         render();
       }
     });
     state.load = async () => {
-      if (!state.patientId || !state.db || state.loading) return;
+      if (!state.patientId || !state.db) return;
+      const patientId = state.patientId;
+      const loadVersion = ++state.loadVersion;
       state.loading = true;
       root.textContent = "جاري تحميل سجل التحاليل...";
       try {
         const {data,error} = await state.db.from("patient_lab_results")
           .select("id,patient_id,test_date,test_name,result_value,unit,reference_range,notes,created_at,created_by")
-          .eq("patient_id",state.patientId).order("test_date",{ascending:false}).order("created_at",{ascending:false});
+          .eq("patient_id",patientId).order("test_date",{ascending:false}).order("created_at",{ascending:false});
         if (error) throw error;
+        if (loadVersion !== state.loadVersion || patientId !== state.patientId) return;
         state.rows = data || [];
         render();
       } catch (error) {
+        if (loadVersion !== state.loadVersion || patientId !== state.patientId) return;
         console.error("Patient labs load failed:",error);
         root.textContent = "تعذر تحميل سجل التحاليل. تحقق من الاتصال والصلاحيات.";
-      } finally { state.loading=false; }
+      } finally {
+        if (loadVersion === state.loadVersion) state.loading = false;
+      }
     };
     return state;
   }
