@@ -82,7 +82,7 @@ body.notifications-page{
 @keyframes notifications-spin{to{transform:rotate(360deg)}}
 @media(max-width:520px){
   .notifications-page main{padding-inline:12px}
-  .notifications-page header.glass{padding:16px}
+
   .notifications-page .notifications-tabs{padding:10px}
   .notifications-page .notifications-tab-list{gap:4px;padding:4px}
   .notifications-page .tab-btn{font-size:11px;padding:8px 4px;min-height:54px}
