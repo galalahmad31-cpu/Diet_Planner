@@ -111,86 +111,15 @@ table tbody tr.dp-themed-table-row > td:is(.text-slate-800,.text-slate-700,.text
 .recipe-page-header :where(h1,h2,h3),
 .support-header :where(h1,h2,h3){color:#fff}
 
-/* Dashboard home and administration headers use one high-contrast brand treatment. */
-body:has(.dashboard-services-section) header.glass,
-body:has(.product-modern) main>.mx-auto>header,
-body:has(#sub-content-quick-calc) .page-header,
-header.header{
+/* Quick calculator keeps its page-title treatment; the application header is
+   rendered independently by css/app-header.css. */
+body:has(#sub-content-quick-calc) .page-header{
   background:linear-gradient(118deg,#174D43 0%,#087F6B 68%,#066B5B 100%)!important;
   color:#fff!important;
   border-color:transparent!important;
 }
-
-/* Brand copy must stay readable even when Tailwind text utilities are present. */
-body:has(.dashboard-services-section) header.glass :is(h1,h2,h3),
-body:has(.product-modern) main>.mx-auto>header :is(h1,h2,h3),
-body:has(#sub-content-quick-calc) .page-header :is(h1,h2,h3),
-header.header :is(h1,h2,h3){
-  color:#fff!important;
-}
-body:has(.dashboard-services-section) header.glass .flex.items-center.gap-4 > div:last-child :is(h1,h2,h3,p,span,small,strong,div),
-body:has(.dashboard-services-section) header.glass #accountInfo,
-body:has(.dashboard-services-section) header.glass #doctorName{
-  color:#fff!important;
-}
-body:has(.dashboard-services-section) header.glass .flex.items-center.gap-4 > div:last-child p,
-body:has(.dashboard-services-section) header.glass #accountInfo .text-xs,
-body:has(.dashboard-services-section) header.glass .brand-sub,
-body:has(.product-modern) main>.mx-auto>header p,
-body:has(#sub-content-quick-calc) .page-header p,
-header.header .brand-sub{
-  color:var(--dp-brand-subtle)!important;
-}
-
-/* White utility controls retain a dark, legible icon on the branded header. */
-body:has(.dashboard-services-section) header.glass #logoutBtn{
-  color:var(--dp-primary-dark)!important;
-}
-
-/* Dashboard header authentication actions — contrast-safe
-   Scoped to the branded public dashboard header; auth behavior is unchanged. */
-body:has(.dashboard-services-section) header.glass #headerActions #loginCta,
-body:has(.dashboard-services-section) header.glass #headerActions #registerCta{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:42px;
-  padding:9px 16px;
-  border-radius:12px;
-  font-weight:700;
-  line-height:1.35;
-  text-decoration:none;
-  transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease;
-}
-body:has(.dashboard-services-section) header.glass #headerActions #loginCta{
-  color:#FFFFFF!important;
-  background:rgba(255,255,255,.10)!important;
-  border:1px solid rgba(255,255,255,.82)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-}
-body:has(.dashboard-services-section) header.glass #headerActions #loginCta:hover{
-  color:#174D43!important;
-  background:#FFFFFF!important;
-  border-color:#FFFFFF!important;
-}
-body:has(.dashboard-services-section) header.glass #headerActions #registerCta{
-  color:#174D43!important;
-  background:#FFFFFF!important;
-  border:1px solid #FFFFFF!important;
-  box-shadow:0 2px 8px rgba(8,48,40,.16);
-}
-body:has(.dashboard-services-section) header.glass #headerActions #registerCta:hover{
-  color:#123D35!important;
-  background:#EAF5F2!important;
-  border-color:#EAF5F2!important;
-}
-body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta):focus-visible{
-  outline:3px solid #FFFFFF!important;
-  outline-offset:3px;
-}
-@media(prefers-reduced-motion:reduce){
-  body:has(.dashboard-services-section) header.glass #headerActions :is(#loginCta,#registerCta){transition:none}
-}
+body:has(#sub-content-quick-calc) .page-header :is(h1,h2,h3){color:#fff!important}
+body:has(#sub-content-quick-calc) .page-header p{color:var(--dp-brand-subtle)!important}
 
 /* =========================================================
    Readability normalization — centralized application layer
