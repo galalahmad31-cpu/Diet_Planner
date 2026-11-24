@@ -2255,3 +2255,71 @@ html[data-theme="dark"] body:has(#section-en) #section-en :is(.bg-emerald-100,.b
   color:var(--dp-text)!important;
   border-color:var(--dp-border)!important;
 }
+
+/* ---------- Central dark theme: patient directory and profile navigation ---------- */
+html[data-theme="dark"] .patient-record-views{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+}
+html[data-theme="dark"] .patient-record-view{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .patient-record-view:hover{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .patient-record-view.is-selected{
+  background:var(--dp-dark-surface-raised)!important;
+  border-color:var(--dp-accent)!important;
+  color:var(--dp-text)!important;
+  box-shadow:0 1px 4px var(--dp-shadow)!important;
+}
+html[data-theme="dark"] .patient-module-tabs{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+  scrollbar-color:var(--dp-muted) transparent;
+}
+html[data-theme="dark"] .patient-module-tab{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .patient-module-tab:hover{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] .patient-module-tab.is-active{
+  background:var(--dp-dark-surface-raised)!important;
+  color:var(--dp-text)!important;
+  border-bottom-color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .patient-module-tab:focus-visible{
+  outline-color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .patient-record-action{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+  color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .patient-record-action:hover{
+  background:var(--dp-surface-3)!important;
+}
+html[data-theme="dark"] .patient-record-action--restore{
+  background:#173a2d!important;
+  border-color:#315e48!important;
+  color:#8ed7a8!important;
+}
+html[data-theme="dark"] .patient-status--linked{
+  background:#1c3047!important;
+  color:#a9c9f5!important;
+}
+html[data-theme="dark"] .patient-status--archived{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] .patient-data-title strong{
+  color:var(--dp-accent)!important;
+}
+html[data-theme="dark"] .patient-data-summary .dashboard-icon{
+  background:var(--dp-surface-3)!important;
+  color:var(--dp-accent)!important;
+}
+
