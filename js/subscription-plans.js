@@ -142,7 +142,8 @@
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('subscription-modal-open');
-    dialog.querySelector('input:not([type="hidden"]),select,textarea,button:not([disabled])')?.focus({ preventScroll: true }) || dialog.focus({ preventScroll: true });
+    const firstField = dialog.querySelector('input:not([type="hidden"]):not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled])');
+    (firstField || dialog).focus({ preventScroll: true });
   }
 
   function resetModal() {
