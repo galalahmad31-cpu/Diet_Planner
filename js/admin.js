@@ -211,7 +211,7 @@ function planForm(p){
   </section>
   <section class="plan-editor-section plan-editor-description">
    <div class="plan-editor-section-head"><span class="plan-editor-section-icon"><i class="fa-regular fa-file-lines"></i></span><div><h3>وصف الخطة</h3><p>تفاصيل مختصرة تظهر للمستخدم</p></div></div>
-   <div class="field"><label for="f_desc">الوصف</label><textarea id="f_desc" rows="3" maxlength="2000" placeholder="اكتب وصفًا واضحًا لمحتوى الخطة...">${esc(p?.description||'')}</textarea></div>
+   <div class="field"><label for="f_desc">الوصف</label><textarea id="f_desc" rows="3" maxlength="2000" required placeholder="اكتب وصفًا واضحًا لمحتوى الخطة...">${esc(p?.description||'')}</textarea></div>
   </section>
   <div class="plan-editor-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> حفظ الخطة</button><button class="btn btn-outline" type="button" id="cancelModal">إلغاء</button></div>
  </form>`
@@ -235,8 +235,8 @@ async function savePlan(id){
  })).filter(item=>item.name&&item.details);
  if(!isTrial&&!paymentMethods.length){toast('أضف طريقة دفع واحدة على الأقل مع بيانات التحويل');return}
  const paymentSummary=isTrial?'تجربة مجانية':paymentMethods.map(item=>item.name+' — '+item.details+(item.instructions?' — '+item.instructions:'')).join(' | ');
- const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),payment_method:paymentSummary,payment_methods:isTrial?[]:paymentMethods,description:$('f_desc').value.trim()||null,is_active:$('f_active').value==='true',is_free_trial:isTrial};
- if(!payload.name||!Number.isInteger(payload.duration_days)||payload.duration_days<1||!Number.isFinite(payload.price)||payload.price<0){toast('راجع بيانات الخطة');return}
+ const payload={name:$('f_name').value.trim(),price:Number($('f_price').value),duration_days:Number($('f_duration').value),payment_method:paymentSummary,payment_methods:isTrial?[]:paymentMethods,description:$('f_desc').value.trim(),is_active:$('f_active').value==='true',is_free_trial:isTrial};
+ if(!payload.name||!payload.description||!Number.isInteger(payload.duration_days)||payload.duration_days<1||!Number.isFinite(payload.price)||payload.price<0){toast('أكمل اسم الخطة ووصفها والسعر والمدة بصورة صحيحة.');return}
  const r=id?await sb.from('subscription_plans').update(payload).eq('id',id):await sb.from('subscription_plans').insert(payload);
  if(r.error){toast(r.error.message||'تعذر حفظ الخطة');return}
  closeModal();toast('تم حفظ الخطة');await loadAll()
