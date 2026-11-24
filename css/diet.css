@@ -11,10 +11,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
 /* Compact, phone-first diet library */
 @media (max-width: 640px) {
   main.min-h-screen { padding: 10px !important; }
-  main > .mx-auto > header.glass {
-    padding: 12px !important;
-    border-radius: 16px !important;
-  }
   main > .mx-auto > header .flex.items-center.gap-4 { gap: 10px !important; }
   main > .mx-auto > header .h-14.w-14 {
     width: 40px !important; height: 40px !important; border-radius: 12px !important;
@@ -73,13 +69,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#178f84;box-sh
 }
 @media(max-width:480px){
  main.min-h-screen{padding:8px}
- main>div>header{padding:12px;border-radius:14px}
- main>div>header .h-14{width:38px;height:38px;border-radius:10px}
- main>div>header .text-2xl{font-size:17px}
- main>div>header .text-2xl i{font-size:17px}
- main>div>header p{font-size:10px;line-height:1.5}
- main>div>header .flex.flex-wrap.gap-2 a,
- main>div>header .flex.flex-wrap.gap-2 button{padding:8px 10px;font-size:10px}
  main>div>section.glass{margin-top:8px;padding:10px;border-radius:14px}
  #search{padding-top:9px;padding-bottom:9px;font-size:12px}
  #visibilityFilter,#refreshBtn{padding:9px 10px;font-size:11px}
