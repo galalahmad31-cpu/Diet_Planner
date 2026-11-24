@@ -980,13 +980,16 @@
     }
     const isHealthPage = currentPage === "patient-health.html";
     state.user = user;
-    void window.DietPlannerPatientNotifications?.init($("patientNotifications"), user.id).catch(error => {
-      console.error("Patient notifications initialization failed:", error);
-      const status = $("patientNotifications")?.querySelector("[data-patient-notification-status]");
-      if (status) status.textContent = error?.message || "تعذر تحميل الإشعارات حاليًا.";
-      const empty = $("patientNotifications")?.querySelector("[data-patient-notification-empty]");
-      if (empty) empty.hidden = true;
-    });
+    const notificationRoot = $("patientNotifications");
+    if (notificationRoot && typeof window.DietPlannerPatientNotifications?.init === "function") {
+      void window.DietPlannerPatientNotifications.init(notificationRoot, user.id).catch(error => {
+        console.error("Patient notifications initialization failed:", error);
+        const status = notificationRoot.querySelector("[data-patient-notification-status]");
+        if (status) status.textContent = error?.message || "تعذر تحميل الإشعارات حاليًا.";
+        const empty = notificationRoot.querySelector("[data-patient-notification-empty]");
+        if (empty) empty.hidden = true;
+      });
+    }
     void loadPatientAnnouncements();
     $("portalLogout")?.addEventListener("click", () => access.logout());
     $("portalRetry")?.addEventListener("click", () => loadPortal().catch(error => fail(error.message || "تعذر تحميل البيانات.")));
