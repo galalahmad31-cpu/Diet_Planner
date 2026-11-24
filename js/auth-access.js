@@ -51,11 +51,6 @@
     accessCache.role = null;
     accessCache.accountType = null;
   }
-  // ---------------------------------------------------------
-  function getToday() {
-    return new Date().toISOString().slice(0, 10);
-  }
-
   function isLoginPage() {
     const path = window.location.pathname;
 
@@ -775,7 +770,7 @@
   // ---------------------------------------------------------
   // Login-page event binding
   // ---------------------------------------------------------
-  function initializeIndex() {
+  function initializeLoginPage() {
     if (!isLoginPage()) return;
 
     /*
@@ -786,7 +781,7 @@
      * appear/disappear or make the fields feel unresponsive.
      *
      * Normal access routing happens after a successful login. OAuth
-     * callbacks are the only case where index must process the existing
+     * callbacks are the only case where login.html must process the existing
      * session automatically.
      */
     document
@@ -962,10 +957,10 @@
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
-      initializeIndex,
+      initializeLoginPage,
       { once: true }
     );
   } else {
-    initializeIndex();
+    initializeLoginPage();
   }
 })();
