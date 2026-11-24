@@ -17,7 +17,6 @@
     user: null,
     isAdmin: false,
     ownFeedbackId: null,
-    feedback: null,
     editingId: null,
     saving: false,
     deleting: false,
@@ -33,7 +32,6 @@
     elements.loginPrompt = document.getElementById("feedbackLoginPrompt");
     elements.rating = document.getElementById("feedbackRating");
     elements.comment = document.getElementById("feedbackComment");
-    elements.name = document.getElementById("feedbackName");
     elements.saveBtn = document.getElementById("saveFeedbackBtn");
     elements.deleteBtn = document.getElementById("deleteFeedbackBtn");
     elements.status = document.getElementById("feedbackStatus");
@@ -145,7 +143,6 @@
   }
 
   function setFormMode(feedback = null) {
-    state.feedback = feedback;
     state.editingId = feedback?.id || null;
 
     if (!feedback) {
@@ -487,9 +484,6 @@
 
       elements.composer?.classList.remove("hidden");
       elements.loginPrompt?.classList.add("hidden");
-
-      const displayName = await getDisplayName(state.user);
-      if (elements.name) elements.name.textContent = displayName;
 
       await loadFeedbacks();
     } catch (error) {
