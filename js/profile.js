@@ -253,7 +253,7 @@
         '<div class="profile-plan-card-top"><span class="profile-plan-tier">' + escapeHTML(plan.name) + '</span>' + status + '</div>' +
         '<div class="profile-plan-price">' + (isTrial || price === 0 ? '<strong>مجاني</strong>' : '<strong>' + price.toLocaleString('ar-EG') + '</strong><span>جنيه</span>') + '</div>' +
         '<div class="profile-plan-duration">' + duration.toLocaleString('ar-EG') + ' يوم</div>' +
-        (String(plan.description || '').trim() ? '<p class="profile-plan-description">' + escapeHTML(String(plan.description).trim()).replace(/\\n/g, '<br>') + '</p>' : '') +
+        (String(plan.description || '').trim() ? '<p class="profile-plan-description">' + escapeHTML(String(plan.description).trim()) + '</p>' : '') +
         action +
       '</article>';
     }).join('');
