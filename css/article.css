@@ -34,6 +34,8 @@ body{margin:0;font-family:var(--dp-font);background:var(--dp-bg);color:var(--dp-
 #empty h3{color:var(--dp-text)}
 #empty p{color:var(--dp-muted)}
 #articleReaderPane #readerPlaceholder{background:var(--dp-surface-2);border-color:var(--dp-border);color:var(--dp-text)}
+/* Respect the HTML hidden state for both reader views at every viewport size. */
+#articleReaderPane [hidden]{display:none!important}
 #articleReaderPane #readerPlaceholder h2{color:var(--dp-text)}
 #articleReaderPane #readerPlaceholder p{color:var(--dp-muted)}
 #readerCategory{color:var(--dp-primary)}
@@ -91,7 +93,7 @@ body{margin:0;font-family:var(--dp-font);background:var(--dp-bg);color:var(--dp-
  #articleWorkspace.is-reading #articleReaderPane{display:block!important}
  #articleWorkspace:not(.is-reading) #articleListPane{display:block!important}
 }
-@media(min-width:1200px){#articleReaderPane{display:block}#articleReaderPane #readerPlaceholder{display:flex}}
+@media(min-width:1200px){#articleReaderPane{display:block}}
 @media(max-width:640px){
  .article-list-item{border-radius:12px}
  .article-list-copy strong{font-size:12px}
