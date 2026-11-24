@@ -2292,7 +2292,9 @@ html[data-theme="dark"] .patient-module-tab.is-active{
   border-bottom-color:var(--dp-accent)!important;
 }
 html[data-theme="dark"] .patient-module-tab:focus-visible{
-  outline-color:var(--dp-accent)!important;
+  outline:2px solid var(--dp-text-2)!important;
+  outline-offset:2px;
+  border-radius:7px;
 }
 html[data-theme="dark"] .patient-record-action{
   background:var(--dp-surface-2)!important;
@@ -2323,3 +2325,27 @@ html[data-theme="dark"] .patient-data-summary .dashboard-icon{
   color:var(--dp-accent)!important;
 }
 
+/* Patient profile measurement summary — centralized semantic dark surfaces. */
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-card{
+  background:var(--dp-surface-2)!important;
+  border-color:var(--dp-border)!important;
+  box-shadow:none!important;
+}
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-label{
+  color:var(--dp-text-2)!important;
+}
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-value{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-value[data-trend="up"]{
+  color:#f0a39b!important;
+}
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-value[data-trend="down"]{
+  color:#72d6b0!important;
+}
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-value[data-trend="neutral"]{
+  color:var(--dp-text)!important;
+}
+html[data-theme="dark"] body.patient-profile-page .measurement-summary-note{
+  color:var(--dp-muted)!important;
+}
