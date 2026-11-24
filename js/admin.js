@@ -444,11 +444,20 @@ async function loadPrivacyPolicy(){
  $('privacyPolicyDate').value=data.updated_at||'';
  box.style.display='none';editor.style.display='block';
 }
+function isValidDateOnly(value){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
+ const [year,month,day]=value.split('-').map(Number);
+ if(year<1000||month<1||month>12||day<1)return false;
+ const date=new Date(Date.UTC(year,month-1,day));
+ return date.getUTCFullYear()===year&&date.getUTCMonth()===month-1&&date.getUTCDate()===day;
+}
 async function savePrivacyPolicy(){
  const content=$('privacyPolicyContent')?.value??'';
- const updatedAt=$('privacyPolicyDate')?.value||'';
+ const dateInput=$('privacyPolicyDate');
+ const updatedAt=dateInput?.value||'';
+ dateInput?.setCustomValidity('');
  if(!updatedAt){toast('حدد تاريخ آخر تحديث.');$('privacyPolicyDate')?.focus();return}
- if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(updatedAt)){toast('تاريخ آخر تحديث غير صالح.');return}
+}
  const button=$('savePrivacyPolicyBtn');
  const original=button.innerHTML;button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
  try{
