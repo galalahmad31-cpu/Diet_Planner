@@ -178,3 +178,15 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 .profile-inline-save:disabled{opacity:.6;cursor:not-allowed}
 .profile-inline-cancel{flex:0 0 auto;min-width:84px;background:#eef3f1;color:#60736d}
 @media(max-width:420px){.profile-inline-actions{flex-direction:column}.profile-inline-cancel{width:100%}}
+
+/* Payment method selection in the subscription request modal. */
+.profile-subscribe-field select{display:block;width:100%;min-height:44px;padding:10px 12px;border:1px solid #d6e2df;border-radius:11px;background:#fff;color:#263f39;font:700 12px Cairo,sans-serif}
+.profile-payment-method-details{display:grid;gap:5px;margin-top:8px;padding:11px 12px;border:1px solid #dcebe4;border-radius:10px;background:#f5faf7;color:#35554c;font-size:11px;line-height:1.8;overflow-wrap:anywhere}
+.profile-payment-method-details strong{font-size:12px}
+.profile-payment-method-details small{color:#71857d}
+.subscription-payment-methods{display:grid;gap:7px;margin-top:7px}
+.subscription-payment-method{display:grid;gap:3px;padding:9px 10px;border:1px solid #e2eee8;border-radius:9px;background:#f8fbf9;font-size:11px;overflow-wrap:anywhere}
+.subscription-payment-method strong{color:#1b6959}
+.subscription-payment-method small{color:#71857d}
+html[data-theme="dark"] .profile-payment-method-details,html[data-theme="dark"] .subscription-payment-method{background:var(--dp-surface-2);border-color:var(--dp-border);color:var(--dp-text)}
+html[data-theme="dark"] .profile-subscribe-field select{background:var(--dp-input);border-color:var(--dp-input-border);color:var(--dp-text)}
