@@ -166,7 +166,12 @@
     if (!isValidPatientId(patientId) || !state.patient || state.patient.id !== patientId) return;
     const loaders = {
       portalMessagesPanel: () => Promise.resolve(),
-      portalSharedHealthPanel: async () => { await Promise.all([loadSharedHealthRecord(), loadMeasurements()]); await window.DietPlannerLabResults?.init({container: $("portalLabResults"), patientId, canEdit: () => false}); },
+      portalSharedHealthPanel: async () => { await Promise.all([loadSharedHealthRecord(), loadMeasurements()]); await window.DietPlannerLabResults?.init({
+        container: $("portalLabResults"),
+        patientId,
+        canAdd: () => Boolean(state.user?.id && state.patientId === patientId),
+        canEditRow: row => row.created_by === state.user?.id
+      }); },
       portalPlansPanel: () => state.activePlanTab === "professional" ? loadPlans() : Promise.resolve(),
       portalFinancePanel: loadPatientFinanceReadOnly
     };
