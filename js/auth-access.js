@@ -63,7 +63,8 @@
     const box = document.getElementById("authMessage");
     if (!box) return;
 
-    const lines = String(message || "").split("\n");
+    const lines = String(message || "").split("
+");
     const isVerification = lines[0]?.trim() === "التحقق من البريد الإلكتروني";
 
     box.className = "msg " + type + (isVerification ? " email-verification" : "");
@@ -398,7 +399,8 @@
     if (error) {
       showAuthMessage(
         error?.code === "email_not_confirmed"
-          ? "التحقق من البريد الإلكتروني\nيرجى التحقق من بريدك الإلكتروني. إذا لم تجد رسالة التأكيد في صندوق الوارد، فتفقّد قسم الرسائل غير المرغوب فيها (Spam)."
+          ? "التحقق من البريد الإلكتروني
+يرجى التحقق من بريدك الإلكتروني. إذا لم تجد رسالة التأكيد في صندوق الوارد، فتفقّد قسم الرسائل غير المرغوب فيها (Spam)."
           : error?.code === "invalid_credentials"
             ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
             : error?.message || "تعذر تسجيل الدخول حاليًا."
@@ -478,7 +480,9 @@
       if (data?.user && !data.user.email_confirmed_at) {
         showOtpStep(email);
         showAuthMessage(
-          "التحقق من البريد الإلكتروني\nتم إنشاء حسابك بنجاح. أرسلنا رمز التحقق المكوّن من 8 أرقام إلى بريدك الإلكتروني.\nإذا لم تجد الرسالة في صندوق الوارد (Inbox)، يُرجى مراجعة البريد غير المرغوب فيه (Spam أو Junk).",
+          "التحقق من البريد الإلكتروني
+تم إنشاء حسابك بنجاح. أرسلنا رمز التحقق المكوّن من 8 أرقام إلى بريدك الإلكتروني.
+إذا لم تجد الرسالة في صندوق الوارد (Inbox)، يُرجى مراجعة البريد غير المرغوب فيه (Spam أو Junk).",
           "success"
         );
         return;
@@ -565,7 +569,9 @@
         return;
       }
       showAuthMessage(
-        "التحقق من البريد الإلكتروني\nتم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.\nإذا لم تجده في صندوق الوارد (Inbox)، راجع مجلد البريد غير المرغوب فيه (Spam أو Junk).",
+        "التحقق من البريد الإلكتروني
+تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.
+إذا لم تجده في صندوق الوارد (Inbox)، راجع مجلد البريد غير المرغوب فيه (Spam أو Junk).",
         "success"
       );
       document.getElementById("signupOtp")?.focus();
@@ -687,7 +693,7 @@
       showRecoveryMessage("ابدأ بإدخال بريدك الإلكتروني لإرسال رمز الاستعادة.");
       return;
     }
-    if (!/^\\d{8}$/.test(token)) {
+    if (!/^\d{8}$/.test(token)) {
       showRecoveryMessage("أدخل رمز التحقق المكوّن من 8 أرقام.");
       return;
     }
@@ -771,9 +777,10 @@
     recoveryElement("sendRecoveryOtpButton")?.addEventListener("click", () => sendRecoveryOtp(false));
     recoveryElement("resendRecoveryOtpButton")?.addEventListener("click", () => sendRecoveryOtp(true));
     recoveryElement("verifyRecoveryOtpButton")?.addEventListener("click", verifyRecoveryOtp);
-    recoveryElement("saveRecoveryPasswordButton")?.addEventListener("click", saveRecoveredPassword);\n    recoveryElement("changeRecoveryEmailButton")?.addEventListener("click", changeRecoveryEmail);
+    recoveryElement("saveRecoveryPasswordButton")?.addEventListener("click", saveRecoveredPassword);
+    recoveryElement("changeRecoveryEmailButton")?.addEventListener("click", changeRecoveryEmail);
     recoveryElement("recoveryOtp")?.addEventListener("input", (event) => {
-      event.target.value = event.target.value.replace(/\\D/g, "").slice(0, 8);
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 8);
     });
     const email = new URLSearchParams(window.location.search).get("email");
     if (email && recoveryElement("recoveryEmail")) recoveryElement("recoveryEmail").value = email;
