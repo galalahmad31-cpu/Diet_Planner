@@ -655,43 +655,6 @@ html.visit-embedded .text-slate-300{color:#64748b!important}
   gap:6px;border-color:var(--dp-primary);background:var(--dp-primary);color:#fff;font-weight:800;
 }
 :is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .meal-card-actions .meal-delete-btn{color:var(--dp-danger)}
-/* Shared gram-plan table: explicit selectors keep every cell under its header. */
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table-wrap{
-  width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;
-}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table{
-  width:100%;min-width:680px;table-layout:fixed;border-collapse:collapse;direction:rtl;
-  color:var(--dp-text);font-size:10px;
-}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table th{
-  padding:9px 7px;background:var(--dp-surface-2);color:var(--dp-text-2);
-  text-align:center;font-size:9px;font-weight:900;white-space:normal;
-}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table td{
-  padding:8px 7px;border-top:1px solid var(--dp-border);background:transparent;
-  color:var(--dp-text-2);vertical-align:middle;overflow-wrap:anywhere;
-}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table th:nth-child(1),
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table td.dpb-food{width:27%;text-align:right}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table th:nth-child(2),
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table td.dpb-grams{width:13%;text-align:center}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table th:nth-child(3),
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table td.dpb-household{width:27%;text-align:center}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table th:nth-child(4),
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table td.dpb-notes{width:21%;text-align:center}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table th:nth-child(5),
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table td.dpb-actions{width:12%;text-align:center}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table input{
-  display:block;width:100%;min-width:0;min-height:31px;box-sizing:border-box;padding:6px 8px;
-  border:1px solid var(--dp-input-border);border-radius:8px;background:var(--dp-input);
-  color:var(--dp-text);font-size:10px;
-}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table .dpb-grams input{
-  display:inline-block;width:calc(100% - 25px);min-width:42px;text-align:center;
-}
-:is(.visit-main-shell .embedded-diet-plan #daysContainer, body .day-details-content) .dpb-table .dpb-grams span{
-  display:inline-block;width:22px;text-align:center;
-}
 .visit-main-shell .embedded-diet-plan #daysContainer .day-empty-state{
   padding:28px 16px;border:1px dashed var(--dp-border);border-radius:12px;background:var(--dp-surface);
   color:var(--dp-text-2);text-align:center;font-size:11px;font-weight:800;
