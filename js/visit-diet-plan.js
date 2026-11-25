@@ -342,6 +342,17 @@ function deleteDay(id){
  });
 }
 
+function ensureDietModalPortal(id){
+ const modal=document.getElementById(id);
+ if(!modal){
+  console.error(`Diet plan modal not found: ${id}`);
+  showToast('تعذر فتح النافذة المطلوبة. أعد تحميل الصفحة.','error');
+  return null;
+ }
+ if(modal.parentElement!==document.body)document.body.appendChild(modal);
+ return modal;
+}
+
 function openAddMealModal(id){
  const day=daysData.find(item=>String(item.id)===String(id));
  if(!day)return;
@@ -349,9 +360,11 @@ function openAddMealModal(id){
  const modal=ensureDietModalPortal('addMealModal');
  if(!modal)return;
  targetMealDayId=day.id;
- document.getElementById('newMealNameInput').value='';
+ const input=document.getElementById('newMealNameInput');
+ if(!input){showToast('حقل اسم الوجبة غير موجود','error');return;}
+ input.value='';
  modal.classList.remove('hidden');
- document.getElementById('newMealNameInput').focus({preventScroll:true});
+ input.focus({preventScroll:true});
 }
 function closeAddMealModal(){
  const modal=document.getElementById('addMealModal');
@@ -524,7 +537,9 @@ async function openFixedMeals(dayId){
  fixedMealsTargetDayId=day.id;
  const search=document.getElementById('fixedMealsSearch');
  if(search)search.value='';
- document.getElementById('fixedMealsList').innerHTML='<div class="text-center py-8 text-slate-400 font-bold">جاري تحميل مكتبة الدايت...</div>';
+ const list=document.getElementById('fixedMealsList');
+ if(!list){showToast('قائمة الدايت الثابت غير موجودة','error');return;}
+ list.innerHTML='<div class="text-center py-8 text-slate-400 font-bold">جاري تحميل مكتبة الدايت...</div>';
  modal.classList.remove('hidden');
  initFixedMealsSearch();
  await syncFixedMeals();
