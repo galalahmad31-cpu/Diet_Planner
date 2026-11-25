@@ -579,6 +579,198 @@
   }
 
 
+
+  // ---------------------------------------------------------
+  // Password recovery — shared Supabase Auth flow
+  // ---------------------------------------------------------
+  const RECOVERY_COOLDOWN_MS = 60 * 1000;
+  const RECOVERY_COOLDOWN_KEY = "dp_recovery_otp_sent_at";
+  let recoveryBusy = false;
+  let recoveryCooldownTimer = null;
+  let recoveryEmail = "";
+
+  function recoveryElement(id) {
+    return document.getElementById(id);
+  }
+
+  function showRecoveryMessage(message, type = "error") {
+    const box = recoveryElement("recoveryMessage");
+    if (!box) return;
+    box.textContent = message;
+    box.className = "msg " + type;
+    box.style.display = "block";
+    box.setAttribute("role", type === "error" ? "alert" : "status");
+    box.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
+  }
+
+  function setRecoveryBusy(button, busy, label) {
+    if (!button) return;
+    button.disabled = busy;
+    button.textContent = busy ? "جاري التنفيذ..." : label;
+  }
+
+  function showRecoveryStep(step) {
+    ["recoveryEmailStep", "recoveryOtpStep", "recoveryPasswordStep"].forEach((id) => {
+      const panel = recoveryElement(id);
+      if (panel) panel.hidden = id !== step;
+    });
+  }
+
+  function getRecoveryCooldownRemaining() {
+    const sentAt = Number(localStorage.getItem(RECOVERY_COOLDOWN_KEY) || 0);
+    return Math.max(0, RECOVERY_COOLDOWN_MS - (Date.now() - sentAt));
+  }
+
+  function startRecoveryCooldown() {
+    localStorage.setItem(RECOVERY_COOLDOWN_KEY, String(Date.now()));
+    const button = recoveryElement("resendRecoveryOtpButton");
+    const update = () => {
+      const remaining = getRecoveryCooldownRemaining();
+      if (button) {
+        button.disabled = recoveryBusy || remaining > 0;
+        button.textContent = remaining > 0
+          ? `إعادة الإرسال بعد ${Math.ceil(remaining / 1000)} ثانية`
+          : "إعادة إرسال الرمز";
+      }
+      if (remaining <= 0 && recoveryCooldownTimer) {
+        clearInterval(recoveryCooldownTimer);
+        recoveryCooldownTimer = null;
+      }
+    };
+    if (recoveryCooldownTimer) clearInterval(recoveryCooldownTimer);
+    update();
+    recoveryCooldownTimer = setInterval(update, 1000);
+  }
+
+  async function sendRecoveryOtp(isResend = false) {
+    if (recoveryBusy) return;
+    const emailInput = recoveryElement("recoveryEmail");
+    const email = (recoveryEmail || emailInput?.value || "").trim().toLowerCase();
+    if (!email) {
+      showRecoveryMessage("أدخل البريد الإلكتروني أولًا.");
+      return;
+    }
+    if (isResend && getRecoveryCooldownRemaining() > 0) return;
+
+    const button = recoveryElement(isResend ? "resendRecoveryOtpButton" : "sendRecoveryOtpButton");
+    recoveryBusy = true;
+    setRecoveryBusy(button, true, isResend ? "إعادة إرسال الرمز" : "إرسال رمز الاستعادة");
+    try {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      recoveryEmail = email;
+      if (emailInput) emailInput.value = email;
+      const emailLabel = recoveryElement("recoveryOtpEmail");
+      if (emailLabel) emailLabel.textContent = email;
+      showRecoveryStep("recoveryOtpStep");
+      showRecoveryMessage(
+        "إذا كان البريد مرتبطًا بحساب، فسيصلك رمز استعادة من 8 أرقام. راجع البريد الوارد والرسائل غير المرغوب فيها.",
+        "success"
+      );
+      startRecoveryCooldown();
+      recoveryElement("recoveryOtp")?.focus();
+    } catch (error) {
+      console.error("Password recovery OTP request failed:", error);
+      showRecoveryMessage("تعذر إرسال رمز الاستعادة حاليًا. حاول مرة أخرى لاحقًا.");
+    } finally {
+      recoveryBusy = false;
+      setRecoveryBusy(button, false, isResend ? "إعادة إرسال الرمز" : "إرسال رمز الاستعادة");
+      if (isResend) startRecoveryCooldown();
+    }
+  }
+
+  async function verifyRecoveryOtp() {
+    if (recoveryBusy) return;
+    const token = recoveryElement("recoveryOtp")?.value.trim() || "";
+    if (!recoveryEmail) {
+      showRecoveryStep("recoveryEmailStep");
+      showRecoveryMessage("ابدأ بإدخال بريدك الإلكتروني لإرسال رمز الاستعادة.");
+      return;
+    }
+    if (!/^\\d{8}$/.test(token)) {
+      showRecoveryMessage("أدخل رمز التحقق المكوّن من 8 أرقام.");
+      return;
+    }
+
+    const button = recoveryElement("verifyRecoveryOtpButton");
+    recoveryBusy = true;
+    setRecoveryBusy(button, true, "التحقق من الرمز");
+    try {
+      const { data, error } = await supabaseClient.auth.verifyOtp({
+        email: recoveryEmail,
+        token,
+        type: "recovery"
+      });
+      if (error) throw error;
+      if (!data?.session?.user) throw new Error("لم يتم إنشاء جلسة استعادة صالحة.");
+      showRecoveryStep("recoveryPasswordStep");
+      showRecoveryMessage("تم التحقق من الرمز. أدخل كلمة المرور الجديدة.", "success");
+      recoveryElement("newRecoveryPassword")?.focus();
+    } catch (error) {
+      console.error("Password recovery OTP verification failed:", error);
+      showRecoveryMessage("رمز التحقق غير صحيح أو انتهت صلاحيته. راجع الرمز أو اطلب رمزًا جديدًا.");
+    } finally {
+      recoveryBusy = false;
+      setRecoveryBusy(button, false, "تأكيد الرمز");
+    }
+  }
+
+  async function saveRecoveredPassword() {
+    if (recoveryBusy) return;
+    const password = recoveryElement("newRecoveryPassword")?.value || "";
+    const confirmation = recoveryElement("confirmRecoveryPassword")?.value || "";
+    if (!isStrongPassword(password)) {
+      showRecoveryMessage(STRONG_PASSWORD_MESSAGE);
+      return;
+    }
+    if (password !== confirmation) {
+      showRecoveryMessage("كلمتا المرور غير متطابقتين.");
+      return;
+    }
+    const button = recoveryElement("saveRecoveryPasswordButton");
+    recoveryBusy = true;
+    setRecoveryBusy(button, true, "حفظ كلمة المرور الجديدة");
+    try {
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!sessionData?.session?.user) {
+        throw new Error("انتهت جلسة الاستعادة. اطلب رمزًا جديدًا.");
+      }
+      const { error } = await supabaseClient.auth.updateUser({ password });
+      if (error) throw error;
+      await supabaseClient.auth.signOut({ scope: "local" });
+      recoveryElement("newRecoveryPassword").value = "";
+      recoveryElement("confirmRecoveryPassword").value = "";
+      showRecoveryStep("recoveryEmailStep");
+      recoveryEmail = "";
+      localStorage.removeItem(RECOVERY_COOLDOWN_KEY);
+      showRecoveryMessage("تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.", "success");
+      button.textContent = "تم تغيير كلمة المرور";
+      button.disabled = true;
+    } catch (error) {
+      console.error("Recovered password update failed:", error);
+      showRecoveryMessage(error?.message || "تعذر تغيير كلمة المرور. أعد طلب رمز الاستعادة إذا انتهت الجلسة.");
+    } finally {
+      recoveryBusy = false;
+      if (button && button.textContent !== "تم تغيير كلمة المرور") {
+        setRecoveryBusy(button, false, "حفظ كلمة المرور الجديدة");
+      }
+    }
+  }
+
+  function initializeRecoveryPage() {
+    if (!window.location.pathname.endsWith("/forgot-password.html")) return;
+    recoveryElement("sendRecoveryOtpButton")?.addEventListener("click", () => sendRecoveryOtp(false));
+    recoveryElement("resendRecoveryOtpButton")?.addEventListener("click", () => sendRecoveryOtp(true));
+    recoveryElement("verifyRecoveryOtpButton")?.addEventListener("click", verifyRecoveryOtp);
+    recoveryElement("saveRecoveryPasswordButton")?.addEventListener("click", saveRecoveredPassword);
+    recoveryElement("recoveryOtp")?.addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\\D/g, "").slice(0, 8);
+    });
+    const email = new URLSearchParams(window.location.search).get("email");
+    if (email && recoveryElement("recoveryEmail")) recoveryElement("recoveryEmail").value = email;
+  }
+
   let accountTypeSelectionMode = "complete";
 
   function showAccountTypeSelection(mode = "complete") {
