@@ -284,7 +284,7 @@
             event_type: isToday ? "calculated_follow_up_today" : "calculated_follow_up_tomorrow",
             title: isToday ? "موعد المتابعة اليوم" : "موعد المتابعة غدًا",
             body: isToday ? "المريض لديه موعد متابعة اليوم." : "المريض لديه موعد متابعة غدًا.",
-            source_key: `follow_up:${patientId}:${followUpDate}`
+            source_key: `follow_up:${isToday ? 'today' : 'tomorrow'}:${patientId}:${followUpDate}`
           });
         }
       }
