@@ -811,30 +811,7 @@ body.support-delete-modal-open{overflow:hidden}
 .patient-profile-contact-button{border-color:var(--dp-primary);background:var(--dp-primary);color:#fff}
 .patient-profile-contact-button:hover{border-color:var(--dp-primary-hover);background:var(--dp-primary-hover)}
 .patient-profile-actions button:disabled{opacity:.55;cursor:wait}
-.patient-conversation-overlay{position:fixed;inset:0;z-index:1200;display:flex;justify-content:flex-start;align-items:stretch;background:rgba(9,25,29,.42);backdrop-filter:blur(2px)}
-.patient-conversation-overlay[hidden]{display:none!important}
-.patient-conversation-drawer{display:flex;flex-direction:column;width:min(430px,calc(100vw - 28px));height:100%;max-height:100dvh;min-height:0;background:var(--dp-card);color:var(--dp-text);border-inline-end:1px solid var(--dp-border);box-shadow:12px 0 42px rgba(0,0,0,.16);overflow:hidden;animation:patientConversationSlideIn .22s ease-out}
-.patient-conversation-drawer.is-unlinked{width:min(360px,calc(100vw - 28px));height:auto;max-height:150px;min-height:0;align-self:center;margin:16px 0;border:1px solid var(--dp-border);border-radius:16px}
-.patient-conversation-drawer.is-unlinked .patient-conversation-body{min-height:0;padding:8px 14px;background:var(--dp-surface)}
-.patient-conversation-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:15px 17px;border-bottom:1px solid var(--dp-border);background:var(--dp-surface)}
-.patient-conversation-heading{display:flex;align-items:center;gap:11px;min-width:0}
-.patient-conversation-avatar{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:50%;background:var(--dp-surface-3);color:var(--dp-primary);font-size:15px}
-.patient-conversation-heading h2{margin:0;color:var(--dp-text);font-size:13px;font-weight:900}
-.patient-conversation-heading p{margin:3px 0 0;color:var(--dp-muted);font-size:10px}
-.patient-conversation-close{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid var(--dp-border);border-radius:50%;background:var(--dp-card);color:var(--dp-text-2);font-size:14px;cursor:pointer}
-.patient-conversation-body{display:flex;flex:1;min-height:0;overflow:hidden;padding:10px}
-.patient-conversation-body>[data-patient-messages]{display:flex;flex:1;min-width:0;min-height:0}
-.patient-conversation-body .patient-messages-shell{display:flex;flex:1;flex-direction:column;gap:10px;width:100%;height:100%;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;overflow:hidden}
-.patient-conversation-body .patient-messages-toolbar{flex:0 0 auto;padding:0 2px}
-.patient-conversation-body .patient-messages-toolbar>div{gap:2px}
-.patient-conversation-body .patient-messages-toolbar strong{font-size:11px}
-.patient-conversation-body .patient-messages-toolbar small{font-size:9px}
-.patient-conversation-body .patient-messages-list{display:flex;flex:1;flex-direction:column;min-height:0;max-height:none;overflow:auto;overscroll-behavior:contain;padding:12px;border-radius:13px}
-.patient-conversation-body .patient-messages-compose{flex:0 0 auto;gap:7px}
-.patient-conversation-body .patient-messages-compose textarea{min-height:54px;max-height:120px;resize:vertical}
-.patient-conversation-body .patient-messages-disclaimer{flex:0 0 auto;padding:0 2px;font-size:8px}
-body.patient-conversation-open{overflow:hidden}
-@keyframes patientConversationSlideIn{from{transform:translateX(-24px);opacity:.75}to{transform:translateX(0);opacity:1}}
+
 @media(max-width:680px){
  /* Compact patient identity: prevent the name row from stretching and pushing actions down. */
  .patient-name-bar{display:block;height:auto!important;min-height:0!important;padding:12px!important}
@@ -847,18 +824,9 @@ body.patient-conversation-open{overflow:hidden}
  .patient-data-summary{min-height:40px;gap:6px}
  .patient-data-actions,.patient-data-actions .patient-save-actions{gap:4px!important}
  .patient-data-actions button{min-height:30px;padding:5px 7px;font-size:9px}
- .patient-conversation-overlay{align-items:flex-end;justify-content:center;padding:0;background:rgba(9,25,29,.48)}
- .patient-conversation-drawer{width:100%;height:min(86vh,780px);height:min(86dvh,780px);max-height:92dvh;border:0;border-top:1px solid var(--dp-border);border-radius:22px 22px 0 0;box-shadow:0 -12px 42px rgba(0,0,0,.2);animation:patientConversationSlideUp .24s ease-out}
- .patient-conversation-drawer.is-unlinked{width:100%;max-height:140px;align-self:flex-end;margin:0;border-radius:18px 18px 0 0}
- .patient-conversation-header{padding:12px 15px}
- .patient-conversation-header:before{content:"";position:absolute;top:6px;left:50%;width:38px;height:4px;border-radius:99px;background:var(--dp-border);transform:translateX(-50%)}
- .patient-conversation-header{position:relative;padding-top:20px}
- .patient-conversation-body{padding:9px}
- .patient-conversation-body .patient-messages-list{padding:10px}
- .patient-conversation-body .patient-messages-compose textarea{min-height:48px;max-height:100px}
+
 }
-@keyframes patientConversationSlideUp{from{transform:translateY(28px);opacity:.8}to{transform:translateY(0);opacity:1}}
-@media(prefers-reduced-motion:reduce){.patient-conversation-drawer{animation:none}}
+
 
 
 /* Numeric values in the shared measurement table must not be reordered by RTL text flow. */
