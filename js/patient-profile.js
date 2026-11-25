@@ -636,7 +636,7 @@
 
     dietPlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/diet-builder.js?v=20261123-central-meal-builder-v1';
+      script.src = 'js/diet-builder.js?v=20261125-unified-builder-v1';
       script.onload = () => {
         const summaryScript = document.createElement('script');
         summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v2';
