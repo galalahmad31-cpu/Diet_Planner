@@ -265,21 +265,93 @@
     return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
   }
 
-  function countCalculatedNotifications(rows) {
+  function buildCalculatedNotificationRows(rows, userId) {
     const now = new Date();
     const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
-    let count = 0;
+    const records = [];
     (rows || []).forEach(row => {
-      const followUpDays = notificationDaysUntil(row.next_follow_up_date, today);
-      if (followUpDays === 0 || followUpDays === 1) count++;
+      const patientId = row.patient_id;
+      if (!patientId) return;
+      const followUpDate = notificationDateKey(row.next_follow_up_date);
+      if (followUpDate) {
+        const days = notificationDaysUntil(followUpDate, today);
+        if (days === 0 || days === 1) {
+          const isToday = days === 0;
+          records.push({
+            recipient_id: userId,
+            patient_id: patientId,
+            actor_id: null,
+            event_type: isToday ? "calculated_follow_up_today" : "calculated_follow_up_tomorrow",
+            title: isToday ? "موعد المتابعة اليوم" : "موعد المتابعة غدًا",
+            body: isToday ? "المريض لديه موعد متابعة اليوم." : "المريض لديه موعد متابعة غدًا.",
+            source_key: `follow_up:${patientId}:${followUpDate}`
+          });
+        }
+      }
 
       const endDate = notificationDateKey(row.subscription_end_date) ||
         notificationAddMonths(row.subscription_start_date, row.subscription_months);
       if (!endDate) return;
-      const subscriptionDays = notificationDaysUntil(endDate, today);
-      if (subscriptionDays >= -7 && subscriptionDays <= 7) count++;
+      const days = notificationDaysUntil(endDate, today);
+      if (days < -7 || days > 7) return;
+
+      let title;
+      let body;
+      if (days < 0) {
+        title = "انتهى اشتراك المريض";
+        body = `انتهى الاشتراك منذ ${Math.abs(days)} ${Math.abs(days) === 1 ? "يوم" : "أيام"}. يُرجى التواصل مع المريض لتجديد الاشتراك واستمرار المتابعة.`;
+      } else if (days === 0) {
+        title = "الاشتراك ينتهي اليوم";
+        body = "ينتهي اشتراك المريض اليوم. يُرجى التواصل معه لتجديد الاشتراك واستمرار المتابعة.";
+      } else if (days === 1) {
+        title = "الاشتراك يقترب من الانتهاء";
+        body = "يتبقى يوم واحد على انتهاء الاشتراك. يُفضّل التواصل مع المريض لتجديد الاشتراك قبل انتهائه.";
+      } else {
+        title = "الاشتراك يقترب من الانتهاء";
+        body = `يتبقى ${days} أيام على انتهاء الاشتراك. يُفضّل التواصل مع المريض مسبقًا لتجديد الاشتراك.`;
+      }
+      records.push({
+        recipient_id: userId,
+        patient_id: patientId,
+        actor_id: null,
+        event_type: "calculated_subscription",
+        title,
+        body,
+        source_key: `subscription:${patientId}:${endDate}:${today}`
+      });
     });
-    return count;
+    return records;
+  }
+
+  async function syncCalculatedNotifications(supabase, user) {
+    const { data: financeRows, error: financeError } = await supabase
+      .from("patient_finances")
+      .select("patient_id,subscription_end_date,next_follow_up_date,subscription_start_date,subscription_months")
+      .eq("user_id", user.id);
+    if (financeError) throw financeError;
+
+    const records = buildCalculatedNotificationRows(financeRows, user.id);
+    const activeKeys = new Set(records.map(item => item.source_key));
+    if (records.length) {
+      const { error } = await supabase.from("notifications")
+        .upsert(records, { onConflict: "recipient_id,source_key", ignoreDuplicates: true });
+      if (error) throw error;
+    }
+
+    const { data: existing, error: existingError } = await supabase
+      .from("notifications")
+      .select("id,source_key")
+      .eq("recipient_id", user.id)
+      .in("event_type", ["calculated_follow_up_today", "calculated_follow_up_tomorrow", "calculated_subscription"]);
+    if (existingError) throw existingError;
+
+    const staleIds = (existing || []).filter(item => !activeKeys.has(item.source_key)).map(item => item.id);
+    if (staleIds.length) {
+      const { error } = await supabase.from("notifications")
+        .delete().eq("recipient_id", user.id).in("id", staleIds);
+      if (error) throw error;
+    }
+    return records;
   }
 
   async function syncNotificationBadge(user) {
@@ -295,29 +367,22 @@
     if (link) link.hidden = false;
 
     const refresh = async () => {
-      const [notificationResult, financeResult] = await Promise.all([
-        supabase.from("notifications")
+      try {
+        await syncCalculatedNotifications(supabase, user);
+        const { count, error } = await supabase.from("notifications")
           .select("id", { count: "exact", head: true })
-          .eq("recipient_id", user.id).is("read_at", null),
-        supabase.from("patient_finances")
-          .select("subscription_end_date,next_follow_up_date,subscription_start_date,subscription_months")
-          .eq("user_id", user.id)
-      ]);
-      if (notificationResult.error) {
-        console.error("Notification badge lookup failed:", notificationResult.error);
-        return;
+          .eq("recipient_id", user.id).is("read_at", null);
+        if (error) throw error;
+        const badge = document.getElementById("dpNotificationBadge");
+        const currentLink = document.getElementById("dpNotificationLink");
+        if (!currentLink || !badge) return;
+        const total = Number(count || 0);
+        badge.textContent = total > 99 ? "99+" : String(total);
+        badge.hidden = total === 0;
+        currentLink.setAttribute("aria-label", total ? `الإشعارات، ${total} تنبيه` : "الإشعارات");
+      } catch (error) {
+        console.error("Notification badge sync failed:", error);
       }
-      if (financeResult.error) {
-        console.error("Calculated notification badge lookup failed:", financeResult.error);
-        return;
-      }
-      const badge = document.getElementById("dpNotificationBadge");
-      const currentLink = document.getElementById("dpNotificationLink");
-      if (!currentLink || !badge) return;
-      const total = Number(notificationResult.count || 0) + countCalculatedNotifications(financeResult.data);
-      badge.textContent = total > 99 ? "99+" : String(total);
-      badge.hidden = total === 0;
-      currentLink.setAttribute("aria-label", total ? `الإشعارات، ${total} تنبيه` : "الإشعارات");
     };
 
     if (notificationUserId !== user.id) {
@@ -330,6 +395,14 @@
     }
     await refresh();
   }
+
+  window.DPNotificationStore = {
+    sync: async user => {
+      const supabase = access()?.supabaseClient;
+      if (!supabase || !user?.id) throw new Error("تعذر تحديد حساب المستخدم.");
+      await syncCalculatedNotifications(supabase, user);
+    }
+  };
 
   async function clearNotificationBadge() {
     const link = document.getElementById("dpNotificationLink");
