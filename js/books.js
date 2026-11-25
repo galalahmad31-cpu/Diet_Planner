@@ -48,7 +48,7 @@
       return;
     }
     if (book.is_free) {
-      $("bookAccessArea").innerHTML = '<button class="book-primary-action" type="button" data-book-free><i class="fa-brands fa-telegram"></i> الحصول على الكتاب مجانًا</button>';
+      $("bookAccessArea").innerHTML = '<button class="book-primary-action" type="button" data-book-free><i class="fa-solid fa-arrow-up-right-from-square"></i> الحصول على الكتاب مجانًا</button>';
       return;
     }
     renderPaidAccess(book);
@@ -59,7 +59,7 @@
     const { data, error } = await sb.from("book_orders").select("id,status,created_at").eq("book_id", book.id).eq("user_id", state.user.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
     if (error) { area.innerHTML = '<div class="book-status">تعذر التحقق من الطلب. حاول تحديث الصفحة.</div>'; console.error(error); return; }
     if (data?.status === "approved") {
-      area.innerHTML = '<div class="book-status approved"><i class="fa-solid fa-circle-check"></i> تم تأكيد الدفع. يمكنك الحصول على الكتاب الآن.</div><button class="book-primary-action" type="button" data-book-delivery><i class="fa-brands fa-telegram"></i> فتح الكتاب على Telegram</button>';
+      area.innerHTML = '<div class="book-status approved"><i class="fa-solid fa-circle-check"></i> تم تأكيد الدفع. يمكنك الحصول على الكتاب الآن.</div><button class="book-primary-action" type="button" data-book-delivery><i class="fa-brands fa-telegram"></i> فتح رابط الكتاب</button>';
       return;
     }
     if (data?.status === "pending") {
@@ -115,7 +115,7 @@
     try {
       const { data,error } = await sb.rpc("get_book_delivery_link",{p_book_id:book.id});
       if (error) throw error;
-      if (!data || !/^https:\/\/(t\.me|telegram\.me)\//.test(data)) throw new Error("رابط تسليم الكتاب غير متاح حاليًا.");
+      if (!data || !/^https?:\/\//i.test(data)) throw new Error("رابط تسليم الكتاب غير متاح حاليًا.");
       window.location.assign(data);
     } catch (error) {
       console.error("Book delivery lookup failed:",error);
