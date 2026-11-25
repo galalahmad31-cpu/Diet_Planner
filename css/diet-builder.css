@@ -40,7 +40,7 @@
 .dpb-table .dpb-actions{white-space:nowrap}
 .dpb-table .dpb-actions button{
   padding:7px 8px;border:0;border-radius:8px;background:#fee2e2;
-  color:#b91c1c;font:700 10px inherit;cursor:pointer;
+  color:#b91c1c;font:inherit;font-size:10px;font-weight:700;cursor:pointer;
 }
 .dpb-table tbody tr:nth-child(even){background:var(--dp-surface-2,#f8fafc)}
 .dpb-table tbody tr:last-child td{border-bottom:0}
