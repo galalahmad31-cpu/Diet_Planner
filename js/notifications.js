@@ -47,15 +47,6 @@ const TAB_INFO = {
 
 const esc = window.DPUtils.escapeHtml;
 
-const dateKey = window.DPDate.dateKey;
-const todayKey = window.DPDate.todayKey;
-const daysUntil = window.DPDate.daysUntil;
-
-function addMonthsToDateKey(baseDate, months) {
-  if (!Number.isInteger(Number(months))) return '';
-  return window.DPDate.addMonths(baseDate, months);
-}
-
 
 const formatDate = window.DPDate.formatDMY;
 function mapCalculatedNotifications(events, financeRows) {
