@@ -217,7 +217,6 @@ function buildDietPreview(){
  minerals.forEach(x=>h+='<div class="dp-mineral"><span>'+x[0]+'</span><strong>'+x[1]+' <small>'+x[2]+'</small></strong></div>');
  h+='</div></details></section><section class="dp-menu"><div class="dp-section-head"><h2 class="dp-section-title">الوجبات</h2><span>'+day.meals.length+' وجبات</span></div>';
  day.meals.forEach((m,i)=>{
-  const mealId='dp-meal-'+i;
   h+='<details class="dp-meal" '+(i===0?'open':'')+'><summary class="dp-meal-head"><span class="dp-meal-num">'+(i+1)+'</span><h3>'+esc(m.name||('وجبة '+(i+1)))+'</h3><span class="dp-count">'+m.items.length+' أصناف</span><span class="dp-meal-chevron" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span></summary>';
   if(!m.items.length)h+='<p class="dp-empty">لم تتم إضافة أصناف لهذه الوجبة.</p>';
   else {h+='<div class="dp-food-list">';
@@ -274,16 +273,16 @@ function prepareDietPrint(){
     .dp-section-head{margin:0 0 1mm!important;padding-bottom:1mm!important;border-bottom:1px solid #b9c8ce!important}
     .dp-section-head .dp-section-title{font-size:9pt!important;margin:0!important}.dp-section-head>span{font-size:6pt!important}
     .dp-meal{display:block!important;margin:0 0 1.8mm!important;padding:0!important;border:0!important;border-bottom:1px solid #dfe7eb!important;border-radius:0!important;background:#fff!important;overflow:visible!important;break-inside:auto!important;page-break-inside:auto!important}
-    .dp-meal-head{display:flex!important;gap:1.5mm!important;padding:1mm 1.5mm!important;background:#f2f6f7!important;border:0!important;border-bottom:1px solid #e3eaee!important;break-after:avoid!important;page-break-after:avoid!important}
+    .dp-meal>summary{list-style:none!important}.dp-meal>summary::-webkit-details-marker{display:none!important}.dp-meal:not([open])>.dp-food-list{display:block!important}.dp-meal-head{display:flex!important;gap:1.5mm!important;padding:1mm 1.5mm!important;background:#f2f6f7!important;border:0!important;border-bottom:1px solid #e3eaee!important;break-after:avoid!important;page-break-after:avoid!important}
     .dp-meal-num{height:4mm!important;flex:0 0 4mm!important;border-radius:1mm!important;font-size:6pt!important}
     .dp-meal-head h3{font-size:8pt!important;line-height:1.2!important;color:#17384b!important}.dp-count{font-size:6pt!important}
     .dp-food-list{padding:0 1mm!important}
-    .dp-food{display:grid!important;direction:rtl!important;grid-template-columns:minmax(0,1.65fr) minmax(13mm,.7fr) minmax(0,1.1fr) minmax(12mm,.65fr) minmax(0,1.1fr)!important;gap:1.2mm!important;align-items:center!important;padding:.8mm 0!important;border-bottom:.25mm solid #edf1f3!important;break-inside:avoid!important;page-break-inside:avoid!important}
+    .dp-food{display:grid!important;direction:rtl!important;grid-template-columns:minmax(0,1.5fr) minmax(13mm,.65fr) minmax(0,1fr)!important;gap:1.2mm!important;align-items:center!important;padding:.8mm 0!important;border-bottom:.25mm solid #edf1f3!important;break-inside:avoid!important;page-break-inside:avoid!important}
     .dp-food-main,.dp-food-detail,.dp-food-note{grid-column:auto!important;grid-row:auto!important;min-width:0!important;width:auto!important}
     .dp-food-main strong,.dp-food-detail b{font-size:6.8pt!important;line-height:1.15!important;font-weight:700!important}
     .dp-food-main small,.dp-label{font-size:5.5pt!important;line-height:1.1!important}
     .dp-food-detail{display:flex!important;flex-direction:column!important;gap:.3mm!important;align-items:flex-start!important}
-    .dp-food-note{display:flex!important;flex-direction:column!important;gap:.3mm!important;align-items:flex-start!important;padding:0!important;background:transparent!important;border-radius:0!important}
+    .dp-food-note{grid-column:1/-1!important;display:flex!important;flex-direction:row!important;gap:1mm!important;align-items:baseline!important;padding:0!important;background:transparent!important;border-radius:0!important}
     .dp-food-note p{margin:0!important;font-size:6pt!important;line-height:1.15!important;color:#80612d!important;overflow-wrap:anywhere!important}
     .dp-empty{padding:1.5mm!important;font-size:6pt!important}
     .dp-notes{margin-top:2mm!important;padding:1.5mm 2mm!important;border:1px solid #e7d9b8!important;border-radius:1mm!important;background:#fffaf0!important;break-inside:avoid!important}
