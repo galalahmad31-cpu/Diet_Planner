@@ -51,26 +51,6 @@
   .dpb-table{min-width:0}
   .dpb-table .dpb-actions{display:none!important}
 }
-.dpb-table-wrap{width:100%;overflow-x:auto;border:1px solid var(--dp-border,var(--border-color,#e2e8f0));border-radius:12px;background:var(--dp-surface,var(--card-bg,#fff))}
-.dpb-table{width:100%;min-width:560px;border-collapse:separate;border-spacing:0;text-align:right;font-size:12px}
-.dpb-table thead{background:var(--dp-surface-2,#f8fafc);color:var(--dp-text-2,#64748b)}
-.dpb-table th{padding:12px 10px;font-weight:800;white-space:nowrap;border-bottom:1px solid var(--dp-border,#e2e8f0)}
-.dpb-table td{padding:9px 10px;border-bottom:1px solid var(--dp-border,#e2e8f0);vertical-align:middle}
-.dpb-table tbody tr:last-child td{border-bottom:0}
-.dpb-table tbody tr:nth-child(even){background:var(--dp-surface-2,#f8fafc)}
-.dpb-table .dpb-food{font-weight:800;color:var(--dp-text,#1e293b);min-width:140px}
-.dpb-table .dpb-grams{text-align:center;white-space:nowrap;font-weight:800}
-.dpb-table .dpb-grams input{width:84px;max-width:100%;padding:8px 5px;text-align:center;border:1px solid var(--dp-border,#cbd5e1);border-radius:8px;background:var(--dp-input,#fff);color:var(--dp-text,#1e293b);font:inherit;font-weight:800}
-.dpb-table .dpb-grams span{margin-inline-start:5px;font-size:10px;color:var(--dp-muted,#64748b)}
-.dpb-table .dpb-household{text-align:center;color:var(--dp-primary,#0d9488);font-weight:800;min-width:110px}
-.dpb-table .dpb-notes{min-width:130px}
-.dpb-table .dpb-notes input{width:100%;min-width:110px;box-sizing:border-box;padding:8px;border:1px solid var(--dp-border,#cbd5e1);border-radius:8px;background:var(--dp-input,#fff);color:var(--dp-text,#1e293b);font:inherit}
-.dpb-table .dpb-actions{text-align:center;white-space:nowrap}
-.dpb-table .dpb-actions button{padding:7px 10px;border:0;border-radius:8px;background:#fee2e2;color:#b91c1c;font:700 11px inherit;cursor:pointer}
-.dpb-table .dpb-empty{text-align:center;color:var(--dp-muted,#94a3b8);padding:24px}
-.dpb-caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-@media print{.dpb-table-wrap{overflow:visible}.dpb-table{min-width:0}.dpb-actions{display:none!important}}
-
 /* Shared meal controls: one visual system for the diet library and patient plan. */
 .meal-card{min-width:0;border:0;border-top:1px solid var(--dp-border,#e2e8f0);border-radius:0;background:transparent}
 .meal-card-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;background:transparent;border:0}
