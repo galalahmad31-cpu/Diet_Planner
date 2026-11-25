@@ -6,7 +6,7 @@
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const money=v=>Number(v||0).toLocaleString("ar-EG",{maximumFractionDigits:2})+" ج.م";
  const date=v=>v?new Date(v).toLocaleString("ar-EG",{dateStyle:"medium",timeStyle:"short"}):"—";
- const isValidTelegramUrl=value=>typeof value==="string"&&/^https:\/\/(?:t\.me|telegram\.me)\/(?:\+(?:[A-Za-z0-9_-]+)|joinchat\/[A-Za-z0-9_-]+|[A-Za-z][A-Za-z0-9_]{4,31}\/?|[A-Za-z][A-Za-z0-9_]{4,31}\/[1-9][0-9]*(?:\?single)?)$/i.test(value);
+ const isValidDeliveryUrl=value=>{try{const url=new URL(value);return (url.protocol==="https:"||url.protocol==="http:")&&!!url.hostname&&!/\s/.test(value)}catch{return false}};
  const coverUrl=path=>path?sb.storage.from("book-covers").getPublicUrl(path).data.publicUrl:"";
  let toastTimer=null;
  function toast(message){const box=$("booksAdminToast");box.textContent=message;box.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove("show"),2800)}
@@ -68,7 +68,7 @@
     '<p>المستخدم: '+esc(profile.full_name||"مستخدم")+' · '+esc(profile.email||"")+'</p><p>القيمة: '+esc(money(order.amount))+' · '+esc(date(order.created_at))+'</p>'+
     '<span class="books-admin-status '+esc(order.status)+'">'+esc(statusLabel(order.status))+'</span></div><div class="books-admin-order-actions">'+
     '<button type="button" data-order-proof="'+esc(order.payment_proof_path)+'">عرض الإيصال</button>'+
-    (order.status==="pending"?'<button type="button" data-order-approve="'+esc(order.id)+'" '+(!linkReady?'disabled title="أضف رابط Telegram للكتاب أولًا"':'')+'>تأكيد الدفع</button><button type="button" data-order-reject="'+esc(order.id)+'">رفض</button>':'')+
+    (order.status==="pending"?'<button type="button" data-order-approve="'+esc(order.id)+'" '+(!linkReady?'disabled title="أضف رابط تسليم الكتاب أولًا"':'')+'>تأكيد الدفع</button><button type="button" data-order-reject="'+esc(order.id)+'">رفض</button>':'')+
     '</div></article>';
   }).join("");
  }
@@ -103,7 +103,7 @@
   $("booksAdminFree").checked=book?.is_free===true;$("booksAdminStatus").value=book?.status||"draft";
   $("booksAdminDescription").value=book?.description||"";
   $("booksAdminFeatures").value=Array.isArray(book?.features)?book.features.join("\n"):"";
-  $("booksAdminTelegram").value=book?state.links.get(book.id)||"":"";
+  $("booksAdminDeliveryUrl").value=book?state.links.get(book.id)||"":"";
   $("booksAdminSort").value=book?.sort_order??0;$("booksAdminCover").value="";
   $("booksAdminPrice").disabled=!!book?.is_free;
   $("booksAdminModal").hidden=false;
@@ -112,10 +112,10 @@
  async function saveBook(event){
   event.preventDefault();if(state.busy)return;
   const id=$("booksAdminId").value||null,title=$("booksAdminTitle").value.trim(),isFree=$("booksAdminFree").checked;
-  const telegram=$("booksAdminTelegram").value.trim(),status=$("booksAdminStatus").value,file=$("booksAdminCover").files[0];
+  const telegram=$("booksAdminDeliveryUrl").value.trim(),status=$("booksAdminStatus").value,file=$("booksAdminCover").files[0];
   if(!title){toast("اكتب اسم الكتاب.");return}
-  if(status==="published"&&!isValidTelegramUrl(telegram)){toast("أضف رابط Telegram صحيحًا قبل نشر الكتاب.");return}
-  if(telegram&&!isValidTelegramUrl(telegram)){toast("رابط Telegram غير صحيح.");return}
+  if(status==="published"&&!isValidDeliveryUrl(telegram)){toast("أضف رابط تسليم صالحًا (HTTP أو HTTPS) قبل نشر الكتاب.");return}
+  if(telegram&&!isValidDeliveryUrl(telegram)){toast("الرابط غير صالح. استخدم عنوانًا يبدأ بـ https:// أو http://");return}
   if(file&&(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024)){toast("الغلاف يجب أن يكون JPG أو PNG أو WEBP وبحد أقصى 5MB.");return}
   const existing=state.books.find(book=>book.id===id);
   const payload={title,author:$("booksAdminAuthor").value.trim(),category:$("booksAdminCategory").value.trim(),description:$("booksAdminDescription").value.trim(),features:$("booksAdminFeatures").value.split("\n").map(x=>x.trim()).filter(Boolean),price:isFree?0:Number($("booksAdminPrice").value),is_free:isFree,status,sort_order:Math.max(0,Number($("booksAdminSort").value)||0),updated_at:new Date().toISOString()};
@@ -178,7 +178,7 @@
  }
  async function reviewOrder(id,status){
   const order=state.orders.find(item=>item.id===id);if(!order||order.status!=="pending")return;
-  if(status==="approved"&&!state.links.has(order.book_id)){toast("لا يمكن التأكيد قبل إضافة رابط Telegram للكتاب.");return}
+  if(status==="approved"&&!state.links.has(order.book_id)){toast("لا يمكن التأكيد قبل إضافة رابط تسليم الكتاب.");return}
   const approved=status==="approved";
   const confirmed=await confirmDialog({title:approved?"تأكيد الدفع وإتاحة الكتاب":"تأكيد رفض الطلب",message:approved?"سيتم تسجيل استلام التحويل وإتاحة رابط الكتاب للمستخدم. هل تريد المتابعة؟":"سيتم رفض طلب الشراء ولن يتم إتاحة رابط الكتاب. هل تريد المتابعة؟",confirmText:approved?"تأكيد الدفع":"تأكيد الرفض",danger:!approved});
   if(!confirmed)return;
