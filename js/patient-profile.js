@@ -636,16 +636,16 @@
 
     dietPlanModulePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'js/diet-builder.js?v=20261125-unified-builder-v1';
+      script.src = 'js/diet-builder.js?v=20261125-unified-builder-v2';
       script.onload = () => {
         const summaryScript = document.createElement('script');
         summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v2';
         summaryScript.onload = () => {
           const pickerScript = document.createElement('script');
-          pickerScript.src = 'js/food-picker.js?v=20261125-unified-builder-v1';
+          pickerScript.src = 'js/food-picker.js?v=20261125-unified-builder-v2';
           pickerScript.onload = () => {
             const planScript = document.createElement('script');
-            planScript.src = 'js/visit-diet-plan.js?v=20261125-unified-builder-v1';
+            planScript.src = 'js/visit-diet-plan.js?v=20261125-unified-builder-v2';
             planScript.async = true;
             planScript.onload = () => {
               if (typeof window.dietPlan?.openPlan !== 'function') {
