@@ -79,12 +79,12 @@
   try{
    const [books,links,orders,settings]=await Promise.all([
     sb.from("books").select("*").order("sort_order",{ascending:true}).order("created_at",{ascending:false}),
-    sb.from("book_delivery_links").select("book_id,telegram_url"),
+    sb.from("book_delivery_links").select("book_id,delivery_url"),
     sb.from("book_orders").select("id,user_id,book_id,amount,payment_proof_path,status,created_at,books(title)").order("created_at",{ascending:false}),
     sb.from("book_store_settings").select("*").eq("id",true).maybeSingle()
    ]);
    for(const result of [books,links,orders,settings])if(result.error)throw result.error;
-   state.books=books.data||[];state.links=new Map((links.data||[]).map(item=>[item.book_id,item.telegram_url]));state.orders=orders.data||[];state.settings=settings.data||{};
+   state.books=books.data||[];state.links=new Map((links.data||[]).map(item=>[item.book_id,item.delivery_url]));state.orders=orders.data||[];state.settings=settings.data||{};
    const ids=[...new Set(state.orders.map(order=>order.user_id))];
    state.profiles.clear();
    if(ids.length){const profiles=await sb.from("profiles").select("id,full_name,email").in("id",ids);if(profiles.error)throw profiles.error;(profiles.data||[]).forEach(profile=>state.profiles.set(profile.id,profile))}
@@ -127,7 +127,7 @@
    let saved;
    if(id){const result=await sb.from("books").update(payload).eq("id",id).select("*").single();if(result.error)throw result.error;saved=result.data}
    else{const result=await sb.from("books").insert(payload).select("*").single();if(result.error)throw result.error;saved=result.data}
-   if(telegram){const linkResult=await sb.from("book_delivery_links").upsert({book_id:saved.id,telegram_url:telegram,updated_at:new Date().toISOString()},{onConflict:"book_id"});if(linkResult.error)throw linkResult.error}
+   if(telegram){const linkResult=await sb.from("book_delivery_links").upsert({book_id:saved.id,delivery_url:telegram,updated_at:new Date().toISOString()},{onConflict:"book_id"});if(linkResult.error)throw linkResult.error}
    else if(id){const removed=await sb.from("book_delivery_links").delete().eq("book_id",saved.id);if(removed.error)throw removed.error}
    if(file&&existing?.cover_path)await sb.storage.from("book-covers").remove([existing.cover_path]);
    toast("تم حفظ بيانات الكتاب.");closeForm();state.loaded=false;await loadAll(true);
