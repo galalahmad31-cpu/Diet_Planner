@@ -317,8 +317,8 @@ async function openPicker(mealIndex,itemIndex=null){
   confirmText:existing?'حفظ التعديل':'إضافة للوجبة',
   onConfirm:({normalizedFood,grams,notes})=>{
    const target=day.meals[mealIndex];if(!target)return false;
-   if(itemIndex!==null){const item=target.items[itemIndex];if(!item)return false;item.food_id=String(normalizedFood.id);item.quantity_g=grams;item.household_measure=normalizedFood.household||'';item.notes=notes;}
-   else target.items.push({food_id:String(normalizedFood.id),quantity_g:grams,household_measure:normalizedFood.household||'',notes});
+   if(itemIndex!==null){if(!target.items[itemIndex])return false;window.DietPlannerDietBuilder.updateFoodItem(day.meals,mealIndex,itemIndex,{food_id:String(normalizedFood.id),quantity_g:grams,household_measure:normalizedFood.household||'',notes});}
+   else window.DietPlannerDietBuilder.addFoodItem(day.meals,mealIndex,{food_id:String(normalizedFood.id),quantity_g:grams,household_measure:normalizedFood.household||'',notes});
    renderDay();return true;
   }
  });
