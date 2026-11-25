@@ -675,7 +675,6 @@
     } finally {
       recoveryBusy = false;
       setRecoveryBusy(button, false, isResend ? "إعادة إرسال الرمز" : "إرسال رمز الاستعادة");
-      if (isResend) startRecoveryCooldown();
     }
   }
 
