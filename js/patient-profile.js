@@ -642,10 +642,10 @@
         summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v2';
         summaryScript.onload = () => {
           const pickerScript = document.createElement('script');
-          pickerScript.src = 'js/food-picker.js?v=20261123-single-source-v1';
+          pickerScript.src = 'js/food-picker.js?v=20261125-unified-builder-v1';
           pickerScript.onload = () => {
             const planScript = document.createElement('script');
-            planScript.src = 'js/visit-diet-plan.js?v=20261123-central-food-picker-v4';
+            planScript.src = 'js/visit-diet-plan.js?v=20261125-unified-builder-v1';
             planScript.async = true;
             planScript.onload = () => {
               if (typeof window.dietPlan?.openPlan !== 'function') {
