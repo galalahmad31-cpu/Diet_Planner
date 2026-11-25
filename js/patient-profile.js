@@ -1515,7 +1515,6 @@
       if (name) name.textContent = patientName;
       drawer.hidden = false;
       document.body.classList.add('patient-conversation-open');
-      openButton.setAttribute('aria-expanded', 'true');
       closeButton.focus();
       void window.DietPlannerPatientMessages?.mount(messagesRoot, {
         patientId: state.patient?.id || patientId,
