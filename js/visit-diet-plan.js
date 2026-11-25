@@ -137,7 +137,7 @@ async function loadPlan(shouldRender=true){
     patientInfo.targetPro=patientInfo.energy_target_protein??'';
     patientInfo.targetCarb=patientInfo.energy_target_carb??'';
     patientInfo.targetFat=patientInfo.energy_target_fat??'';
-    updateTargets(); if(shouldRender)renderDays();
+    if(shouldRender)renderDays();
     return;
   }
   let query=sb.from('nutrition_plans').select('id,patient_id,plan_name,start_date,target_fluid,notes,created_at,updated_at')
@@ -147,7 +147,7 @@ async function loadPlan(shouldRender=true){
   const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
   if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
   const plan=plans?.[0];
-  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;activePlanName=null;updateTargets();if(shouldRender)renderDays();return;}
+  if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;activePlanName=null;if(shouldRender)renderDays();return;}
   activeCloudPlanId=plan.id; activePlanStartDate=plan.start_date||null;
   activePlanName=plan.plan_name||'الخطة الغذائية باستخدام الجرامات';
   if(activePlanName.includes('البدائل')){
@@ -166,7 +166,7 @@ async function loadPlan(shouldRender=true){
   meals.forEach(meal=>{const group=mealsByDay.get(meal.day_id)||[];group.push(meal);mealsByDay.set(meal.day_id,group);});
   items.forEach(item=>{const group=itemsByMeal.get(item.meal_id)||[];group.push(item);itemsByMeal.set(item.meal_id,group);});
   daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:(mealsByDay.get(d.id)||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:(itemsByMeal.get(m.id)||[]).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,...(i.notes!=null?{notes:i.notes}:{})}))}))}));
-  savedDaysData=cloneDays(daysData); dayEditModes={}; updateTargets(); if(shouldRender)renderDays();
+  savedDaysData=cloneDays(daysData); dayEditModes={}; if(shouldRender)renderDays();
 }
 
 function getPlanFoodIds(){
@@ -175,9 +175,6 @@ function getPlanFoodIds(){
   if(item.foodId)ids.add(String(item.foodId));
  })));
  return [...ids];
-}
-
-function updateTargets(){
 }
 
 function isDayEditing(id){return!!dayEditModes[String(id)];}
@@ -850,6 +847,6 @@ async function openPlan(planId=null, createNew=false){
  return init();
 }
 
-window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, updateTargets, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
+window.dietPlan = {escapeHtml, num, cloneDays, showToast, openConfirmModal, closeConfirmModal, scaleHouseholdMeasure, formatHouseholdNumber, currentUser, loadPatient, loadFoods, ensureAllFoods, loadPlan, isDayEditing, setDayEditMode, editDay, saveDay, addNewDay, openDayDetails, closeDayDetails, duplicateDay, updateDayTitle, updateDayNotes, updateMealName, moveMeal, deleteDay, openAddMealModal, closeAddMealModal, confirmCreateMeal, deleteMeal, openFoodModal, updateMealItemGrams, updateMealItemNotes, deleteFoodItemFromMeal, renderDays, syncFixedMeals, renderFixedMealsList, initFixedMealsSearch, openFixedMeals, closeFixedMeals, applyFixedDiet, newCloudUuid, openPrintSettingsModal, closePrintSettingsModal, executePrint, goBack, init, openPlan};
 window.__dpDietPlanLoadError = null;
 })();
