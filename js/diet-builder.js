@@ -40,5 +40,50 @@ function bind(root,handlers){
   boundRoots.add(root);
  }
 }
-window.DietPlannerDietBuilder=Object.freeze({renderTable,bind});
+
+function formatHouseholdNumber(value){
+ const n=Number(value);
+ if(!Number.isFinite(n))return '—';
+ if(Math.abs(n-Math.round(n))<.0001)return String(Math.round(n));
+ return String(Math.round(n*100)/100).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
+}
+function scaleHouseholdMeasure(measure,grams){
+ if(!measure)return '—';
+ const g=Number(grams);
+ if(!Number.isFinite(g)||g<0)return String(measure);
+ const factor=g/100;
+ const arabic={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+ const fractions={'½':.5,'⅓':1/3,'⅔':2/3,'¼':.25,'¾':.75,'⅕':.2,'⅖':.4,'⅗':.6,'⅘':.8,'⅙':1/6,'⅚':5/6,'⅛':.125,'⅜':.375,'⅝':.625,'⅞':.875};
+ const normalized=String(measure).replace(/[٠-٩]/g,d=>arabic[d]);
+ let text=normalized;
+ Object.keys(fractions).forEach(symbol=>{text=text.replaceAll(symbol,formatHouseholdNumber(fractions[symbol]*factor));});
+ text=text.replace(/(^|[^\d.])(\d+(?:\.\d+)?)(?=\s|$|[^\d.])/g,(match,prefix,value)=>prefix+formatHouseholdNumber(Number(value)*factor));
+ return text===normalized?formatHouseholdNumber(factor)+' × '+text:text;
+}
+function calculateTotals(meals,foods,{foodIdKey='food_id',gramsKey='quantity_g',foodKeys={},outputKeys={}}={}){
+ const map=foods instanceof Map?foods:new Map((Array.isArray(foods)?foods:[]).map(food=>[String(food.id),food]));
+ const totals={kcal:0,protein:0,carb:0,fat:0,sodium:0,potassium:0,phosphorus:0};
+ const sourceKeys={kcal:'kcal',protein:'protein',carb:'carb',fat:'fat',sodium:'sodium',potassium:'potassium',phosphorus:'phosphorus',...foodKeys};
+ (Array.isArray(meals)?meals:[]).forEach(meal=>(Array.isArray(meal?.items)?meal.items:[]).forEach(item=>{
+  const food=map.get(String(item?.[foodIdKey]??''));
+  if(!food)return;
+  const factor=Math.max(0,Number(item?.[gramsKey])||0)/100;
+  Object.keys(totals).forEach(key=>{totals[key]+=(Number(food[sourceKeys[key]])||0)*factor;});
+ }));
+ return Object.keys(outputKeys).length?Object.fromEntries(Object.entries(totals).map(([key,value])=>[outputKeys[key]||key,value])):totals;
+}
+function renderMealCard({titleInputHtml='',actionsHtml='',rows=[],caption='أصناف الوجبة',editable=true}={}){
+ return '<article class="meal-card"><header class="meal-card-header"><div class="meal-title-wrap">'+titleInputHtml+'</div><div class="meal-card-actions no-print">'+actionsHtml+'</div></header>'+renderTable(rows,{editable,caption})+'</article>';
+}
+
+
+function addMeal(meals,meal){if(!Array.isArray(meals)||!meal)return false;meals.push(meal);return true;}
+function removeMeal(meals,index){if(!Array.isArray(meals)||!Number.isInteger(index)||index<0||index>=meals.length)return null;return meals.splice(index,1)[0]||null;}
+function moveMeal(meals,index,direction){if(!Array.isArray(meals))return false;const target=index+direction;if(!Number.isInteger(index)||!Number.isInteger(direction)||index<0||target<0||index>=meals.length||target>=meals.length)return false;[meals[index],meals[target]]=[meals[target],meals[index]];return true;}
+function renameMeal(meals,index,name){const meal=meals?.[index];if(!meal||!String(name??'').trim())return false;meal.name=String(name).trim();return true;}
+function addFoodItem(meals,mealIndex,item){const meal=meals?.[mealIndex];if(!meal||!item)return false;if(!Array.isArray(meal.items))meal.items=[];meal.items.push(item);return true;}
+function updateFoodItem(meals,mealIndex,itemIndex,patch){const item=meals?.[mealIndex]?.items?.[itemIndex];if(!item||!patch||typeof patch!=='object')return false;Object.assign(item,patch);return true;}
+function removeFoodItem(meals,mealIndex,itemIndex){const items=meals?.[mealIndex]?.items;if(!Array.isArray(items)||!Number.isInteger(itemIndex)||itemIndex<0||itemIndex>=items.length)return null;return items.splice(itemIndex,1)[0]||null;}
+
+window.DietPlannerDietBuilder=Object.freeze({renderTable,bind,formatHouseholdNumber,scaleHouseholdMeasure,calculateTotals,renderMealCard,addMeal,removeMeal,moveMeal,renameMeal,addFoodItem,updateFoodItem,removeFoodItem});
 })();
