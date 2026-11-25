@@ -161,7 +161,7 @@ function buildNotifications(rows) {
           tone,
           date: subscriptionEnd
         });
-      } else if (subscriptionDays < 0) {
+      } else if (subscriptionDays < 0 && subscriptionDays >= -7) {
         const expiredDays = Math.abs(subscriptionDays);
         const elapsedText = expiredDays === 1
           ? 'يوم واحد'
@@ -355,6 +355,14 @@ function subscribeToNotifications() {
       schema: 'public',
       table: 'notifications',
       filter: `recipient_id=eq.${currentUser.id}`
+    }, () => {
+      loadNotifications().catch(showError);
+    })
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'patient_finances',
+      filter: `user_id=eq.${currentUser.id}`
     }, () => {
       loadNotifications().catch(showError);
     })
