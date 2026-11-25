@@ -45,7 +45,7 @@ function formatHouseholdNumber(value){
  const n=Number(value);
  if(!Number.isFinite(n))return '—';
  if(Math.abs(n-Math.round(n))<.0001)return String(Math.round(n));
- return String(Math.round(n*100)/100).replace(/\\.0+$/,'').replace(/(\\.\\d*?)0+$/,'$1');
+ return String(Math.round(n*100)/100).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
 }
 function scaleHouseholdMeasure(measure,grams){
  if(!measure)return '—';
@@ -57,7 +57,7 @@ function scaleHouseholdMeasure(measure,grams){
  const normalized=String(measure).replace(/[٠-٩]/g,d=>arabic[d]);
  let text=normalized;
  Object.keys(fractions).forEach(symbol=>{text=text.replaceAll(symbol,formatHouseholdNumber(fractions[symbol]*factor));});
- text=text.replace(/(^|[^\\d.])(\\d+(?:\\.\\d+)?)(?=\\s|$|[^\\d.])/g,(match,prefix,value)=>prefix+formatHouseholdNumber(Number(value)*factor));
+ text=text.replace(/(^|[^\d.])(\d+(?:\.\d+)?)(?=\s|$|[^\d.])/g,(match,prefix,value)=>prefix+formatHouseholdNumber(Number(value)*factor));
  return text===normalized?formatHouseholdNumber(factor)+' × '+text:text;
 }
 function calculateTotals(meals,foods,{foodIdKey='food_id',gramsKey='quantity_g',foodKeys={},outputKeys={}}={}){
