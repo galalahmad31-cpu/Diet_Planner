@@ -638,7 +638,7 @@
       ['js/diet-builder.js?v=20261125-unified-builder-v2', 'تعذر تحميل محرك بناء الوجبات.'],
       ['js/nutrition-summary.js?v=20261123-central-summary-v2', 'تعذر تحميل ملخص القيم الغذائية.'],
       ['js/food-picker.js?v=20261125-unified-builder-v2', 'تعذر تحميل مكوّن اختيار الأغذية.'],
-      ['js/visit-diet-plan.js?v=20261125-editor-loader-fix-v1', 'تعذر تحميل وحدة خطة الجرامات.']
+      ['js/visit-diet-plan.js?v=20261125-fixed-diet-syntax-fix-v1', 'تعذر تحميل وحدة خطة الجرامات.']
     ];
 
     dietPlanModulePromise = (async () => {
