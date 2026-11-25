@@ -1496,7 +1496,7 @@
       if (linkButton) linkButton.hidden = true;
     }
   }
-  function bindPatientConversationDrawer() {
+  function bindPatientContactButton() {
     const openButton = $('openPatientConversation');
     if (!openButton) return;
 
@@ -1521,7 +1521,7 @@
 
   function bindEvents() {
     bindPatientModuleTabs();
-    bindPatientConversationDrawer();
+    bindPatientContactButton();
     bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {

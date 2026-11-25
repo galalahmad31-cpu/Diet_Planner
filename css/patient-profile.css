@@ -801,7 +801,7 @@ body.support-delete-modal-open{overflow:hidden}
 
 /* Inline measurement editor inside the history table. */
 
-/* Patient identity actions and responsive conversation panel */
+/* Patient identity actions */
 .patient-profile-identity{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .patient-profile-identity #patientName{min-width:0;flex:1 1 220px}
 .patient-profile-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
