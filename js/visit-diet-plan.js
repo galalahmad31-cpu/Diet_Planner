@@ -7,11 +7,12 @@
 /* Diet-plan module. Kept isolated in an IIFE to avoid global collisions. */
 (function(){
 
-const sb=window.DietPlannerAccess?.supabaseClient;
-if (!sb) {
- window.__dpDietPlanLoadError = 'DietPlannerAccess.supabaseClient غير متاح عند تحميل الوحدة';
- console.error(window.__dpDietPlanLoadError);
- return;
+let sb=null;
+function getSupabaseClient(){
+ const client=window.DietPlannerAccess?.supabaseClient;
+ if(!client)throw new Error('خدمة الاتصال بقاعدة البيانات غير جاهزة. تحقق من تحميل auth-access.js ومكتبة Supabase ثم أعد المحاولة.');
+ sb=client;
+ return client;
 }
 const params=new URLSearchParams(location.search);
 const initialUrlPatientId=params.get('patient_id') || params.get('id');
@@ -820,6 +821,7 @@ function init(){
  if(dietInitPromise)return dietInitPromise;
 
  dietInitPromise=(async()=>{
+   getSupabaseClient();
    patientId=params.get('patient_id') || params.get('id') || window.currentPatientId || null;
 const ok=await loadPatient();
    if(!ok){dietInitPromise=null;return false;}
