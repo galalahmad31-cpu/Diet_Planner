@@ -1149,10 +1149,14 @@
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
-      initializeLoginPage,
+      () => {
+        initializeLoginPage();
+        initializeRecoveryPage();
+      },
       { once: true }
     );
   } else {
     initializeLoginPage();
+    initializeRecoveryPage();
   }
 })();
