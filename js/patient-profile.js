@@ -643,17 +643,28 @@
 
     dietPlanModulePromise = (async () => {
       for (const [src, message] of modules) {
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = false;
-        script.dataset.dpDietModule = src.split('?')[0];
+        const modulePath = src.split('?')[0];
+        let script = Array.from(document.scripts).find(item => item.dataset.dpDietModule === modulePath);
+
+        if (script?.dataset.dpLoaded === 'true') continue;
+
+        if (!script) {
+          script = document.createElement('script');
+          script.src = src;
+          script.async = false;
+          script.dataset.dpDietModule = modulePath;
+        }
+
         await new Promise((resolve, reject) => {
-          script.onload = resolve;
+          script.onload = () => {
+            script.dataset.dpLoaded = 'true';
+            resolve();
+          };
           script.onerror = () => {
             script.remove();
-            reject(new Error(message + ' (' + src.split('?')[0] + ')'));
+            reject(new Error(message + ' (' + modulePath + ')'));
           };
-          document.head.appendChild(script);
+          if (!script.isConnected) document.head.appendChild(script);
         });
       }
 
