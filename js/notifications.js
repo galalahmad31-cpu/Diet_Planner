@@ -58,127 +58,20 @@ function addMonthsToDateKey(baseDate, months) {
 
 
 const formatDate = window.DPDate.formatDMY;
-function addNotification(list, row, details) {
-  list.push({
-    patientName: row.patients?.name || 'المريض',
-    ...details
-  });
-}
-
-function buildNotifications(rows) {
-  const result = {
-    today: [],
-    tomorrow: [],
-    subscriptions: []
-  };
-
-  const today = todayKey();
-
-  (rows || []).forEach((row) => {
-    const nextFollowUp = dateKey(row.next_follow_up_date);
-
-    const subscriptionEnd = dateKey(row.subscription_end_date) ||
-      addMonthsToDateKey(row.subscription_start_date, row.subscription_months);
-
-    /*
-     * Follow-up logic:
-     * - Today      -> next_follow_up_date = today
-     * - Tomorrow   -> next_follow_up_date = tomorrow
-     * Past dates remain overdue and are NOT automatically rolled forward.
-     */
-    if (nextFollowUp) {
-      const followUpDays = daysUntil(nextFollowUp, today);
-
-      if (followUpDays === 0) {
-        addNotification(result.today, row, {
-          type: 'متابعة اليوم',
-          title: 'موعد المتابعة اليوم',
-          text: 'المريض لديه موعد متابعة اليوم.',
-          icon: 'fa-solid fa-calendar-check',
-          tone: 'info',
-          date: nextFollowUp
-        });
-      }
-
-      if (followUpDays === 1) {
-        addNotification(result.tomorrow, row, {
-          type: 'متابعة الغد',
-          title: 'موعد المتابعة غدًا',
-          text: 'المريض لديه موعد متابعة غدًا.',
-          icon: 'fa-solid fa-calendar-plus',
-          tone: 'info',
-          date: nextFollowUp
-        });
-      }
-    }
-
-    /*
-     * Subscription logic:
-     * - Show a daily countdown from 7 days before expiry through expiry day.
-     * - Example: 7, 6, 5 ... 2, 1, today.
-     * - If subscription_end_date is missing, derive it from subscription_start_date + subscription_months.
-     * - Keep expired subscriptions visible with a renewal action message.
-     * - No database notification rows are created; notifications are
-     *   calculated fresh from subscription_end_date on every page load.
-     */
-    if (subscriptionEnd) {
-      const subscriptionDays = daysUntil(subscriptionEnd, today);
-
-      if (subscriptionDays >= 0 && subscriptionDays <= 7) {
-        const isToday = subscriptionDays === 0;
-        const isTomorrow = subscriptionDays === 1;
-
-        let type;
-        let title;
-        let text;
-        let icon = 'fa-solid fa-calendar-days';
-        let tone = 'info';
-
-        if (isToday) {
-          type = 'ينتهي اليوم';
-          title = 'الاشتراك ينتهي اليوم';
-          text = 'ينتهي اشتراك المريض اليوم. يُرجى التواصل معه لتجديد الاشتراك واستمرار المتابعة.';
-          icon = 'fa-solid fa-triangle-exclamation';
-          tone = 'danger';
-        } else if (isTomorrow) {
-          type = 'ينتهي غدًا';
-          title = 'الاشتراك يقترب من الانتهاء';
-          text = 'يتبقى يوم واحد على انتهاء الاشتراك. يُفضّل التواصل مع المريض لتجديد الاشتراك قبل انتهائه.';
-          icon = 'fa-solid fa-calendar-day';
-          tone = 'warning';
-        } else {
-          type = `ينتهي خلال ${subscriptionDays} أيام`;
-          title = 'الاشتراك يقترب من الانتهاء';
-          text = `يتبقى ${subscriptionDays} أيام على انتهاء الاشتراك. يُفضّل التواصل مع المريض مسبقًا لتجديد الاشتراك.`;
-          tone = subscriptionDays <= 3 ? 'warning' : 'info';
-        }
-
-        addNotification(result.subscriptions, row, {
-          type,
-          title,
-          text,
-          icon,
-          tone,
-          date: subscriptionEnd
-        });
-      } else if (subscriptionDays < 0 && subscriptionDays >= -7) {
-        const expiredDays = Math.abs(subscriptionDays);
-        const elapsedText = expiredDays === 1
-          ? 'يوم واحد'
-          : `${expiredDays} أيام`;
-
-        addNotification(result.subscriptions, row, {
-          type: 'انتهى الاشتراك',
-          title: 'انتهى اشتراك المريض',
-          text: `انتهى الاشتراك منذ ${elapsedText}. يُرجى التواصل مع المريض لتجديد الاشتراك واستمرار المتابعة.`,
-          icon: 'fa-solid fa-circle-exclamation',
-          tone: 'danger',
-          date: subscriptionEnd
-        });
-      }
+function mapCalculatedNotifications(events, financeRows) {
+  const names = new Map((financeRows || []).map(row => [row.patient_id, row.patients?.name || 'المريض']));
+  const result = { today: [], tomorrow: [], subscriptions: [] };
+  (events || []).forEach(event => {
+    const item = { id: event.id, read_at: event.read_at, patientName: names.get(event.patient_id) || 'المريض', title: event.title, text: event.body, date: String(event.source_key || '').split(':').at(-1) };
+    if (event.event_type === 'calculated_follow_up_today') result.today.push({ ...item, type: 'متابعة اليوم', icon: 'fa-solid fa-calendar-check', tone: 'info' });
+    else if (event.event_type === 'calculated_follow_up_tomorrow') result.tomorrow.push({ ...item, type: 'متابعة الغد', icon: 'fa-solid fa-calendar-plus', tone: 'info' });
+    else if (event.event_type === 'calculated_subscription') {
+      const expired = event.title === 'انتهى اشتراك المريض';
+      const today = event.title === 'الاشتراك ينتهي اليوم';
+      const tomorrow = event.body.includes('يوم واحد');
+      result.subscriptions.push({ ...item, type: expired ? 'انتهى الاشتراك' : today ? 'ينتهي اليوم' : tomorrow ? 'ينتهي غدًا' : 'اشتراك يقترب من الانتهاء', icon: expired || today ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-calendar-days', tone: expired || today ? 'danger' : tomorrow ? 'warning' : 'info' });
     }
   });
-
   return result;
 }
 
@@ -227,7 +120,7 @@ function render() {
   list.forEach((notification) => {
     const element = document.createElement('div');
 
-    element.className = 'card glass rounded-3xl p-4 sm:p-5 notification-card';
+    element.className = 'card glass rounded-3xl p-4 sm:p-5 notification-card' + (notification.read_at ? ' is-read' : '');
 
     element.innerHTML = `
       <div class="flex items-start gap-4">
@@ -264,6 +157,10 @@ function render() {
               `
               : ''
           }
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <span class="text-xs font-bold notification-read-state">${notification.read_at ? 'تمت القراءة' : 'غير مقروء'}</span>
+            ${notification.read_at ? '' : `<button type="button" class="notification-mark-read" data-mark-calculated-read="${esc(notification.id)}">تمت القراءة</button>`}
+          </div>
         </div>
       </div>
     `;
@@ -320,25 +217,28 @@ async function loadNotifications() {
     financeRows = data || [];
   }
 
+  await window.DPNotificationStore.sync(user);
+
   const { data: events, error: eventError } = await supabase
     .from('notifications')
-    .select('id,event_type,title,body,created_at,read_at,patient_id,actor_id')
+    .select('id,event_type,title,body,created_at,read_at,patient_id,actor_id,source_key')
     .eq('recipient_id', user.id)
     .order('created_at', { ascending: false })
     .limit(100);
   if (eventError) throw eventError;
 
+  const calculated = mapCalculatedNotifications(events || [], financeRows);
   state.notifications = {
-    ...buildNotifications(financeRows),
-    messages: (events || []).map(event => ({
+    ...calculated,
+    messages: (events || []).filter(event => !String(event.event_type).startsWith('calculated_')).map(event => ({
       ...event,
       icon: event.event_type === 'message_received' ? 'fa-comment-dots' : 'fa-bowl-food'
     }))
   };
 
-  $('todayCount').textContent = state.notifications.today.length;
-  $('tomorrowCount').textContent = state.notifications.tomorrow.length;
-  $('subscriptionCount').textContent = state.notifications.subscriptions.length;
+  $('todayCount').textContent = state.notifications.today.filter(item => !item.read_at).length;
+  $('tomorrowCount').textContent = state.notifications.tomorrow.filter(item => !item.read_at).length;
+  $('subscriptionCount').textContent = state.notifications.subscriptions.filter(item => !item.read_at).length;
   $('messagesCount').textContent = state.notifications.messages.filter(item => !item.read_at).length;
 
   updateTabButtons();
@@ -370,6 +270,16 @@ function subscribeToNotifications() {
 }
 
 document.addEventListener('click', async (event) => {
+  const markReadButton = event.target.closest('[data-mark-calculated-read]');
+  if (markReadButton) {
+    markReadButton.disabled = true;
+    const { error } = await supabase.from('notifications').update({ read_at: new Date().toISOString() })
+      .eq('id', markReadButton.dataset.markCalculatedRead).eq('recipient_id', currentUser.id).is('read_at', null);
+    if (error) { console.error('Unable to mark calculated notification as read:', error); markReadButton.disabled = false; return; }
+    await loadNotifications();
+    return;
+  }
+
   const openButton = event.target.closest('[data-notification-open]');
   if (openButton) {
     if (openButton.disabled) return;
