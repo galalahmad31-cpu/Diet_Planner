@@ -645,7 +645,7 @@
           pickerScript.src = 'js/food-picker.js?v=20261125-unified-builder-v2';
           pickerScript.onload = () => {
             const planScript = document.createElement('script');
-            planScript.src = 'js/visit-diet-plan.js?v=20261125-unified-builder-v2';
+            planScript.src = 'js/visit-diet-plan.js?v=20261125-meal-actions-fix-v1';
             planScript.async = true;
             planScript.onload = () => {
               if (typeof window.dietPlan?.openPlan !== 'function') {

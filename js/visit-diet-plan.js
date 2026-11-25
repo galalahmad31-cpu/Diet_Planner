@@ -190,7 +190,7 @@ function setDayEditMode(id,editing){
  if(!card)return;
  card.classList.toggle('day-locked',!editing);
  card.querySelectorAll('input,select,textarea').forEach(e=>e.disabled=!editing);
- card.querySelectorAll('button').forEach(b=>{if(b.classList.contains('day-action-always'))return;b.disabled=!editing;});
+ card.querySelectorAll('button').forEach(b=>{if(b.classList.contains('day-action-always')||b.matches('.day-edit-btn,.day-add-meal-btn,.day-fixed-meal-btn'))return;b.disabled=!editing;});
  const e=card.querySelector('.day-edit-btn'),s=card.querySelector('.day-save-btn'); if(e)e.disabled=editing||savingDayIds.has(String(id));if(s){s.disabled=!editing||savingDayIds.has(String(id));s.textContent=savingDayIds.has(String(id))?'جارٍ الحفظ...':'حفظ';}
 }
 function editDay(id){if(daysData.find(d=>String(d.id)===String(id)))setDayEditMode(id,true);}
@@ -343,9 +343,12 @@ function deleteDay(id){
 }
 
 function openAddMealModal(id){
+ const day=daysData.find(item=>String(item.id)===String(id));
+ if(!day)return;
+ if(!isDayEditing(day.id))editDay(day.id);
  const modal=ensureDietModalPortal('addMealModal');
  if(!modal)return;
- targetMealDayId=id;
+ targetMealDayId=day.id;
  document.getElementById('newMealNameInput').value='';
  modal.classList.remove('hidden');
  document.getElementById('newMealNameInput').focus({preventScroll:true});
@@ -513,9 +516,12 @@ function initFixedMealsSearch(){
 }
 
 async function openFixedMeals(dayId){
+ const day=daysData.find(item=>String(item.id)===String(dayId));
+ if(!day)return;
+ if(!isDayEditing(day.id))editDay(day.id);
  const modal=ensureDietModalPortal('fixedMealsModal');
  if(!modal)return;
- fixedMealsTargetDayId=dayId;
+ fixedMealsTargetDayId=day.id;
  const search=document.getElementById('fixedMealsSearch');
  if(search)search.value='';
  document.getElementById('fixedMealsList').innerHTML='<div class="text-center py-8 text-slate-400 font-bold">جاري تحميل مكتبة الدايت...</div>';
