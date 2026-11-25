@@ -668,7 +668,7 @@
           script.onload = () => {
             window.removeEventListener('error', captureRuntimeError);
             if (runtimeError) {
-              script.dataset.dpLoaded = 'false';
+              script.remove();
               reject(runtimeError);
               return;
             }
