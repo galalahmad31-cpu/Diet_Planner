@@ -206,36 +206,39 @@ async function openDiet(id){const d=diets.find(x=>x.id===id);if(!d)return;await 
 function buildDietPreview(){
  const d=diets.find(x=>x.id===editingId)||{};
  const t=calcTotals();
- const macro=[['السعرات','kcal',t.kcal.toFixed(0)],['البروتين','جم',t.protein.toFixed(1)],['الكربوهيدرات','جم',t.carb.toFixed(1)],['الدهون','جم',t.fat.toFixed(1)],['الصوديوم','mg',t.sodium.toFixed(0)],['البوتاسيوم','mg',t.potassium.toFixed(0)],['الفسفور','mg',t.phosphorus.toFixed(0)]];
- let h=`<article class="diet-preview" dir="rtl">`;
+ const primary=[['السعرات',t.kcal.toFixed(0),'kcal'],['البروتين',t.protein.toFixed(1),'جم'],['الكربوهيدرات',t.carb.toFixed(1),'جم'],['الدهون',t.fat.toFixed(1),'جم']];
+ const minerals=[['الصوديوم',t.sodium.toFixed(0),'mg'],['البوتاسيوم',t.potassium.toFixed(0),'mg'],['الفسفور',t.phosphorus.toFixed(0),'mg']];
+ let h='<article class="diet-preview" dir="rtl">';
  h+='<header class="dp-cover"><div class="dp-brand"><span>DIET PLANNER</span><span class="dp-tag">خطة غذائية</span></div><h1>'+esc(d.name||$('dietName').value)+'</h1>';
  if(d.description||$('description').value)h+='<p>'+esc(d.description||$('description').value)+'</p>';
- h+='</header><section class="dp-summary"><h2 class="dp-section-title">القيم الغذائية اليومية</h2><div class="dp-macros">';
- macro.forEach(x=>h+='<div class="dp-macro"><span>'+x[0]+'</span><strong>'+x[2]+'</strong><small>'+x[1]+'</small></div>');
- h+='</div></section><section class="dp-menu"><div class="dp-section-head"><h2 class="dp-section-title">تفاصيل الوجبات</h2><span>'+day.meals.length+' وجبات</span></div>';
+ h+='</header><section class="dp-summary"><h2 class="dp-section-title">ملخص القيم الغذائية اليومية</h2><div class="dp-macros dp-macros-primary">';
+ primary.forEach(x=>h+='<div class="dp-macro"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>');
+ h+='</div><details class="dp-minerals"><summary>عرض المعادن</summary><div class="dp-minerals-grid">';
+ minerals.forEach(x=>h+='<div class="dp-mineral"><span>'+x[0]+'</span><strong>'+x[1]+' <small>'+x[2]+'</small></strong></div>');
+ h+='</div></details></section><section class="dp-menu"><div class="dp-section-head"><h2 class="dp-section-title">الوجبات</h2><span>'+day.meals.length+' وجبات</span></div>';
  day.meals.forEach((m,i)=>{
-  h+='<section class="dp-meal"><header class="dp-meal-head"><span class="dp-meal-num">'+(i+1)+'</span><h3>'+esc(m.name||('وجبة '+(i+1)))+'</h3><span class="dp-count">'+m.items.length+' أصناف</span></header>';
+  const mealId='dp-meal-'+i;
+  h+='<details class="dp-meal" '+(i===0?'open':'')+'><summary class="dp-meal-head"><span class="dp-meal-num">'+(i+1)+'</span><h3>'+esc(m.name||('وجبة '+(i+1)))+'</h3><span class="dp-count">'+m.items.length+' أصناف</span><span class="dp-meal-chevron" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span></summary>';
   if(!m.items.length)h+='<p class="dp-empty">لم تتم إضافة أصناف لهذه الوجبة.</p>';
   else {h+='<div class="dp-food-list">';
    m.items.forEach(it=>{
     const f=foods.find(x=>String(x.id)===String(it.food_id));
-    h+='<div class="dp-food"><div class="dp-food-main"><strong>'+esc(f?.name_ar||'صنف غير موجود')+'</strong>'+(f?.name_en?'<small>'+esc(f.name_en)+'</small>':'')+'</div>';
     const household=f?.household?scaleHouseholdMeasure(f.household,num(it.quantity_g)):(it.household_measure||'—');
-    h+='<div class="dp-food-detail"><span class="dp-label">الكمية بالجرام</span><b>'+num(it.quantity_g)+' جم</b></div>';
+    h+='<div class="dp-food"><div class="dp-food-main"><strong>'+esc(f?.name_ar||'صنف غير موجود')+'</strong>'+(f?.name_en?'<small>'+esc(f.name_en)+'</small>':'')+'</div>';
+    h+='<div class="dp-food-detail"><span class="dp-label">الكمية</span><b>'+num(it.quantity_g)+' جم</b></div>';
     h+='<div class="dp-food-detail"><span class="dp-label">المقياس المنزلي</span><b>'+esc(household)+'</b></div>';
-     h+='<div class="dp-food-note"><span class="dp-label">ملاحظة</span><p>'+esc(it.notes||'—')+'</p></div>';
+    if(it.notes)h+='<div class="dp-food-note"><span class="dp-label">ملاحظة</span><p>'+esc(it.notes)+'</p></div>';
     h+='</div>';
    });
    h+='</div>';
   }
-  h+='</section>';
+  h+='</details>';
  });
  h+='</section>';
  if($('notes').value.trim())h+='<section class="dp-notes"><h2 class="dp-section-title">ملاحظات وتعليمات</h2><p>'+esc($('notes').value).replace(/\n/g,'<br>')+'</p></section>';
  h+='<footer class="dp-footer"><span>Diet Planner</span><span>خطة غذائية منظمة</span></footer></article>';
  return h;
 }
-
 function prepareDietPrint(){
   const preview=document.querySelector('#editor .diet-preview-host .diet-preview');
   if(!preview)return;
