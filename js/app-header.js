@@ -317,7 +317,7 @@
         event_type: "calculated_subscription",
         title,
         body,
-        source_key: `subscription:${patientId}:${endDate}:${today}`
+        source_key: `subscription:${patientId}:${today}:${endDate}`
       });
     });
     return records;
