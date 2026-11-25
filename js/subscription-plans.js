@@ -28,7 +28,7 @@
     if (m.includes('invalid plan duration') || m.includes('invalid subscription duration')) return 'مدة خطة الاشتراك غير صحيحة.';
     if (m.includes('free trial has already been used')) return 'لقد تم استخدام التجربة المجانية لهذا الحساب من قبل.';
     if (m.includes('already have an active subscription')) return 'لديك اشتراك فعال بالفعل.';
-    return trial ? 'تعذر بدء التجربة المجانية حاليًا. تم تسجيل المحاولة.' : 'تعذر إنشاء طلب الاشتراك حاليًا.';
+    return trial ? 'تعذر بدء التجربة المجانية حاليًا.' : 'تعذر إنشاء طلب الاشتراك حاليًا.';
   }
 
   function showError(context, error, trial = false) {
