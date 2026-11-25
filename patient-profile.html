@@ -17,7 +17,7 @@
   <script src="js/weight-logs-table.js?v=20261122-clean-measurement-headings-v1" defer></script>
   <script src="js/patient-lab-results.js?v=20261124-clean-lab-heading-v2" defer></script>
   <script src="js/dp-utils.js?v=20261122-central-utils-v1"></script>
-  <script src="js/patient-profile.js?v=20261125-runtime-diagnostic-v1" defer></script>
+  <script src="js/patient-profile.js?v=20261125-central-floating-chat-v1" defer></script>
   
   <script src="js/patient-portal-link.js?v=20261123-code-only-v1" defer></script>
   <script src="js/patient-messages.js?v=20261123-direct-file-messaging-v2" defer></script>
@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="css/diet-plan.css?v=20261125-central-table-align-v1">
   <link rel="stylesheet" href="css/diet-builder.css?v=20261125-bilingual-food-stack-v2">
   <link rel="stylesheet" href="css/nutrition-summary.css?v=20261123-central-summary-v2">
-  <link rel="stylesheet" href="css/patient-profile.css?v=20261123-labs-v1">
+  <link rel="stylesheet" href="css/patient-profile.css?v=20261125-central-floating-chat-v1">
   
   <link rel="stylesheet" href="css/weight-logs-table.css?v=20261124-inline-measurement-actions-v1">
   <link rel="stylesheet" href="css/patient-lab-results.css?v=20261124-clean-lab-spacing-v2">
@@ -55,7 +55,7 @@
       <div class="patient-profile-identity">
         <h2 id="patientName" class="font-black text-slate-800 text-2xl"></h2>
         <div id="patientActionToolbar" class="patient-profile-actions" aria-label="إجراءات المريض">
-          <button type="button" id="openPatientConversation" class="patient-profile-contact-button" aria-haspopup="dialog" aria-controls="patientConversationDrawer" aria-expanded="false" hidden>
+          <button type="button" id="openPatientConversation" class="patient-profile-contact-button" aria-haspopup="dialog" hidden>
             <i class="fa-solid fa-comments" aria-hidden="true"></i><span>التواصل مع المريض</span>
           </button>
         </div>
@@ -388,20 +388,7 @@
     </section>
   </section>
 </main>
-<div id="patientConversationDrawer" class="patient-conversation-overlay" hidden>
-  <aside class="patient-conversation-drawer" role="dialog" aria-modal="true" aria-labelledby="patientConversationTitle" dir="rtl">
-    <header class="patient-conversation-header">
-      <div class="patient-conversation-heading">
-        <span class="patient-conversation-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
-        <div><h2 id="patientConversationTitle">التواصل مع المريض</h2><p id="patientConversationPatientName">محادثة خاصة وآمنة</p></div>
-      </div>
-      <button type="button" id="closePatientConversation" class="patient-conversation-close" aria-label="إغلاق المحادثة"><i class="fa-solid fa-xmark"></i></button>
-    </header>
-    <div class="patient-conversation-body">
-      <div id="patientProfileMessages" data-patient-messages data-patient-role="professional"></div>
-    </div>
-  </aside>
-</div>
+
 
 <div id="dietPlanToastContainer" class="fixed bottom-5 left-5 z-[1000] space-y-2 pointer-events-none no-print"></div>
 <div id="printDocument" class="print-document" aria-hidden="true">

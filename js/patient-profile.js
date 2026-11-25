@@ -1496,40 +1496,16 @@
       if (linkButton) linkButton.hidden = true;
     }
   }
-  function bindPatientConversationDrawer() {
-    const drawer = $('patientConversationDrawer');
+  function bindPatientContactButton() {
     const openButton = $('openPatientConversation');
-    const closeButton = $('closePatientConversation');
-    const name = $('patientConversationPatientName');
-    const messagesRoot = $('patientProfileMessages');
-    if (!drawer || !openButton || !closeButton || !messagesRoot) return;
+    if (!openButton) return;
 
-    const close = () => {
-      drawer.hidden = true;
-      document.body.classList.remove('patient-conversation-open');
-      openButton.setAttribute('aria-expanded', 'false');
-      openButton.focus();
-    };
-    const open = () => {
+    openButton.addEventListener('click', () => {
       const patientName = state.patient?.name || $('patientName')?.textContent || 'المريض';
-      if (name) name.textContent = patientName;
-      drawer.hidden = false;
-      document.body.classList.add('patient-conversation-open');
-      openButton.setAttribute('aria-expanded', 'true');
-      closeButton.focus();
-      void window.DietPlannerPatientMessages?.mount(messagesRoot, {
-        patientId: state.patient?.id || patientId,
-        role: 'professional'
-      });
-    };
-
-    openButton.addEventListener('click', open);
-    closeButton.addEventListener('click', close);
-    drawer.addEventListener('click', event => {
-      if (event.target === drawer) close();
-    });
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && !drawer.hidden) close();
+      window.DietPlannerPatientMessages?.openConversation(
+        { name: patientName, subtitle: 'محادثة مباشرة مع المريض' },
+        { patientId: state.patient?.id || patientId, role: 'professional' }
+      );
     });
   }
 
@@ -1545,7 +1521,7 @@
 
   function bindEvents() {
     bindPatientModuleTabs();
-    bindPatientConversationDrawer();
+    bindPatientContactButton();
     bindDietPlanActions();
     // These controls live inside <summary>; cancel its toggle behavior but keep button actions.
     $('patientDataActions')?.addEventListener('click', (event) => {
