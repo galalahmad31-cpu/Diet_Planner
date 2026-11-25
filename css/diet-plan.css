@@ -792,6 +792,22 @@ html.visit-embedded #visitContent>section.visit-module-section{margin-top:0!impo
 .visit-main-shell .embedded-diet-plan #daysContainer .day-list-actions button:hover{
   border-color:var(--dp-primary);color:var(--dp-primary);
 }
+/* Patient gram-plan dialogs: keep overlays above sticky page layers after portal-to-body. */
+html body #addMealModal,
+html body #fixedMealsModal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:20000!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box;
+  margin:0!important;
+}
+html body #addMealModal.hidden,
+html body #fixedMealsModal.hidden{
+  display:none!important;
+}
 body .day-details-modal[hidden]{display:none!important}
 body .day-details-modal{
   position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
