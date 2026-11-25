@@ -146,3 +146,9 @@ body.notifications-page{
 .notifications-page .notification-open-button:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
 .notifications-page .notification-open-button:disabled{opacity:.6;cursor:wait}
 @media(max-width:520px){.notifications-page .notifications-tab-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.notifications-page .notification-mark-read{border:1px solid var(--dp-border);border-radius:9px;padding:7px 11px;background:var(--dp-surface-2);color:var(--dp-text);font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.notifications-page .notification-mark-read:hover{border-color:var(--dp-primary);color:var(--dp-primary)}
+.notifications-page .notification-mark-read:disabled{opacity:.6;cursor:wait}
+.notifications-page .notification-card.is-read{opacity:.78}
+.notifications-page .notification-read-state{color:var(--dp-text-2)}
