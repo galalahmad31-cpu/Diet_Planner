@@ -241,6 +241,47 @@
     return header;
   }
 
+  function notificationDateKey(value) {
+    const key = String(value ?? "").slice(0, 10);
+    return /^\\d{4}-\\d{2}-\\d{2}$/.test(key) ? key : "";
+  }
+
+  function notificationDaysUntil(target, reference) {
+    const a = notificationDateKey(target);
+    const b = notificationDateKey(reference);
+    if (!a || !b) return NaN;
+    return Math.round((Date.parse(a + "T00:00:00Z") - Date.parse(b + "T00:00:00Z")) / 86400000);
+  }
+
+  function notificationAddMonths(value, months) {
+    const key = notificationDateKey(value);
+    const count = Number(months);
+    if (!key || !Number.isFinite(count) || count === 0) return "";
+    const [year, month, day] = key.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setMonth(date.getMonth() + count);
+    if (!Number.isFinite(date.getTime())) return "";
+    if (date.getDate() !== day) date.setDate(0);
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  }
+
+  function countCalculatedNotifications(rows) {
+    const now = new Date();
+    const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+    let count = 0;
+    (rows || []).forEach(row => {
+      const followUpDays = notificationDaysUntil(row.next_follow_up_date, today);
+      if (followUpDays === 0 || followUpDays === 1) count++;
+
+      const endDate = notificationDateKey(row.subscription_end_date) ||
+        notificationAddMonths(row.subscription_start_date, row.subscription_months);
+      if (!endDate) return;
+      const subscriptionDays = notificationDaysUntil(endDate, today);
+      if (subscriptionDays < 0 || subscriptionDays <= 7) count++;
+    });
+    return count;
+  }
+
   async function syncNotificationBadge(user) {
     const supabase = access()?.supabaseClient;
     if (!supabase || !user?.id) {
@@ -250,26 +291,41 @@
       if (badge) badge.hidden = true;
       return;
     }
-    const currentLink = document.getElementById("dpNotificationLink");
-    if (currentLink) currentLink.hidden = false;
+    const link = document.getElementById("dpNotificationLink");
+    if (link) link.hidden = false;
+
     const refresh = async () => {
-      const { count, error } = await supabase.from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("recipient_id", user.id).is("read_at", null);
-      if (error) { console.error("Notification badge lookup failed:", error); return; }
-      const link = document.getElementById("dpNotificationLink");
+      const [notificationResult, financeResult] = await Promise.all([
+        supabase.from("notifications")
+          .select("id", { count: "exact", head: true })
+          .eq("recipient_id", user.id).is("read_at", null),
+        supabase.from("patient_finances")
+          .select("subscription_end_date,next_follow_up_date,subscription_start_date,subscription_months")
+          .eq("user_id", user.id)
+      ]);
+      if (notificationResult.error) {
+        console.error("Notification badge lookup failed:", notificationResult.error);
+        return;
+      }
+      if (financeResult.error) {
+        console.error("Calculated notification badge lookup failed:", financeResult.error);
+        return;
+      }
       const badge = document.getElementById("dpNotificationBadge");
-      if (!link || !badge) return;
-      const unread = Number(count || 0);
-      badge.textContent = unread > 99 ? "99+" : String(unread);
-      badge.hidden = unread === 0;
-      link.setAttribute("aria-label", unread ? `الإشعارات، ${unread} غير مقروء` : "الإشعارات");
+      const currentLink = document.getElementById("dpNotificationLink");
+      if (!currentLink || !badge) return;
+      const total = Number(notificationResult.count || 0) + countCalculatedNotifications(financeResult.data);
+      badge.textContent = total > 99 ? "99+" : String(total);
+      badge.hidden = total === 0;
+      currentLink.setAttribute("aria-label", total ? `الإشعارات، ${total} تنبيه` : "الإشعارات");
     };
+
     if (notificationUserId !== user.id) {
       if (notificationChannel) await supabase.removeChannel(notificationChannel);
       notificationUserId = user.id;
       notificationChannel = supabase.channel(`dp-header-notifications-${user.id}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `recipient_id=eq.${user.id}` }, refresh)
+        .on("postgres_changes", { event: "*", schema: "public", table: "patient_finances", filter: `user_id=eq.${user.id}` }, refresh)
         .subscribe();
     }
     await refresh();
