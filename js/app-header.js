@@ -243,7 +243,7 @@
 
   function notificationDateKey(value) {
     const key = String(value ?? "").slice(0, 10);
-    return /^\\d{4}-\\d{2}-\\d{2}$/.test(key) ? key : "";
+    return /^\d{4}-\d{2}-\d{2}$/.test(key) ? key : "";
   }
 
   function notificationDaysUntil(target, reference) {
@@ -277,7 +277,7 @@
         notificationAddMonths(row.subscription_start_date, row.subscription_months);
       if (!endDate) return;
       const subscriptionDays = notificationDaysUntil(endDate, today);
-      if (subscriptionDays < 0 || subscriptionDays <= 7) count++;
+      if (subscriptionDays >= -7 && subscriptionDays <= 7) count++;
     });
     return count;
   }
