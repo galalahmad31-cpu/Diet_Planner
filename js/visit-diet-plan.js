@@ -544,7 +544,7 @@ async function openFixedMeals(dayId){
  modal.classList.remove('hidden');
  initFixedMealsSearch();
  await syncFixedMeals();
- const list=document.getElementById('fixedMealsList');
+ if(!list.isConnected)return;
  if(!fixedMealsDatabase.length){
   list.innerHTML='<div class="text-center py-8 text-slate-400 font-bold">لا توجد دايتات منشورة أو دايتات خاصة بك في مكتبة الدايت</div>';
   return;
