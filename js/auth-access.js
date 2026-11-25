@@ -597,8 +597,8 @@
     const box = recoveryElement("recoveryMessage");
     if (!box) return;
     box.textContent = message;
-    box.className = "msg " + type;
-    box.style.display = "block";
+    box.className = "recovery-message " + type;
+    box.hidden = false;
     box.setAttribute("role", type === "error" ? "alert" : "status");
     box.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
   }
@@ -675,6 +675,11 @@
     } finally {
       recoveryBusy = false;
       setRecoveryBusy(button, false, isResend ? "إعادة إرسال الرمز" : "إرسال رمز الاستعادة");
+      if (isResend && getRecoveryCooldownRemaining() > 0 && button) {
+        const seconds = Math.ceil(getRecoveryCooldownRemaining() / 1000);
+        button.disabled = true;
+        button.textContent = `إعادة الإرسال بعد ${seconds} ثانية`;
+      }
     }
   }
 
@@ -761,7 +766,7 @@
     recoveryEmail = "";
     showRecoveryStep("recoveryEmailStep");
     const message = recoveryElement("recoveryMessage");
-    if (message) message.style.display = "none";
+    if (message) message.hidden = true;
     recoveryElement("recoveryEmail")?.focus();
   }
 
