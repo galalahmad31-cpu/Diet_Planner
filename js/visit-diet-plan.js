@@ -306,8 +306,8 @@ function duplicateDay(id){
 }
 function updateDayTitle(id,v){const d=daysData.find(x=>String(x.id)===String(id));if(!d||!isDayEditing(id))return;d.title=v;const row=document.querySelector(`[data-day-row="${CSS.escape(String(id))}"] .day-list-title`);if(row)row.textContent=v;const title=document.getElementById('dayDetailsTitle');if(title&&activeDayDetailsId===String(id))title.textContent=v;}
 function updateDayNotes(id,v){const d=daysData.find(x=>String(x.id)===String(id));if(d&&isDayEditing(id))d.notes=v;}
-function updateMealName(did,mid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(!m||!isDayEditing(did))return;if(!String(v).trim()){showToast('اسم الوجبة لا يمكن أن يكون فارغًا','error');renderDays();return}m.name=String(v).trim();}
-function moveMeal(did,mid,dir){const d=daysData.find(x=>x.id===did);if(!d||!isDayEditing(did))return;const i=d.meals.findIndex(x=>x.id===mid),n=i+Number(dir);if(i<0||n<0||n>=d.meals.length)return;const [m]=d.meals.splice(i,1);d.meals.splice(n,0,m);renderDays();}
+function updateMealName(did,mid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(!m||!isDayEditing(did))return;if(!String(v).trim()){showToast('اسم الوجبة لا يمكن أن يكون فارغًا','error');renderDays();return}window.DietPlannerDietBuilder.renameMeal(d.meals,d.meals.indexOf(m),v);}
+function moveMeal(did,mid,dir){const d=daysData.find(x=>x.id===did);if(!d||!isDayEditing(did))return;const i=d.meals.findIndex(x=>x.id===mid),n=i+Number(dir);if(i<0||n<0||n>=d.meals.length)return;window.DietPlannerDietBuilder.moveMeal(d.meals,i,Number(dir));renderDays();}
 function deleteDay(id){
  openConfirmModal('حذف اليوم','هل أنت متأكد من حذف هذا اليوم بالكامل؟',async()=>{
   const day=daysData.find(item=>String(item.id)===String(id));
@@ -355,8 +355,8 @@ function closeAddMealModal(){
  if(modal)modal.classList.add('hidden');
  targetMealDayId=null;
 }
-function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){d.meals.push({id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
-function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){d.meals=d.meals.filter(m=>m.id!==mid);renderDays();showToast('تم حذف الوجبة بنجاح')}});}
+function confirmCreateMeal(){const n=document.getElementById('newMealNameInput').value.trim();if(!n){showToast('يرجى كتابة اسم الوجبة','error');return}const d=daysData.find(x=>x.id===targetMealDayId);if(d&&isDayEditing(d.id)){window.DietPlannerDietBuilder.addMeal(d.meals,{id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:n,items:[]});renderDays();closeAddMealModal();showToast(`تمت إضافة ${n} بنجاح`);}}
+function deleteMeal(did,mid){openConfirmModal('حذف الوجبة','هل أنت متأكد من حذف هذه الوجبة بجميع عناصرها؟',()=>{const d=daysData.find(x=>x.id===did);if(d&&isDayEditing(did)){window.DietPlannerDietBuilder.removeMeal(d.meals,d.meals.findIndex(m=>m.id===mid));renderDays();showToast('تم حذف الوجبة بنجاح')}});}
 
 async function openFoodModal(dayId,mealId){
  const day=daysData.find(item=>item.id===dayId),meal=day?.meals.find(item=>item.id===mealId);
@@ -368,7 +368,7 @@ async function openFoodModal(dayId,mealId){
   onConfirm:({normalizedFood,grams,notes})=>{
    const targetDay=daysData.find(item=>item.id===dayId),targetMeal=targetDay?.meals.find(item=>item.id===mealId);
    if(!targetDay||!targetMeal||!isDayEditing(targetDay.id))return false;
-   targetMeal.items.push({itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(normalizedFood.id),grams:Number(grams),notes:notes||''});
+   window.DietPlannerDietBuilder.addFoodItem(targetDay.meals,targetDay.meals.indexOf(targetMeal),{itemId:'it_'+Date.now()+'_'+Math.random().toString(36).slice(2),foodId:String(normalizedFood.id),grams:Number(grams),notes:notes||''});
    renderDays();showToast('تمت إضافة الصنف بنجاح');return true;
   }
  });
@@ -376,9 +376,9 @@ async function openFoodModal(dayId,mealId){
 const normalizeFoodSearch=window.DietPlannerFoodPicker.normalizeSearch;
 const escapeHtml = window.DPUtils.escapeHtml;
 
-function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){it.grams=Number(v)||0;renderDays();}}
-function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))it.notes=v;}
-function deleteFoodItemFromMeal(did,mid,iid){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){m.items=m.items.filter(x=>x.itemId!==iid);renderDays();}}
+function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){window.DietPlannerDietBuilder.updateFoodItem(d.meals,d.meals.indexOf(m),m.items.indexOf(it),{grams:Number(v)||0});renderDays();}}
+function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))window.DietPlannerDietBuilder.updateFoodItem(d.meals,d.meals.indexOf(m),m.items.indexOf(it),{notes:v});}
+function deleteFoodItemFromMeal(did,mid,iid){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid);if(m&&isDayEditing(did)){window.DietPlannerDietBuilder.removeFoodItem(d.meals,d.meals.indexOf(m),m.items.findIndex(x=>x.itemId===iid));renderDays();}}
 
 function calculateDay(day){return window.DietPlannerDietBuilder.calculateTotals(day?.meals,foodById,{foodIdKey:'foodId',gramsKey:'grams',foodKeys:{kcal:'calories',carb:'carbs'},outputKeys:{kcal:'cal',protein:'pro',carb:'carb',fat:'fat',sodium:'sod',potassium:'pot',phosphorus:'pho'}})}
 async function syncFixedMeals(){
