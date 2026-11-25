@@ -758,12 +758,20 @@
     }
   }
 
+  function changeRecoveryEmail() {
+    recoveryEmail = "";
+    showRecoveryStep("recoveryEmailStep");
+    const message = recoveryElement("recoveryMessage");
+    if (message) message.style.display = "none";
+    recoveryElement("recoveryEmail")?.focus();
+  }
+
   function initializeRecoveryPage() {
     if (!window.location.pathname.endsWith("/forgot-password.html")) return;
     recoveryElement("sendRecoveryOtpButton")?.addEventListener("click", () => sendRecoveryOtp(false));
     recoveryElement("resendRecoveryOtpButton")?.addEventListener("click", () => sendRecoveryOtp(true));
     recoveryElement("verifyRecoveryOtpButton")?.addEventListener("click", verifyRecoveryOtp);
-    recoveryElement("saveRecoveryPasswordButton")?.addEventListener("click", saveRecoveredPassword);
+    recoveryElement("saveRecoveryPasswordButton")?.addEventListener("click", saveRecoveredPassword);\n    recoveryElement("changeRecoveryEmailButton")?.addEventListener("click", changeRecoveryEmail);
     recoveryElement("recoveryOtp")?.addEventListener("input", (event) => {
       event.target.value = event.target.value.replace(/\\D/g, "").slice(0, 8);
     });
