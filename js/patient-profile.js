@@ -634,41 +634,43 @@
     if (typeof window.dietPlan?.openPlan === 'function') return true;
     if (dietPlanModulePromise) return dietPlanModulePromise;
 
-    dietPlanModulePromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'js/diet-builder.js?v=20261125-unified-builder-v2';
-      script.onload = () => {
-        const summaryScript = document.createElement('script');
-        summaryScript.src = 'js/nutrition-summary.js?v=20261123-central-summary-v2';
-        summaryScript.onload = () => {
-          const pickerScript = document.createElement('script');
-          pickerScript.src = 'js/food-picker.js?v=20261125-unified-builder-v2';
-          pickerScript.onload = () => {
-            const planScript = document.createElement('script');
-            planScript.src = 'js/visit-diet-plan.js?v=20261125-modal-portal-fix-v1';
-            planScript.async = true;
-            planScript.onload = () => {
-              if (typeof window.dietPlan?.openPlan !== 'function') {
-                reject(new Error(window.__dpDietPlanLoadError || 'تعذر تهيئة محرر الخطة الغذائية.'));
-                return;
-              }
-              resolve(true);
-            };
-            planScript.onerror = () => reject(new Error('تعذر تحميل محرر الخطة الغذائية.'));
-            document.head.appendChild(planScript);
+    const modules = [
+      ['js/diet-builder.js?v=20261125-unified-builder-v2', 'تعذر تحميل محرك بناء الوجبات.'],
+      ['js/nutrition-summary.js?v=20261123-central-summary-v2', 'تعذر تحميل ملخص القيم الغذائية.'],
+      ['js/food-picker.js?v=20261125-unified-builder-v2', 'تعذر تحميل مكوّن اختيار الأغذية.'],
+      ['js/visit-diet-plan.js?v=20261125-editor-loader-fix-v1', 'تعذر تحميل وحدة خطة الجرامات.']
+    ];
+
+    dietPlanModulePromise = (async () => {
+      for (const [src, message] of modules) {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = false;
+        script.dataset.dpDietModule = src.split('?')[0];
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = () => {
+            script.remove();
+            reject(new Error(message + ' (' + src.split('?')[0] + ')'));
           };
-          pickerScript.onerror = () => reject(new Error('تعذر تحميل مكوّن اختيار الأغذية.'));
-          document.head.appendChild(pickerScript);
-        };
-        summaryScript.onerror = () => reject(new Error('تعذر تحميل ملخص القيم الغذائية.'));
-        document.head.appendChild(summaryScript);
-      };
-      script.onerror = () => reject(new Error('تعذر تحميل محرر بناء الوجبات.'));
-      document.head.appendChild(script);
-    }).catch(error => {
+          document.head.appendChild(script);
+        });
+      }
+
+      if (!window.DietPlannerDietBuilder) {
+        throw new Error('تم تحميل الملفات لكن محرك بناء الوجبات لم يسجل واجهته.');
+      }
+      if (!window.DietPlannerFoodPicker) {
+        throw new Error('تم تحميل الملفات لكن مكوّن اختيار الأغذية لم يسجل واجهته.');
+      }
+      if (typeof window.dietPlan?.openPlan !== 'function') {
+        throw new Error('تم تحميل وحدة خطة الجرامات دون تسجيل واجهة المحرر. راجع أخطاء JavaScript السابقة.');
+      }
+      return true;
+    })().catch(error => {
       dietPlanModulePromise = null;
       console.error('Direct diet-plan module load failed:', error);
-      return false;
+      throw error;
     });
 
     return dietPlanModulePromise;
