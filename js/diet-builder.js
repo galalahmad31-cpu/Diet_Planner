@@ -76,5 +76,14 @@ function renderMealCard({titleInputHtml='',actionsHtml='',rows=[],caption='أص�
  return '<article class="meal-card"><header class="meal-card-header"><div class="meal-title-wrap">'+titleInputHtml+'</div><div class="meal-card-actions no-print">'+actionsHtml+'</div></header>'+renderTable(rows,{editable,caption})+'</article>';
 }
 
-window.DietPlannerDietBuilder=Object.freeze({renderTable,bind,formatHouseholdNumber,scaleHouseholdMeasure,calculateTotals,renderMealCard});
+
+function addMeal(meals,meal){if(!Array.isArray(meals)||!meal)return false;meals.push(meal);return true;}
+function removeMeal(meals,index){if(!Array.isArray(meals)||!Number.isInteger(index)||index<0||index>=meals.length)return null;return meals.splice(index,1)[0]||null;}
+function moveMeal(meals,index,direction){if(!Array.isArray(meals))return false;const target=index+direction;if(!Number.isInteger(index)||!Number.isInteger(direction)||index<0||target<0||index>=meals.length||target>=meals.length)return false;[meals[index],meals[target]]=[meals[target],meals[index]];return true;}
+function renameMeal(meals,index,name){const meal=meals?.[index];if(!meal||!String(name??'').trim())return false;meal.name=String(name).trim();return true;}
+function addFoodItem(meals,mealIndex,item){const meal=meals?.[mealIndex];if(!meal||!item)return false;if(!Array.isArray(meal.items))meal.items=[];meal.items.push(item);return true;}
+function updateFoodItem(meals,mealIndex,itemIndex,patch){const item=meals?.[mealIndex]?.items?.[itemIndex];if(!item||!patch||typeof patch!=='object')return false;Object.assign(item,patch);return true;}
+function removeFoodItem(meals,mealIndex,itemIndex){const items=meals?.[mealIndex]?.items;if(!Array.isArray(items)||!Number.isInteger(itemIndex)||itemIndex<0||itemIndex>=items.length)return null;return items.splice(itemIndex,1)[0]||null;}
+
+window.DietPlannerDietBuilder=Object.freeze({renderTable,bind,formatHouseholdNumber,scaleHouseholdMeasure,calculateTotals,renderMealCard,addMeal,removeMeal,moveMeal,renameMeal,addFoodItem,updateFoodItem,removeFoodItem});
 })();
