@@ -390,8 +390,16 @@ async function openFoodModal(dayId,mealId){
   }
  });
 }
-const normalizeFoodSearch=window.DietPlannerFoodPicker.normalizeSearch;
-const escapeHtml = window.DPUtils.escapeHtml;
+const normalizeFoodSearch=value=>{
+ const normalize=window.DietPlannerFoodPicker?.normalizeSearch;
+ if(typeof normalize!=='function')throw new Error('مكوّن اختيار الأغذية لم يجهز دالة البحث.');
+ return normalize(value);
+};
+const escapeHtml=value=>{
+ const escape=window.DPUtils?.escapeHtml;
+ if(typeof escape!=='function')throw new Error('أداة تنسيق النصوص DPUtils غير محمّلة.');
+ return escape(value);
+};
 
 function updateMealItemGrams(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did)){window.DietPlannerDietBuilder.updateFoodItem(d.meals,d.meals.indexOf(m),m.items.indexOf(it),{grams:Number(v)||0});renderDays();}}
 function updateMealItemNotes(did,mid,iid,v){const d=daysData.find(x=>x.id===did),m=d?.meals.find(x=>x.id===mid),it=m?.items.find(x=>x.itemId===iid);if(it&&isDayEditing(did))window.DietPlannerDietBuilder.updateFoodItem(d.meals,d.meals.indexOf(m),m.items.indexOf(it),{notes:v});}
@@ -822,6 +830,9 @@ function init(){
 
  dietInitPromise=(async()=>{
    getSupabaseClient();
+   if(!window.DietPlannerDietBuilder)throw new Error('محرك بناء الوجبات غير محمّل.');
+   if(typeof window.DietPlannerFoodPicker?.normalizeSearch!=='function')throw new Error('مكوّن اختيار الأغذية غير مكتمل التحميل.');
+   if(typeof window.DPUtils?.escapeHtml!=='function')throw new Error('أداة تنسيق النصوص DPUtils غير محمّلة.');
    patientId=params.get('patient_id') || params.get('id') || window.currentPatientId || null;
 const ok=await loadPatient();
    if(!ok){dietInitPromise=null;return false;}

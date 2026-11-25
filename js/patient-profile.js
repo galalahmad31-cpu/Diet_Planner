@@ -638,7 +638,7 @@
       ['js/diet-builder.js?v=20261125-unified-builder-v2', 'تعذر تحميل محرك بناء الوجبات.'],
       ['js/nutrition-summary.js?v=20261123-central-summary-v2', 'تعذر تحميل ملخص القيم الغذائية.'],
       ['js/food-picker.js?v=20261125-unified-builder-v2', 'تعذر تحميل مكوّن اختيار الأغذية.'],
-      ['js/visit-diet-plan.js?v=20261125-fixed-diet-syntax-fix-v1', 'تعذر تحميل وحدة خطة الجرامات.']
+      ['js/visit-diet-plan.js?v=20261125-runtime-diagnostic-v1', 'تعذر تحميل وحدة خطة الجرامات.']
     ];
 
     dietPlanModulePromise = (async () => {
@@ -656,11 +656,27 @@
         }
 
         await new Promise((resolve, reject) => {
+          let runtimeError = null;
+          const scriptUrl = script.src.split('?')[0];
+          const captureRuntimeError = event => {
+            if (event.filename && event.filename.split('?')[0] === scriptUrl) {
+              runtimeError = new Error((event.message || 'JavaScript runtime error') +
+                ' [' + modulePath + ':' + event.lineno + ':' + event.colno + ']');
+            }
+          };
+          window.addEventListener('error', captureRuntimeError);
           script.onload = () => {
+            window.removeEventListener('error', captureRuntimeError);
+            if (runtimeError) {
+              script.remove();
+              reject(runtimeError);
+              return;
+            }
             script.dataset.dpLoaded = 'true';
             resolve();
           };
           script.onerror = () => {
+            window.removeEventListener('error', captureRuntimeError);
             script.remove();
             reject(new Error(message + ' (' + modulePath + ')'));
           };
@@ -669,10 +685,13 @@
       }
 
       if (!window.DietPlannerDietBuilder) {
-        throw new Error('تم تحميل الملفات لكن محرك بناء الوجبات لم يسجل واجهته.');
+        throw new Error('محرك بناء الوجبات غير متاح بعد تحميل ملفاته.');
       }
-      if (!window.DietPlannerFoodPicker) {
-        throw new Error('تم تحميل الملفات لكن مكوّن اختيار الأغذية لم يسجل واجهته.');
+      if (!window.DietPlannerFoodPicker || typeof window.DietPlannerFoodPicker.normalizeSearch !== 'function') {
+        throw new Error('مكوّن اختيار الأغذية غير متاح أو دالة البحث غير مسجلة.');
+      }
+      if (!window.DPUtils || typeof window.DPUtils.escapeHtml !== 'function') {
+        throw new Error('أداة DPUtils غير متاحة. تحقق من تحميل js/dp-utils.js.');
       }
       if (typeof window.dietPlan?.openPlan !== 'function') {
         throw new Error('تم تحميل وحدة خطة الجرامات دون تسجيل واجهة المحرر. راجع أخطاء JavaScript السابقة.');
