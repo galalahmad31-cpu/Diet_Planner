@@ -25,7 +25,7 @@
 .dpb-table th:nth-child(5),.dpb-table td.dpb-actions{width:12%;text-align:center}
 .dpb-table .dpb-food{font-weight:800;color:var(--dp-text,#1e293b)}
 .dpb-table .dpb-food-name-ar{display:block}
-.dpb-table .dpb-food-name-en{display:block;margin-top:3px;color:var(--dp-muted,#64748b);font-size:9px;font-weight:500;line-height:1.4;direction:ltr;text-align:right}
+.dpb-table .dpb-food-name-en{display:block!important;width:100%;margin-top:3px;color:var(--dp-muted,#64748b);font-size:9px;font-weight:500;line-height:1.4;direction:ltr;text-align:right;white-space:normal}
 .dpb-table .dpb-grams{white-space:nowrap;font-weight:800}
 .dpb-table .dpb-household{color:var(--dp-primary,#0d9488);font-weight:800}
 .dpb-table input{
