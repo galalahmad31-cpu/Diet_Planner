@@ -635,10 +635,10 @@
     if (dietPlanModulePromise) return dietPlanModulePromise;
 
     const modules = [
-      ['js/diet-builder.js?v=20261125-unified-builder-v2', 'تعذر تحميل محرك بناء الوجبات.'],
+      ['js/diet-builder.js?v=20261125-bilingual-food-names-v1', 'تعذر تحميل محرك بناء الوجبات.'],
       ['js/nutrition-summary.js?v=20261123-central-summary-v2', 'تعذر تحميل ملخص القيم الغذائية.'],
-      ['js/food-picker.js?v=20261125-unified-builder-v2', 'تعذر تحميل مكوّن اختيار الأغذية.'],
-      ['js/visit-diet-plan.js?v=20261125-runtime-diagnostic-v1', 'تعذر تحميل وحدة خطة الجرامات.']
+      ['js/food-picker.js?v=20261125-bilingual-food-names-v1', 'تعذر تحميل مكوّن اختيار الأغذية.'],
+      ['js/visit-diet-plan.js?v=20261125-bilingual-food-names-v1', 'تعذر تحميل وحدة خطة الجرامات.']
     ];
 
     dietPlanModulePromise = (async () => {
