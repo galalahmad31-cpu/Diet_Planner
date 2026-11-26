@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:css",
+  "buildCommand": "env -u npm_config_cache_dir npm run build:css",
   "outputDirectory": ".",
   "rewrites": [
     {
@@ -24,5 +24,6 @@
       "destination": "https://diet-planner-eg.vercel.app/:path*",
       "statusCode": 301
     }
-  ]
+  ],
+  "installCommand": "env -u npm_config_cache_dir npm install --no-audit --no-fund"
 }
