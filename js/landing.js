@@ -116,21 +116,23 @@
     try {
       const status = await access.getAccessStatus();
       if (!status.authenticated) return;
+      // The landing page is an entry point, not an authenticated workspace.
+      // Route only after the account identity and required access have been verified.
+      if (status.isAdmin === true) {
+        window.location.replace("app.html");
+        return;
+      }
       if (status.accessVerificationFailed) {
         elements.status.hidden = false;
         elements.status.textContent = "تعذر التحقق من صلاحيات الحساب أو الاشتراك حاليًا. يمكنك المحاولة لاحقًا.";
         return;
       }
-      if (status.isAdmin) {
-        elements.patientCard.hidden = true;
-        elements.professionalCard.hidden = true;
-        elements.status.hidden = false;
-        elements.status.textContent = "تم تسجيل الدخول بحساب الإدارة.";
-        const adminAction = document.createElement("a");
-        adminAction.className = "dp-landing-role-action";
-        adminAction.href = "app.html";
-        adminAction.textContent = "دخول لوحة الإدارة";
-        elements.status.append(" ", adminAction);
+      if (status.accountType === "patient") {
+        window.location.replace("patient-portal.html");
+        return;
+      }
+      if (status.accountType === "professional") {
+        window.location.replace(status.hasActiveSubscription ? "app.html" : "profile.html");
         return;
       }
       showAccountRoute(status.accountType, status.hasActiveSubscription);
