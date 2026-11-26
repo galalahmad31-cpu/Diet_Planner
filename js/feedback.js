@@ -280,15 +280,12 @@
     let own = null;
     if (state.user?.id) {
       const { data: ownData, error: ownError } = await supabase
-        .from("app_feedback")
-        .select("id,user_id,rating,comment,display_name,created_at,updated_at")
-        .eq("user_id", state.user.id)
-        .maybeSingle();
+        .rpc("get_my_app_feedback");
 
       if (ownError) {
         console.error("Own feedback lookup failed:", ownError);
       } else {
-        own = ownData;
+        own = ownData || null;
       }
     }
 
@@ -340,7 +337,7 @@
           .from("app_feedback")
           .update({ rating, comment })
           .eq("id", state.editingId)
-          .select("id,user_id,rating,comment,display_name,created_at,updated_at")
+          .select("id,rating,comment,display_name,created_at,updated_at")
           .single();
 
         if (error) throw error;
@@ -350,16 +347,13 @@
 
         const { data: created, error } = await supabase
           .from("app_feedback")
-          .upsert(
-            {
-              user_id: state.user.id,
-              rating,
-              comment,
-              display_name: displayName
-            },
-            { onConflict: "user_id" }
-          )
-          .select("id,user_id,rating,comment,display_name,created_at,updated_at")
+          .insert({
+            user_id: state.user.id,
+            rating,
+            comment,
+            display_name: displayName
+          })
+          .select("id,rating,comment,display_name,created_at,updated_at")
           .single();
 
         if (error) throw error;
