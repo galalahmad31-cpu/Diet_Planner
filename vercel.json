@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:css",
+  "buildCommand": "npm ls caniuse-lite --all; npm ls browserslist --all; npm run build:css",
   "outputDirectory": ".",
   "rewrites": [
     {
