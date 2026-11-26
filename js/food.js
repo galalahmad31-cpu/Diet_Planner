@@ -7,6 +7,8 @@ let visibleFoodCount=FOOD_PAGE_SIZE;
 
 const $=id=>document.getElementById(id);
 const num=v=>Number(v||0);
+const nullableNum=v=>v===''||v==null?null:Number(v);
+const displayMineral=v=>v==null?'—':String(v);
 function toast(msg,ok=true){
   const el=$('toast'); el.textContent=msg; el.className=`fixed bottom-5 left-5 z-[120] max-w-sm rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl ${ok?'bg-brand-600':'bg-red-600'}`;
   el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'),3200);
@@ -90,7 +92,7 @@ function switchTab(tab){
 async function loadFoods(){
   const {data,error}=await supabase.from('foods').select('id,name_ar,name_en,household,kcal,protein,carb,fat,sodium,potassium,phosphorus,water,preparation_method,is_custom,created_by').order('name_ar',{ascending:true});
   if(error){console.error(error);toast('تعذر تحميل مكتبة الأغذية: '+error.message,false);return;}
-  foods=(data||[]).map(f=>({...f,id:String(f.id),kcal:num(f.kcal),protein:num(f.protein),carb:num(f.carb),fat:num(f.fat),sodium:num(f.sodium),potassium:num(f.potassium),phosphorus:num(f.phosphorus),water:num(f.water),is_custom:Boolean(f.is_custom)}));
+  foods=(data||[]).map(f=>({...f,id:String(f.id),kcal:num(f.kcal),protein:num(f.protein),carb:num(f.carb),fat:num(f.fat),sodium:nullableNum(f.sodium),potassium:nullableNum(f.potassium),phosphorus:nullableNum(f.phosphorus),water:num(f.water),is_custom:Boolean(f.is_custom)}));
   visibleFoodCount=FOOD_PAGE_SIZE;
   render();
 }
@@ -106,7 +108,7 @@ function render(){
     <td class="px-3 py-3"><div class="font-bold text-slate-800">${esc(f.name_ar)}</div>${f.name_en?`<div class="mt-0.5 text-[10px] text-slate-400" dir="ltr">${esc(f.name_en)}</div>`:''}</td>
     <td class="px-3 py-3 text-slate-600">${esc(f.household)}</td>
     <td class="px-3 py-3 text-center font-bold">${f.kcal}</td><td class="px-3 py-3 text-center">${f.carb}</td><td class="px-3 py-3 text-center">${f.protein}</td><td class="px-3 py-3 text-center">${f.fat}</td>
-    <td class="px-3 py-3 text-center">${f.sodium}</td><td class="px-3 py-3 text-center">${f.potassium}</td><td class="px-3 py-3 text-center">${f.phosphorus}</td><td class="px-3 py-3 text-center">${f.water}</td>
+    <td class="px-3 py-3 text-center">${displayMineral(f.sodium)}</td><td class="px-3 py-3 text-center">${displayMineral(f.potassium)}</td><td class="px-3 py-3 text-center">${displayMineral(f.phosphorus)}</td><td class="px-3 py-3 text-center">${f.water}</td>
     <td class="px-3 py-3 text-center">${f.preparation_method?`<button type="button" data-prep="${esc(f.id)}" class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">أعرض</button>`:'—'}</td>
     <td class="px-3 py-3 text-center">${f.is_custom?'<span class="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-600">مخصص</span>':'<span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">أساسي</span>'}</td>
     <td class="px-3 py-3 text-center">${(isAdmin||(f.is_custom&&f.created_by===user?.id))?`<button data-action="${esc(f.id)}" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-brand-50">إجراء</button>`:"—"}</td>
@@ -178,7 +180,7 @@ $('foodForm').onsubmit=async e=>{
   e.preventDefault();$('saveBtn').disabled=true;$('saveBtn').textContent='جاري الحفظ...';
   const editId=$('editId').value;
   const existing=editId?foods.find(f=>f.id===editId):null;
-  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:num($('sodium').value),potassium:num($('potassium').value),phosphorus:num($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:existing?existing.is_custom:!isAdmin,created_by:existing?existing.created_by:(isAdmin?null:user.id)};
+  const payload={name_ar:$('nameAr').value.trim(),name_en:$('nameEn').value.trim(),kcal:num($('kcal').value),protein:num($('protein').value),carb:num($('carb').value),fat:num($('fat').value),sodium:nullableNum($('sodium').value),potassium:nullableNum($('potassium').value),phosphorus:nullableNum($('phosphorus').value),water:num($('water').value),household:$('household').value.trim(),preparation_method:$('preparationMethod').value.trim(),is_custom:existing?existing.is_custom:!isAdmin,created_by:existing?existing.created_by:(isAdmin?null:user.id)};
   if(!editId && isAdmin){ payload.is_custom = false; payload.created_by = null; }
   let error=null;
   if(editId){
