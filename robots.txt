@@ -4,4 +4,4 @@ Disallow: /login.html
 Disallow: /app.html
 Disallow: /admin.html
 
-Sitemap: https://nutrition-3.vercel.app/sitemap.xml
+Sitemap: https://diet-planner-eg.vercel.app/sitemap.xml
