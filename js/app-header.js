@@ -480,6 +480,24 @@
     mountHeader(selectedRole, user, revision, Boolean(user?.id && account.isAdmin && selectedRole === "professional"));
   }
 
+  let entryRouting = false;
+
+  async function routeAuthenticatedEntry(user) {
+    if (!user?.id || !["", "index.html"].includes(path) || entryRouting) return false;
+    const status = await access()?.getAccessStatus?.();
+    if (!status?.authenticated || status.user?.id !== user.id || status.accessVerificationFailed) return false;
+
+    let destination = "";
+    if (status.isAdmin === true) destination = "app.html";
+    else if (status.accountType === "patient") destination = "patient-portal.html";
+    else if (status.accountType === "professional") destination = status.hasActiveSubscription ? "app.html" : "profile.html";
+
+    if (!destination) return false;
+    entryRouting = true;
+    window.location.replace(base + destination);
+    return true;
+  }
+
   async function initialize() {
     if (!document.body) return;
     const supabase = access()?.supabaseClient;
@@ -489,9 +507,19 @@
     }
     const { data, error } = await supabase.auth.getSession();
     if (error) console.error("Header session lookup failed:", error);
-    await renderForSession(data?.session?.user || null);
+    const user = data?.session?.user || null;
+    if (await routeAuthenticatedEntry(user)) return;
+    await renderForSession(user);
     supabase.auth.onAuthStateChange((_event, session) => {
-      queueMicrotask(() => void renderForSession(session?.user || null));
+      const nextUser = session?.user || null;
+      if (nextUser?.id && ["", "index.html"].includes(path)) {
+        queueMicrotask(async () => {
+          if (await routeAuthenticatedEntry(nextUser)) return;
+          await renderForSession(nextUser);
+        });
+        return;
+      }
+      queueMicrotask(() => void renderForSession(nextUser));
     });
   }
 
