@@ -26,16 +26,7 @@ async function getSession(){
   user=await withTimeout(access.getCurrentUser(),5000,'التحقق من الجلسة');
   if(!user){window.DietPlannerAccess?.showAccessPrompt?.({title:'تسجيل الدخول مطلوب',message:'مكتبة الدايت تتطلب تسجيل الدخول.',actionLabel:'تسجيل الدخول',actionHref:'login.html'});$('loading')&&( $('loading').style.display='none');return false;}
   const accessStatus=await withTimeout(access.getAccessStatus(),5000,'التحقق من الاشتراك');
-  if(!accessStatus?.authenticated || !accessStatus.user){
-    access.showAccessPrompt?.({
-      title:'تسجيل الدخول مطلوب',
-      message:'انتهت جلسة الدخول أو تعذر استعادتها. سجّل الدخول مرة أخرى للمتابعة.',
-      actionLabel:'تسجيل الدخول',
-      actionHref:'login.html'
-    });
-    $('loading')&&($('loading').style.display='none');
-    return false;
-  }
+  if(!accessStatus?.authenticated || !accessStatus.user){location.replace('index.html');return false;}
   isAdmin=accessStatus.isAdmin===true;
   if(!isAdmin && accessStatus.hasActiveSubscription!==true){
     access.showAccessPrompt?.({title:'اشتراك فعال مطلوب',message:'مكتبة الدايت متاحة للمشتركين ذوي الاشتراك الفعال.',actionLabel:'عرض الاشتراكات',actionHref:'subscription-plans.html'});
