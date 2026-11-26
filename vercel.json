@@ -1,5 +1,5 @@
 {
-  "buildCommand": "find node_modules -path '*/caniuse-lite/package.json' -print -exec grep '\"version\"' {} \\; ; npm ls caniuse-lite --all || true; env -u npm_config_cache_dir npm run build:css",
+  "buildCommand": "npm ls caniuse-lite --all || true; env -u npm_config_cache_dir npm run build:css",
   "outputDirectory": ".",
   "rewrites": [
     {
@@ -24,5 +24,5 @@
       "statusCode": 301
     }
   ],
-  "installCommand": "env -u npm_config_cache_dir npm install --no-audit --no-fund"
+  "installCommand": "env -u npm_config_cache_dir npm install --include=dev --no-audit --no-fund"
 }
