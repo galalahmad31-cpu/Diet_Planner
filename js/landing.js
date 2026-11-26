@@ -104,44 +104,8 @@
     }
   }
 
-  async function initialize() {
-    const articleTask = loadLatestArticles();
-    const access = window.DietPlannerAccess;
-    if (!access?.getAccessStatus) {
-      elements.status.hidden = false;
-      elements.status.textContent = "يمكنك استعراض المنصة، لكن تعذر التحقق من حالة الحساب حاليًا.";
-      await articleTask;
-      return;
-    }
-    try {
-      const status = await access.getAccessStatus();
-      if (!status.authenticated) return;
-      if (status.accessVerificationFailed) {
-        elements.status.hidden = false;
-        elements.status.textContent = "تعذر التحقق من صلاحيات الحساب أو الاشتراك حاليًا. يمكنك المحاولة لاحقًا.";
-        return;
-      }
-      if (status.isAdmin) {
-        elements.patientCard.hidden = true;
-        elements.professionalCard.hidden = true;
-        elements.status.hidden = false;
-        elements.status.textContent = "تم تسجيل الدخول بحساب الإدارة.";
-        const adminAction = document.createElement("a");
-        adminAction.className = "dp-landing-role-action";
-        adminAction.href = "app.html";
-        adminAction.textContent = "دخول لوحة الإدارة";
-        elements.status.append(" ", adminAction);
-        return;
-      }
-      showAccountRoute(status.accountType, status.hasActiveSubscription);
-    } catch (error) {
-      console.error("Landing account check failed:", error);
-      elements.status.hidden = false;
-      elements.status.textContent = "تعذر التحقق من حالة الحساب حاليًا. يمكنك تسجيل الدخول والمحاولة مرة أخرى.";
-    } finally {
-      await articleTask;
-    }
-  }
+  // Public landing content is rendered only for guests and accounts still awaiting setup.
+  // Authenticated role routing is centralized in the shared application header.
+  void loadLatestArticles();
 
-  initialize();
 })();
