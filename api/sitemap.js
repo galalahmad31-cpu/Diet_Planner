@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://zwxnmnfoknfbzvptnpmv.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_A6u5kWAdL60bYpz1wRyv6w_J2p896iY';
-const BASE_URL = 'https://nutrition-3.vercel.app';
+const BASE_URL = 'https://diet-planner-eg.vercel.app';
 
 module.exports = async function handler(req, res) {
   try {
