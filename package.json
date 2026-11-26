@@ -6,6 +6,7 @@
     "build:css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --minify"
   },
   "devDependencies": {
-    "tailwindcss": "3.4.17"
+    "tailwindcss": "3.4.17",
+    "caniuse-lite": "1.0.30001828"
   }
 }
