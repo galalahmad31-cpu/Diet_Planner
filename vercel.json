@@ -1,5 +1,5 @@
 {
-  "buildCommand": "env -u npm_config_cache_dir npm run build:css",
+  "buildCommand": "npm ls browserslist caniuse-lite --all || true; env -u npm_config_cache_dir npm run build:css",
   "outputDirectory": ".",
   "rewrites": [
     {
