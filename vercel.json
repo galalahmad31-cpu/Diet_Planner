@@ -2,10 +2,27 @@
   "buildCommand": "npm run build:css",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/jobs/:id", "destination": "/api/job?id=:id" },
+    {
+      "source": "/jobs/:id",
+      "destination": "/api/job?id=:id"
+    },
     {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "key": "host",
+          "value": "nutrition-3.vercel.app"
+        }
+      ],
+      "destination": "https://diet-planner-eg.vercel.app/:path*",
+      "statusCode": 301
     }
   ]
 }
