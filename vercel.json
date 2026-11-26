@@ -11,18 +11,5 @@
       "destination": "/api/sitemap"
     }
   ],
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "nutrition-3.vercel.app"
-        }
-      ],
-      "destination": "https://diet-planner-eg.vercel.app/:path*",
-      "statusCode": 301
-    }
-  ],
   "installCommand": "npm install --include=dev --no-audit --no-fund"
 }
