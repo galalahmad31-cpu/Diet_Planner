@@ -260,7 +260,9 @@
       accountType,
       isAdmin: role === "admin",
       hasActiveSubscription: activeSubscription === true,
-      accessVerificationFailed: role === null || accountType === null || activeSubscription === null
+      // Admin authorization is independent of account_type and subscription state.
+      // Do not mark a verified admin session as a failed access check when account_type is absent.
+      accessVerificationFailed: role === null || (role !== "admin" && (accountType === null || activeSubscription === null))
     };
   }
 
