@@ -65,6 +65,21 @@ function renderPager(id,page,total,onNext,onPrev){
  const prev=document.createElement('button');prev.type='button';prev.className='btn btn-outline';prev.textContent='السابق';prev.disabled=page<=0;prev.onclick=onPrev;
  const next=document.createElement('button');next.type='button';next.className='btn btn-outline';next.textContent='عرض 20 التالية';next.disabled=(page+1)*PAGE_SIZE>=total;next.onclick=onNext;host.append(prev,info,next);
 }
+
+async function attachProfileAuthStatus(profiles){
+ if(!profiles.length)return profiles;
+ const {data,error}=await sb.rpc('admin_get_profile_auth_status',{p_user_ids:profiles.map(profile=>profile.id)});
+ if(error)throw error;
+ const statusById=new Map((data||[]).map(item=>[item.user_id,item]));
+ return profiles.map(profile=>({...profile,...(statusById.get(profile.id)||{email_confirmed_at:null,last_sign_in_at:null})}));
+}
+function emailConfirmationBadge(value){
+ return value ? '<span class="badge active">مؤكد</span>' : '<span class="badge off">غير مؤكد</span>';
+}
+function lastLoginLabel(value){
+ return value ? esc(dateTime(value)) : '<span class="meta">لم يسجل الدخول</span>';
+}
+
 async function loadRequestsPage(page=0){
  state.requestPage=Math.max(0,page);setState('request','جاري تحميل الطلبات...');
  const from=state.requestPage*PAGE_SIZE,to=from+PAGE_SIZE-1,q=state.requestSearch.trim().replace(/[,%()]/g,' ');
@@ -84,7 +99,7 @@ async function loadRequestsPage(page=0){
   const result=await query.range(from,to);if(result.error)throw result.error;
   state.subs=result.data||[];state.requestTotal=result.count||0;state.requestAllTotal=allCount.count||0;
   const ids=[...new Set(state.subs.map(s=>s.user_id).filter(Boolean))];
-  if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,account_type,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=p.data||[]}else state.profiles=[];
+  if(ids.length){const p=await sb.from('profiles').select('id,full_name,email,phone,role,account_type,created_at').in('id',ids);if(p.error)throw p.error;state.profiles=await attachProfileAuthStatus(p.data||[])}else state.profiles=[];
   $('pendingCount').textContent=statuses[0].count||0;$('paidCount').textContent=statuses[1].count||0;$('canceledCount').textContent=statuses[2].count||0;$('totalCount').textContent=allCount.count||0;
   renderRequests();
  }catch(error){console.error('Admin requests page load failed:',error);setState('request',error.message||'تعذر تحميل الطلبات.')}
@@ -100,7 +115,7 @@ async function loadDoctorsPage(page=0){
    sb.from('subscriptions').select('id',{count:'exact',head:true}).eq('status','paid').lte('start_date',today).gte('expiry_date',today)
   ]);
   if(profilesResult.error)throw profilesResult.error;if(activeResult.error)throw activeResult.error;
-  state.profiles=profilesResult.data||[];state.doctorTotal=profilesResult.count||0;
+  state.profiles=await attachProfileAuthStatus(profilesResult.data||[]);state.doctorTotal=profilesResult.count||0;
   const ids=state.profiles.map(p=>p.id);
   if(ids.length){
    const sr=await sb.from('subscriptions').select('id,user_id,start_date,expiry_date,status,notes,created_at,updated_at,full_name,plan_id,payment_proof_path,duration_days_snapshot').in('user_id',ids).order('created_at',{ascending:false});
@@ -131,7 +146,7 @@ function renderRequests(){
  if(!rows.length){setState('request',state.requestTotal?'لا توجد نتائج مطابقة للبحث أو الحالة المحددة.':'لا توجد طلبات اشتراك حاليًا.');renderPager('requestPager',state.requestPage,state.requestTotal,()=>loadRequestsPage(state.requestPage+1),()=>loadRequestsPage(state.requestPage-1));return}
  body.innerHTML=rows.map(s=>{const profile=state.profiles.find(p=>p.id===s.user_id);return `<tr>
  <td><span class="name">${esc(s.full_name||'بدون اسم')}</span><span class="meta">${esc(profile?.email||'')}</span></td>
- <td>${accountTypeBadge(profile?.account_type,profile?.role)}</td>
+ <td>${accountTypeBadge(profile?.account_type,profile?.role)}</td><td>${emailConfirmationBadge(profile?.email_confirmed_at)}</td><td>${lastLoginLabel(profile?.last_sign_in_at)}</td>
  <td>${esc(planName(s.plan_id))}</td><td>${money(state.plans.find(p=>p.id===s.plan_id)?.price)}</td><td>${dateTime(s.created_at)}</td>
  <td>${date(s.start_date)}<br>${date(s.expiry_date)}</td><td>${statusBadge(s.status,s.expiry_date)}</td>
  <td>${s.payment_proof_path?'<button class="icon-btn" title="عرض الإثبات" data-proof="'+esc(s.id)+'"><i class="fa-solid fa-image"></i></button>':'—'}</td>
@@ -179,7 +194,7 @@ function renderDoctors(){
   ? '<button class="icon-btn" title="تعديل الاشتراك والدور" data-edit-sub="'+esc(s.id)+'"><i class="fa-solid fa-pen"></i></button><button class="icon-btn danger" title="حذف الاشتراك" data-del-sub="'+esc(s.id)+'"><i class="fa-solid fa-trash"></i></button>'
   : '<button class="icon-btn" title="إضافة اشتراك" data-add-sub="'+esc(p.id)+'"><i class="fa-solid fa-pen"></i></button>';
  return `<tr><td><span class="name">${esc(p.full_name||'بدون اسم')}</span><span class="meta">${esc(p.email||'')}</span></td>
- <td>${accountTypeBadge(p.account_type,p.role)}</td>
+ <td>${accountTypeBadge(p.account_type,p.role)}</td><td>${emailConfirmationBadge(p.email_confirmed_at)}</td><td>${lastLoginLabel(p.last_sign_in_at)}</td>
  <td><span class="badge ${p.role==='admin'?'active':'off'}">${roleLabel(p.role)}</span></td>
  <td>${s?esc(planName(s.plan_id)):'—'}</td><td>${date(s?.start_date)}</td><td>${date(s?.expiry_date)}</td>
  <td>${count}</td><td>${s?statusBadge(s.status,s.expiry_date):'<span class="badge off">بدون اشتراك</span>'}</td>
