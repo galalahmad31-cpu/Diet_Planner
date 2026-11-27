@@ -74,20 +74,28 @@ body{padding-top:0}
 }
 
 
-/* Doctors table: fixed RTL column order shared by header and rendered rows. */
-.doctors-table{direction:rtl;table-layout:fixed;min-width:1160px;width:100%}
-.doctors-table .doctor-col-user{width:20%}
-.doctors-table .doctor-col-account{width:10%}
-.doctors-table .doctor-col-role{width:8%}
-.doctors-table .doctor-col-plan{width:14%}
-.doctors-table .doctor-col-start,.doctors-table .doctor-col-end{width:10%}
-.doctors-table .doctor-col-patients{width:9%}
-.doctors-table .doctor-col-status{width:9%}
-.doctors-table .doctor-col-actions{width:10%}
-.doctors-table th,.doctors-table td{white-space:nowrap}
+/* Doctors table: one explicit width map for the 11-column header/body grid.
+   The wrapper is the only horizontal scroll container on narrow screens. */
+#doctorWrap{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch;direction:rtl}
+.doctors-table{direction:rtl;table-layout:fixed;width:1170px;min-width:1170px;max-width:none;border-collapse:collapse}
+.doctors-table .doctor-col-user{width:190px}
+.doctors-table .doctor-col-account{width:90px}
+.doctors-table .doctor-col-auth{width:100px}
+.doctors-table .doctor-col-login{width:140px}
+.doctors-table .doctor-col-role{width:70px}
+.doctors-table .doctor-col-plan{width:125px}
+.doctors-table .doctor-col-start,.doctors-table .doctor-col-end{width:100px}
+.doctors-table .doctor-col-patients{width:65px}
+.doctors-table .doctor-col-status{width:100px}
+.doctors-table .doctor-col-actions{width:90px}
+.doctors-table th,.doctors-table td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .doctors-table td:first-child{white-space:normal;overflow-wrap:anywhere}
 .doctors-table td.actions-cell{display:table-cell;white-space:normal}.doctors-table td.actions-cell .icon-btn{margin-inline-start:4px}
 .doctors-table .badge{white-space:nowrap}
+@media(max-width:767px){
+ #doctorWrap{scrollbar-width:thin}
+ .doctors-table th,.doctors-table td{padding:9px 8px;font-size:11px}
+}
 
 /* Professional directory approval tab */
 .admin-review-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;margin-inline-start:5px;border-radius:20px;background:#fff;color:#11786f;font-size:10px;font-weight:900}
