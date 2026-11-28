@@ -1,6 +1,5 @@
 :root{
-  --dp-font:'Cairo',Tahoma,sans-serif;
-  --nsp-font:var(--dp-font);
+  --nsp-font:'Cairo',Tahoma,sans-serif;
   --app-bg:#f5f8f8;
   --surface:#ffffff;
   --ink:#17252a;
