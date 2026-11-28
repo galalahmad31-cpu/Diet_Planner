@@ -407,3 +407,38 @@ html[data-theme="dark"] .nsp-monitoring-icon-plan{background:#493a21;color:#f1ca
 .nsp-monitoring-card textarea{min-height:55px;height:auto;border:1px solid #ddd;background:#fff;color:#111}
 .nsp-monitoring-plan{grid-column:1/-1}
 }
+
+
+/* TPN analysis + glucose mixing: paired cards with safe narrow-screen fallback. */
+#section-tpn .nsp-tpn-analysis-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:14px;
+  width:100%;
+  min-width:0;
+  align-items:stretch;
+}
+#section-tpn .nsp-tpn-analysis-card{
+  min-width:0;
+  width:100%;
+  box-sizing:border-box;
+}
+#section-tpn .nsp-tpn-analysis-title{
+  color:#fff!important;
+  line-height:1.35;
+}
+#section-tpn .nsp-tpn-mixing-title{
+  color:#065f46!important;
+  line-height:1.35;
+}
+@media (min-width:560px){
+  #section-tpn .nsp-tpn-analysis-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(12px,2vw,22px);
+  }
+}
+@media (max-width:559px){
+  #section-tpn .nsp-tpn-analysis-card{padding:14px!important}
+  #section-tpn .nsp-tpn-analysis-card h4{font-size:1rem!important}
+  #section-tpn .nsp-tpn-analysis-card .grid{gap:10px!important}
+}
