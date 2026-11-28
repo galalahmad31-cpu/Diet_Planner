@@ -239,7 +239,9 @@
     if(cleanupError)console.warn("Previous cover cleanup failed:",saved.id,cleanupError);
    }
    toast("تم حفظ الكتاب وضغط غلافي العرض والتفاصيل.");
-   closeForm();state.loaded=false;await loadAll(true);
+   closeForm();state.loaded=false;
+   state.busy=false;
+   await loadAll(true);
   }catch(error){
    if(uploaded.length&&!bookSaved)await sb.storage.from("book-covers").remove(uploaded);
    console.error("Book save failed:",error);toast(error.message||"تعذر حفظ الكتاب.")
