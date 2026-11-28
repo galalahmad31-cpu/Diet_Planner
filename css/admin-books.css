@@ -18,3 +18,7 @@
 @keyframes booksConfirmRise{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:480px){.books-admin-confirm{padding:23px 18px 17px;border-radius:19px}.books-admin-confirm h2{font-size:16px}.books-admin-confirm p{font-size:11px}.books-admin-confirm-actions button{min-height:42px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){.books-admin-confirm-overlay,.books-admin-confirm{animation:none}.books-admin-confirm-actions button{transition:none}}
+
+.books-admin-head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.books-admin-head-actions .btn{white-space:nowrap}
+@media(max-width:640px){.books-admin-head-actions{width:100%}.books-admin-head-actions .btn{flex:1;justify-content:center}}
