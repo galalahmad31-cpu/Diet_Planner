@@ -218,6 +218,7 @@
   if(!isFree&&(!Number.isFinite(payload.price)||payload.price<=0)){toast("حدد سعرًا أكبر من صفر للكتاب المدفوع.");return}
   state.busy=true;const button=$("booksAdminSave");button.disabled=true;button.textContent="جاري الحفظ...";
   let uploaded=[];
+  let bookSaved=false;
   try{
    if(file){
     const variants=await uploadCoverVariants(id||crypto.randomUUID(),file);
@@ -228,6 +229,7 @@
    let saved;
    if(id){const result=await sb.from("books").update(payload).eq("id",id).select("*").single();if(result.error)throw result.error;saved=result.data}
    else{const result=await sb.from("books").insert(payload).select("*").single();if(result.error)throw result.error;saved=result.data}
+   bookSaved=true;
    if(telegram){const linkResult=await sb.from("book_delivery_links").upsert({book_id:saved.id,delivery_url:telegram,updated_at:new Date().toISOString()},{onConflict:"book_id"});if(linkResult.error)throw linkResult.error}
    else if(id){const removed=await sb.from("book_delivery_links").delete().eq("book_id",saved.id);if(removed.error)throw removed.error}
    if(file&&existing){
@@ -237,7 +239,7 @@
    toast("تم حفظ الكتاب وضغط غلافي العرض والتفاصيل.");
    closeForm();state.loaded=false;await loadAll(true);
   }catch(error){
-   if(uploaded.length)await sb.storage.from("book-covers").remove(uploaded);
+   if(uploaded.length&&!bookSaved)await sb.storage.from("book-covers").remove(uploaded);
    console.error("Book save failed:",error);toast(error.message||"تعذر حفظ الكتاب.")
   }finally{state.busy=false;button.disabled=false;button.textContent="حفظ الكتاب"}
  }
