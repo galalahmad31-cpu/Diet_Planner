@@ -657,20 +657,27 @@ function serializePlanDay(day){
   id:isPersistedDayId(day.id)?String(day.id):null,
   title:day.title||'',
   notes:day.notes||'',
-  meals:(day.meals||[]).map(meal=>({
-   name:meal.name||'',
-   items:(meal.items||[]).map(item=>{
-    const food=foodById.get(String(item.foodId));
-    return {
-     foodId:item.foodId?String(item.foodId):null,
-     grams:num(item.grams),
-     household_measure:food?.household
-      ? scaleHouseholdMeasure(food.household,num(item.grams))
-      : null,
-     notes:item.notes??null
-    };
-   })
-  }))
+  meals:(day.meals||[]).map(meal=>{
+   // Keep stable database IDs; assign UUIDs once to newly-created local rows.
+   if(!isPersistedDayId(meal.id))meal.id=newCloudUuid();
+   return {
+    id:String(meal.id),
+    name:meal.name||'',
+    items:(meal.items||[]).map(item=>{
+     if(!isPersistedDayId(item.itemId))item.itemId=newCloudUuid();
+     const food=foodById.get(String(item.foodId));
+     return {
+      id:String(item.itemId),
+      foodId:item.foodId?String(item.foodId):null,
+      grams:num(item.grams),
+      household_measure:food?.household
+       ? scaleHouseholdMeasure(food.household,num(item.grams))
+       : null,
+      notes:item.notes??null
+     };
+    })
+   };
+  })
  };
 }
 
