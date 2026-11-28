@@ -1,4 +1,5 @@
 :root{
+  --dp-font:'Cairo',Tahoma,sans-serif;
   --nsp-font:var(--dp-font);
   --app-bg:#f5f8f8;
   --surface:#ffffff;
@@ -21,11 +22,12 @@
 html{scroll-behavior:smooth}
 body{
   margin:0;
-  font-family:var(--dp-font),sans-serif;
+  font-family:var(--nsp-font);
   background:radial-gradient(circle at 90% 0%,rgba(22,139,128,.08),transparent 28%),var(--app-bg);
   color:var(--ink);
 }
 
+button,input,select,textarea{font-family:var(--nsp-font)}
 input,select,textarea{
   width:100%;
   border:1px solid #cbd5e1;
@@ -142,7 +144,7 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
 .support-report-print-header{display:none}
 
 @media(max-width:700px){
-  body{font-size:.84rem}
+
   .detail-patient-area{padding:5px 10px 0}
   .detail-top{margin:5px 6px 8px;align-items:center}
   .detail-top h2{font-size:20px}
@@ -160,7 +162,7 @@ input:disabled,select:disabled,textarea:disabled{opacity:1}
   .day-edit-actions button{flex:0 0 auto;padding:6px 9px}
   .support-content{padding:9px 10px 18px}
   .support-section:not(.hidden){gap:10px}
-  #section-en,#section-tpn{font-size:.82rem}
+
   #section-en input,#section-en select,#section-en textarea,#section-tpn input,#section-tpn select,#section-tpn textarea{font-size:.80rem!important;min-height:36px;padding:6px 7px}
   #section-en label,#section-tpn label{font-size:.72rem!important;line-height:1.2}
   .table-custom th{font-size:.72rem;padding:7px 6px}.table-custom td{font-size:.76rem;padding:6px}
