@@ -220,11 +220,13 @@
   let uploaded=[];
   let bookSaved=false;
   try{
-   if(file){
-    const variants=await uploadCoverVariants(id||crypto.randomUUID(),file);
+   const bookStorageId=id||crypto.randomUUID();
+  if(file){
+    const variants=await uploadCoverVariants(bookStorageId,file);
     uploaded=variants.uploaded;
     payload.cover_path=variants.detailPath;
     payload.cover_thumb_path=variants.thumbPath;
+    if(!id)payload.id=bookStorageId;
    }
    let saved;
    if(id){const result=await sb.from("books").update(payload).eq("id",id).select("*").single();if(result.error)throw result.error;saved=result.data}
