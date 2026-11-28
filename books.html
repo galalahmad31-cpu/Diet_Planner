@@ -6,7 +6,7 @@
 <title>مكتبة الكتب العلمية | Diet Planner</title>
 <meta name="description" content="تصفح الكتب والمراجع العلمية في التغذية العلاجية والعلوم الصحية من مكتبة Diet Planner.">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<link rel="canonical" href="https://nutrition-3.vercel.app/books.html">
+<link rel="canonical" href="https://diet-planner-eg.vercel.app/books.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Diet Planner">
 <meta property="og:title" content="مكتبة الكتب العلمية | Diet Planner">
@@ -20,12 +20,12 @@
 <link rel="stylesheet" href="css/light-theme.css?v=20261120-central-v2">
 <link rel="stylesheet" href="css/dark-theme.css?v=20261120-central-v5">
 <link rel="stylesheet" href="css/components.css?v=20261120-central-v2">
-<link rel="stylesheet" href="css/books.css?v=20261121-books-v1">
+<link rel="stylesheet" href="css/books.css?v=20261128-books-pagination-v2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="js/auth-access.js?v=20261121-google-account-type-v1" defer></script>
 <script src="js/theme.js?v=20261121-header-only-v15" defer></script>
 <script src="js/app-header.js?v=20261125-notifications-v1" defer></script>
-<script src="js/books.js?v=20261125-generic-delivery-url-v1" defer></script>
+<script src="js/books.js?v=20261128-paged-thumbnails-v2" defer></script>
 <link rel="stylesheet" href="css/app-header.css?v=20261124-central-header-v5">
 </head>
 <body>
@@ -47,6 +47,7 @@
       <label class="books-category"><i class="fa-solid fa-filter"></i><select id="booksCategory"><option value="">كل التصنيفات</option></select></label>
     </div>
     <div id="booksGrid" class="books-grid" aria-live="polite"><div class="books-state"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الكتب...</div></div>
+    <div class="books-load-more-wrap"><button id="booksLoadMore" class="books-load-more" type="button" hidden>عرض المزيد</button></div>
     <div id="booksEmpty" class="books-state" hidden><i class="fa-regular fa-folder-open"></i><span>لا توجد كتب منشورة تطابق بحثك حاليًا.</span></div>
   </section>
   <footer class="books-footer">Diet Planner <span>•</span> مكتبة الكتب العلمية</footer>
