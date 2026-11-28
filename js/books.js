@@ -16,7 +16,7 @@
       if (category && book.category !== category) return false;
       return !query || [book.title,book.author,book.category,book.description].join(" ").toLocaleLowerCase().includes(query);
     });
-    $("booksCount").textContent = rows.length + " كتاب";
+    $("booksCount").textContent = rows.length + (state.hasMore ? "+ كتاب" : " كتاب");
     $("booksEmpty").hidden = rows.length > 0;
     $("booksGrid").innerHTML = rows.map(book => {
       const image = coverUrl(book.cover_thumb_path || book.cover_path);
@@ -147,7 +147,7 @@
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false })
         .order("id", { ascending: true })
-        .range(state.offset, state.offset + PAGE_SIZE - 1);
+        .range(state.offset, state.offset + PAGE_SIZE);
       const search = $("booksSearch").value.trim();
       const category = $("booksCategory").value;
       if (search) {
@@ -157,12 +157,12 @@
       if (category) query = query.eq("category", category);
       const { data, error } = await query;
       if (error) throw error;
-      const page = data || [];
+      const received = data || [];
+      const page = received.slice(0, PAGE_SIZE);
       state.books = reset ? page : state.books.concat(page);
       state.offset += page.length;
-      state.hasMore = page.length === PAGE_SIZE;
+      state.hasMore = received.length > PAGE_SIZE;
       render();
-      $("booksCount").textContent = "تم عرض " + state.books.length + (state.hasMore ? "+ كتاب" : " كتاب");
       $("booksLoadMore").hidden = !state.hasMore;
     } catch (error) {
       console.error("Public books catalog page failed:", error);
