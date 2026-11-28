@@ -145,8 +145,8 @@ async function loadPlan(shouldRender=true){
     .eq('patient_id',window.currentPatientId||patientId);
   if(initialUrlPlanId) query=query.eq('id',initialUrlPlanId);
   else query=query.eq('plan_name','الخطة الغذائية باستخدام الجرامات');
-  const {data:plans,error}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
-  if(error){showToast('تعذر تحميل الخطة الغذائية','error');return;}
+  const {data:plans,error:plansError}=await query.order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(1);
+  if(plansError)throw plansError;
   const plan=plans?.[0];
   if(!plan){daysData=[];savedDaysData=[];activeCloudPlanId=null;activePlanStartDate=null;activePlanName=null;if(shouldRender)renderDays();return;}
   activeCloudPlanId=plan.id; activePlanStartDate=plan.start_date||null;
@@ -158,10 +158,33 @@ async function loadPlan(shouldRender=true){
   patientInfo.targetPro=patientInfo.energy_target_protein??'';
   patientInfo.targetCarb=patientInfo.energy_target_carb??'';
   patientInfo.targetFat=patientInfo.energy_target_fat??'';
-  const {data:dayRows}=await sb.from('plan_days').select('id,plan_id,day_number,day_name,notes').eq('plan_id',plan.id).order('day_number',{ascending:true});
+
+  const {data:dayRows,error:daysError}=await sb.from('plan_days')
+    .select('id,plan_id,day_number,day_name,notes')
+    .eq('plan_id',plan.id)
+    .order('day_number',{ascending:true});
+  if(daysError)throw daysError;
+
   const ids=(dayRows||[]).map(x=>x.id);
-  let meals=[]; if(ids.length){const r=await sb.from('plan_meals').select('id,day_id,meal_order,meal_name').in('day_id',ids).order('meal_order',{ascending:true});meals=r.data||[];}
-  const mids=meals.map(x=>x.id); let items=[]; if(mids.length){const r=await sb.from('plan_items').select('id,meal_id,food_id,quantity_g,notes').in('meal_id',mids);items=r.data||[];}
+  let meals=[];
+  if(ids.length){
+    const {data:mealRows,error:mealsError}=await sb.from('plan_meals')
+      .select('id,day_id,meal_order,meal_name')
+      .in('day_id',ids)
+      .order('meal_order',{ascending:true});
+    if(mealsError)throw mealsError;
+    meals=mealRows||[];
+  }
+
+  const mids=meals.map(x=>x.id);
+  let items=[];
+  if(mids.length){
+    const {data:itemRows,error:itemsError}=await sb.from('plan_items')
+      .select('id,meal_id,food_id,quantity_g,notes')
+      .in('meal_id',mids);
+    if(itemsError)throw itemsError;
+    items=itemRows||[];
+  }
   const mealsByDay=new Map();
   const itemsByMeal=new Map();
   meals.forEach(meal=>{const group=mealsByDay.get(meal.day_id)||[];group.push(meal);mealsByDay.set(meal.day_id,group);});
