@@ -92,56 +92,6 @@
   const { error } = await sb.storage.from("book-covers").remove(unique);
   return error || null;
  }
- async function optimizeExistingCovers() {
-  if (state.busy) return;
-  const button = $("booksCoversOptimizeBtn");
-  const pending = state.books.filter(book => book.cover_path && !book.cover_thumb_path);
-  if (!pending.length) { toast("كل أغلفة الكتب الحالية محسّنة بالفعل."); return; }
-  const confirmed = await confirmDialog({
-   title: "تحسين أغلفة المكتبة الحالية",
-   message: "سيتم تنزيل الأغلفة الحالية وضغطها إلى نسختين WebP، ثم تحديث مساراتها وحذف الملفات الأصلية بعد نجاح التحديث. لن تتغير بيانات الكتب أو روابط التسليم.",
-   confirmText: "بدء التحسين"
-  });
-  if (!confirmed) return;
-  state.busy = true;
-  button.disabled = true;
-  let completed = 0, failed = 0, cleanupFailed = 0;
-  try {
-   for (const book of pending) {
-    button.textContent = "تحسين " + (completed + failed + 1) + " / " + pending.length;
-    let uploaded = [];
-    try {
-     const response = await fetch(coverUrl(book.cover_path), { cache: "no-store" });
-     if (!response.ok) throw new Error("تعذر تنزيل الغلاف: " + book.title);
-     const source = await response.blob();
-     const variants = await uploadCoverVariants(book.id, source);
-     uploaded = variants.uploaded;
-     const { error } = await sb.from("books").update({
-      cover_path: variants.detailPath,
-      cover_thumb_path: variants.thumbPath,
-      updated_at: new Date().toISOString()
-     }).eq("id", book.id);
-     if (error) throw error;
-     const oldPaths = [book.cover_path, book.cover_thumb_path].filter(Boolean);
-     const cleanupError = await removeOldCoverPaths(oldPaths);
-     book.cover_path = variants.detailPath;
-     book.cover_thumb_path = variants.thumbPath;
-     completed++;
-     if (cleanupError) { cleanupFailed++; console.warn("Old book cover cleanup needs review:", book.id, cleanupError); }
-    } catch (error) {
-     if (uploaded.length) await sb.storage.from("book-covers").remove(uploaded);
-     failed++;
-     console.error("Cover optimization failed for book:", book.id, error);
-    }
-   }
-   renderBooks();
-   toast("اكتمل تحسين " + completed + " غلاف" + (failed ? "، وتعذر تحسين " + failed : "") + (cleanupFailed ? "، وبقيت " + cleanupFailed + " ملفات قديمة تحتاج حذفًا" : "") + ".");
-  } finally {
-   state.busy = false;
-   button.disabled = false;
-   button.textContent = "تحسين الأغلفة الحالية";
-  }
- }
  function renderBooks(){
   const list=$("booksAdminList");
   if(!state.books.length){list.hidden=true;setState("booksAdminState","لا توجد كتب حتى الآن. أضف أول كتاب.");return}
@@ -318,7 +268,6 @@
   if(!status.authenticated||!status.isAdmin)return;
   await loadAll(true);
   $("booksNewBtn").addEventListener("click",()=>openForm());
-  $("booksCoversOptimizeBtn").addEventListener("click",optimizeExistingCovers);
   $("booksAdminClose").addEventListener("click",closeForm);$("booksAdminCancel").addEventListener("click",closeForm);
   $("booksAdminModal").addEventListener("click",event=>{if(event.target===$("booksAdminModal"))closeForm()});
   $("booksAdminForm").addEventListener("submit",saveBook);
