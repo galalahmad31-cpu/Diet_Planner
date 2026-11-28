@@ -189,7 +189,7 @@ async function loadPlan(shouldRender=true){
   const itemsByMeal=new Map();
   meals.forEach(meal=>{const group=mealsByDay.get(meal.day_id)||[];group.push(meal);mealsByDay.set(meal.day_id,group);});
   items.forEach(item=>{const group=itemsByMeal.get(item.meal_id)||[];group.push(item);itemsByMeal.set(item.meal_id,group);});
-  daysData=(dayRows||[]).map(d=>({id:d.id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:(mealsByDay.get(d.id)||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:(itemsByMeal.get(m.id)||[]).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,...(i.notes!=null?{notes:i.notes}:{})}))}))}));
+  daysData=(dayRows||[]).map(d=>({id:d.id,planId:d.plan_id,title:d.day_name||`اليوم ${d.day_number}`,notes:d.notes||'',meals:(mealsByDay.get(d.id)||[]).map(m=>({id:m.id,name:m.meal_name||'وجبة',description:'',items:(itemsByMeal.get(m.id)||[]).map(i=>({itemId:i.id,foodId:String(i.food_id),grams:Number(i.quantity_g)||0,...(i.notes!=null?{notes:i.notes}:{})}))}))}));
   savedDaysData=cloneDays(daysData); dayEditModes={}; if(shouldRender)renderDays();
 }
 
@@ -254,8 +254,11 @@ async function saveDayNow(id){
   }));
   if(missingFoods.length)throw new Error('أصناف غير موجودة في مكتبة الأغذية: '+[...new Set(missingFoods)].join(', '));
 
+  const dayPlanId=day.planId||null;
+  if(isPersistedDayId(day.id)&&!dayPlanId)throw new Error('تعذر تحديد الخطة المالكة لهذا اليوم. أعد فتح الخطة ثم حاول الحفظ.');
+  if(dayPlanId&&activeCloudPlanId&&String(dayPlanId)!==String(activeCloudPlanId))throw new Error('تغيّر سياق الخطة أثناء التعديل. أعد فتح اليوم من قائمة الخطط قبل الحفظ.');
   const planData={
-   id:activeCloudPlanId||null,
+   id:dayPlanId,
    patient_id:window.currentPatientId||patientId,
    plan_name:activePlanName||'الخطة الغذائية باستخدام الجرامات',
    start_date:activePlanStartDate||new Date().toISOString().slice(0,10),
@@ -272,6 +275,7 @@ async function saveDayNow(id){
   const newId=String(data.day_id);
   activeCloudPlanId=data.plan_id;
   activePlanName=planData.plan_name;
+  day.planId=data.plan_id;
   day.id=newId;
 
   if(activeDayDetailsId===dayKey)activeDayDetailsId=newId;
@@ -306,6 +310,7 @@ async function addNewDay(){
  const n=daysData.length+1,stamp=Date.now();
  const day={
   id:'d_'+stamp,
+  planId:activeCloudPlanId,
   title:`اليوم ${n}`,
   notes:'',
   meals:[
@@ -339,13 +344,15 @@ function deleteDay(id){
 
   try{
    if(isPersistedDayId(day.id)){
-    if(!activeCloudPlanId)throw new Error('لم يتم تحديد الخطة المحفوظة لهذا اليوم');
+    const owningPlanId=day.planId||activeCloudPlanId;
+    if(!owningPlanId)throw new Error('لم يتم تحديد الخطة المحفوظة لهذا اليوم');
+    if(activeCloudPlanId&&String(owningPlanId)!==String(activeCloudPlanId))throw new Error('اليوم لا يتبع الخطة المفتوحة حاليًا. أعد فتح الخطة قبل الحذف.');
     if(!(await canWriteVisitData())){
      showToast('حذف أيام الخطة متاح أثناء الاشتراك المدفوع فقط','error');
      return;
     }
     const {data,error}=await sb.rpc('delete_nutrition_plan_day',{
-     p_plan_id:activeCloudPlanId,
+     p_plan_id:owningPlanId,
      p_day_id:day.id
     });
     if(error)throw error;
