@@ -44,12 +44,108 @@
    submit.focus();
   });
  }
+ async function createCoverVariants(source) {
+  const bitmap = await createImageBitmap(source);
+  const make = async (maxWidth, maxHeight, quality) => {
+   const scale = Math.min(1, maxWidth / bitmap.width, maxHeight / bitmap.height);
+   const width = Math.max(1, Math.round(bitmap.width * scale));
+   const height = Math.max(1, Math.round(bitmap.height * scale));
+   const canvas = document.createElement("canvas");
+   canvas.width = width; canvas.height = height;
+   const context = canvas.getContext("2d", { alpha: true });
+   if (!context) throw new Error("تعذر تجهيز صورة الغلاف في المتصفح.");
+   context.drawImage(bitmap, 0, 0, width, height);
+   const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", quality));
+   if (!blob) throw new Error("تعذر ضغط صورة الغلاف.");
+   return { blob, extension: blob.type === "image/webp" ? "webp" : "jpg", contentType: blob.type || "image/jpeg" };
+  };
+  try {
+   const [thumbnail, detail] = await Promise.all([make(320, 420, 0.74), make(720, 960, 0.82)]);
+   return { thumbnail, detail };
+  } finally { bitmap.close?.(); }
+ }
+ async function uploadCoverVariants(bookId, source) {
+  const variants = await createCoverVariants(source);
+  const token = crypto.randomUUID();
+  const thumbPath = "covers/optimized/" + bookId + "-" + token + "-thumb." + variants.thumbnail.extension;
+  const detailPath = "covers/optimized/" + bookId + "-" + token + "-detail." + variants.detail.extension;
+  const bucket = sb.storage.from("book-covers");
+  const uploaded = [];
+  try {
+   const thumbResult = await bucket.upload(thumbPath, variants.thumbnail.blob, { contentType: variants.thumbnail.contentType, cacheControl: "31536000", upsert: false });
+   if (thumbResult.error) throw thumbResult.error;
+   uploaded.push(thumbPath);
+   const detailResult = await bucket.upload(detailPath, variants.detail.blob, { contentType: variants.detail.contentType, cacheControl: "31536000", upsert: false });
+   if (detailResult.error) throw detailResult.error;
+   uploaded.push(detailPath);
+   return { thumbPath, detailPath, uploaded };
+  } catch (error) {
+   if (uploaded.length) await bucket.remove(uploaded);
+   throw error;
+  }
+ }
+ async function removeOldCoverPaths(paths) {
+  const unique = [...new Set((paths || []).filter(Boolean))];
+  if (!unique.length) return null;
+  const { error } = await sb.storage.from("book-covers").remove(unique);
+  return error || null;
+ }
+ async function optimizeExistingCovers() {
+  if (state.busy) return;
+  const button = $("booksCoversOptimizeBtn");
+  const pending = state.books.filter(book => book.cover_path && !book.cover_thumb_path);
+  if (!pending.length) { toast("كل أغلفة الكتب الحالية محسّنة بالفعل."); return; }
+  const confirmed = await confirmDialog({
+   title: "تحسين أغلفة المكتبة الحالية",
+   message: "سيتم تنزيل الأغلفة الحالية وضغطها إلى نسختين WebP، ثم تحديث مساراتها وحذف الملفات الأصلية بعد نجاح التحديث. لن تتغير بيانات الكتب أو روابط التسليم.",
+   confirmText: "بدء التحسين"
+  });
+  if (!confirmed) return;
+  state.busy = true;
+  button.disabled = true;
+  let completed = 0, failed = 0;
+  try {
+   for (const book of pending) {
+    button.textContent = "تحسين " + (completed + failed + 1) + " / " + pending.length;
+    let uploaded = [];
+    try {
+     const response = await fetch(coverUrl(book.cover_path), { cache: "no-store" });
+     if (!response.ok) throw new Error("تعذر تنزيل الغلاف: " + book.title);
+     const source = await response.blob();
+     const variants = await uploadCoverVariants(book.id, source);
+     uploaded = variants.uploaded;
+     const { error } = await sb.from("books").update({
+      cover_path: variants.detailPath,
+      cover_thumb_path: variants.thumbPath,
+      updated_at: new Date().toISOString()
+     }).eq("id", book.id);
+     if (error) throw error;
+     const oldPaths = [book.cover_path, book.cover_thumb_path].filter(Boolean);
+     const cleanupError = await removeOldCoverPaths(oldPaths);
+     book.cover_path = variants.detailPath;
+     book.cover_thumb_path = variants.thumbPath;
+     completed++;
+     if (cleanupError) console.warn("Old book cover cleanup needs review:", book.id, cleanupError);
+    } catch (error) {
+     if (uploaded.length) await sb.storage.from("book-covers").remove(uploaded);
+     failed++;
+     console.error("Cover optimization failed for book:", book.id, error);
+    }
+   }
+   renderBooks();
+   toast("اكتمل تحسين " + completed + " غلاف" + (failed ? "، وتعذر تحسين " + failed : "") + ".");
+  } finally {
+   state.busy = false;
+   button.disabled = false;
+   button.textContent = "تحسين الأغلفة الحالية";
+  }
+ }
  function renderBooks(){
   const list=$("booksAdminList");
   if(!state.books.length){list.hidden=true;setState("booksAdminState","لا توجد كتب حتى الآن. أضف أول كتاب.");return}
   setState("booksAdminState","",true);list.hidden=false;
   list.innerHTML=state.books.map(book=>{
-   const url=coverUrl(book.cover_path);
+   const url=coverUrl(book.cover_thumb_path || book.cover_path);
    return '<article class="books-admin-book">'+(url?'<img src="'+esc(url)+'" alt="">':'<div class="books-admin-book-placeholder"><i class="fa-solid fa-book"></i></div>')+
     '<div class="books-admin-book-copy"><strong>'+esc(book.title)+'</strong><small>'+esc(book.category||"بدون تصنيف")+' · '+(book.is_free?"مجاني":esc(money(book.price)))+' · '+esc(({draft:"مسودة",published:"منشور",archived:"مؤرشف"})[book.status]||book.status)+'</small>'+
     '<div class="books-admin-book-actions"><button type="button" data-book-edit="'+esc(book.id)+'">تعديل</button><button type="button" data-book-delete="'+esc(book.id)+'">حذف</button></div></div></article>';
@@ -121,18 +217,29 @@
   const payload={title,author:$("booksAdminAuthor").value.trim(),category:$("booksAdminCategory").value.trim(),description:$("booksAdminDescription").value.trim(),features:$("booksAdminFeatures").value.split("\n").map(x=>x.trim()).filter(Boolean),price:isFree?0:Number($("booksAdminPrice").value),is_free:isFree,status,sort_order:Math.max(0,Number($("booksAdminSort").value)||0),updated_at:new Date().toISOString()};
   if(!isFree&&(!Number.isFinite(payload.price)||payload.price<=0)){toast("حدد سعرًا أكبر من صفر للكتاب المدفوع.");return}
   state.busy=true;const button=$("booksAdminSave");button.disabled=true;button.textContent="جاري الحفظ...";
-  let uploadedPath=null;
+  let uploaded=[];
   try{
-   if(file){const ext=({ "image/jpeg":"jpg","image/png":"png","image/webp":"webp" })[file.type];uploadedPath="covers/"+crypto.randomUUID()+"."+ext;const {error}=await sb.storage.from("book-covers").upload(uploadedPath,file,{contentType:file.type,upsert:false});if(error)throw error;payload.cover_path=uploadedPath}
+   if(file){
+    const variants=await uploadCoverVariants(id||crypto.randomUUID(),file);
+    uploaded=variants.uploaded;
+    payload.cover_path=variants.detailPath;
+    payload.cover_thumb_path=variants.thumbPath;
+   }
    let saved;
    if(id){const result=await sb.from("books").update(payload).eq("id",id).select("*").single();if(result.error)throw result.error;saved=result.data}
    else{const result=await sb.from("books").insert(payload).select("*").single();if(result.error)throw result.error;saved=result.data}
    if(telegram){const linkResult=await sb.from("book_delivery_links").upsert({book_id:saved.id,delivery_url:telegram,updated_at:new Date().toISOString()},{onConflict:"book_id"});if(linkResult.error)throw linkResult.error}
    else if(id){const removed=await sb.from("book_delivery_links").delete().eq("book_id",saved.id);if(removed.error)throw removed.error}
-   if(file&&existing?.cover_path)await sb.storage.from("book-covers").remove([existing.cover_path]);
-   toast("تم حفظ بيانات الكتاب.");closeForm();state.loaded=false;await loadAll(true);
-  }catch(error){if(uploadedPath)await sb.storage.from("book-covers").remove([uploadedPath]);console.error("Book save failed:",error);toast(error.message||"تعذر حفظ الكتاب.")}
-  finally{state.busy=false;button.disabled=false;button.textContent="حفظ الكتاب"}
+   if(file&&existing){
+    const cleanupError=await removeOldCoverPaths([existing.cover_path,existing.cover_thumb_path]);
+    if(cleanupError)console.warn("Previous cover cleanup failed:",saved.id,cleanupError);
+   }
+   toast("تم حفظ الكتاب وضغط غلافي العرض والتفاصيل.");
+   closeForm();state.loaded=false;await loadAll(true);
+  }catch(error){
+   if(uploaded.length)await sb.storage.from("book-covers").remove(uploaded);
+   console.error("Book save failed:",error);toast(error.message||"تعذر حفظ الكتاب.")
+  }finally{state.busy=false;button.disabled=false;button.textContent="حفظ الكتاب"}
  }
  async function deleteBook(id,button){
   const book=state.books.find(item=>item.id===id);
@@ -154,8 +261,8 @@
     throw deleteError;
    }
    let coverCleanupFailed=false;
-   if(book.cover_path){
-    const {error:storageError}=await sb.storage.from("book-covers").remove([book.cover_path]);
+   if(book.cover_path || book.cover_thumb_path){
+    const {error:storageError}=await sb.storage.from("book-covers").remove([book.cover_path,book.cover_thumb_path].filter(Boolean));
     if(storageError){coverCleanupFailed=true;console.error("Deleted book cover cleanup failed:",storageError)}
    }
    state.books=state.books.filter(item=>item.id!==id);
@@ -203,6 +310,7 @@
   if(!status.authenticated||!status.isAdmin)return;
   await loadAll(true);
   $("booksNewBtn").addEventListener("click",()=>openForm());
+  $("booksCoversOptimizeBtn").addEventListener("click",optimizeExistingCovers);
   $("booksAdminClose").addEventListener("click",closeForm);$("booksAdminCancel").addEventListener("click",closeForm);
   $("booksAdminModal").addEventListener("click",event=>{if(event.target===$("booksAdminModal"))closeForm()});
   $("booksAdminForm").addEventListener("submit",saveBook);
