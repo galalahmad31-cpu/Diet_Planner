@@ -514,11 +514,19 @@ async function loadFixedDietDetails(dietId){
   items=itemResult.data||[];
  }
 
+ // Group items once instead of scanning the complete item list for every meal.
+ const itemsByMeal=new Map();
+ items.forEach(item=>{
+  const group=itemsByMeal.get(item.meal_id)||[];
+  group.push(item);
+  itemsByMeal.set(item.meal_id,group);
+ });
+
  return {
   id:dietId,
   meals:meals.map(m=>({
    name:m.meal_name||'وجبة',
-   items:items.filter(i=>i.meal_id===m.id).map(i=>({
+   items:(itemsByMeal.get(m.id)||[]).map(i=>({
     foodId:String(i.food_id),
     grams:Number(i.quantity_g)||0,
     notes:i.notes??'',
