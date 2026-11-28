@@ -3,7 +3,8 @@
   const access = window.DietPlannerAccess;
   const sb = access?.supabaseClient;
   const $ = (id) => document.getElementById(id);
-  const state = { books: [], settings: null, user: null, activeBook: null };
+  const PAGE_SIZE = 20;
+  const state = { books: [], settings: null, user: null, activeBook: null, offset: 0, hasMore: false, loading: false, searchTimer: null };
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[ch]));
   const money = value => Number(value || 0).toLocaleString("ar-EG",{maximumFractionDigits:2}) + " جنيه";
   const coverUrl = path => path ? sb.storage.from("book-covers").getPublicUrl(path).data.publicUrl : "";
@@ -18,9 +19,9 @@
     $("booksCount").textContent = rows.length + " كتاب";
     $("booksEmpty").hidden = rows.length > 0;
     $("booksGrid").innerHTML = rows.map(book => {
-      const image = coverUrl(book.cover_path);
+      const image = coverUrl(book.cover_thumb_path || book.cover_path);
       return '<article class="book-card"><div class="book-cover">' +
-        (image ? '<img src="' + esc(image) + '" alt="غلاف ' + esc(book.title) + '" loading="lazy">' : '<div class="book-cover-placeholder"><i class="fa-solid fa-book-open"></i></div>') +
+        (image ? '<img src="' + esc(image) + '" alt="غلاف ' + esc(book.title) + '" loading="lazy" decoding="async" fetchpriority="low">' : '<div class="book-cover-placeholder"><i class="fa-solid fa-book-open"></i></div>') +
         '<span class="book-price-tag">' + (book.is_free ? "مجاني" : esc(money(book.price))) + '</span></div>' +
         '<div class="book-card-copy"><span class="book-category">' + esc(book.category || "مرجع علمي") + '</span><h3>' + esc(book.title) + '</h3>' +
         (book.author ? '<span class="book-author">' + esc(book.author) + '</span>' : '<span class="book-author">Diet Planner</span>') +
@@ -127,33 +128,79 @@
     if (!book) return;
     renderBookDetails(book);
   }
+  async function loadCatalog(reset = true) {
+    if (!sb || state.loading) return;
+    if (reset) {
+      state.offset = 0;
+      state.hasMore = false;
+      state.books = [];
+      $("booksGrid").innerHTML = '<div class="books-state"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الكتب...</div>';
+      $("booksLoadMore").hidden = true;
+    }
+    state.loading = true;
+    const button = $("booksLoadMore");
+    if (button) { button.disabled = true; button.textContent = "جاري التحميل..."; }
+    try {
+      let query = sb.from("books")
+        .select("id,title,author,category,description,features,price,is_free,cover_path,cover_thumb_path")
+        .eq("status", "published")
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: true })
+        .range(state.offset, state.offset + PAGE_SIZE - 1);
+      const search = $("booksSearch").value.trim();
+      const category = $("booksCategory").value;
+      if (search) {
+        const safe = search.replace(/[,%()]/g, " ").trim();
+        if (safe) query = query.or("title.ilike.%"+safe+"%,author.ilike.%"+safe+"%,description.ilike.%"+safe+"%");
+      }
+      if (category) query = query.eq("category", category);
+      const { data, error } = await query;
+      if (error) throw error;
+      const page = data || [];
+      state.books = reset ? page : state.books.concat(page);
+      state.offset += page.length;
+      state.hasMore = page.length === PAGE_SIZE;
+      render();
+      $("booksCount").textContent = "تم عرض " + state.books.length + (state.hasMore ? "+ كتاب" : " كتاب");
+      $("booksLoadMore").hidden = !state.hasMore;
+    } catch (error) {
+      console.error("Public books catalog page failed:", error);
+      if (reset) showCatalogError("تعذر تحميل الكتب حاليًا. حاول تحديث الصفحة.");
+      else $("booksLoadMore").textContent = "تعذر التحميل — حاول مرة أخرى";
+    } finally {
+      state.loading = false;
+      if (button) { button.disabled = false; button.textContent = "عرض المزيد"; }
+    }
+  }
   async function initialize() {
     if (!sb) { showCatalogError("تعذر الاتصال بالمكتبة حاليًا."); return; }
     try {
-      const [booksResult,settingsResult,user] = await Promise.all([
-        sb.from("books").select("id,title,author,category,description,features,price,is_free,cover_path").eq("status","published").order("sort_order",{ascending:true}).order("created_at",{ascending:false}),
+      const [settingsResult, user, categoriesResult] = await Promise.all([
         sb.from("book_store_settings").select("payment_method,payment_details,payment_instructions").eq("id",true).maybeSingle(),
-        access?.getCurrentUser?.() || Promise.resolve(null)
+        access?.getCurrentUser?.() || Promise.resolve(null),
+        sb.rpc("get_published_book_categories")
       ]);
-      if (booksResult.error) throw booksResult.error;
-      state.books = booksResult.data || [];
       if (settingsResult.error) {
         console.warn("Book store settings unavailable; catalog remains available:", settingsResult.error);
         state.settings = {};
-      } else {
-        state.settings = settingsResult.data || {};
-      }
+      } else state.settings = settingsResult.data || {};
+      if (categoriesResult.error) throw categoriesResult.error;
       state.user = user;
-      const categories = [...new Set(state.books.map(book => book.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
+      const categories = (categoriesResult.data || []).map(row => row.category).filter(Boolean);
       $("booksCategory").innerHTML = '<option value="">كل التصنيفات</option>' + categories.map(category => '<option value="' + esc(category) + '">' + esc(category) + '</option>').join("");
-      render();
+      await loadCatalog(true);
     } catch (error) {
       console.error("Public books catalog failed:",error);
       showCatalogError("تعذر تحميل الكتب حاليًا. حاول تحديث الصفحة.");
     }
   }
-  $("booksSearch").addEventListener("input",render);
-  $("booksCategory").addEventListener("change",render);
+  $("booksSearch").addEventListener("input", () => {
+    clearTimeout(state.searchTimer);
+    state.searchTimer = setTimeout(() => loadCatalog(true), 250);
+  });
+  $("booksCategory").addEventListener("change", () => loadCatalog(true));
+  $("booksLoadMore").addEventListener("click", () => loadCatalog(false));
   $("booksGrid").addEventListener("click",event=>{const button=event.target.closest("[data-book-view]");if(button)openBook(button.dataset.bookView)});
   $("bookModalClose").addEventListener("click",closeModal);
   $("bookModalBackdrop").addEventListener("click",event=>{if(event.target===$("bookModalBackdrop"))closeModal()});
