@@ -57,7 +57,7 @@ async function loadPatient(){
  if(!user){location.href='index.html';return false;}
  const resolvedPatientId=patientId||window.currentPatientId;
  if(!resolvedPatientId){showToast('لم يتم تحديد المريض','error');return false;}
- const {data:p,error}=await sb.from('patients').select('*').eq('id',resolvedPatientId).maybeSingle();
+ const {data:p,error}=await sb.from('patients').select('user_id,energy_target_calories,energy_target_protein,energy_target_carb,energy_target_fat').eq('id',resolvedPatientId).maybeSingle();
  const role=await window.DietPlannerAccess?.getUserRole?.(user.id);
   const hasCareManagementAccess = window.DietPlannerPatientProfileAccess?.canManagePatientCare?.() === true;
   if(error||!p||(p.user_id!==user.id&&role!=='admin'&&!hasCareManagementAccess)){showToast('تعذر تحميل ملف المريض أو لا تملك صلاحية الوصول إليه','error');return false;}
