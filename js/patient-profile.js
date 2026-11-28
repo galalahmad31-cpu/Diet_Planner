@@ -1408,11 +1408,43 @@
   function loadNutritionSupportFrame() {
     const frame = $('nutritionSupportFrame');
     const id = state.patient?.id || patientId;
-    if (!frame || !id || frame.dataset.loaded === 'true') return;
-    try { sessionStorage.setItem('dpNutritionSupportPatientId', id); } catch (_) {}
+    if (!frame || !id || frame.dataset.loaded === 'true' || frame.dataset.loading === 'true') return;
+
+    if (frame.dataset.lifecycleBound !== 'true') {
+      frame.addEventListener('load', () => {
+        let pageReady = false;
+        try {
+          pageReady = Boolean(frame.contentDocument?.querySelector('#selectedPatientName'));
+        } catch (_) {
+          pageReady = false;
+        }
+        frame.dataset.loading = 'false';
+        frame.dataset.loaded = String(pageReady);
+        if (!pageReady) {
+          frame.removeAttribute('src');
+          console.error('Nutrition support iframe loaded without its expected page root.');
+        }
+      });
+      frame.addEventListener('error', () => {
+        frame.dataset.loading = 'false';
+        frame.dataset.loaded = 'false';
+        console.error('Nutrition support iframe navigation failed.');
+      });
+      frame.dataset.lifecycleBound = 'true';
+    }
+
+    const target = new URL('nutritionsupport-patient.html', window.location.href);
+    target.searchParams.set('patient', String(id));
+    target.searchParams.set('embed', '1');
+    if (target.origin !== window.location.origin) {
+      console.error('Nutrition support iframe URL must remain same-origin.');
+      return;
+    }
+
     frame.style.height = '720px';
-    frame.src = `nutritionsupport-patient.html?patient=${encodeURIComponent(id)}&embed=1`;
-    frame.dataset.loaded = 'true';
+    frame.dataset.loading = 'true';
+    frame.dataset.loaded = 'false';
+    frame.src = target.href;
   }
 
   function bindPatientModuleTabs() {
