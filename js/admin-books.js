@@ -57,7 +57,9 @@
    context.drawImage(bitmap, 0, 0, width, height);
    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", quality));
    if (!blob) throw new Error("تعذر ضغط صورة الغلاف.");
-   return { blob, extension: blob.type === "image/webp" ? "webp" : "jpg", contentType: blob.type || "image/jpeg" };
+   const contentType = blob.type || "image/jpeg";
+   const extension = contentType === "image/webp" ? "webp" : contentType === "image/png" ? "png" : "jpg";
+   return { blob, extension, contentType };
   };
   try {
    const [thumbnail, detail] = await Promise.all([make(320, 420, 0.74), make(720, 960, 0.82)]);
@@ -103,7 +105,7 @@
   if (!confirmed) return;
   state.busy = true;
   button.disabled = true;
-  let completed = 0, failed = 0;
+  let completed = 0, failed = 0, cleanupFailed = 0;
   try {
    for (const book of pending) {
     button.textContent = "تحسين " + (completed + failed + 1) + " / " + pending.length;
@@ -125,7 +127,7 @@
      book.cover_path = variants.detailPath;
      book.cover_thumb_path = variants.thumbPath;
      completed++;
-     if (cleanupError) console.warn("Old book cover cleanup needs review:", book.id, cleanupError);
+     if (cleanupError) { cleanupFailed++; console.warn("Old book cover cleanup needs review:", book.id, cleanupError); }
     } catch (error) {
      if (uploaded.length) await sb.storage.from("book-covers").remove(uploaded);
      failed++;
@@ -133,7 +135,7 @@
     }
    }
    renderBooks();
-   toast("اكتمل تحسين " + completed + " غلاف" + (failed ? "، وتعذر تحسين " + failed : "") + ".");
+   toast("اكتمل تحسين " + completed + " غلاف" + (failed ? "، وتعذر تحسين " + failed : "") + (cleanupFailed ? "، وبقيت " + cleanupFailed + " ملفات قديمة تحتاج حذفًا" : "") + ".");
   } finally {
    state.busy = false;
    button.disabled = false;
